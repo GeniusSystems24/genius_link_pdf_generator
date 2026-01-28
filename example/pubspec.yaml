@@ -1,0 +1,53 @@
+name: genius_pdf_example
+description: Example app demonstrating genius_link_pdf_generator features.
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  genius_link_pdf_generator:
+    path: ../
+  cupertino_icons: ^1.0.8
+  logger: ^2.6.1
+  flutter_syntax_view: ^4.1.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/fonts/
+    - assets/fonts/din/
+    - assets/fonts/hacen/
+    - assets/fonts/cairo/
+    - assets/fonts/open_sans/
+    - assets/images/
+
+  fonts:
+    - family: hacen
+      fonts:
+        - asset: assets/fonts/hacen/hacenTunisia.ttf
+    - family: cairo
+      fonts:
+        - asset: assets/fonts/cairo/cairoRegular.ttf
+        - asset: assets/fonts/cairo/tahoma.ttf
+    - family: OpenSans
+      fonts:
+        - asset: assets/fonts/open_sans/OpenSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/open_sans/OpenSans-Regular.ttf
+          weight: 400
+    - family: din
+      fonts:
+        - asset: assets/fonts/din/din.ttf
+        - asset: assets/fonts/din/din_bold.ttf
+          weight: 700
