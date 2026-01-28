@@ -745,3 +745,471 @@ class GeniusPdfQRCodeGenerator {
     return base64.encode(buffer);
   }
 }
+
+// ============================================================================
+// GeniusBarcodeValidator - Barcode Data Validation
+// ============================================================================
+
+/// Validates barcode data for different formats.
+class GeniusBarcodeValidator {
+  /// Validates data for the given barcode type.
+  static GeniusBarcodeValidationResult validate({
+    required String data,
+    required GeniusBarcodeType type,
+  }) {
+    switch (type) {
+      case GeniusBarcodeType.ean13:
+        return _validateEan13(data);
+      case GeniusBarcodeType.ean8:
+        return _validateEan8(data);
+      case GeniusBarcodeType.upcA:
+        return _validateUpcA(data);
+      case GeniusBarcodeType.code128:
+        return _validateCode128(data);
+      case GeniusBarcodeType.code39:
+        return _validateCode39(data);
+      case GeniusBarcodeType.itf:
+        return _validateItf(data);
+      case GeniusBarcodeType.qrCode:
+        return _validateQrCode(data);
+      case GeniusBarcodeType.dataMatrix:
+        return _validateDataMatrix(data);
+      case GeniusBarcodeType.pdf417:
+        return _validatePdf417(data);
+    }
+  }
+
+  static GeniusBarcodeValidationResult _validateEan13(String data) {
+    // EAN-13: exactly 12 or 13 digits (12 if no check digit)
+    if (!RegExp(r'^\d{12,13}$').hasMatch(data)) {
+      return GeniusBarcodeValidationResult.invalid(
+        'EAN-13 requires exactly 12 or 13 digits',
+        'رمز EAN-13 يتطلب 12 أو 13 رقم بالضبط',
+      );
+    }
+    if (data.length == 13 && !_verifyCheckDigit(data, 13)) {
+      return GeniusBarcodeValidationResult.invalid(
+        'Invalid EAN-13 check digit',
+        'رقم التحقق غير صحيح لـ EAN-13',
+      );
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+
+  static GeniusBarcodeValidationResult _validateEan8(String data) {
+    // EAN-8: exactly 7 or 8 digits
+    if (!RegExp(r'^\d{7,8}$').hasMatch(data)) {
+      return GeniusBarcodeValidationResult.invalid(
+        'EAN-8 requires exactly 7 or 8 digits',
+        'رمز EAN-8 يتطلب 7 أو 8 أرقام بالضبط',
+      );
+    }
+    if (data.length == 8 && !_verifyCheckDigit(data, 8)) {
+      return GeniusBarcodeValidationResult.invalid(
+        'Invalid EAN-8 check digit',
+        'رقم التحقق غير صحيح لـ EAN-8',
+      );
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+
+  static GeniusBarcodeValidationResult _validateUpcA(String data) {
+    // UPC-A: exactly 11 or 12 digits
+    if (!RegExp(r'^\d{11,12}$').hasMatch(data)) {
+      return GeniusBarcodeValidationResult.invalid(
+        'UPC-A requires exactly 11 or 12 digits',
+        'رمز UPC-A يتطلب 11 أو 12 رقم بالضبط',
+      );
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+
+  static GeniusBarcodeValidationResult _validateCode128(String data) {
+    // Code128: ASCII characters 0-127
+    if (data.isEmpty) {
+      return GeniusBarcodeValidationResult.invalid(
+        'Code128 requires at least one character',
+        'رمز Code128 يتطلب حرف واحد على الأقل',
+      );
+    }
+    for (final char in data.codeUnits) {
+      if (char > 127) {
+        return GeniusBarcodeValidationResult.invalid(
+          'Code128 only supports ASCII characters',
+          'رمز Code128 يدعم حروف ASCII فقط',
+        );
+      }
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+
+  static GeniusBarcodeValidationResult _validateCode39(String data) {
+    // Code39: A-Z, 0-9, -, ., $, /, +, %, space
+    if (data.isEmpty) {
+      return GeniusBarcodeValidationResult.invalid(
+        'Code39 requires at least one character',
+        'رمز Code39 يتطلب حرف واحد على الأقل',
+      );
+    }
+    if (!RegExp(r'^[A-Z0-9\-\.\$\/\+\%\s]+$').hasMatch(data.toUpperCase())) {
+      return GeniusBarcodeValidationResult.invalid(
+        'Code39 only supports A-Z, 0-9, and special characters (- . \$ / + %)',
+        'رمز Code39 يدعم A-Z و 0-9 والرموز الخاصة فقط',
+      );
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+
+  static GeniusBarcodeValidationResult _validateItf(String data) {
+    // ITF: even number of digits
+    if (!RegExp(r'^\d+$').hasMatch(data)) {
+      return GeniusBarcodeValidationResult.invalid(
+        'ITF requires only digits',
+        'رمز ITF يتطلب أرقام فقط',
+      );
+    }
+    if (data.length < 2 || data.length % 2 != 0) {
+      return GeniusBarcodeValidationResult.invalid(
+        'ITF requires an even number of digits (minimum 2)',
+        'رمز ITF يتطلب عدد زوجي من الأرقام (حد أدنى 2)',
+      );
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+
+  static GeniusBarcodeValidationResult _validateQrCode(String data) {
+    // QR Code: up to 4296 alphanumeric or 7089 numeric characters
+    if (data.isEmpty) {
+      return GeniusBarcodeValidationResult.invalid(
+        'QR Code requires at least one character',
+        'رمز QR يتطلب حرف واحد على الأقل',
+      );
+    }
+    if (data.length > 4296) {
+      return GeniusBarcodeValidationResult.invalid(
+        'QR Code data exceeds maximum length (4296 characters)',
+        'بيانات رمز QR تتجاوز الحد الأقصى (4296 حرف)',
+      );
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+
+  static GeniusBarcodeValidationResult _validateDataMatrix(String data) {
+    // DataMatrix: up to 2335 alphanumeric or 3116 numeric characters
+    if (data.isEmpty) {
+      return GeniusBarcodeValidationResult.invalid(
+        'DataMatrix requires at least one character',
+        'رمز DataMatrix يتطلب حرف واحد على الأقل',
+      );
+    }
+    if (data.length > 2335) {
+      return GeniusBarcodeValidationResult.invalid(
+        'DataMatrix data exceeds maximum length (2335 characters)',
+        'بيانات DataMatrix تتجاوز الحد الأقصى (2335 حرف)',
+      );
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+
+  static GeniusBarcodeValidationResult _validatePdf417(String data) {
+    // PDF417: up to 1850 text characters
+    if (data.isEmpty) {
+      return GeniusBarcodeValidationResult.invalid(
+        'PDF417 requires at least one character',
+        'رمز PDF417 يتطلب حرف واحد على الأقل',
+      );
+    }
+    if (data.length > 1850) {
+      return GeniusBarcodeValidationResult.invalid(
+        'PDF417 data exceeds maximum length (1850 characters)',
+        'بيانات PDF417 تتجاوز الحد الأقصى (1850 حرف)',
+      );
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+
+  /// Verifies check digit for EAN/UPC barcodes.
+  static bool _verifyCheckDigit(String data, int length) {
+    int sum = 0;
+    for (int i = 0; i < length - 1; i++) {
+      final digit = int.parse(data[i]);
+      sum += digit * (i % 2 == 0 ? 1 : 3);
+    }
+    final checkDigit = (10 - (sum % 10)) % 10;
+    return checkDigit == int.parse(data[length - 1]);
+  }
+
+  /// Calculates check digit for EAN-13.
+  static String calculateEan13CheckDigit(String data12) {
+    if (data12.length != 12) return '';
+    int sum = 0;
+    for (int i = 0; i < 12; i++) {
+      final digit = int.parse(data12[i]);
+      sum += digit * (i % 2 == 0 ? 1 : 3);
+    }
+    final checkDigit = (10 - (sum % 10)) % 10;
+    return '$data12$checkDigit';
+  }
+}
+
+/// Result of barcode validation.
+class GeniusBarcodeValidationResult {
+  const GeniusBarcodeValidationResult._({
+    required this.isValid,
+    this.errorMessage,
+    this.errorMessageAr,
+  });
+
+  /// Creates a valid result.
+  factory GeniusBarcodeValidationResult.valid() {
+    return const GeniusBarcodeValidationResult._(isValid: true);
+  }
+
+  /// Creates an invalid result with error message.
+  factory GeniusBarcodeValidationResult.invalid(
+      String message, String messageAr) {
+    return GeniusBarcodeValidationResult._(
+      isValid: false,
+      errorMessage: message,
+      errorMessageAr: messageAr,
+    );
+  }
+
+  /// Whether the data is valid.
+  final bool isValid;
+
+  /// Error message in English.
+  final String? errorMessage;
+
+  /// Error message in Arabic.
+  final String? errorMessageAr;
+
+  /// Gets error message based on locale.
+  String? getErrorMessage({bool isRTL = false}) {
+    return isRTL ? errorMessageAr : errorMessage;
+  }
+}
+
+// ============================================================================
+// GeniusBarcodeGroup - Multiple Barcodes in a Row/Column
+// ============================================================================
+
+/// Layout direction for barcode groups.
+enum GeniusBarcodeGroupLayout {
+  /// Arrange barcodes horizontally.
+  horizontal,
+
+  /// Arrange barcodes vertically.
+  vertical,
+
+  /// Grid layout with specified columns.
+  grid,
+}
+
+/// A group of barcodes arranged in a layout.
+class GeniusBarcodeGroup {
+  GeniusBarcodeGroup({
+    required this.barcodes,
+    this.layout = GeniusBarcodeGroupLayout.horizontal,
+    this.spacing = 16.0,
+    this.gridColumns = 2,
+    this.groupTitle,
+    this.groupTitleAr,
+    required this.baseFont,
+    this.boldFont,
+    this.isRTL = true,
+  });
+
+  /// List of barcodes to display.
+  final List<GeniusPdfBarcode> barcodes;
+
+  /// Layout direction.
+  final GeniusBarcodeGroupLayout layout;
+
+  /// Spacing between barcodes.
+  final double spacing;
+
+  /// Number of columns for grid layout.
+  final int gridColumns;
+
+  /// Group title in English.
+  final String? groupTitle;
+
+  /// Group title in Arabic.
+  final String? groupTitleAr;
+
+  /// Base font for title.
+  final PdfFont baseFont;
+
+  /// Bold font for title.
+  final PdfFont? boldFont;
+
+  /// RTL mode.
+  final bool isRTL;
+
+  /// Gets display title based on locale.
+  String? getTitle() {
+    if (isRTL && groupTitleAr != null) return groupTitleAr;
+    return groupTitle;
+  }
+
+  /// Draws the barcode group on a PDF page.
+  Rect draw({
+    required PdfPage page,
+    required Rect bounds,
+  }) {
+    final graphics = page.graphics;
+    double currentY = bounds.top;
+    double currentX = bounds.left;
+
+    // Draw title if present
+    final title = getTitle();
+    if (title != null) {
+      final titleFont = boldFont ?? baseFont;
+      graphics.drawString(
+        title,
+        titleFont,
+        brush: PdfBrushes.black,
+        bounds: Rect.fromLTWH(bounds.left, currentY, bounds.width, 20),
+        format: PdfStringFormat(
+          alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+          textDirection:
+              isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+        ),
+      );
+      currentY += 24;
+    }
+
+    switch (layout) {
+      case GeniusBarcodeGroupLayout.horizontal:
+        return _drawHorizontal(page, Rect.fromLTWH(bounds.left, currentY, bounds.width, bounds.height - (currentY - bounds.top)));
+      case GeniusBarcodeGroupLayout.vertical:
+        return _drawVertical(page, Rect.fromLTWH(bounds.left, currentY, bounds.width, bounds.height - (currentY - bounds.top)));
+      case GeniusBarcodeGroupLayout.grid:
+        return _drawGrid(page, Rect.fromLTWH(bounds.left, currentY, bounds.width, bounds.height - (currentY - bounds.top)));
+    }
+  }
+
+  Rect _drawHorizontal(PdfPage page, Rect bounds) {
+    final itemWidth = (bounds.width - (spacing * (barcodes.length - 1))) / barcodes.length;
+    double maxHeight = 0;
+
+    for (int i = 0; i < barcodes.length; i++) {
+      final x = bounds.left + (itemWidth + spacing) * i;
+      final result = barcodes[i].draw(
+        page: page,
+        bounds: Rect.fromLTWH(x, bounds.top, itemWidth, bounds.height),
+      );
+      if (result.height > maxHeight) {
+        maxHeight = result.height;
+      }
+    }
+
+    return Rect.fromLTWH(bounds.left, bounds.top, bounds.width, maxHeight);
+  }
+
+  Rect _drawVertical(PdfPage page, Rect bounds) {
+    double currentY = bounds.top;
+
+    for (int i = 0; i < barcodes.length; i++) {
+      final result = barcodes[i].draw(
+        page: page,
+        bounds: Rect.fromLTWH(bounds.left, currentY, bounds.width, bounds.height - (currentY - bounds.top)),
+      );
+      currentY += result.height + spacing;
+    }
+
+    return Rect.fromLTWH(bounds.left, bounds.top, bounds.width, currentY - bounds.top - spacing);
+  }
+
+  Rect _drawGrid(PdfPage page, Rect bounds) {
+    final cols = gridColumns.clamp(1, barcodes.length);
+    final rows = (barcodes.length / cols).ceil();
+    final itemWidth = (bounds.width - (spacing * (cols - 1))) / cols;
+    final itemHeight = 100.0; // Estimated height per barcode
+
+    double maxY = bounds.top;
+
+    for (int i = 0; i < barcodes.length; i++) {
+      final row = i ~/ cols;
+      final col = i % cols;
+      final x = bounds.left + (itemWidth + spacing) * col;
+      final y = bounds.top + (itemHeight + spacing) * row;
+
+      final result = barcodes[i].draw(
+        page: page,
+        bounds: Rect.fromLTWH(x, y, itemWidth, itemHeight),
+      );
+
+      if (y + result.height > maxY) {
+        maxY = y + result.height;
+      }
+    }
+
+    return Rect.fromLTWH(bounds.left, bounds.top, bounds.width, maxY - bounds.top);
+  }
+}
+
+// ============================================================================
+// GeniusBarcodeGenerator - Utility for Batch Generation
+// ============================================================================
+
+/// Utility class for generating multiple barcodes.
+class GeniusBarcodeGenerator {
+  /// Generates a sequence of barcodes with incrementing data.
+  static List<GeniusPdfBarcode> generateSequence({
+    required String prefix,
+    required int start,
+    required int count,
+    required GeniusBarcodeType type,
+    int padLength = 6,
+    GeniusPdfBarcodeStyle style = const GeniusPdfBarcodeStyle(),
+    required PdfFont baseFont,
+    PdfFont? boldFont,
+    bool isRTL = true,
+  }) {
+    return List.generate(count, (i) {
+      final number = (start + i).toString().padLeft(padLength, '0');
+      final data = '$prefix$number';
+      return GeniusPdfBarcode(
+        data: data,
+        type: type,
+        style: style,
+        baseFont: baseFont,
+        boldFont: boldFont,
+        isRTL: isRTL,
+      );
+    });
+  }
+
+  /// Generates barcodes from a list of data.
+  static List<GeniusPdfBarcode> fromDataList({
+    required List<String> dataList,
+    required GeniusBarcodeType type,
+    GeniusPdfBarcodeStyle style = const GeniusPdfBarcodeStyle(),
+    required PdfFont baseFont,
+    PdfFont? boldFont,
+    bool isRTL = true,
+  }) {
+    return dataList
+        .map((data) => GeniusPdfBarcode(
+              data: data,
+              type: type,
+              style: style,
+              baseFont: baseFont,
+              boldFont: boldFont,
+              isRTL: isRTL,
+            ))
+        .toList();
+  }
+
+  /// Validates all data in a list before generating barcodes.
+  static List<GeniusBarcodeValidationResult> validateDataList({
+    required List<String> dataList,
+    required GeniusBarcodeType type,
+  }) {
+    return dataList
+        .map((data) => GeniusBarcodeValidator.validate(data: data, type: type))
+        .toList();
+  }
+}

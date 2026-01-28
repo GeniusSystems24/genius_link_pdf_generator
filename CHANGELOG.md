@@ -5,6 +5,144 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.3+4] - 2026-01-28
+
+### Added
+
+#### Enhanced Printing Service (`GeniusPrinterService`)
+- **PDF Sharing** - Share PDF documents via system share sheet
+  - `sharePdf()` - Share using share_plus with subject and text
+  - `sharePdfNative()` - Share using printing package's native share
+  - `savePdfToFile()` - Save PDF to documents directory or custom path
+  - `GeniusPdfShareResult` - Result class for share operations
+- **PDF Rasterization** - Convert PDF pages to images
+  - `rasterPdf()` - Convert all or specific pages to PNG images
+  - `getPageImage()` - Get a single page as an image
+  - `generateThumbnail()` - Generate a thumbnail for the first page
+  - `convertPdfToHtml()` - Convert PDF to HTML with embedded images
+  - `GeniusPdfRasterResult` - Result class with page images, DPI, and format
+  - `GeniusRasterFormat` - PNG or JPEG format options
+- **Platform Capabilities** - Check available features
+  - `isPrintingAvailable()` - Check if printing is supported
+  - `isSharingAvailable()` - Check if sharing is supported
+  - `isRasterAvailable()` - Check if rasterization is supported
+  - `getPrintingInfo()` - Get detailed platform printing info
+- **Extension Methods** - Easy-to-use extensions on `Uint8List`
+  - `.share()` - Share PDF bytes
+  - `.saveToFile()` - Save PDF bytes to file
+  - `.toImages()` - Convert PDF bytes to images
+  - `.toThumbnail()` - Generate thumbnail from PDF bytes
+
+#### Enhanced Printer Discovery (`GeniusPrinterDiscovery`)
+- **Filtered Printer Lists** - Get printers by category
+  - `availablePrinters` - Only ready printers
+  - `networkPrinters` - Network-connected printers
+  - `usbPrinters` - USB-connected printers
+  - `bluetoothPrinters` - Bluetooth-connected printers
+  - `colorPrinters` - Printers that support color
+  - `duplexPrinters` - Printers that support duplex
+- **Printing Capabilities** - `GeniusPrintingCapabilities` class
+  - Detect available features (print, share, raster, list printers, direct print)
+  - Bilingual summary text (English/Arabic)
+- **Discovery Extensions** - Enhanced discovery methods
+  - `discoverPrintersWithDetails()` - Get full discovery result
+  - `getCapabilities()` - Get platform capabilities
+
+#### Enhanced Print Preview (`GeniusPrintPreviewEnhanced`)
+- **Share Button** - Share PDF directly from preview
+- **Save Button** - Save PDF to file from preview
+- **Processing Overlay** - Visual feedback during operations
+- **Bilingual Messages** - Arabic/English status messages
+- **Dialog Helper** - `GeniusPrintPreviewEnhancedDialog.show()`
+
+#### Barcode Validation (`GeniusBarcodeValidator`)
+- Validate barcode data before generation
+- Support for all barcode types (EAN-13, EAN-8, UPC-A, Code128, Code39, ITF, QR, DataMatrix, PDF417)
+- `GeniusBarcodeValidationResult` - Result with bilingual error messages
+- Check digit verification for EAN/UPC barcodes
+- `calculateEan13CheckDigit()` - Calculate check digit for EAN-13
+
+#### Barcode Groups (`GeniusBarcodeGroup`)
+- Arrange multiple barcodes in layouts
+- `GeniusBarcodeGroupLayout` - horizontal, vertical, grid
+- Configurable spacing and grid columns
+- Group title support (bilingual)
+
+#### Barcode Batch Generation (`GeniusBarcodeGenerator`)
+- `generateSequence()` - Generate barcodes with incrementing numbers
+- `fromDataList()` - Generate barcodes from a list of data
+- `validateDataList()` - Validate all data before generation
+
+### Example
+
+```dart
+// Share a PDF
+final shareResult = await GeniusPrinterService.instance.sharePdf(
+  pdfBytes: pdfBytes,
+  fileName: 'invoice.pdf',
+  subject: 'Invoice #123',
+  text: 'Please find attached your invoice.',
+);
+
+// Convert PDF to images
+final images = await GeniusPrinterService.instance.rasterPdf(
+  pdfBytes: pdfBytes,
+  dpi: 150,
+  onProgress: (current, total) => print('Page $current of $total'),
+);
+
+// Save PDF to file
+final saveResult = await GeniusPrinterService.instance.savePdfToFile(
+  pdfBytes: pdfBytes,
+  fileName: 'report.pdf',
+);
+
+// Validate barcode data
+final validation = GeniusBarcodeValidator.validate(
+  data: '5901234123457',
+  type: GeniusBarcodeType.ean13,
+);
+if (!validation.isValid) {
+  print('Error: ${validation.getErrorMessage(isRTL: true)}');
+}
+
+// Generate a sequence of barcodes
+final barcodes = GeniusBarcodeGenerator.generateSequence(
+  prefix: 'SKU-',
+  start: 1,
+  count: 10,
+  type: GeniusBarcodeType.code128,
+  baseFont: config.baseFont,
+);
+
+// Group barcodes in a grid
+final group = GeniusBarcodeGroup(
+  barcodes: barcodes,
+  layout: GeniusBarcodeGroupLayout.grid,
+  gridColumns: 3,
+  groupTitle: 'Product Barcodes',
+  groupTitleAr: 'باركودات المنتجات',
+  baseFont: config.baseFont,
+);
+group.draw(page: page, bounds: bounds);
+
+// Use enhanced preview with share/save
+await GeniusPrintPreviewEnhancedDialog.show(
+  context: context,
+  pdfBytes: pdfBytes,
+  documentName: 'Invoice_001',
+  showShareButton: true,
+  showSaveButton: true,
+);
+
+// Use extension methods
+await pdfBytes.share(fileName: 'document.pdf');
+await pdfBytes.saveToFile(fileName: 'document.pdf');
+final thumbnail = await pdfBytes.toThumbnail(dpi: 72);
+```
+
+---
+
 ## [2.3.3+3] - 2026-01-27
 
 ### Added

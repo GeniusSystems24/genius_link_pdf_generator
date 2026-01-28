@@ -1,6 +1,12 @@
 /// Printer Discovery Service
 ///
 /// Discovers available printers on the network and system.
+///
+/// This service provides:
+/// - System printer discovery
+/// - Printer status monitoring
+/// - Caching for efficient discovery
+/// - Platform-specific printer detection
 library;
 
 import 'dart:async';
@@ -180,4 +186,120 @@ class GeniusPrinterDiscoveryResult {
   /// Default printer (if any)
   GeniusPrinterInfo? get defaultPrinter =>
       printers.where((p) => p.isDefault).firstOrNull;
+
+  /// Gets available (ready) printers only
+  List<GeniusPrinterInfo> get availablePrinters =>
+      printers.where((p) => p.isAvailable).toList();
+
+  /// Gets network printers only
+  List<GeniusPrinterInfo> get networkPrinters =>
+      printers.where((p) => p.connectionType == GeniusPrinterConnectionType.network).toList();
+
+  /// Gets USB printers only
+  List<GeniusPrinterInfo> get usbPrinters =>
+      printers.where((p) => p.connectionType == GeniusPrinterConnectionType.usb).toList();
+
+  /// Gets Bluetooth printers only
+  List<GeniusPrinterInfo> get bluetoothPrinters =>
+      printers.where((p) => p.connectionType == GeniusPrinterConnectionType.bluetooth).toList();
+
+  /// Gets printers that support color
+  List<GeniusPrinterInfo> get colorPrinters =>
+      printers.where((p) => p.capabilities.supportsColor).toList();
+
+  /// Gets printers that support duplex
+  List<GeniusPrinterInfo> get duplexPrinters =>
+      printers.where((p) => p.capabilities.supportsDuplex).toList();
+}
+
+/// Printing capabilities info
+class GeniusPrintingCapabilities {
+  /// Creates printing capabilities
+  const GeniusPrintingCapabilities({
+    required this.canPrint,
+    required this.canShare,
+    required this.canRaster,
+    required this.canListPrinters,
+    required this.directPrint,
+  });
+
+  /// Creates from PrintingInfo
+  factory GeniusPrintingCapabilities.fromPrintingInfo(PrintingInfo info) {
+    return GeniusPrintingCapabilities(
+      canPrint: info.canPrint,
+      canShare: info.canShare,
+      canRaster: info.canRaster,
+      canListPrinters: info.canListPrinters,
+      directPrint: info.directPrint,
+    );
+  }
+
+  /// Whether printing is available
+  final bool canPrint;
+
+  /// Whether sharing is available
+  final bool canShare;
+
+  /// Whether rasterization is available
+  final bool canRaster;
+
+  /// Whether listing printers is available
+  final bool canListPrinters;
+
+  /// Whether direct printing is available
+  final bool directPrint;
+
+  /// Whether all features are available
+  bool get allFeaturesAvailable =>
+      canPrint && canShare && canRaster && canListPrinters && directPrint;
+
+  /// Display text (English)
+  String get summaryEn {
+    final features = <String>[];
+    if (canPrint) features.add('Print');
+    if (canShare) features.add('Share');
+    if (canRaster) features.add('Raster');
+    if (directPrint) features.add('Direct Print');
+    return features.isEmpty ? 'No printing features available' : features.join(', ');
+  }
+
+  /// Display text (Arabic)
+  String get summaryAr {
+    final features = <String>[];
+    if (canPrint) features.add('الطباعة');
+    if (canShare) features.add('المشاركة');
+    if (canRaster) features.add('التحويل لصور');
+    if (directPrint) features.add('الطباعة المباشرة');
+    return features.isEmpty ? 'لا تتوفر ميزات الطباعة' : features.join('، ');
+  }
+}
+
+/// Extension methods for printer discovery
+extension GeniusPrinterDiscoveryExtension on GeniusPrinterDiscovery {
+  /// Gets printers with full discovery result
+  Future<GeniusPrinterDiscoveryResult> discoverPrintersWithDetails({
+    bool forceRefresh = false,
+  }) async {
+    final startTime = DateTime.now();
+    final errors = <String>[];
+    List<GeniusPrinterInfo> printers = [];
+
+    try {
+      printers = await discoverPrinters(forceRefresh: forceRefresh);
+    } catch (e) {
+      errors.add(e.toString());
+    }
+
+    return GeniusPrinterDiscoveryResult(
+      printers: printers,
+      duration: DateTime.now().difference(startTime),
+      errors: errors,
+    );
+  }
+
+  /// Gets platform printing capabilities
+  Future<GeniusPrintingCapabilities> getCapabilities() async {
+    final info = await Printing.info();
+    return GeniusPrintingCapabilities.fromPrintingInfo(info);
+  }
 }

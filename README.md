@@ -53,6 +53,13 @@ A comprehensive PDF generation and preview library for Flutter applications with
 📧 **Email Sharing** (v2.3.1) - Direct email with attachments and templates
 📶 **Bluetooth Sharing** (v2.3.2) - Nearby device sharing, Nearby Share/AirDrop
 📱 **App Sharing** (v2.3.3) - WhatsApp, Telegram, cloud apps, local storage
+🖨️ **PDF Rasterization** (v2.3.3+4) - Convert PDF pages to images (PNG/JPEG)
+📄 **Enhanced Sharing** (v2.3.3+4) - Share PDF via system share sheet with share_plus
+💾 **Save to File** (v2.3.3+4) - Save PDF to documents or custom directory
+🔍 **Barcode Validation** (v2.3.3+4) - Validate barcode data before generation
+📊 **Barcode Groups** (v2.3.3+4) - Arrange multiple barcodes in rows, columns, or grids
+🏷️ **Batch Barcodes** (v2.3.3+4) - Generate sequences of barcodes with auto-incrementing data
+👁️ **Enhanced Preview** (v2.3.3+4) - Print preview with share, save, and settings options
 
 ---
 
