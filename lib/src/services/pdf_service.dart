@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
@@ -13,7 +14,8 @@ import '../builders/pdf_document_builder.dart';
 import '../models/pdf_result.dart';
 
 /// Callback for progress updates during PDF operations
-typedef GeniusPdfProgressCallback = void Function(double progress, String? message);
+typedef GeniusPdfProgressCallback = void Function(
+    double progress, String? message);
 
 /// Cancellation token for PDF operations
 class GeniusPdfCancellationToken {
@@ -165,7 +167,8 @@ class GeniusPdfInfo {
 
   String get fileSizeFormatted {
     if (fileSizeBytes < 1024) return '$fileSizeBytes B';
-    if (fileSizeBytes < 1024 * 1024) return '${(fileSizeBytes / 1024).toStringAsFixed(1)} KB';
+    if (fileSizeBytes < 1024 * 1024)
+      return '${(fileSizeBytes / 1024).toStringAsFixed(1)} KB';
     return '${(fileSizeBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 }
@@ -416,7 +419,8 @@ class GeniusPdfService {
   }) async {
     try {
       final dir = await getTemporaryDirectory();
-      final effectiveFileName = fileName.endsWith('.pdf') ? fileName : '$fileName.pdf';
+      final effectiveFileName =
+          fileName.endsWith('.pdf') ? fileName : '$fileName.pdf';
       final file = File('${dir.path}/$effectiveFileName');
       await file.writeAsBytes(bytes);
 
@@ -478,16 +482,17 @@ class GeniusPdfService {
         // Import all pages
         for (int i = 0; i < sourceDoc.pages.count; i++) {
           mergedDoc.pages.add().graphics.drawPdfTemplate(
-            sourceDoc.pages[i].createTemplate(),
-            const Offset(0, 0),
-          );
+                sourceDoc.pages[i].createTemplate(),
+                const Offset(0, 0),
+              );
         }
 
         sourceDoc.dispose();
         processedCount++;
 
         final progress = processedCount / pdfBytesList.length;
-        onProgress?.call(progress, 'Merged $processedCount of ${pdfBytesList.length} PDFs');
+        onProgress?.call(
+            progress, 'Merged $processedCount of ${pdfBytesList.length} PDFs');
       }
 
       cancellationToken?.throwIfCancelled();
@@ -500,7 +505,9 @@ class GeniusPdfService {
       String? filePath;
       if (saveToFile) {
         final dir = await getApplicationDocumentsDirectory();
-        final effectiveFileName = outputFileName.endsWith('.pdf') ? outputFileName : '$outputFileName.pdf';
+        final effectiveFileName = outputFileName.endsWith('.pdf')
+            ? outputFileName
+            : '$outputFileName.pdf';
         filePath = '${dir.path}/$effectiveFileName';
         await File(filePath).writeAsBytes(bytes);
       }
@@ -549,7 +556,8 @@ class GeniusPdfService {
       }
 
       final splitFiles = <GeniusPdfSplitFile>[];
-      final Directory? saveDir = saveToFiles ? await getApplicationDocumentsDirectory() : null;
+      final Directory? saveDir =
+          saveToFiles ? await getApplicationDocumentsDirectory() : null;
 
       // Determine page ranges
       List<List<int>> ranges;
@@ -581,9 +589,9 @@ class GeniusPdfService {
 
         for (int pageIndex = startPage; pageIndex <= endPage; pageIndex++) {
           splitDoc.pages.add().graphics.drawPdfTemplate(
-            sourceDoc.pages[pageIndex].createTemplate(),
-            const Offset(0, 0),
-          );
+                sourceDoc.pages[pageIndex].createTemplate(),
+                const Offset(0, 0),
+              );
         }
 
         final bytes = Uint8List.fromList(await splitDoc.save());
@@ -637,7 +645,8 @@ class GeniusPdfService {
           creationDate: doc.documentInformation.creationDate,
           modificationDate: doc.documentInformation.modificationDate,
         ),
-        isEncrypted: doc.security.encryptionOptions != sf.PdfEncryptionOptions.encryptAllContents,
+        isEncrypted: doc.security.encryptionOptions !=
+            sf.PdfEncryptionOptions.encryptAllContents,
       );
 
       doc.dispose();
@@ -672,16 +681,18 @@ class GeniusPdfService {
 
       if (validPages.isEmpty) {
         sourceDoc.dispose();
-        return GeniusPdfFailure(message: 'No valid pages to extract');
+        return GeniusPdfFailure(
+            error: 'No valid pages to extract',
+            message: 'No valid pages to extract');
       }
 
       final extractedDoc = sf.PdfDocument();
 
       for (final pageNum in validPages) {
         extractedDoc.pages.add().graphics.drawPdfTemplate(
-          sourceDoc.pages[pageNum - 1].createTemplate(),
-          const Offset(0, 0),
-        );
+              sourceDoc.pages[pageNum - 1].createTemplate(),
+              const Offset(0, 0),
+            );
       }
 
       final bytes = Uint8List.fromList(await extractedDoc.save());
@@ -780,13 +791,16 @@ class GeniusPdfService {
     String outputFileName = 'rotated',
   }) async {
     if (rotation % 90 != 0) {
-      return GeniusPdfFailure(message: 'Rotation must be a multiple of 90');
+      return GeniusPdfFailure(
+          error: 'Rotation must be a multiple of 90',
+          message: 'Rotation must be a multiple of 90');
     }
 
     try {
       final doc = sf.PdfDocument(inputBytes: pdfBytes);
 
-      final pagesToRotate = pageNumbers ?? List.generate(doc.pages.count, (i) => i + 1);
+      final pagesToRotate =
+          pageNumbers ?? List.generate(doc.pages.count, (i) => i + 1);
 
       for (final pageNum in pagesToRotate) {
         if (pageNum >= 1 && pageNum <= doc.pages.count) {
@@ -819,7 +833,8 @@ class GeniusPdfService {
   /// - [onProgress]: Progress callback.
   /// - [onItemComplete]: Callback when each item completes.
   Future<List<GeniusPdfResult>> generateBatch({
-    required List<({GeniusPdfDocumentBuilder builder, String fileName})> builders,
+    required List<({GeniusPdfDocumentBuilder builder, String fileName})>
+        builders,
     bool saveToFiles = false,
     GeniusPdfProgressCallback? onProgress,
     void Function(int index, GeniusPdfResult result)? onItemComplete,
@@ -828,10 +843,12 @@ class GeniusPdfService {
 
     for (int i = 0; i < builders.length; i++) {
       final item = builders[i];
-      onProgress?.call(i / builders.length, 'Generating ${i + 1} of ${builders.length}...');
+      onProgress?.call(
+          i / builders.length, 'Generating ${i + 1} of ${builders.length}...');
 
       final result = saveToFiles
-          ? await generateAndSave(builder: item.builder, fileName: item.fileName)
+          ? await generateAndSave(
+              builder: item.builder, fileName: item.fileName)
           : await generate(builder: item.builder, fileName: item.fileName);
 
       results.add(result);
