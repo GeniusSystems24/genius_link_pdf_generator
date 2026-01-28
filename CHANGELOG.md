@@ -5,6 +5,146 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.3+6] - 2026-01-28
+
+### Added
+
+#### Rich Text Engine Overhaul (`GeniusPdfRichText`)
+- **Background Color Rendering** - Background highlights now correctly draw behind text
+  - `backgroundColor` property on spans is now fully rendered with configurable padding
+  - `backgroundPadding` parameter on `GeniusPdfRichText` for control over highlight size
+- **Strikethrough Rendering** - `isStrikethrough` now draws a line through the text center
+- **Overline Decoration** - New `isOverline` property draws a line above text
+- **Superscript/Subscript Positioning** - Proper font size scaling (65%) and Y-offset
+  - Superscript: raised by 30% of line height
+  - Subscript: lowered by 20% of line height
+- **Letter & Word Spacing** - `letterSpacing` and `wordSpacing` now applied via `PdfStringFormat`
+- **Opacity Support** - New `opacity` property (0.0–1.0) for transparent text
+- **Italic Font Resolution** - New `italicFont` and `boldItalicFont` parameters on `GeniusPdfRichText`
+- **Word-Level Line Wrapping** - Text now wraps at word boundaries, not just span boundaries
+- **Paragraph Alignment** - New `GeniusPdfParagraphAlignment` enum (start, center, end)
+- **Max Lines & Overflow** - `maxLines` parameter to limit rendered lines
+  - `GeniusPdfTextOverflow.clip` - Cut off at bounds
+  - `GeniusPdfTextOverflow.ellipsis` - Show "…" at the end of last visible line
+- **Height Measurement** - `measureHeight(availableWidth)` to pre-calculate layout height
+- **Fixed `_createLayoutResult`** - No longer uses hardcoded Helvetica; uses `baseFont` instead
+
+#### New TextSpan Factories
+- `GeniusPdfTextSpan.italic()` - Italic text
+- `GeniusPdfTextSpan.boldItalic()` - Bold-italic text
+- `GeniusPdfTextSpan.label()` - Form field label style (bold, 11pt, gray)
+- `GeniusPdfTextSpan.currency()` - Currency formatting with optional symbol placement
+- `GeniusPdfTextSpan.heading()` - Heading style (14pt bold)
+- `GeniusPdfTextSpan.small()` - Caption/small text (8pt, gray)
+- `GeniusPdfTextSpan.badge()` - Badge style with colored background and white text
+- New properties: `wordSpacing`, `isOverline`, `opacity`, `textDirectionOverride`
+
+#### Enhanced Builder (`GeniusPdfRichTextBuilder`)
+- New text methods: `italic()`, `boldItalic()`, `highlight()`, `superscript()`, `subscript()`, `strikethrough()`, `code()`, `label()`, `heading()`, `small()`, `badge()`, `currency()`
+- Spacing helpers: `tab()` (4 spaces), `separator()` (styled delimiter like " | ")
+- Conditional methods: `addIf()`, `textIf()`, `boldIf()` - add spans conditionally
+- `amount()` - auto-styles as positive (green) or negative (red) based on value
+- State getters: `spanCount`, `isEmpty`, `isNotEmpty`
+- `paragraphAlignment` parameter for center/end aligned text
+- `build()` now accepts `maxLines` and `overflow` parameters
+
+#### Bullet & Numbered Lists (`GeniusPdfBulletList`)
+- **Bullet styles**: disc (•), circle (○), square (■), dash (–)
+- **Numbered styles**: Arabic (1. 2. 3.), Arabic-Indic (١. ٢. ٣.), alphabetic (a. b. c.)
+- **Nested sub-items** with automatic style cycling (disc → circle → dash)
+- **Rich text items** via `GeniusPdfBulletItem.rich()` with span lists
+- RTL support with proper marker and text positioning
+- Configurable: `bulletColor`, `textColor`, `itemSpacing`, `indentWidth`, `startNumber`
+
+#### Multi-Paragraph Component (`GeniusPdfParagraph`)
+- Wraps multiple `GeniusPdfRichText` blocks with `paragraphSpacing`
+- `firstLineIndent` for paragraph indentation
+- `measureHeight()` to pre-calculate total height
+- Automatic vertical overflow handling
+
+#### Text Measurer (`GeniusPdfTextMeasurer`)
+- `measureSpan()` - Measure a single span's Size
+- `measureSpanWidth()` / `measureSpansWidth()` - Width calculations
+- `measureRichTextHeight()` - Full rich text height at given width
+- `fitsInSingleLine()` - Check if spans fit in one line
+- `estimateLineCount()` - Estimate number of wrapped lines
+
+#### Simple Markdown Parser (`GeniusPdfSimpleMarkdownParser`)
+- `**bold**` → bold span
+- `*italic*` → italic span
+- `***bold italic***` → bold-italic span
+- `~~strikethrough~~` → strikethrough span
+- `==highlight==` → highlighted span
+- `^superscript^` → superscript span
+- `` `code` `` → code span
+- `[text](url)` → link span
+
+#### String Extensions (`GeniusPdfStringSpanExtension`)
+- `toSpan()`, `toBoldSpan()`, `toItalicSpan()`, `toColoredSpan()`
+- `toHighlightSpan()`, `toLinkSpan()`, `toBadgeSpan()`
+- `toLabelSpan()`, `toHeadingSpan()`, `toSmallSpan()`
+- `parseMarkdownSpans()` - Parse markdown string into spans
+
+#### Labeled Value Enhancements (`GeniusPdfLabeledValue`)
+- `GeniusPdfLabeledValue.positive()` - Green value styling
+- `GeniusPdfLabeledValue.negative()` - Red value styling
+- New `valueColor` property for explicit value coloring
+
+### Fixed
+- Background color on text spans was defined but never rendered
+- Strikethrough decoration was defined but never drawn
+- Superscript/subscript had no visual effect (no size reduction or positioning)
+- Letter spacing property was ignored during drawing
+- `_createLayoutResult` used hardcoded `PdfStandardFont(PdfFontFamily.helvetica, 1)` instead of `baseFont`
+- Multi-column `GeniusPdfKeyValueList` could crash when `startIndex >= items.length`
+
+### Example
+
+```dart
+// Fluent builder with new methods
+final richText = GeniusPdfRichTextBuilder(baseFont: font, boldFont: boldFont)
+  .heading('Invoice Summary')
+  .newLine()
+  .label('Total')
+  .separator(': ')
+  .currency('34,615.00', symbol: 'SAR')
+  .space()
+  .badge('PAID', backgroundColor: const Color(0xFF4CAF50))
+  .newLine()
+  .text('Previous: ')
+  .strikethrough('28,500.00')
+  .space()
+  .positive('34,615.00')
+  .superscript('*')
+  .build(maxLines: 5, overflow: GeniusPdfTextOverflow.ellipsis);
+
+// Bullet list with nested items
+final list = GeniusPdfBulletList(
+  items: [
+    GeniusPdfBulletItem.simple('Revenue increased by 15%'),
+    GeniusPdfBulletItem(text: 'Expenses', subItems: [
+      GeniusPdfBulletItem.simple('Salaries: 45%'),
+      GeniusPdfBulletItem.simple('Operations: 30%'),
+    ]),
+  ],
+  style: GeniusPdfBulletStyle.disc,
+  baseFont: font,
+  boldFont: boldFont,
+);
+
+// Markdown to spans
+final spans = 'This is **bold** and *italic* with `code`'.parseMarkdownSpans();
+
+// String extensions
+final span = 'Important'.toBoldSpan(color: const Color(0xFFC62828));
+
+// Pre-measure before drawing
+final measurer = GeniusPdfTextMeasurer(baseFont: font, boldFont: boldFont);
+final fits = measurer.fitsInSingleLine(mySpans, pageWidth);
+```
+
+---
+
 ## [2.3.3+5] - 2026-01-28
 
 ### Added

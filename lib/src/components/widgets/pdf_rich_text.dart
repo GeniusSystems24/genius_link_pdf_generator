@@ -1,15 +1,21 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import '../../../genius_link_pdf_generator.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Text Span
+// ─────────────────────────────────────────────────────────────────────────────
+
 /// A text span with optional styling for use in [GeniusPdfRichText].
 ///
 /// Enhanced text span with support for:
-/// - Multiple text decorations (underline, strikethrough)
+/// - Multiple text decorations (underline, strikethrough, overline)
 /// - Background highlighting
 /// - Superscript and subscript
-/// - Letter spacing
+/// - Letter spacing and word spacing
 /// - Custom fonts
+/// - Inline direction override (LTR/RTL)
 ///
 /// ## Example
 /// ```dart
@@ -29,15 +35,21 @@ class GeniusPdfTextSpan {
     this.backgroundColor,
     this.fontSize,
     this.letterSpacing,
+    this.wordSpacing,
     this.isBold = false,
     this.isItalic = false,
     this.isUnderline = false,
     this.isStrikethrough = false,
+    this.isOverline = false,
     this.isSuperscript = false,
     this.isSubscript = false,
     this.fontFamily,
     this.tooltip,
+    this.opacity = 1.0,
+    this.textDirectionOverride,
   });
+
+  // ─── Factory Constructors ───────────────────────────────────────────
 
   /// Creates a plain text span.
   const GeniusPdfTextSpan.plain(this.text)
@@ -47,28 +59,75 @@ class GeniusPdfTextSpan {
         backgroundColor = null,
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = false,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = false,
         fontFamily = null,
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
   /// Creates a bold text span.
-  const GeniusPdfTextSpan.bold(this.text, {this.color, this.fontSize, this.backgroundColor})
+  const GeniusPdfTextSpan.bold(this.text,
+      {this.color, this.fontSize, this.backgroundColor})
       : style = null,
         link = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = true,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = false,
         fontFamily = null,
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
+
+  /// Creates an italic text span.
+  const GeniusPdfTextSpan.italic(this.text, {this.color, this.fontSize})
+      : style = null,
+        link = null,
+        backgroundColor = null,
+        letterSpacing = null,
+        wordSpacing = null,
+        isBold = false,
+        isItalic = true,
+        isUnderline = false,
+        isStrikethrough = false,
+        isOverline = false,
+        isSuperscript = false,
+        isSubscript = false,
+        fontFamily = null,
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
+
+  /// Creates a bold-italic text span.
+  const GeniusPdfTextSpan.boldItalic(this.text, {this.color, this.fontSize})
+      : style = null,
+        link = null,
+        backgroundColor = null,
+        letterSpacing = null,
+        wordSpacing = null,
+        isBold = true,
+        isItalic = true,
+        isUnderline = false,
+        isStrikethrough = false,
+        isOverline = false,
+        isSuperscript = false,
+        isSubscript = false,
+        fontFamily = null,
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
   /// Creates a link text span.
   const GeniusPdfTextSpan.link(
@@ -80,60 +139,77 @@ class GeniusPdfTextSpan {
         backgroundColor = null,
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = false,
         isItalic = false,
         isUnderline = true,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = false,
-        fontFamily = null;
+        fontFamily = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
   /// Creates a colored text span.
-  const GeniusPdfTextSpan.colored(this.text, this.color, {this.backgroundColor})
+  const GeniusPdfTextSpan.colored(this.text, this.color,
+      {this.backgroundColor})
       : style = null,
         link = null,
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = false,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = false,
         fontFamily = null,
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
-  /// Creates a highlighted (positive amount) span.
+  /// Creates a highlighted (positive amount) span — green bold.
   const GeniusPdfTextSpan.positive(this.text, {this.backgroundColor})
       : style = null,
         link = null,
         color = const Color(0xFF2E7D32),
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = true,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = false,
         fontFamily = null,
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
-  /// Creates a highlighted (negative amount) span.
+  /// Creates a highlighted (negative amount) span — red bold.
   const GeniusPdfTextSpan.negative(this.text, {this.backgroundColor})
       : style = null,
         link = null,
         color = const Color(0xFFC62828),
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = true,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = false,
         fontFamily = null,
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
   /// Creates a highlighted/marked text span.
   const GeniusPdfTextSpan.highlight(
@@ -144,14 +220,18 @@ class GeniusPdfTextSpan {
         link = null,
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = false,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = false,
         fontFamily = null,
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
   /// Creates a superscript text span (for footnotes, powers, etc.).
   const GeniusPdfTextSpan.superscript(this.text, {this.color})
@@ -160,14 +240,18 @@ class GeniusPdfTextSpan {
         backgroundColor = null,
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = false,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = true,
         isSubscript = false,
         fontFamily = null,
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
   /// Creates a subscript text span (for chemical formulas, etc.).
   const GeniusPdfTextSpan.subscript(this.text, {this.color})
@@ -176,14 +260,18 @@ class GeniusPdfTextSpan {
         backgroundColor = null,
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = false,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = true,
         fontFamily = null,
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
   /// Creates a strikethrough text span (for deleted/old values).
   const GeniusPdfTextSpan.strikethrough(this.text, {this.color})
@@ -192,14 +280,18 @@ class GeniusPdfTextSpan {
         backgroundColor = null,
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = false,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = true,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = false,
         fontFamily = null,
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
 
   /// Creates a code/monospace text span.
   const GeniusPdfTextSpan.code(this.text)
@@ -209,14 +301,131 @@ class GeniusPdfTextSpan {
         backgroundColor = const Color(0xFFF5F5F5),
         fontSize = null,
         letterSpacing = null,
+        wordSpacing = null,
         isBold = false,
         isItalic = false,
         isUnderline = false,
         isStrikethrough = false,
+        isOverline = false,
         isSuperscript = false,
         isSubscript = false,
         fontFamily = 'monospace',
-        tooltip = null;
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
+
+  /// Creates a label-style span — bold, slightly larger, gray color.
+  /// Useful for form field labels, section titles, etc.
+  const GeniusPdfTextSpan.label(this.text, {this.fontSize = 11})
+      : style = null,
+        link = null,
+        color = const Color(0xFF424242),
+        backgroundColor = null,
+        letterSpacing = null,
+        wordSpacing = null,
+        isBold = true,
+        isItalic = false,
+        isUnderline = false,
+        isStrikethrough = false,
+        isOverline = false,
+        isSuperscript = false,
+        isSubscript = false,
+        fontFamily = null,
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
+
+  /// Creates a currency value span — bold, right-aligned friendly.
+  ///
+  /// ```dart
+  /// GeniusPdfTextSpan.currency('1,250.00', symbol: 'SAR')
+  /// // renders as "1,250.00 SAR" or "SAR 1,250.00"
+  /// ```
+  factory GeniusPdfTextSpan.currency(
+    String amount, {
+    String? symbol,
+    bool symbolBefore = false,
+    Color? color,
+    bool isBold = true,
+  }) {
+    final display = symbol != null
+        ? (symbolBefore ? '$symbol $amount' : '$amount $symbol')
+        : amount;
+    return GeniusPdfTextSpan(
+      text: display,
+      color: color,
+      isBold: isBold,
+      letterSpacing: 0.3,
+    );
+  }
+
+  /// Creates a heading-style span — larger, bold.
+  const GeniusPdfTextSpan.heading(this.text,
+      {this.fontSize = 14, this.color = const Color(0xFF212121)})
+      : style = null,
+        link = null,
+        backgroundColor = null,
+        letterSpacing = null,
+        wordSpacing = null,
+        isBold = true,
+        isItalic = false,
+        isUnderline = false,
+        isStrikethrough = false,
+        isOverline = false,
+        isSuperscript = false,
+        isSubscript = false,
+        fontFamily = null,
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
+
+  /// Creates a small/caption text span — smaller font, gray.
+  const GeniusPdfTextSpan.small(this.text, {this.color = const Color(0xFF757575)})
+      : style = null,
+        link = null,
+        backgroundColor = null,
+        fontSize = 8,
+        letterSpacing = null,
+        wordSpacing = null,
+        isBold = false,
+        isItalic = false,
+        isUnderline = false,
+        isStrikethrough = false,
+        isOverline = false,
+        isSuperscript = false,
+        isSubscript = false,
+        fontFamily = null,
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
+
+  /// Creates a badge-style span — bold text with colored background.
+  ///
+  /// ```dart
+  /// GeniusPdfTextSpan.badge('PAID', backgroundColor: Colors.green, color: Colors.white)
+  /// ```
+  const GeniusPdfTextSpan.badge(
+    this.text, {
+    this.backgroundColor = const Color(0xFF1976D2),
+    this.color = const Color(0xFFFFFFFF),
+    this.fontSize = 9,
+  })  : style = null,
+        link = null,
+        letterSpacing = 0.5,
+        wordSpacing = null,
+        isBold = true,
+        isItalic = false,
+        isUnderline = false,
+        isStrikethrough = false,
+        isOverline = false,
+        isSuperscript = false,
+        isSubscript = false,
+        fontFamily = null,
+        tooltip = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
+
+  // ─── Properties ─────────────────────────────────────────────────────
 
   /// The text content.
   final String text;
@@ -239,6 +448,9 @@ class GeniusPdfTextSpan {
   /// Letter spacing.
   final double? letterSpacing;
 
+  /// Word spacing.
+  final double? wordSpacing;
+
   /// Whether text is bold.
   final bool isBold;
 
@@ -250,6 +462,9 @@ class GeniusPdfTextSpan {
 
   /// Whether text has strikethrough.
   final bool isStrikethrough;
+
+  /// Whether text has an overline.
+  final bool isOverline;
 
   /// Whether text is superscript.
   final bool isSuperscript;
@@ -263,14 +478,31 @@ class GeniusPdfTextSpan {
   /// Tooltip text (for accessibility).
   final String? tooltip;
 
+  /// Opacity of this span (0.0 – 1.0).
+  final double opacity;
+
+  /// Explicit text direction override for this span.
+  final TextDirection? textDirectionOverride;
+
+  // ─── Computed Properties ────────────────────────────────────────────
+
   /// Whether this span has a link.
   bool get hasLink => link != null && link!.isNotEmpty;
 
   /// Whether this span has any decoration.
-  bool get hasDecoration => isUnderline || isStrikethrough;
+  bool get hasDecoration => isUnderline || isStrikethrough || isOverline;
 
   /// Whether this span has background highlighting.
   bool get hasBackground => backgroundColor != null;
+
+  /// Whether the text is empty.
+  bool get isEmpty => text.isEmpty;
+
+  /// Whether the text is not empty.
+  bool get isNotEmpty => text.isNotEmpty;
+
+  /// Effective font size multiplier for superscript/subscript.
+  double get _scriptSizeRatio => 0.65;
 
   /// Creates a copy with the given fields replaced.
   GeniusPdfTextSpan copyWith({
@@ -281,14 +513,18 @@ class GeniusPdfTextSpan {
     Color? backgroundColor,
     double? fontSize,
     double? letterSpacing,
+    double? wordSpacing,
     bool? isBold,
     bool? isItalic,
     bool? isUnderline,
     bool? isStrikethrough,
+    bool? isOverline,
     bool? isSuperscript,
     bool? isSubscript,
     String? fontFamily,
     String? tooltip,
+    double? opacity,
+    TextDirection? textDirectionOverride,
   }) {
     return GeniusPdfTextSpan(
       text: text ?? this.text,
@@ -298,22 +534,52 @@ class GeniusPdfTextSpan {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       fontSize: fontSize ?? this.fontSize,
       letterSpacing: letterSpacing ?? this.letterSpacing,
+      wordSpacing: wordSpacing ?? this.wordSpacing,
       isBold: isBold ?? this.isBold,
       isItalic: isItalic ?? this.isItalic,
       isUnderline: isUnderline ?? this.isUnderline,
       isStrikethrough: isStrikethrough ?? this.isStrikethrough,
+      isOverline: isOverline ?? this.isOverline,
       isSuperscript: isSuperscript ?? this.isSuperscript,
       isSubscript: isSubscript ?? this.isSubscript,
       fontFamily: fontFamily ?? this.fontFamily,
       tooltip: tooltip ?? this.tooltip,
+      opacity: opacity ?? this.opacity,
+      textDirectionOverride: textDirectionOverride ?? this.textDirectionOverride,
     );
   }
+
+  @override
+  String toString() => 'GeniusPdfTextSpan("$text", bold=$isBold, italic=$isItalic)';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Rich Text Component
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Paragraph alignment for [GeniusPdfRichText].
+enum GeniusPdfParagraphAlignment {
+  /// Align to the start (left for LTR, right for RTL).
+  start,
+
+  /// Center alignment.
+  center,
+
+  /// Align to the end (right for LTR, left for RTL).
+  end,
 }
 
 /// A rich text component that supports multiple styled spans.
 ///
 /// [GeniusPdfRichText] allows you to create text with multiple styles,
-/// colors, and links in a single paragraph.
+/// colors, and links in a single paragraph. Now supports:
+/// - Background color rendering
+/// - Strikethrough and overline decorations
+/// - Superscript and subscript positioning
+/// - Letter spacing
+/// - Italic font rendering
+/// - Paragraph alignment (start, center, end)
+/// - Word-level wrapping within spans
 ///
 /// ## Example
 /// ```dart
@@ -335,10 +601,16 @@ class GeniusPdfRichText {
     required this.spans,
     required this.baseFont,
     required this.boldFont,
+    this.italicFont,
+    this.boldItalicFont,
     this.defaultStyle = const GeniusPdfTextStyle.body(),
     this.isRTL = true,
     this.lineSpacing = 1.2,
     this.paragraphSpacing = 8,
+    this.paragraphAlignment = GeniusPdfParagraphAlignment.start,
+    this.maxLines,
+    this.overflow = GeniusPdfTextOverflow.clip,
+    this.backgroundPadding = 1.5,
   });
 
   /// Text spans to render.
@@ -353,6 +625,12 @@ class GeniusPdfRichText {
   /// Bold font for bold text.
   final PdfFont boldFont;
 
+  /// Italic font for italic text (falls back to baseFont if null).
+  final PdfFont? italicFont;
+
+  /// Bold-italic font (falls back to boldFont if null).
+  final PdfFont? boldItalicFont;
+
   /// Whether to use RTL layout.
   final bool isRTL;
 
@@ -362,10 +640,72 @@ class GeniusPdfRichText {
   /// Spacing between paragraphs.
   final double paragraphSpacing;
 
+  /// Paragraph alignment.
+  final GeniusPdfParagraphAlignment paragraphAlignment;
+
+  /// Maximum number of lines to render (null = unlimited).
+  final int? maxLines;
+
+  /// Overflow behavior when text exceeds bounds.
+  final GeniusPdfTextOverflow overflow;
+
+  /// Padding around background highlight rectangles.
+  final double backgroundPadding;
+
   /// Gets the combined plain text of all spans.
   String get plainText => spans.map((s) => s.text).join();
 
+  /// Number of spans.
+  int get spanCount => spans.length;
+
+  /// Whether there are no spans.
+  bool get isEmpty => spans.isEmpty;
+
+  /// Resolves the font for a given span.
+  PdfFont _resolveFont(GeniusPdfTextSpan span) {
+    final wantBold = span.isBold || (span.style?.isBold ?? false);
+    final wantItalic = span.isItalic;
+
+    if (wantBold && wantItalic) {
+      return boldItalicFont ?? boldFont;
+    } else if (wantBold) {
+      return boldFont;
+    } else if (wantItalic) {
+      return italicFont ?? baseFont;
+    }
+    return baseFont;
+  }
+
+  /// Resolves the effective font size for a span, accounting for
+  /// superscript/subscript scaling.
+  double _resolveEffectiveFontSize(GeniusPdfTextSpan span) {
+    final base = span.fontSize ?? defaultStyle.fontSize;
+    if (span.isSuperscript || span.isSubscript) {
+      return base * span._scriptSizeRatio;
+    }
+    return base;
+  }
+
+  /// Calculates the Y offset for superscript/subscript.
+  double _resolveYOffset(GeniusPdfTextSpan span, double lineHeight) {
+    if (span.isSuperscript) {
+      return -lineHeight * 0.3;
+    }
+    if (span.isSubscript) {
+      return lineHeight * 0.2;
+    }
+    return 0;
+  }
+
+  /// Measures a text string with the given font, returning its Size.
+  Size _measureText(String text, PdfFont font) {
+    return font.measureString(text);
+  }
+
   /// Draws the rich text on a PDF page.
+  ///
+  /// Fully renders: background color, underline, strikethrough, overline,
+  /// superscript/subscript positioning, letter spacing, opacity, and links.
   PdfLayoutResult? draw({
     required PdfPage page,
     required Rect bounds,
@@ -377,111 +717,181 @@ class GeniusPdfRichText {
     final textDirection =
         isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
 
-    // Create a text element for the entire rich text
-    // For complex rich text, we use positioned drawing
-    double currentX = isRTL ? bounds.right : bounds.left;
+    // ── Build line segments first (word-wrap aware) ──────────────────
+    final lines = _buildLines(bounds.width);
+    if (lines.isEmpty) return null;
+
+    // ── Clamp to maxLines ───────────────────────────────────────────
+    final effectiveLines = maxLines != null && lines.length > maxLines!
+        ? lines.sublist(0, maxLines!)
+        : lines;
+
     double currentY = bounds.top;
-    double lineHeight = 0;
+    int lineIndex = 0;
 
-    PdfLayoutResult? lastResult;
+    for (final line in effectiveLines) {
+      final lineHeight = line.height * lineSpacing;
 
-    for (final span in spans) {
-      // Determine font - baseFont and boldFont are required, no fallback to Helvetica
-      PdfFont font;
-      if (span.isBold || (span.style?.isBold ?? false)) {
-        font = boldFont;
-      } else {
-        font = baseFont;
+      // Check vertical overflow
+      if (currentY + lineHeight > bounds.bottom) {
+        break;
       }
 
-      // Determine color
-      final color = span.color ?? span.style?.color ?? defaultStyle.color;
-      final brush = PdfSolidBrush(color.toPdfColor());
-
-      // Measure text
-      final textSize = font.measureString(span.text);
-      lineHeight = lineHeight > textSize.height ? lineHeight : textSize.height;
-
-      // Check if we need to wrap to next line
-      final textWidth = textSize.width;
-      if (isRTL) {
-        if (currentX - textWidth < bounds.left) {
-          currentX = bounds.right;
-          currentY += lineHeight * lineSpacing;
-          lineHeight = textSize.height;
-        }
-      } else {
-        if (currentX + textWidth > bounds.right) {
-          currentX = bounds.left;
-          currentY += lineHeight * lineSpacing;
-          lineHeight = textSize.height;
-        }
-      }
-
-      // Draw text
-      final drawX = isRTL ? currentX - textWidth : currentX;
-
-      final format = PdfStringFormat(
-        alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: textDirection,
+      // Calculate line X start based on alignment
+      final lineStartX = _resolveLineStartX(
+        bounds: bounds,
+        lineWidth: line.width,
       );
 
-      graphics.drawString(
-        span.text,
-        font,
-        brush: brush,
-        bounds: Rect.fromLTWH(drawX, currentY, textWidth, textSize.height),
-        format: format,
-      );
+      double cursorX = lineStartX;
 
-      // Draw underline if needed
-      if (span.isUnderline) {
-        final underlineY = currentY + textSize.height - 1;
-        graphics.drawLine(
-          PdfPen(color.toPdfColor(), width: 0.5),
-          Offset(drawX, underlineY),
-          Offset(drawX + textWidth, underlineY),
+      // Check if this is the last rendered line and we're truncating
+      final isLastLine = lineIndex == effectiveLines.length - 1 &&
+          maxLines != null &&
+          lines.length > maxLines!;
+
+      for (int si = 0; si < line.segments.length; si++) {
+        final seg = line.segments[si];
+        final span = seg.span;
+        final font = seg.font;
+        final textSize = seg.size;
+        final effectiveFontSize = _resolveEffectiveFontSize(span);
+
+        // Apply ellipsis on last segment of last truncated line
+        String drawText = seg.text;
+        double drawWidth = textSize.width;
+        if (isLastLine &&
+            si == line.segments.length - 1 &&
+            overflow == GeniusPdfTextOverflow.ellipsis) {
+          final ellipsis = '…';
+          final ellipsisSize = _measureText(ellipsis, font);
+          if (drawWidth + ellipsisSize.width <= bounds.width) {
+            drawText = '${seg.text}$ellipsis';
+            drawWidth += ellipsisSize.width;
+          }
+        }
+
+        // Resolve color + opacity
+        final baseColor =
+            span.color ?? span.style?.color ?? defaultStyle.color;
+        final effectiveColor = span.opacity < 1.0
+            ? Color.fromARGB(
+                (baseColor.alpha * span.opacity).round(),
+                baseColor.red,
+                baseColor.green,
+                baseColor.blue,
+              )
+            : baseColor;
+        final brush = PdfSolidBrush(effectiveColor.toPdfColor());
+
+        // Y offset for superscript / subscript
+        final yOffset = _resolveYOffset(span, line.height);
+        final drawY = currentY + yOffset;
+
+        final drawX = isRTL ? cursorX - drawWidth : cursorX;
+
+        // ── Draw background ──────────────────────────────────────
+        if (span.hasBackground) {
+          final bgRect = Rect.fromLTWH(
+            drawX - backgroundPadding,
+            drawY - backgroundPadding,
+            drawWidth + backgroundPadding * 2,
+            textSize.height + backgroundPadding * 2,
+          );
+          graphics.drawRectangle(
+            brush: PdfSolidBrush(span.backgroundColor!.toPdfColor()),
+            bounds: bgRect,
+          );
+        }
+
+        // ── Draw text ────────────────────────────────────────────
+        final format = PdfStringFormat(
+          alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+          textDirection: textDirection,
+          characterSpacing: span.letterSpacing ?? 0,
+          wordSpacing: span.wordSpacing ?? 0,
         );
-      }
 
-      // Add link annotation if present
-      if (span.hasLink) {
-        final linkBounds =
-            Rect.fromLTWH(drawX, currentY, textWidth, textSize.height);
-        final annotation = PdfUriAnnotation(
-          bounds: linkBounds,
-          uri: span.link!,
+        graphics.drawString(
+          drawText,
+          font,
+          brush: brush,
+          bounds: Rect.fromLTWH(
+            drawX, drawY, drawWidth + 10, effectiveFontSize + 4,
+          ),
+          format: format,
         );
-        page.annotations.add(annotation);
+
+        // ── Draw decorations ─────────────────────────────────────
+        final penColor = effectiveColor.toPdfColor();
+        final decorPen = PdfPen(penColor, width: 0.5);
+
+        if (span.isUnderline) {
+          final uY = drawY + textSize.height - 1;
+          graphics.drawLine(
+            decorPen,
+            Offset(drawX, uY),
+            Offset(drawX + drawWidth, uY),
+          );
+        }
+
+        if (span.isStrikethrough) {
+          final sY = drawY + textSize.height * 0.5;
+          graphics.drawLine(
+            decorPen,
+            Offset(drawX, sY),
+            Offset(drawX + drawWidth, sY),
+          );
+        }
+
+        if (span.isOverline) {
+          final oY = drawY + 1;
+          graphics.drawLine(
+            decorPen,
+            Offset(drawX, oY),
+            Offset(drawX + drawWidth, oY),
+          );
+        }
+
+        // ── Add link annotation ──────────────────────────────────
+        if (span.hasLink) {
+          final linkBounds = Rect.fromLTWH(
+            drawX, drawY, drawWidth, textSize.height,
+          );
+          page.annotations.add(PdfUriAnnotation(
+            bounds: linkBounds,
+            uri: span.link!,
+          ));
+        }
+
+        // Advance cursor
+        if (isRTL) {
+          cursorX -= drawWidth;
+        } else {
+          cursorX += drawWidth;
+        }
       }
 
-      // Update position
-      if (isRTL) {
-        currentX -= textWidth;
-      } else {
-        currentX += textWidth;
-      }
+      currentY += lineHeight;
+      lineIndex++;
     }
 
-    // Return approximate bounds
+    // Return approximate layout bounds
     final resultBounds = Rect.fromLTWH(
       bounds.left,
       bounds.top,
       bounds.width,
-      currentY - bounds.top + lineHeight,
+      currentY - bounds.top,
     );
-
-    // Create a dummy result for positioning
     return _createLayoutResult(page, resultBounds);
   }
 
-  /// Draws as a simple single-line text element.
+  /// Draws as a simple single-line text element using Syncfusion's PdfTextElement.
   PdfLayoutResult? drawSimple({
     required PdfPage page,
     required Rect bounds,
     PdfLayoutFormat? layoutFormat,
   }) {
-    // Font - baseFont is required, no fallback to Helvetica
     final font = baseFont;
 
     final textElement = PdfTextElement(
@@ -504,13 +914,136 @@ class GeniusPdfRichText {
     );
   }
 
+  /// Measures the total height the rich text will occupy at the given width.
+  double measureHeight(double availableWidth) {
+    if (spans.isEmpty) return 0;
+    final lines = _buildLines(availableWidth);
+    double total = 0;
+    for (final line in lines) {
+      total += line.height * lineSpacing;
+    }
+    return total;
+  }
+
+  // ─── Private Helpers ────────────────────────────────────────────────
+
+  /// Calculates the starting X position for a line based on alignment.
+  double _resolveLineStartX({
+    required Rect bounds,
+    required double lineWidth,
+  }) {
+    switch (paragraphAlignment) {
+      case GeniusPdfParagraphAlignment.center:
+        final centerOffset = (bounds.width - lineWidth) / 2;
+        return isRTL
+            ? bounds.right - centerOffset
+            : bounds.left + centerOffset;
+      case GeniusPdfParagraphAlignment.end:
+        return isRTL ? bounds.left + lineWidth : bounds.right - lineWidth;
+      case GeniusPdfParagraphAlignment.start:
+      default:
+        return isRTL ? bounds.right : bounds.left;
+    }
+  }
+
+  /// Builds a list of [_RichTextLine] by performing word-level wrapping.
+  List<_RichTextLine> _buildLines(double maxWidth) {
+    final lines = <_RichTextLine>[];
+    var currentSegments = <_RichTextSegment>[];
+    double currentLineWidth = 0;
+    double currentLineHeight = 0;
+
+    for (final span in spans) {
+      if (span.isEmpty) continue;
+
+      // Handle explicit newlines
+      if (span.text == '\n') {
+        lines.add(_RichTextLine(
+          segments: List.unmodifiable(currentSegments),
+          width: currentLineWidth,
+          height: currentLineHeight > 0 ? currentLineHeight : _defaultLineHeight(),
+        ));
+        currentSegments = [];
+        currentLineWidth = 0;
+        currentLineHeight = 0;
+        continue;
+      }
+
+      final font = _resolveFont(span);
+      final words = _splitIntoWords(span.text);
+
+      for (final word in words) {
+        final wordSize = _measureText(word, font);
+        final wordWidth = wordSize.width;
+        final wordHeight = wordSize.height;
+
+        // Check if word fits on current line
+        if (currentLineWidth + wordWidth > maxWidth &&
+            currentSegments.isNotEmpty) {
+          // Flush current line
+          lines.add(_RichTextLine(
+            segments: List.unmodifiable(currentSegments),
+            width: currentLineWidth,
+            height: currentLineHeight,
+          ));
+          currentSegments = [];
+          currentLineWidth = 0;
+          currentLineHeight = 0;
+        }
+
+        // Add word as segment
+        currentSegments.add(_RichTextSegment(
+          text: word,
+          span: span,
+          font: font,
+          size: wordSize,
+        ));
+        currentLineWidth += wordWidth;
+        currentLineHeight = math.max(currentLineHeight, wordHeight);
+      }
+    }
+
+    // Flush remaining segments
+    if (currentSegments.isNotEmpty) {
+      lines.add(_RichTextLine(
+        segments: List.unmodifiable(currentSegments),
+        width: currentLineWidth,
+        height: currentLineHeight,
+      ));
+    }
+
+    return lines;
+  }
+
+  /// Splits text into words preserving spaces and delimiters.
+  List<String> _splitIntoWords(String text) {
+    final words = <String>[];
+    final buffer = StringBuffer();
+    for (int i = 0; i < text.length; i++) {
+      final char = text[i];
+      if (char == ' ') {
+        buffer.write(char);
+        words.add(buffer.toString());
+        buffer.clear();
+      } else {
+        buffer.write(char);
+      }
+    }
+    if (buffer.isNotEmpty) {
+      words.add(buffer.toString());
+    }
+    return words;
+  }
+
+  double _defaultLineHeight() {
+    return _measureText('A', baseFont).height;
+  }
+
   PdfLayoutResult? _createLayoutResult(PdfPage page, Rect bounds) {
-    // Create a minimal text element to get a proper layout result
     final dummyElement = PdfTextElement(
       text: ' ',
-      font: PdfStandardFont(PdfFontFamily.helvetica, 1),
+      font: baseFont,
     );
-
     return dummyElement.draw(
       page: page,
       bounds: Rect.fromLTWH(bounds.left, bounds.bottom, 1, 1),
@@ -518,21 +1051,89 @@ class GeniusPdfRichText {
   }
 }
 
-/// Builder for creating rich text content easily.
+/// Text overflow behavior.
+enum GeniusPdfTextOverflow {
+  /// Clip text that exceeds bounds (no indicator).
+  clip,
+
+  /// Show ellipsis (…) at the end of the last visible line.
+  ellipsis,
+}
+
+// ─── Internal Layout Models ─────────────────────────────────────────────────
+
+class _RichTextSegment {
+  const _RichTextSegment({
+    required this.text,
+    required this.span,
+    required this.font,
+    required this.size,
+  });
+
+  final String text;
+  final GeniusPdfTextSpan span;
+  final PdfFont font;
+  final Size size;
+}
+
+class _RichTextLine {
+  const _RichTextLine({
+    required this.segments,
+    required this.width,
+    required this.height,
+  });
+
+  final List<_RichTextSegment> segments;
+  final double width;
+  final double height;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Rich Text Builder
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Builder for creating rich text content with a fluent API.
+///
+/// ## Example
+/// ```dart
+/// final richText = GeniusPdfRichTextBuilder(baseFont: font, boldFont: boldFont)
+///   .text('Total: ')
+///   .bold('1,250.00')
+///   .space()
+///   .small('SAR')
+///   .build();
+/// ```
 class GeniusPdfRichTextBuilder {
   GeniusPdfRichTextBuilder({
     this.defaultStyle = const GeniusPdfTextStyle.body(),
     required this.baseFont,
     required this.boldFont,
+    this.italicFont,
+    this.boldItalicFont,
     this.isRTL = true,
+    this.paragraphAlignment = GeniusPdfParagraphAlignment.start,
   });
 
   final GeniusPdfTextStyle defaultStyle;
   final PdfFont baseFont;
   final PdfFont boldFont;
+  final PdfFont? italicFont;
+  final PdfFont? boldItalicFont;
   final bool isRTL;
+  final GeniusPdfParagraphAlignment paragraphAlignment;
 
   final List<GeniusPdfTextSpan> _spans = [];
+
+  /// Number of spans added so far.
+  int get spanCount => _spans.length;
+
+  /// Whether no spans have been added.
+  bool get isEmpty => _spans.isEmpty;
+
+  /// Whether at least one span has been added.
+  bool get isNotEmpty => _spans.isNotEmpty;
+
+  // ─── Text Methods ───────────────────────────────────────────────────
 
   /// Adds plain text.
   GeniusPdfRichTextBuilder text(String text) {
@@ -543,6 +1144,18 @@ class GeniusPdfRichTextBuilder {
   /// Adds bold text.
   GeniusPdfRichTextBuilder bold(String text, {Color? color}) {
     _spans.add(GeniusPdfTextSpan.bold(text, color: color));
+    return this;
+  }
+
+  /// Adds italic text.
+  GeniusPdfRichTextBuilder italic(String text, {Color? color}) {
+    _spans.add(GeniusPdfTextSpan.italic(text, color: color));
+    return this;
+  }
+
+  /// Adds bold-italic text.
+  GeniusPdfRichTextBuilder boldItalic(String text, {Color? color}) {
+    _spans.add(GeniusPdfTextSpan.boldItalic(text, color: color));
     return this;
   }
 
@@ -574,11 +1187,86 @@ class GeniusPdfRichTextBuilder {
     return this;
   }
 
+  /// Adds highlighted text.
+  GeniusPdfRichTextBuilder highlight(String text, {Color? backgroundColor}) {
+    _spans.add(GeniusPdfTextSpan.highlight(
+      text,
+      backgroundColor: backgroundColor ?? const Color(0xFFFFEB3B),
+    ));
+    return this;
+  }
+
+  /// Adds superscript text.
+  GeniusPdfRichTextBuilder superscript(String text, {Color? color}) {
+    _spans.add(GeniusPdfTextSpan.superscript(text, color: color));
+    return this;
+  }
+
+  /// Adds subscript text.
+  GeniusPdfRichTextBuilder subscript(String text, {Color? color}) {
+    _spans.add(GeniusPdfTextSpan.subscript(text, color: color));
+    return this;
+  }
+
+  /// Adds strikethrough text.
+  GeniusPdfRichTextBuilder strikethrough(String text, {Color? color}) {
+    _spans.add(GeniusPdfTextSpan.strikethrough(text, color: color));
+    return this;
+  }
+
+  /// Adds code-style text.
+  GeniusPdfRichTextBuilder code(String text) {
+    _spans.add(GeniusPdfTextSpan.code(text));
+    return this;
+  }
+
+  /// Adds a label-style span.
+  GeniusPdfRichTextBuilder label(String text) {
+    _spans.add(GeniusPdfTextSpan.label(text));
+    return this;
+  }
+
+  /// Adds a heading-style span.
+  GeniusPdfRichTextBuilder heading(String text, {double fontSize = 14}) {
+    _spans.add(GeniusPdfTextSpan.heading(text, fontSize: fontSize));
+    return this;
+  }
+
+  /// Adds a small/caption text.
+  GeniusPdfRichTextBuilder small(String text, {Color? color}) {
+    _spans.add(GeniusPdfTextSpan.small(text, color: color));
+    return this;
+  }
+
+  /// Adds a badge-style span.
+  GeniusPdfRichTextBuilder badge(String text, {Color? backgroundColor, Color? color}) {
+    _spans.add(GeniusPdfTextSpan.badge(
+      text,
+      backgroundColor: backgroundColor ?? const Color(0xFF1976D2),
+      color: color ?? const Color(0xFFFFFFFF),
+    ));
+    return this;
+  }
+
+  /// Adds a currency value span.
+  GeniusPdfRichTextBuilder currency(String amount,
+      {String? symbol, bool symbolBefore = false, Color? color}) {
+    _spans.add(GeniusPdfTextSpan.currency(
+      amount,
+      symbol: symbol,
+      symbolBefore: symbolBefore,
+      color: color,
+    ));
+    return this;
+  }
+
   /// Adds a custom styled span.
   GeniusPdfRichTextBuilder span(GeniusPdfTextSpan span) {
     _spans.add(span);
     return this;
   }
+
+  // ─── Spacing & Structure ────────────────────────────────────────────
 
   /// Adds a line break.
   GeniusPdfRichTextBuilder newLine() {
@@ -592,14 +1280,70 @@ class GeniusPdfRichTextBuilder {
     return this;
   }
 
+  /// Adds a tab (4 spaces).
+  GeniusPdfRichTextBuilder tab() {
+    _spans.add(const GeniusPdfTextSpan.plain('    '));
+    return this;
+  }
+
+  /// Adds a separator (e.g. ' | ', ' - ', ' · ').
+  GeniusPdfRichTextBuilder separator([String sep = ' | ']) {
+    _spans.add(GeniusPdfTextSpan(
+      text: sep,
+      color: const Color(0xFF9E9E9E),
+    ));
+    return this;
+  }
+
+  // ─── Conditional Methods ────────────────────────────────────────────
+
+  /// Adds a span only if [condition] is true.
+  GeniusPdfRichTextBuilder addIf(bool condition, GeniusPdfTextSpan span) {
+    if (condition) _spans.add(span);
+    return this;
+  }
+
+  /// Adds plain text only if [condition] is true.
+  GeniusPdfRichTextBuilder textIf(bool condition, String text) {
+    if (condition) _spans.add(GeniusPdfTextSpan.plain(text));
+    return this;
+  }
+
+  /// Adds bold text only if [condition] is true.
+  GeniusPdfRichTextBuilder boldIf(bool condition, String text, {Color? color}) {
+    if (condition) _spans.add(GeniusPdfTextSpan.bold(text, color: color));
+    return this;
+  }
+
+  /// Adds text styled positive or negative based on the value.
+  GeniusPdfRichTextBuilder amount(double value, {String? format}) {
+    final display = format ?? value.toStringAsFixed(2);
+    if (value >= 0) {
+      _spans.add(GeniusPdfTextSpan.positive(display));
+    } else {
+      _spans.add(GeniusPdfTextSpan.negative(display));
+    }
+    return this;
+  }
+
+  // ─── Build ──────────────────────────────────────────────────────────
+
   /// Builds the rich text component.
-  GeniusPdfRichText build() {
+  GeniusPdfRichText build({
+    int? maxLines,
+    GeniusPdfTextOverflow overflow = GeniusPdfTextOverflow.clip,
+  }) {
     return GeniusPdfRichText(
       spans: List.unmodifiable(_spans),
       defaultStyle: defaultStyle,
       baseFont: baseFont,
       boldFont: boldFont,
+      italicFont: italicFont,
+      boldItalicFont: boldItalicFont,
       isRTL: isRTL,
+      paragraphAlignment: paragraphAlignment,
+      maxLines: maxLines,
+      overflow: overflow,
     );
   }
 
@@ -608,6 +1352,10 @@ class GeniusPdfRichTextBuilder {
     _spans.clear();
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Labeled Value
+// ─────────────────────────────────────────────────────────────────────────────
 
 /// A labeled value component for key-value pairs.
 ///
@@ -619,17 +1367,59 @@ class GeniusPdfLabeledValue {
     this.labelAr,
     this.labelStyle,
     this.valueStyle,
+    this.valueColor,
     this.separator = ': ',
     required this.baseFont,
     required this.boldFont,
     this.isRTL = true,
   });
 
+  /// Creates a labeled value where the value is styled as positive (green).
+  factory GeniusPdfLabeledValue.positive({
+    required String label,
+    required String value,
+    String? labelAr,
+    required PdfFont baseFont,
+    required PdfFont boldFont,
+    bool isRTL = true,
+  }) {
+    return GeniusPdfLabeledValue(
+      label: label,
+      value: value,
+      labelAr: labelAr,
+      valueColor: const Color(0xFF2E7D32),
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: isRTL,
+    );
+  }
+
+  /// Creates a labeled value where the value is styled as negative (red).
+  factory GeniusPdfLabeledValue.negative({
+    required String label,
+    required String value,
+    String? labelAr,
+    required PdfFont baseFont,
+    required PdfFont boldFont,
+    bool isRTL = true,
+  }) {
+    return GeniusPdfLabeledValue(
+      label: label,
+      value: value,
+      labelAr: labelAr,
+      valueColor: const Color(0xFFC62828),
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: isRTL,
+    );
+  }
+
   final String label;
   final String? labelAr;
   final String value;
   final GeniusPdfTextStyle? labelStyle;
   final GeniusPdfTextStyle? valueStyle;
+  final Color? valueColor;
   final String separator;
   final PdfFont baseFont;
   final PdfFont boldFont;
@@ -649,11 +1439,15 @@ class GeniusPdfLabeledValue {
   }) {
     final labelText = getLabel();
 
+    final valueSpan = valueColor != null
+        ? GeniusPdfTextSpan.bold(value, color: valueColor)
+        : GeniusPdfTextSpan.plain(value);
+
     final richText = GeniusPdfRichText(
       spans: [
         GeniusPdfTextSpan.bold(labelText),
         GeniusPdfTextSpan.plain(separator),
-        GeniusPdfTextSpan.plain(value),
+        valueSpan,
       ],
       baseFont: baseFont,
       boldFont: boldFont,
@@ -664,6 +1458,10 @@ class GeniusPdfLabeledValue {
         page: page, bounds: bounds, layoutFormat: layoutFormat);
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Key-Value List
+// ─────────────────────────────────────────────────────────────────────────────
 
 /// A key-value list component for displaying multiple labeled values.
 class GeniusPdfKeyValueList {
@@ -705,6 +1503,7 @@ class GeniusPdfKeyValueList {
           value: item.value,
           labelStyle: item.labelStyle,
           valueStyle: item.valueStyle,
+          valueColor: item.valueColor,
           separator: item.separator,
           baseFont: baseFont ?? item.baseFont,
           boldFont: boldFont ?? item.boldFont,
@@ -735,6 +1534,7 @@ class GeniusPdfKeyValueList {
       for (int col = 0; col < columns; col++) {
         final startIndex = col * itemsPerColumn;
         final endIndex = (startIndex + itemsPerColumn).clamp(0, items.length);
+        if (startIndex >= items.length) break;
         final columnItems = items.sublist(startIndex, endIndex);
 
         double colY = bounds.top;
@@ -745,6 +1545,7 @@ class GeniusPdfKeyValueList {
             label: item.label,
             labelAr: item.labelAr,
             value: item.value,
+            valueColor: item.valueColor,
             baseFont: baseFont ?? item.baseFont,
             boldFont: boldFont ?? item.boldFont,
             isRTL: isRTL,
@@ -771,4 +1572,702 @@ class GeniusPdfKeyValueList {
 
     return lastResult;
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bullet List
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Bullet/number style for [GeniusPdfBulletList].
+enum GeniusPdfBulletStyle {
+  /// Filled circle bullet (•).
+  disc,
+
+  /// Open circle bullet (○).
+  circle,
+
+  /// Square bullet (■).
+  square,
+
+  /// Dash bullet (–).
+  dash,
+
+  /// Arabic numbered list (1. 2. 3.).
+  numberedArabic,
+
+  /// Arabic-Indic numbered list (١. ٢. ٣.).
+  numberedArabicIndic,
+
+  /// Alphabetic list (a. b. c.).
+  alphabetic,
+
+  /// No bullet or number.
+  none,
+}
+
+/// A single item in a [GeniusPdfBulletList].
+class GeniusPdfBulletItem {
+  const GeniusPdfBulletItem({
+    required this.text,
+    this.spans,
+    this.color,
+    this.isBold = false,
+    this.subItems,
+  });
+
+  /// Creates a simple text bullet item.
+  const GeniusPdfBulletItem.simple(this.text)
+      : spans = null,
+        color = null,
+        isBold = false,
+        subItems = null;
+
+  /// Creates a bullet item with rich text spans.
+  const GeniusPdfBulletItem.rich(this.spans, {this.color})
+      : text = '',
+        isBold = false,
+        subItems = null;
+
+  /// Plain text content for the item.
+  final String text;
+
+  /// Rich text spans (overrides [text] if provided).
+  final List<GeniusPdfTextSpan>? spans;
+
+  /// Override color for this item.
+  final Color? color;
+
+  /// Whether this item text is bold.
+  final bool isBold;
+
+  /// Nested sub-items for hierarchical lists.
+  final List<GeniusPdfBulletItem>? subItems;
+
+  /// Whether this item has rich text spans.
+  bool get hasSpans => spans != null && spans!.isNotEmpty;
+
+  /// Whether this item has nested sub-items.
+  bool get hasSubItems => subItems != null && subItems!.isNotEmpty;
+}
+
+/// A bulleted or numbered list component for PDF.
+///
+/// Supports disc, circle, square, dash, numbered, and alphabetic styles.
+/// Supports nested sub-items and rich text per item.
+///
+/// ## Example
+/// ```dart
+/// final list = GeniusPdfBulletList(
+///   items: [
+///     GeniusPdfBulletItem.simple('First item'),
+///     GeniusPdfBulletItem.simple('Second item'),
+///     GeniusPdfBulletItem(text: 'Third', subItems: [
+///       GeniusPdfBulletItem.simple('Sub-item A'),
+///     ]),
+///   ],
+///   style: GeniusPdfBulletStyle.disc,
+///   baseFont: font,
+///   boldFont: boldFont,
+/// );
+///
+/// list.draw(page: page, bounds: bounds);
+/// ```
+class GeniusPdfBulletList {
+  const GeniusPdfBulletList({
+    required this.items,
+    this.style = GeniusPdfBulletStyle.disc,
+    required this.baseFont,
+    required this.boldFont,
+    this.fontSize = 10,
+    this.itemSpacing = 4,
+    this.indentWidth = 20,
+    this.bulletColor,
+    this.textColor,
+    this.isRTL = true,
+    this.startNumber = 1,
+  });
+
+  final List<GeniusPdfBulletItem> items;
+  final GeniusPdfBulletStyle style;
+  final PdfFont baseFont;
+  final PdfFont boldFont;
+  final double fontSize;
+  final double itemSpacing;
+  final double indentWidth;
+  final Color? bulletColor;
+  final Color? textColor;
+  final bool isRTL;
+  final int startNumber;
+
+  /// Returns the bullet/number marker for a given index.
+  String _bulletMarker(int index, GeniusPdfBulletStyle bulletStyle) {
+    switch (bulletStyle) {
+      case GeniusPdfBulletStyle.disc:
+        return '•  ';
+      case GeniusPdfBulletStyle.circle:
+        return '○  ';
+      case GeniusPdfBulletStyle.square:
+        return '■  ';
+      case GeniusPdfBulletStyle.dash:
+        return '–  ';
+      case GeniusPdfBulletStyle.numberedArabic:
+        return '${startNumber + index}.  ';
+      case GeniusPdfBulletStyle.numberedArabicIndic:
+        return '${_toArabicIndic(startNumber + index)}.  ';
+      case GeniusPdfBulletStyle.alphabetic:
+        return '${String.fromCharCode(97 + (index % 26))}.  ';
+      case GeniusPdfBulletStyle.none:
+        return '';
+    }
+  }
+
+  /// Converts a number to Arabic-Indic numerals (٠١٢٣٤٥٦٧٨٩).
+  String _toArabicIndic(int number) {
+    const arabicIndic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    return number
+        .toString()
+        .split('')
+        .map((d) => arabicIndic[int.parse(d)])
+        .join();
+  }
+
+  /// Sub-item bullet style (cycles: disc → circle → dash).
+  GeniusPdfBulletStyle _subItemStyle(GeniusPdfBulletStyle parentStyle) {
+    switch (parentStyle) {
+      case GeniusPdfBulletStyle.disc:
+        return GeniusPdfBulletStyle.circle;
+      case GeniusPdfBulletStyle.circle:
+        return GeniusPdfBulletStyle.dash;
+      default:
+        return GeniusPdfBulletStyle.dash;
+    }
+  }
+
+  /// Draws the bullet list on a PDF page.
+  PdfLayoutResult? draw({
+    required PdfPage page,
+    required Rect bounds,
+    PdfLayoutFormat? layoutFormat,
+  }) {
+    if (items.isEmpty) return null;
+
+    double currentY = bounds.top;
+    PdfLayoutResult? lastResult;
+
+    lastResult = _drawItems(
+      items: items,
+      page: page,
+      bounds: bounds,
+      currentY: currentY,
+      depth: 0,
+      bulletStyle: style,
+      onYAdvance: (y) => currentY = y,
+    );
+
+    return lastResult;
+  }
+
+  PdfLayoutResult? _drawItems({
+    required List<GeniusPdfBulletItem> items,
+    required PdfPage page,
+    required Rect bounds,
+    required double currentY,
+    required int depth,
+    required GeniusPdfBulletStyle bulletStyle,
+    required void Function(double) onYAdvance,
+  }) {
+    final graphics = page.graphics;
+    PdfLayoutResult? lastResult;
+
+    final indent = depth * indentWidth;
+    final effectiveBounds = Rect.fromLTWH(
+      isRTL ? bounds.left : bounds.left + indent,
+      bounds.top,
+      bounds.width - indent,
+      bounds.height,
+    );
+
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i];
+      final marker = _bulletMarker(i, bulletStyle);
+      final itemFont = item.isBold ? boldFont : baseFont;
+      final itemColor = item.color ?? textColor ?? const Color(0xFF212121);
+      final markerColor = bulletColor ?? itemColor;
+
+      // Draw marker
+      final markerSize = baseFont.measureString(marker);
+      final markerBrush = PdfSolidBrush(markerColor.toPdfColor());
+
+      final textDirection =
+          isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
+      final format = PdfStringFormat(
+        textDirection: textDirection,
+        alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+      );
+
+      final markerX = isRTL
+          ? effectiveBounds.right - markerSize.width
+          : effectiveBounds.left;
+
+      graphics.drawString(
+        marker,
+        baseFont,
+        brush: markerBrush,
+        bounds: Rect.fromLTWH(
+          markerX,
+          currentY,
+          markerSize.width + 5,
+          markerSize.height,
+        ),
+        format: format,
+      );
+
+      // Draw item text or rich spans
+      final textX = isRTL
+          ? effectiveBounds.left
+          : effectiveBounds.left + markerSize.width;
+      final textWidth = effectiveBounds.width - markerSize.width;
+
+      if (item.hasSpans) {
+        final richText = GeniusPdfRichText(
+          spans: item.spans!,
+          baseFont: baseFont,
+          boldFont: boldFont,
+          isRTL: isRTL,
+        );
+        lastResult = richText.draw(
+          page: page,
+          bounds: Rect.fromLTWH(textX, currentY, textWidth, bounds.height),
+        );
+      } else {
+        final brush = PdfSolidBrush(itemColor.toPdfColor());
+        final textSize = itemFont.measureString(item.text);
+        graphics.drawString(
+          item.text,
+          itemFont,
+          brush: brush,
+          bounds: Rect.fromLTWH(
+            textX,
+            currentY,
+            textWidth,
+            textSize.height + 4,
+          ),
+          format: format,
+        );
+      }
+
+      final lineHeight = baseFont.measureString('A').height;
+      currentY += lineHeight + itemSpacing;
+
+      // Draw sub-items recursively
+      if (item.hasSubItems) {
+        lastResult = _drawItems(
+          items: item.subItems!,
+          page: page,
+          bounds: bounds,
+          currentY: currentY,
+          depth: depth + 1,
+          bulletStyle: _subItemStyle(bulletStyle),
+          onYAdvance: (y) => currentY = y,
+        );
+      }
+
+      onYAdvance(currentY);
+    }
+
+    return lastResult;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Paragraph
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A multi-paragraph rich text component.
+///
+/// Wraps multiple [GeniusPdfRichText] blocks with paragraph spacing
+/// and consistent alignment.
+///
+/// ## Example
+/// ```dart
+/// final paragraph = GeniusPdfParagraph(
+///   blocks: [
+///     GeniusPdfRichText(spans: [...], baseFont: font, boldFont: boldFont),
+///     GeniusPdfRichText(spans: [...], baseFont: font, boldFont: boldFont),
+///   ],
+///   paragraphSpacing: 12,
+/// );
+///
+/// paragraph.draw(page: page, bounds: bounds);
+/// ```
+class GeniusPdfParagraph {
+  const GeniusPdfParagraph({
+    required this.blocks,
+    this.paragraphSpacing = 10,
+    this.firstLineIndent = 0,
+  });
+
+  /// Rich text blocks, one per paragraph.
+  final List<GeniusPdfRichText> blocks;
+
+  /// Vertical spacing between paragraphs.
+  final double paragraphSpacing;
+
+  /// Indent for the first line of each paragraph.
+  final double firstLineIndent;
+
+  /// Draws all paragraphs on the page.
+  PdfLayoutResult? draw({
+    required PdfPage page,
+    required Rect bounds,
+    PdfLayoutFormat? layoutFormat,
+  }) {
+    if (blocks.isEmpty) return null;
+
+    double currentY = bounds.top;
+    PdfLayoutResult? lastResult;
+
+    for (final block in blocks) {
+      final blockBounds = Rect.fromLTWH(
+        bounds.left + (firstLineIndent > 0 ? firstLineIndent : 0),
+        currentY,
+        bounds.width - firstLineIndent,
+        bounds.bottom - currentY,
+      );
+
+      if (blockBounds.height <= 0) break;
+
+      lastResult = block.draw(
+        page: page,
+        bounds: blockBounds,
+        layoutFormat: layoutFormat,
+      );
+
+      if (lastResult != null) {
+        currentY = lastResult.bounds.bottom + paragraphSpacing;
+      }
+    }
+
+    return lastResult;
+  }
+
+  /// Measures the total height all paragraphs will occupy.
+  double measureHeight(double availableWidth) {
+    double total = 0;
+    for (int i = 0; i < blocks.length; i++) {
+      total += blocks[i].measureHeight(availableWidth - firstLineIndent);
+      if (i < blocks.length - 1) total += paragraphSpacing;
+    }
+    return total;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Text Measurer
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Utility class for measuring text dimensions before drawing.
+///
+/// Use this to calculate bounds, check if text fits,
+/// or plan layout before committing to a draw call.
+///
+/// ## Example
+/// ```dart
+/// final measurer = GeniusPdfTextMeasurer(baseFont: font, boldFont: boldFont);
+/// final size = measurer.measureSpan(GeniusPdfTextSpan.bold('Hello'));
+/// final height = measurer.measureRichTextHeight(richText, availableWidth: 400);
+/// ```
+class GeniusPdfTextMeasurer {
+  const GeniusPdfTextMeasurer({
+    required this.baseFont,
+    required this.boldFont,
+    this.italicFont,
+    this.boldItalicFont,
+  });
+
+  final PdfFont baseFont;
+  final PdfFont boldFont;
+  final PdfFont? italicFont;
+  final PdfFont? boldItalicFont;
+
+  /// Measures a single text span's size.
+  Size measureSpan(GeniusPdfTextSpan span) {
+    final font = _resolveFont(span);
+    return font.measureString(span.text);
+  }
+
+  /// Measures the width of a single text span.
+  double measureSpanWidth(GeniusPdfTextSpan span) {
+    return measureSpan(span).width;
+  }
+
+  /// Measures the total width of multiple spans (single-line, no wrapping).
+  double measureSpansWidth(List<GeniusPdfTextSpan> spans) {
+    double total = 0;
+    for (final span in spans) {
+      total += measureSpanWidth(span);
+    }
+    return total;
+  }
+
+  /// Measures the height a [GeniusPdfRichText] will occupy at the given width.
+  double measureRichTextHeight(GeniusPdfRichText richText,
+      {required double availableWidth}) {
+    return richText.measureHeight(availableWidth);
+  }
+
+  /// Checks whether the given spans fit in a single line at the given width.
+  bool fitsInSingleLine(List<GeniusPdfTextSpan> spans, double availableWidth) {
+    return measureSpansWidth(spans) <= availableWidth;
+  }
+
+  /// Returns the number of lines the spans will occupy at the given width.
+  int estimateLineCount(List<GeniusPdfTextSpan> spans, double availableWidth) {
+    if (availableWidth <= 0) return 0;
+    final totalWidth = measureSpansWidth(spans);
+    return (totalWidth / availableWidth).ceil();
+  }
+
+  PdfFont _resolveFont(GeniusPdfTextSpan span) {
+    final wantBold = span.isBold || (span.style?.isBold ?? false);
+    final wantItalic = span.isItalic;
+
+    if (wantBold && wantItalic) return boldItalicFont ?? boldFont;
+    if (wantBold) return boldFont;
+    if (wantItalic) return italicFont ?? baseFont;
+    return baseFont;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Simple Markdown Parser
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Converts simple markdown-like markup into [GeniusPdfTextSpan] list.
+///
+/// Supported syntax:
+/// - `**bold**` → bold span
+/// - `*italic*` → italic span
+/// - `***bold italic***` → bold-italic span
+/// - `~~strikethrough~~` → strikethrough span
+/// - `==highlight==` → highlighted span
+/// - `^superscript^` → superscript span
+/// - `` `code` `` → code span
+/// - `[text](url)` → link span
+///
+/// ## Example
+/// ```dart
+/// final spans = GeniusPdfSimpleMarkdownParser.parse(
+///   'This is **bold** and *italic* with a [link](https://example.com)',
+/// );
+/// ```
+class GeniusPdfSimpleMarkdownParser {
+  GeniusPdfSimpleMarkdownParser._();
+
+  /// Parses a markdown-like string into a list of spans.
+  static List<GeniusPdfTextSpan> parse(String input) {
+    if (input.isEmpty) return [];
+
+    final spans = <GeniusPdfTextSpan>[];
+    final buffer = StringBuffer();
+    int i = 0;
+
+    while (i < input.length) {
+      // ── Link [text](url) ────────────────────────────────────────
+      if (input[i] == '[') {
+        final linkMatch = RegExp(r'\[([^\]]+)\]\(([^)]+)\)').matchAsPrefix(input, i);
+        if (linkMatch != null) {
+          // Flush buffer
+          if (buffer.isNotEmpty) {
+            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+            buffer.clear();
+          }
+          spans.add(GeniusPdfTextSpan.link(
+            linkMatch.group(1)!,
+            link: linkMatch.group(2)!,
+          ));
+          i += linkMatch.end - linkMatch.start;
+          continue;
+        }
+      }
+
+      // ── Bold italic ***text*** ──────────────────────────────────
+      if (_matchAt(input, i, '***')) {
+        final end = input.indexOf('***', i + 3);
+        if (end != -1) {
+          if (buffer.isNotEmpty) {
+            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+            buffer.clear();
+          }
+          spans.add(GeniusPdfTextSpan.boldItalic(input.substring(i + 3, end)));
+          i = end + 3;
+          continue;
+        }
+      }
+
+      // ── Bold **text** ───────────────────────────────────────────
+      if (_matchAt(input, i, '**')) {
+        final end = input.indexOf('**', i + 2);
+        if (end != -1) {
+          if (buffer.isNotEmpty) {
+            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+            buffer.clear();
+          }
+          spans.add(GeniusPdfTextSpan.bold(input.substring(i + 2, end)));
+          i = end + 2;
+          continue;
+        }
+      }
+
+      // ── Strikethrough ~~text~~ ──────────────────────────────────
+      if (_matchAt(input, i, '~~')) {
+        final end = input.indexOf('~~', i + 2);
+        if (end != -1) {
+          if (buffer.isNotEmpty) {
+            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+            buffer.clear();
+          }
+          spans.add(GeniusPdfTextSpan.strikethrough(input.substring(i + 2, end)));
+          i = end + 2;
+          continue;
+        }
+      }
+
+      // ── Highlight ==text== ──────────────────────────────────────
+      if (_matchAt(input, i, '==')) {
+        final end = input.indexOf('==', i + 2);
+        if (end != -1) {
+          if (buffer.isNotEmpty) {
+            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+            buffer.clear();
+          }
+          spans.add(GeniusPdfTextSpan.highlight(input.substring(i + 2, end)));
+          i = end + 2;
+          continue;
+        }
+      }
+
+      // ── Italic *text* (single, not double) ──────────────────────
+      if (input[i] == '*' && !_matchAt(input, i, '**')) {
+        final end = _findSingleChar(input, '*', i + 1);
+        if (end != -1) {
+          if (buffer.isNotEmpty) {
+            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+            buffer.clear();
+          }
+          spans.add(GeniusPdfTextSpan.italic(input.substring(i + 1, end)));
+          i = end + 1;
+          continue;
+        }
+      }
+
+      // ── Superscript ^text^ ──────────────────────────────────────
+      if (input[i] == '^') {
+        final end = input.indexOf('^', i + 1);
+        if (end != -1) {
+          if (buffer.isNotEmpty) {
+            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+            buffer.clear();
+          }
+          spans.add(GeniusPdfTextSpan.superscript(input.substring(i + 1, end)));
+          i = end + 1;
+          continue;
+        }
+      }
+
+      // ── Code `text` ────────────────────────────────────────────
+      if (input[i] == '`') {
+        final end = input.indexOf('`', i + 1);
+        if (end != -1) {
+          if (buffer.isNotEmpty) {
+            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+            buffer.clear();
+          }
+          spans.add(GeniusPdfTextSpan.code(input.substring(i + 1, end)));
+          i = end + 1;
+          continue;
+        }
+      }
+
+      // ── Plain character ─────────────────────────────────────────
+      buffer.write(input[i]);
+      i++;
+    }
+
+    // Flush remaining buffer
+    if (buffer.isNotEmpty) {
+      spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+    }
+
+    return spans;
+  }
+
+  /// Checks if [pattern] appears at position [i] in [input].
+  static bool _matchAt(String input, int i, String pattern) {
+    if (i + pattern.length > input.length) return false;
+    return input.substring(i, i + pattern.length) == pattern;
+  }
+
+  /// Finds the next occurrence of a single [char] that is NOT doubled.
+  static int _findSingleChar(String input, String char, int start) {
+    for (int i = start; i < input.length; i++) {
+      if (input[i] == char) {
+        // Make sure it's not a double (e.g. ** for bold)
+        final isDouble = (i + 1 < input.length && input[i + 1] == char);
+        if (!isDouble) return i;
+      }
+    }
+    return -1;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// String Extensions
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Extension methods on [String] for quick span creation.
+extension GeniusPdfStringSpanExtension on String {
+  /// Converts to a plain text span.
+  GeniusPdfTextSpan toSpan() => GeniusPdfTextSpan.plain(this);
+
+  /// Converts to a bold text span.
+  GeniusPdfTextSpan toBoldSpan({Color? color}) =>
+      GeniusPdfTextSpan.bold(this, color: color);
+
+  /// Converts to an italic text span.
+  GeniusPdfTextSpan toItalicSpan({Color? color}) =>
+      GeniusPdfTextSpan.italic(this, color: color);
+
+  /// Converts to a colored text span.
+  GeniusPdfTextSpan toColoredSpan(Color color) =>
+      GeniusPdfTextSpan.colored(this, color);
+
+  /// Converts to a highlighted text span.
+  GeniusPdfTextSpan toHighlightSpan({Color? backgroundColor}) =>
+      GeniusPdfTextSpan.highlight(this, backgroundColor: backgroundColor);
+
+  /// Converts to a link text span.
+  GeniusPdfTextSpan toLinkSpan(String url) =>
+      GeniusPdfTextSpan.link(this, link: url);
+
+  /// Converts to a badge text span.
+  GeniusPdfTextSpan toBadgeSpan({Color? backgroundColor, Color? color}) =>
+      GeniusPdfTextSpan.badge(this,
+          backgroundColor: backgroundColor ?? const Color(0xFF1976D2),
+          color: color ?? const Color(0xFFFFFFFF));
+
+  /// Converts to a label text span.
+  GeniusPdfTextSpan toLabelSpan() => GeniusPdfTextSpan.label(this);
+
+  /// Converts to a heading text span.
+  GeniusPdfTextSpan toHeadingSpan({double fontSize = 14}) =>
+      GeniusPdfTextSpan.heading(this, fontSize: fontSize);
+
+  /// Converts to a small/caption text span.
+  GeniusPdfTextSpan toSmallSpan({Color? color}) =>
+      GeniusPdfTextSpan.small(this, color: color);
+
+  /// Parses this string as simple markdown into spans.
+  List<GeniusPdfTextSpan> parseMarkdownSpans() =>
+      GeniusPdfSimpleMarkdownParser.parse(this);
 }

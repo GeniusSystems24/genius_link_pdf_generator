@@ -72,6 +72,15 @@ A comprehensive PDF generation and preview library for Flutter applications with
 📦 **Export Presets** (v2.3.3+5) - Pre-configured export settings for common use cases
 🎨 **Conditional Formatting** (v2.3.3+5) - Excel-like conditional formatting for data grids
 🔢 **Grid Calculations** (v2.3.3+5) - Calculate totals, averages, sort and filter grid data
+✏️ **Rich Text Engine** (v2.3.3+6) - Complete rewrite with background, strikethrough, superscript/subscript rendering
+📝 **Italic Font Support** (v2.3.3+6) - Italic and bold-italic font resolution for rich text
+📑 **Bullet Lists** (v2.3.3+6) - Bulleted, numbered (Arabic/Arabic-Indic/alphabetic), and nested lists
+📐 **Text Measurer** (v2.3.3+6) - Pre-measure text dimensions before drawing
+📋 **Markdown Parser** (v2.3.3+6) - Convert simple markdown to styled text spans
+🏷️ **Text Span Factories** (v2.3.3+6) - Currency, badge, label, heading, small span constructors
+🔤 **String Extensions** (v2.3.3+6) - Quick span conversion methods on String
+📄 **Multi-Paragraph** (v2.3.3+6) - Multi-paragraph component with spacing and indent
+✂️ **Text Overflow** (v2.3.3+6) - Max lines with ellipsis or clip overflow
 
 ---
 
