@@ -5,6 +5,161 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.3+5] - 2026-01-28
+
+### Added
+
+#### PDF Manipulation (`GeniusPdfService`)
+- **Merge PDFs** - Combine multiple PDF documents into one
+  - `mergePdfs()` - Merge with configurable options
+  - `GeniusPdfMergeResult` - Result with page count and file size
+- **Split PDF** - Split a document into separate files
+  - `splitPdf()` - Split by page ranges or page count
+  - `GeniusPdfSplitResult` - Result with list of split documents
+- **Extract Pages** - Extract specific pages from a document
+  - `extractPages()` - Extract by page numbers or range
+- **Add Watermark** - Add text watermark to pages
+  - `addWatermark()` - Customizable text, position, opacity, rotation
+- **Rotate Pages** - Rotate specific pages
+  - `rotatePages()` - Rotate by 90, 180, or 270 degrees
+- **PDF Info** - Get detailed document information
+  - `getPdfInfo()` - Page count, size, title, author, dates
+  - `GeniusPdfInfo` and `GeniusPdfMetadata` - Info classes
+- **Batch Generation** - Generate multiple PDFs
+  - `generateBatch()` - Generate with progress callbacks
+- **Share with Options** - Enhanced sharing
+  - `shareWithOptions()` - Share with custom subject and message
+- **Cancellation Support** - Cancel long-running operations
+  - `GeniusPdfCancellationToken` - Token for operation cancellation
+
+#### Job Scheduling (`GeniusPdfGenerationManager`)
+- **Schedule Jobs** - Schedule PDF generation for later
+  - `GeniusPdfScheduler` - Timer-based job scheduling
+  - `scheduleJob()` - Schedule with delay
+  - `scheduleAfter()` - Schedule after another job completes
+  - `cancelScheduledJob()` - Cancel a scheduled job
+- **Job Statistics** - Track generation metrics
+  - `GeniusPdfJobStatistics` - Completed, failed, avg duration
+  - Statistics extension on `GeniusPdfGenerationManager`
+- **Job Chains** - Chain jobs with dependencies
+  - `GeniusPdfJobChain` - Chain multiple jobs sequentially
+  - `addJob()`, `start()`, `cancel()` - Chain methods
+
+#### Export Validation (`GeniusPdfExportService`)
+- **Export Validator** - Validate export configuration
+  - `GeniusExportValidator` - Validate before export
+  - Validates format, page range, quality, filename
+  - Bilingual error messages (Arabic/English)
+- **Batch Export Summary** - Detailed batch results
+  - `GeniusBatchExportSummary` - Success rate, duration, file sizes
+  - Average file size calculation
+- **Format Detection** - Auto-detect export format
+  - `GeniusExportFormatDetector` - Detect from filename or content
+  - Supports MIME type detection
+- **Export Presets** - Common export configurations
+  - `GeniusExportPresets.archival()` - PDF/A with full quality
+  - `GeniusExportPresets.webOptimized()` - Compressed PNG
+  - `GeniusExportPresets.print()` - High DPI for printing
+  - `GeniusExportPresets.email()` - Optimized for email
+  - `GeniusExportPresets.thumbnail()` - Small preview images
+
+#### Conditional Formatting (`GeniusPdfDataGrid`)
+- **Condition Types** - Multiple condition operators
+  - `GeniusConditionType` - equals, greaterThan, lessThan, between, contains, isEmpty, custom, etc.
+- **Formatting Rules** - Define conditional format rules
+  - `GeniusConditionalFormatRule` - Rule with condition and formatting
+  - `GeniusConditionalFormatRule.positive()` - Green for positive values
+  - `GeniusConditionalFormatRule.negative()` - Red for negative values
+  - `GeniusConditionalFormatRule.aboveThreshold()` - Highlight above value
+  - `GeniusConditionalFormatRule.belowThreshold()` - Highlight below value
+  - `GeniusConditionalFormatRule.between()` - Highlight value range
+  - `GeniusConditionalFormatRule.contains()` - Text contains match
+  - `GeniusConditionalFormatRule.empty()` - Highlight empty cells
+- **Format Manager** - Manage multiple rules
+  - `GeniusConditionalFormatManager` - Add/remove/evaluate rules
+  - Priority-based rule evaluation
+- **Cell Formatting** - Format applied to cells
+  - `GeniusCellFormatting` - Background, text color, bold, italic
+- **Data Grid Utils** - Utility functions for grids
+  - `GeniusDataGridUtils.calculateTotals()` - Sum numeric columns
+  - `GeniusDataGridUtils.calculateAverages()` - Average numeric columns
+  - `GeniusDataGridUtils.sortBy()` - Sort rows by column
+  - `GeniusDataGridUtils.filter()` - Filter rows by condition
+  - `GeniusDataGridUtils.groupBy()` - Group rows by column value
+
+### Example
+
+```dart
+// Merge multiple PDFs
+final mergeResult = await GeniusPdfService.instance.mergePdfs(
+  documents: [pdf1Bytes, pdf2Bytes, pdf3Bytes],
+  outputFileName: 'merged.pdf',
+);
+
+// Split PDF by pages
+final splitResult = await GeniusPdfService.instance.splitPdf(
+  pdfBytes: pdfBytes,
+  pageRanges: [(1, 5), (6, 10), (11, 15)],
+);
+
+// Add watermark
+await GeniusPdfService.instance.addWatermark(
+  pdfBytes: pdfBytes,
+  text: 'CONFIDENTIAL',
+  opacity: 0.3,
+  rotation: 45,
+);
+
+// Schedule a job for later
+final scheduler = GeniusPdfScheduler();
+scheduler.scheduleJob(
+  delay: Duration(minutes: 5),
+  builder: myBuilder,
+  onComplete: (result) => print('Scheduled job completed'),
+);
+
+// Validate export configuration
+final validation = GeniusExportValidator.validate(config, totalPages: 10);
+if (!validation.isValid) {
+  print('Error: ${validation.getErrorMessage(isRTL: true)}');
+}
+
+// Use export presets
+final archivalConfig = GeniusExportPresets.archival();
+final webConfig = GeniusExportPresets.webOptimized();
+final printConfig = GeniusExportPresets.print();
+
+// Apply conditional formatting
+final manager = GeniusConditionalFormatManager();
+manager.addRule(GeniusConditionalFormatRule.positive(
+  columnId: 'profit',
+  formatting: GeniusCellFormatting(
+    backgroundColor: PdfColor(0.9, 1.0, 0.9),
+    textColor: PdfColor(0, 0.5, 0),
+    isBold: true,
+  ),
+));
+manager.addRule(GeniusConditionalFormatRule.negative(
+  columnId: 'profit',
+  formatting: GeniusCellFormatting(
+    backgroundColor: PdfColor(1.0, 0.9, 0.9),
+    textColor: PdfColor(0.8, 0, 0),
+  ),
+));
+
+// Calculate grid totals
+final totals = GeniusDataGridUtils.calculateTotals(
+  rows: myRows,
+  columns: ['quantity', 'price', 'total'],
+);
+
+// Sort and filter
+final sorted = GeniusDataGridUtils.sortBy(rows, 'date', ascending: false);
+final filtered = GeniusDataGridUtils.filter(rows, 'status', 'active');
+```
+
+---
+
 ## [2.3.3+4] - 2026-01-28
 
 ### Added

@@ -283,3 +283,315 @@ extension PdfDocumentExport on PdfDocument {
     );
   }
 }
+
+// ============================================================================
+// Export Validation
+// ============================================================================
+
+/// Validates export configuration and document before export.
+class GeniusExportValidator {
+  /// Validates that the export configuration is valid.
+  static GeniusExportValidationResult validateConfiguration(
+    GeniusExportConfiguration config,
+  ) {
+    final errors = <String>[];
+
+    // Validate page range
+    if (config.startPage != null && config.endPage != null) {
+      if (config.startPage! > config.endPage!) {
+        errors.add('Start page cannot be greater than end page');
+      }
+      if (config.startPage! < 1) {
+        errors.add('Start page must be at least 1');
+      }
+    }
+
+    // Validate image quality
+    if (config.format == GeniusExportFormat.png ||
+        config.format == GeniusExportFormat.jpeg) {
+      final dpi = config.imageQuality.dpi;
+      if (dpi < 72 || dpi > 600) {
+        errors.add('DPI must be between 72 and 600');
+      }
+    }
+
+    // Validate output filename
+    if (config.outputFileName != null) {
+      final invalidChars = RegExp(r'[<>:"/\\|?*]');
+      if (invalidChars.hasMatch(config.outputFileName!)) {
+        errors.add('Output filename contains invalid characters');
+      }
+    }
+
+    return GeniusExportValidationResult(
+      isValid: errors.isEmpty,
+      errors: errors,
+    );
+  }
+
+  /// Validates that a document can be exported.
+  static GeniusExportValidationResult validateDocument(
+    PdfDocument document,
+    GeniusExportConfiguration config,
+  ) {
+    final errors = <String>[];
+
+    // Check page count
+    if (document.pages.count == 0) {
+      errors.add('Document has no pages');
+    }
+
+    // Check page range
+    if (config.startPage != null && config.startPage! > document.pages.count) {
+      errors.add('Start page exceeds document page count');
+    }
+    if (config.endPage != null && config.endPage! > document.pages.count) {
+      errors.add('End page exceeds document page count');
+    }
+
+    return GeniusExportValidationResult(
+      isValid: errors.isEmpty,
+      errors: errors,
+    );
+  }
+}
+
+/// Result of export validation.
+class GeniusExportValidationResult {
+  const GeniusExportValidationResult({
+    required this.isValid,
+    this.errors = const [],
+  });
+
+  final bool isValid;
+  final List<String> errors;
+
+  String get errorSummary => errors.join('; ');
+}
+
+// ============================================================================
+// Batch Export with Summary
+// ============================================================================
+
+/// Result of a batch export operation.
+class GeniusBatchExportSummary {
+  const GeniusBatchExportSummary({
+    required this.totalDocuments,
+    required this.successCount,
+    required this.failureCount,
+    required this.results,
+    required this.totalDuration,
+    this.outputDirectory,
+  });
+
+  final int totalDocuments;
+  final int successCount;
+  final int failureCount;
+  final List<GeniusExportResult> results;
+  final Duration totalDuration;
+  final String? outputDirectory;
+
+  bool get allSucceeded => failureCount == 0;
+  double get successRate => totalDocuments == 0 ? 0 : successCount / totalDocuments;
+
+  List<GeniusExportSuccess> get successResults =>
+      results.whereType<GeniusExportSuccess>().toList();
+
+  List<GeniusExportFailure> get failureResults =>
+      results.whereType<GeniusExportFailure>().toList();
+}
+
+/// Extension for batch export operations.
+extension GeniusBatchExportExtension on GeniusPdfExportService {
+  /// Exports multiple documents in batch.
+  Future<GeniusBatchExportSummary> exportBatch({
+    required List<PdfDocument> documents,
+    required GeniusExportConfiguration config,
+    String? outputDirectory,
+    String Function(int index)? fileNameGenerator,
+    void Function(int current, int total, GeniusExportProgress?)? onProgress,
+    bool stopOnError = false,
+  }) async {
+    final startTime = DateTime.now();
+    final results = <GeniusExportResult>[];
+    int successCount = 0;
+    int failureCount = 0;
+
+    for (int i = 0; i < documents.length; i++) {
+      onProgress?.call(i, documents.length, null);
+
+      final document = documents[i];
+      final fileName = fileNameGenerator?.call(i) ?? 'export_${i + 1}';
+
+      GeniusExportResult result;
+      if (outputDirectory != null) {
+        final extension = config.format.extension;
+        final outputPath = '$outputDirectory/$fileName.$extension';
+        result = await exportAndSave(
+          document,
+          config.copyWith(outputFileName: fileName),
+          outputPath,
+          onProgress: (progress) {
+            onProgress?.call(i, documents.length, progress);
+          },
+        );
+      } else {
+        result = await export(
+          document,
+          config.copyWith(outputFileName: fileName),
+          onProgress: (progress) {
+            onProgress?.call(i, documents.length, progress);
+          },
+        );
+      }
+
+      results.add(result);
+
+      if (result is GeniusExportSuccess) {
+        successCount++;
+      } else {
+        failureCount++;
+        if (stopOnError) break;
+      }
+    }
+
+    onProgress?.call(documents.length, documents.length, null);
+
+    return GeniusBatchExportSummary(
+      totalDocuments: documents.length,
+      successCount: successCount,
+      failureCount: failureCount,
+      results: results,
+      totalDuration: DateTime.now().difference(startTime),
+      outputDirectory: outputDirectory,
+    );
+  }
+}
+
+// ============================================================================
+// Export Format Detection
+// ============================================================================
+
+/// Utilities for export format detection.
+class GeniusExportFormatDetector {
+  /// Detects the recommended export format based on file extension.
+  static GeniusExportFormat? fromExtension(String extension) {
+    final ext = extension.toLowerCase().replaceAll('.', '');
+    switch (ext) {
+      case 'png':
+        return GeniusExportFormat.png;
+      case 'jpg':
+      case 'jpeg':
+        return GeniusExportFormat.jpeg;
+      case 'html':
+      case 'htm':
+        return GeniusExportFormat.html;
+      case 'txt':
+      case 'text':
+        return GeniusExportFormat.text;
+      case 'pdf':
+        return GeniusExportFormat.pdfA;
+      default:
+        return null;
+    }
+  }
+
+  /// Detects the recommended export format from a file path.
+  static GeniusExportFormat? fromPath(String path) {
+    final parts = path.split('.');
+    if (parts.length < 2) return null;
+    return fromExtension(parts.last);
+  }
+
+  /// Gets all supported extensions for a format.
+  static List<String> getExtensionsForFormat(GeniusExportFormat format) {
+    switch (format) {
+      case GeniusExportFormat.png:
+        return ['png'];
+      case GeniusExportFormat.jpeg:
+        return ['jpg', 'jpeg'];
+      case GeniusExportFormat.html:
+        return ['html', 'htm'];
+      case GeniusExportFormat.text:
+        return ['txt', 'text'];
+      case GeniusExportFormat.pdfA:
+        return ['pdf'];
+    }
+  }
+}
+
+// ============================================================================
+// Export Presets
+// ============================================================================
+
+/// Predefined export configurations for common use cases.
+class GeniusExportPresets {
+  GeniusExportPresets._();
+
+  /// High quality image export (300 DPI PNG).
+  static GeniusExportConfiguration highQualityImage() {
+    return const GeniusExportConfiguration(
+      format: GeniusExportFormat.png,
+      imageQuality: GeniusImageQuality.high,
+      compress: false,
+    );
+  }
+
+  /// Web-optimized image export (150 DPI JPEG).
+  static GeniusExportConfiguration webImage() {
+    return const GeniusExportConfiguration(
+      format: GeniusExportFormat.jpeg,
+      imageQuality: GeniusImageQuality.medium,
+      compress: true,
+    );
+  }
+
+  /// Thumbnail export (72 DPI JPEG).
+  static GeniusExportConfiguration thumbnail() {
+    return const GeniusExportConfiguration(
+      format: GeniusExportFormat.jpeg,
+      imageQuality: GeniusImageQuality.low,
+      compress: true,
+    );
+  }
+
+  /// Print quality export (600 DPI PNG).
+  static GeniusExportConfiguration printQuality() {
+    return const GeniusExportConfiguration(
+      format: GeniusExportFormat.png,
+      imageQuality: GeniusImageQuality.maximum,
+      compress: false,
+    );
+  }
+
+  /// Archival PDF/A export.
+  static GeniusExportConfiguration archive() {
+    return const GeniusExportConfiguration(
+      format: GeniusExportFormat.pdfA,
+      compress: true,
+    );
+  }
+
+  /// Accessible HTML export.
+  static GeniusExportConfiguration accessibleHtml() {
+    return const GeniusExportConfiguration(
+      format: GeniusExportFormat.html,
+    );
+  }
+
+  /// Plain text export.
+  static GeniusExportConfiguration plainText() {
+    return const GeniusExportConfiguration(
+      format: GeniusExportFormat.text,
+    );
+  }
+
+  /// Email attachment (moderate quality JPEG).
+  static GeniusExportConfiguration emailAttachment() {
+    return const GeniusExportConfiguration(
+      format: GeniusExportFormat.jpeg,
+      imageQuality: GeniusImageQuality.medium,
+      compress: true,
+    );
+  }
+}

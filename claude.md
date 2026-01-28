@@ -6,6 +6,217 @@
 
 ---
 
+## ⭐ ملاحظات أسلوب التطوير المعتمد
+
+### 1. نمط Factory Constructors
+
+استخدم Factory Constructors لتوفير إعدادات جاهزة شائعة الاستخدام:
+
+```dart
+class GeniusPrintSettings {
+  // المُنشئ الأساسي
+  const GeniusPrintSettings({...});
+
+  // Factory constructors للاستخدامات الشائعة
+  factory GeniusPrintSettings.defaults() => ...;
+  factory GeniusPrintSettings.draft() => ...;
+  factory GeniusPrintSettings.highQuality() => ...;
+  factory GeniusPrintSettings.eco() => ...;
+}
+```
+
+### 2. نمط Singleton للخدمات
+
+استخدم Singleton Pattern للخدمات التي تحتاج instance واحد:
+
+```dart
+class GeniusPrinterService {
+  GeniusPrinterService._();
+
+  static GeniusPrinterService? _instance;
+
+  static GeniusPrinterService get instance {
+    _instance ??= GeniusPrinterService._();
+    return _instance!;
+  }
+}
+```
+
+### 3. نمط Result Classes
+
+استخدم Result Classes لإرجاع نتائج العمليات:
+
+```dart
+class GeniusPdfShareResult {
+  const GeniusPdfShareResult({
+    required this.success,
+    this.error,
+    this.filePath,
+  });
+
+  factory GeniusPdfShareResult.success({String? filePath}) => ...;
+  factory GeniusPdfShareResult.failure(String error) => ...;
+
+  final bool success;
+  final String? error;
+  final String? filePath;
+}
+```
+
+### 4. Extension Methods للاستخدام السهل
+
+أضف Extension Methods على الأنواع الشائعة:
+
+```dart
+extension GeniusPrintBytesExtension on Uint8List {
+  Future<GeniusPrintResult> print({required String documentName}) => ...;
+  Future<GeniusPdfShareResult> share({required String fileName}) => ...;
+  Future<Uint8List?> toThumbnail({double dpi = 72}) => ...;
+}
+```
+
+### 5. دعم ثنائي اللغة (Bilingual)
+
+كل مكون يجب أن يدعم العربية والإنجليزية:
+
+```dart
+class GeniusBarcodeValidationResult {
+  final String? errorMessage;     // English
+  final String? errorMessageAr;   // Arabic
+
+  String? getErrorMessage({bool isRTL = false}) {
+    return isRTL ? errorMessageAr : errorMessage;
+  }
+}
+```
+
+### 6. Validation قبل التنفيذ
+
+أنشئ فئات Validator للتحقق من صحة البيانات:
+
+```dart
+class GeniusBarcodeValidator {
+  static GeniusBarcodeValidationResult validate({
+    required String data,
+    required GeniusBarcodeType type,
+  }) {
+    // التحقق من صحة البيانات
+    if (!isValid) {
+      return GeniusBarcodeValidationResult.invalid(
+        'Error message',
+        'رسالة الخطأ',
+      );
+    }
+    return GeniusBarcodeValidationResult.valid();
+  }
+}
+```
+
+### 7. Batch/Group Operations
+
+وفر طرق لمعالجة مجموعات من العناصر:
+
+```dart
+class GeniusBarcodeGenerator {
+  // توليد سلسلة من الباركودات
+  static List<GeniusPdfBarcode> generateSequence({
+    required String prefix,
+    required int start,
+    required int count,
+    ...
+  });
+
+  // توليد من قائمة بيانات
+  static List<GeniusPdfBarcode> fromDataList({
+    required List<String> dataList,
+    ...
+  });
+}
+```
+
+### 8. Layout/Grouping Components
+
+وفر مكونات لتجميع العناصر المتشابهة:
+
+```dart
+enum GeniusBarcodeGroupLayout { horizontal, vertical, grid }
+
+class GeniusBarcodeGroup {
+  final List<GeniusPdfBarcode> barcodes;
+  final GeniusBarcodeGroupLayout layout;
+  final double spacing;
+  final int gridColumns;
+
+  Rect draw({required PdfPage page, required Rect bounds});
+}
+```
+
+### 9. Platform Capabilities Detection
+
+تحقق من قدرات المنصة قبل تنفيذ العمليات:
+
+```dart
+class GeniusPrintingCapabilities {
+  final bool canPrint;
+  final bool canShare;
+  final bool canRaster;
+  final bool directPrint;
+
+  String get summaryEn => ...; // English summary
+  String get summaryAr => ...; // Arabic summary
+}
+```
+
+### 10. Filtered Lists/Getters
+
+وفر getters للحصول على قوائم مفلترة:
+
+```dart
+class GeniusPrinterDiscoveryResult {
+  final List<GeniusPrinterInfo> printers;
+
+  // Filtered getters
+  List<GeniusPrinterInfo> get availablePrinters =>
+      printers.where((p) => p.isAvailable).toList();
+  List<GeniusPrinterInfo> get networkPrinters =>
+      printers.where((p) => p.connectionType == ConnectionType.network).toList();
+  List<GeniusPrinterInfo> get colorPrinters =>
+      printers.where((p) => p.capabilities.supportsColor).toList();
+}
+```
+
+### 11. Progress Callbacks
+
+وفر callbacks لتتبع التقدم في العمليات الطويلة:
+
+```dart
+Future<GeniusPdfRasterResult> rasterPdf({
+  required Uint8List pdfBytes,
+  double dpi = 150,
+  void Function(int current, int total)? onProgress,
+});
+```
+
+### 12. Enhanced UI Widgets
+
+أنشئ versions محسنة من الـ widgets مع ميزات إضافية:
+
+```dart
+// Widget أساسي
+class GeniusPrintPreview extends StatefulWidget { ... }
+
+// Widget محسن مع ميزات إضافية
+class GeniusPrintPreviewEnhanced extends StatefulWidget {
+  final bool showShareButton;
+  final bool showSaveButton;
+  final void Function()? onShare;
+  final void Function()? onSave;
+  ...
+}
+```
+
+---
+
 ## قواعد إلزامية لكل طلب تطوير
 
 ### 1. تحديث الملفات الأساسية

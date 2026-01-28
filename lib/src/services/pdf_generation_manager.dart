@@ -865,3 +865,392 @@ extension PdfGenerationManagerExtension on GeniusPdfGenerationManager {
     }
   }
 }
+
+// ============================================================================
+// Job Scheduling Support
+// ============================================================================
+
+/// A scheduled PDF job that will be processed at a specific time.
+class GeniusPdfScheduledJob {
+  GeniusPdfScheduledJob({
+    required this.id,
+    required this.builder,
+    required this.fileName,
+    required this.scheduledTime,
+    this.priority = GeniusPdfJobPriority.normal,
+    this.autoOpen = false,
+    this.autoShare = false,
+    this.autoPrint = false,
+    this.onComplete,
+    this.onError,
+    this.metadata,
+    this.repeatInterval,
+  }) : createdAt = DateTime.now();
+
+  final String id;
+  final GeniusPdfDocumentBuilder builder;
+  final String fileName;
+  final DateTime scheduledTime;
+  final GeniusPdfJobPriority priority;
+  final bool autoOpen;
+  final bool autoShare;
+  final bool autoPrint;
+  final void Function(GeniusPdfSuccess result)? onComplete;
+  final void Function(GeniusPdfFailure error)? onError;
+  final Map<String, dynamic>? metadata;
+  final Duration? repeatInterval;
+  final DateTime createdAt;
+
+  Timer? _timer;
+  bool _isCancelled = false;
+
+  bool get isCancelled => _isCancelled;
+  bool get isPending => !_isCancelled && _timer != null;
+
+  Duration get timeUntilExecution {
+    final diff = scheduledTime.difference(DateTime.now());
+    return diff.isNegative ? Duration.zero : diff;
+  }
+
+  void cancel() {
+    _isCancelled = true;
+    _timer?.cancel();
+    _timer = null;
+  }
+}
+
+/// Manages scheduled PDF jobs.
+class GeniusPdfScheduler {
+  GeniusPdfScheduler({
+    required this.manager,
+  });
+
+  final GeniusPdfGenerationManager manager;
+  final Map<String, GeniusPdfScheduledJob> _scheduledJobs = {};
+  int _scheduledCounter = 0;
+
+  /// All scheduled jobs.
+  List<GeniusPdfScheduledJob> get scheduledJobs => _scheduledJobs.values.toList();
+
+  /// Pending scheduled jobs (not yet executed or cancelled).
+  List<GeniusPdfScheduledJob> get pendingJobs =>
+      _scheduledJobs.values.where((j) => j.isPending).toList();
+
+  /// Schedules a job for later execution.
+  String scheduleJob({
+    required GeniusPdfDocumentBuilder builder,
+    required String fileName,
+    required DateTime scheduledTime,
+    GeniusPdfJobPriority priority = GeniusPdfJobPriority.normal,
+    bool autoOpen = false,
+    bool autoShare = false,
+    bool autoPrint = false,
+    void Function(GeniusPdfSuccess result)? onComplete,
+    void Function(GeniusPdfFailure error)? onError,
+    Map<String, dynamic>? metadata,
+    Duration? repeatInterval,
+  }) {
+    _scheduledCounter++;
+    final id = 'scheduled_${DateTime.now().millisecondsSinceEpoch}_$_scheduledCounter';
+
+    final job = GeniusPdfScheduledJob(
+      id: id,
+      builder: builder,
+      fileName: fileName,
+      scheduledTime: scheduledTime,
+      priority: priority,
+      autoOpen: autoOpen,
+      autoShare: autoShare,
+      autoPrint: autoPrint,
+      onComplete: onComplete,
+      onError: onError,
+      metadata: metadata,
+      repeatInterval: repeatInterval,
+    );
+
+    _scheduledJobs[id] = job;
+    _scheduleExecution(job);
+
+    return id;
+  }
+
+  /// Schedules a job to run after a delay.
+  String scheduleAfter({
+    required GeniusPdfDocumentBuilder builder,
+    required String fileName,
+    required Duration delay,
+    GeniusPdfJobPriority priority = GeniusPdfJobPriority.normal,
+    bool autoOpen = false,
+    bool autoShare = false,
+    bool autoPrint = false,
+    void Function(GeniusPdfSuccess result)? onComplete,
+    void Function(GeniusPdfFailure error)? onError,
+  }) {
+    return scheduleJob(
+      builder: builder,
+      fileName: fileName,
+      scheduledTime: DateTime.now().add(delay),
+      priority: priority,
+      autoOpen: autoOpen,
+      autoShare: autoShare,
+      autoPrint: autoPrint,
+      onComplete: onComplete,
+      onError: onError,
+    );
+  }
+
+  void _scheduleExecution(GeniusPdfScheduledJob job) {
+    final delay = job.timeUntilExecution;
+
+    job._timer = Timer(delay, () async {
+      if (job.isCancelled) return;
+
+      await manager.addJob(
+        builder: job.builder,
+        fileName: job.fileName,
+        priority: job.priority,
+        autoOpen: job.autoOpen,
+        autoShare: job.autoShare,
+        autoPrint: job.autoPrint,
+        onComplete: job.onComplete,
+        onError: job.onError,
+        metadata: job.metadata,
+      );
+
+      // Handle repeating jobs
+      if (job.repeatInterval != null && !job.isCancelled) {
+        final nextTime = DateTime.now().add(job.repeatInterval!);
+        scheduleJob(
+          builder: job.builder,
+          fileName: '${job.fileName}_${DateTime.now().millisecondsSinceEpoch}',
+          scheduledTime: nextTime,
+          priority: job.priority,
+          autoOpen: job.autoOpen,
+          autoShare: job.autoShare,
+          autoPrint: job.autoPrint,
+          onComplete: job.onComplete,
+          onError: job.onError,
+          metadata: job.metadata,
+          repeatInterval: job.repeatInterval,
+        );
+      }
+
+      _scheduledJobs.remove(job.id);
+    });
+  }
+
+  /// Cancels a scheduled job.
+  bool cancelScheduledJob(String id) {
+    final job = _scheduledJobs[id];
+    if (job == null) return false;
+
+    job.cancel();
+    _scheduledJobs.remove(id);
+    return true;
+  }
+
+  /// Cancels all scheduled jobs.
+  int cancelAllScheduled() {
+    int count = 0;
+    for (final job in _scheduledJobs.values) {
+      job.cancel();
+      count++;
+    }
+    _scheduledJobs.clear();
+    return count;
+  }
+
+  /// Gets a scheduled job by ID.
+  GeniusPdfScheduledJob? getScheduledJob(String id) => _scheduledJobs[id];
+
+  /// Disposes the scheduler.
+  void dispose() {
+    cancelAllScheduled();
+  }
+}
+
+// ============================================================================
+// Job Statistics and Metrics
+// ============================================================================
+
+/// Statistics about PDF generation jobs.
+class GeniusPdfJobStatistics {
+  const GeniusPdfJobStatistics({
+    required this.totalJobs,
+    required this.completedJobs,
+    required this.failedJobs,
+    required this.cancelledJobs,
+    required this.averageDuration,
+    required this.totalBytesGenerated,
+    required this.fastestJob,
+    required this.slowestJob,
+    required this.successRate,
+  });
+
+  final int totalJobs;
+  final int completedJobs;
+  final int failedJobs;
+  final int cancelledJobs;
+  final Duration averageDuration;
+  final int totalBytesGenerated;
+  final Duration? fastestJob;
+  final Duration? slowestJob;
+  final double successRate;
+
+  String get formattedAverageDuration {
+    final seconds = averageDuration.inSeconds;
+    if (seconds < 60) return '${seconds}s';
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '${minutes}m ${remainingSeconds}s';
+  }
+
+  String get formattedTotalBytes {
+    if (totalBytesGenerated < 1024) return '$totalBytesGenerated B';
+    if (totalBytesGenerated < 1024 * 1024) {
+      return '${(totalBytesGenerated / 1024).toStringAsFixed(1)} KB';
+    }
+    return '${(totalBytesGenerated / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+}
+
+/// Extension for job statistics.
+extension GeniusPdfStatisticsExtension on GeniusPdfGenerationManager {
+  /// Calculates statistics for all jobs.
+  GeniusPdfJobStatistics getStatistics() {
+    final jobs = allJobs;
+    final completed = jobs.where((j) => j.status == GeniusPdfJobStatus.completed).toList();
+    final failed = jobs.where((j) => j.status == GeniusPdfJobStatus.failed).length;
+    final cancelled = jobs.where((j) => j.status == GeniusPdfJobStatus.cancelled).length;
+
+    // Calculate durations
+    final durations = completed
+        .where((j) => j.duration != null)
+        .map((j) => j.duration!)
+        .toList();
+
+    Duration avgDuration = Duration.zero;
+    Duration? fastest;
+    Duration? slowest;
+
+    if (durations.isNotEmpty) {
+      final totalMs = durations.fold<int>(0, (sum, d) => sum + d.inMilliseconds);
+      avgDuration = Duration(milliseconds: totalMs ~/ durations.length);
+      durations.sort((a, b) => a.compareTo(b));
+      fastest = durations.first;
+      slowest = durations.last;
+    }
+
+    // Calculate total bytes
+    int totalBytes = 0;
+    for (final job in completed) {
+      if (job.result is GeniusPdfSuccess) {
+        totalBytes += (job.result as GeniusPdfSuccess).bytes.length;
+      }
+    }
+
+    final successRate = jobs.isEmpty ? 0.0 : completed.length / jobs.length;
+
+    return GeniusPdfJobStatistics(
+      totalJobs: jobs.length,
+      completedJobs: completed.length,
+      failedJobs: failed,
+      cancelledJobs: cancelled,
+      averageDuration: avgDuration,
+      totalBytesGenerated: totalBytes,
+      fastestJob: fastest,
+      slowestJob: slowest,
+      successRate: successRate,
+    );
+  }
+
+  /// Gets jobs grouped by status.
+  Map<GeniusPdfJobStatus, List<GeniusPdfJob>> getJobsByStatus() {
+    final result = <GeniusPdfJobStatus, List<GeniusPdfJob>>{};
+    for (final status in GeniusPdfJobStatus.values) {
+      result[status] = allJobs.where((j) => j.status == status).toList();
+    }
+    return result;
+  }
+
+  /// Gets jobs grouped by priority.
+  Map<GeniusPdfJobPriority, List<GeniusPdfJob>> getJobsByPriority() {
+    final result = <GeniusPdfJobPriority, List<GeniusPdfJob>>{};
+    for (final priority in GeniusPdfJobPriority.values) {
+      result[priority] = allJobs.where((j) => j.priority == priority).toList();
+    }
+    return result;
+  }
+}
+
+// ============================================================================
+// Job Dependencies / Chains
+// ============================================================================
+
+/// A chain of PDF jobs that execute in sequence.
+class GeniusPdfJobChain {
+  GeniusPdfJobChain({
+    required this.id,
+    required this.jobs,
+    this.stopOnError = true,
+    this.onChainComplete,
+    this.onChainError,
+  });
+
+  final String id;
+  final List<GeniusPdfJob> jobs;
+  final bool stopOnError;
+  final void Function(List<GeniusPdfResult> results)? onChainComplete;
+  final void Function(int failedIndex, GeniusPdfFailure error)? onChainError;
+
+  final List<GeniusPdfResult> _results = [];
+  int _currentIndex = 0;
+  bool _isRunning = false;
+  bool _isCancelled = false;
+
+  bool get isRunning => _isRunning;
+  bool get isCancelled => _isCancelled;
+  bool get isComplete => _currentIndex >= jobs.length;
+  int get progress => _currentIndex;
+  int get totalJobs => jobs.length;
+  double get progressPercent => jobs.isEmpty ? 0 : _currentIndex / jobs.length;
+
+  void cancel() {
+    _isCancelled = true;
+  }
+}
+
+/// Extension for job chains.
+extension GeniusPdfJobChainExtension on GeniusPdfGenerationManager {
+  /// Creates and executes a chain of jobs.
+  Future<List<GeniusPdfResult>> executeChain({
+    required List<({GeniusPdfDocumentBuilder builder, String fileName})> jobs,
+    GeniusPdfJobPriority priority = GeniusPdfJobPriority.normal,
+    bool stopOnError = true,
+    void Function(int index, int total)? onProgress,
+    void Function(int index, GeniusPdfResult result)? onJobComplete,
+  }) async {
+    final results = <GeniusPdfResult>[];
+
+    for (int i = 0; i < jobs.length; i++) {
+      onProgress?.call(i, jobs.length);
+
+      final job = jobs[i];
+      final result = await addJobAndWait(
+        builder: job.builder,
+        fileName: job.fileName,
+        priority: priority,
+      );
+
+      results.add(result);
+      onJobComplete?.call(i, result);
+
+      if (stopOnError && result is GeniusPdfFailure) {
+        break;
+      }
+    }
+
+    onProgress?.call(jobs.length, jobs.length);
+    return results;
+  }
+}

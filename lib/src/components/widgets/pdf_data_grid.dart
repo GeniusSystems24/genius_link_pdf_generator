@@ -510,3 +510,553 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
     );
   }
 }
+
+// ============================================================================
+// Conditional Formatting
+// ============================================================================
+
+/// Type of condition for conditional formatting.
+enum GeniusConditionType {
+  /// Value equals a specific value.
+  equals,
+
+  /// Value does not equal a specific value.
+  notEquals,
+
+  /// Value is greater than a specific value.
+  greaterThan,
+
+  /// Value is greater than or equal to a specific value.
+  greaterThanOrEqual,
+
+  /// Value is less than a specific value.
+  lessThan,
+
+  /// Value is less than or equal to a specific value.
+  lessThanOrEqual,
+
+  /// Value is between two values.
+  between,
+
+  /// Value contains a string.
+  contains,
+
+  /// Value starts with a string.
+  startsWith,
+
+  /// Value ends with a string.
+  endsWith,
+
+  /// Value is empty or null.
+  isEmpty,
+
+  /// Value is not empty.
+  isNotEmpty,
+
+  /// Custom condition using a function.
+  custom,
+}
+
+/// A conditional formatting rule for grid cells.
+class GeniusConditionalFormatRule {
+  const GeniusConditionalFormatRule({
+    required this.conditionType,
+    this.value,
+    this.value2,
+    this.customCondition,
+    this.backgroundColor,
+    this.textColor,
+    this.fontWeight,
+    this.prefix,
+    this.suffix,
+    this.columnIds,
+    this.priority = 0,
+  });
+
+  /// Creates a rule for positive values (green).
+  factory GeniusConditionalFormatRule.positive({
+    List<String>? columnIds,
+    Color backgroundColor = const Color(0xFFE8F5E9),
+    Color textColor = const Color(0xFF2E7D32),
+  }) {
+    return GeniusConditionalFormatRule(
+      conditionType: GeniusConditionType.greaterThan,
+      value: 0,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      columnIds: columnIds,
+    );
+  }
+
+  /// Creates a rule for negative values (red).
+  factory GeniusConditionalFormatRule.negative({
+    List<String>? columnIds,
+    Color backgroundColor = const Color(0xFFFFEBEE),
+    Color textColor = const Color(0xFFC62828),
+  }) {
+    return GeniusConditionalFormatRule(
+      conditionType: GeniusConditionType.lessThan,
+      value: 0,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      columnIds: columnIds,
+    );
+  }
+
+  /// Creates a rule for zero values.
+  factory GeniusConditionalFormatRule.zero({
+    List<String>? columnIds,
+    Color backgroundColor = const Color(0xFFFFFDE7),
+    Color textColor = const Color(0xFFF9A825),
+  }) {
+    return GeniusConditionalFormatRule(
+      conditionType: GeniusConditionType.equals,
+      value: 0,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      columnIds: columnIds,
+    );
+  }
+
+  /// Creates a rule for values above a threshold.
+  factory GeniusConditionalFormatRule.aboveThreshold({
+    required num threshold,
+    List<String>? columnIds,
+    Color backgroundColor = const Color(0xFFE3F2FD),
+    Color textColor = const Color(0xFF1565C0),
+  }) {
+    return GeniusConditionalFormatRule(
+      conditionType: GeniusConditionType.greaterThanOrEqual,
+      value: threshold,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      columnIds: columnIds,
+    );
+  }
+
+  /// Creates a rule for values below a threshold.
+  factory GeniusConditionalFormatRule.belowThreshold({
+    required num threshold,
+    List<String>? columnIds,
+    Color backgroundColor = const Color(0xFFFCE4EC),
+    Color textColor = const Color(0xFFC2185B),
+  }) {
+    return GeniusConditionalFormatRule(
+      conditionType: GeniusConditionType.lessThan,
+      value: threshold,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      columnIds: columnIds,
+    );
+  }
+
+  /// Creates a rule for values between two thresholds.
+  factory GeniusConditionalFormatRule.between({
+    required num min,
+    required num max,
+    List<String>? columnIds,
+    Color backgroundColor = const Color(0xFFF3E5F5),
+    Color textColor = const Color(0xFF7B1FA2),
+  }) {
+    return GeniusConditionalFormatRule(
+      conditionType: GeniusConditionType.between,
+      value: min,
+      value2: max,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      columnIds: columnIds,
+    );
+  }
+
+  /// Creates a rule based on text content.
+  factory GeniusConditionalFormatRule.textContains({
+    required String text,
+    List<String>? columnIds,
+    Color backgroundColor = const Color(0xFFFFF8E1),
+    Color textColor = const Color(0xFFFF8F00),
+  }) {
+    return GeniusConditionalFormatRule(
+      conditionType: GeniusConditionType.contains,
+      value: text,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      columnIds: columnIds,
+    );
+  }
+
+  /// Creates a custom rule with a function.
+  factory GeniusConditionalFormatRule.custom({
+    required bool Function(dynamic value, String columnId, Map<String, dynamic> rowData) condition,
+    List<String>? columnIds,
+    Color? backgroundColor,
+    Color? textColor,
+    material.FontWeight? fontWeight,
+    String? prefix,
+    String? suffix,
+  }) {
+    return GeniusConditionalFormatRule(
+      conditionType: GeniusConditionType.custom,
+      customCondition: condition,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      fontWeight: fontWeight,
+      prefix: prefix,
+      suffix: suffix,
+      columnIds: columnIds,
+    );
+  }
+
+  /// The type of condition.
+  final GeniusConditionType conditionType;
+
+  /// The value to compare against.
+  final dynamic value;
+
+  /// The second value for range conditions.
+  final dynamic value2;
+
+  /// Custom condition function.
+  final bool Function(dynamic value, String columnId, Map<String, dynamic> rowData)? customCondition;
+
+  /// Background color when condition is met.
+  final Color? backgroundColor;
+
+  /// Text color when condition is met.
+  final Color? textColor;
+
+  /// Font weight when condition is met.
+  final material.FontWeight? fontWeight;
+
+  /// Prefix to add to cell value.
+  final String? prefix;
+
+  /// Suffix to add to cell value.
+  final String? suffix;
+
+  /// Column IDs this rule applies to. If null, applies to all columns.
+  final List<String>? columnIds;
+
+  /// Priority of this rule (higher = applied later).
+  final int priority;
+
+  /// Checks if this rule applies to a column.
+  bool appliesToColumn(String columnId) {
+    return columnIds == null || columnIds!.contains(columnId);
+  }
+
+  /// Evaluates if the condition is met.
+  bool evaluate(dynamic cellValue, String columnId, Map<String, dynamic> rowData) {
+    if (!appliesToColumn(columnId)) return false;
+
+    switch (conditionType) {
+      case GeniusConditionType.equals:
+        return cellValue == value;
+
+      case GeniusConditionType.notEquals:
+        return cellValue != value;
+
+      case GeniusConditionType.greaterThan:
+        if (cellValue is num && value is num) {
+          return cellValue > value;
+        }
+        return false;
+
+      case GeniusConditionType.greaterThanOrEqual:
+        if (cellValue is num && value is num) {
+          return cellValue >= value;
+        }
+        return false;
+
+      case GeniusConditionType.lessThan:
+        if (cellValue is num && value is num) {
+          return cellValue < value;
+        }
+        return false;
+
+      case GeniusConditionType.lessThanOrEqual:
+        if (cellValue is num && value is num) {
+          return cellValue <= value;
+        }
+        return false;
+
+      case GeniusConditionType.between:
+        if (cellValue is num && value is num && value2 is num) {
+          return cellValue >= value && cellValue <= value2;
+        }
+        return false;
+
+      case GeniusConditionType.contains:
+        return cellValue.toString().contains(value.toString());
+
+      case GeniusConditionType.startsWith:
+        return cellValue.toString().startsWith(value.toString());
+
+      case GeniusConditionType.endsWith:
+        return cellValue.toString().endsWith(value.toString());
+
+      case GeniusConditionType.isEmpty:
+        return cellValue == null || cellValue.toString().isEmpty;
+
+      case GeniusConditionType.isNotEmpty:
+        return cellValue != null && cellValue.toString().isNotEmpty;
+
+      case GeniusConditionType.custom:
+        return customCondition?.call(cellValue, columnId, rowData) ?? false;
+    }
+  }
+}
+
+/// Manager for applying conditional formatting rules.
+class GeniusConditionalFormatManager {
+  GeniusConditionalFormatManager({
+    List<GeniusConditionalFormatRule>? rules,
+  }) : _rules = rules ?? [];
+
+  final List<GeniusConditionalFormatRule> _rules;
+
+  /// Adds a rule.
+  void addRule(GeniusConditionalFormatRule rule) {
+    _rules.add(rule);
+    _rules.sort((a, b) => a.priority.compareTo(b.priority));
+  }
+
+  /// Removes a rule.
+  void removeRule(GeniusConditionalFormatRule rule) {
+    _rules.remove(rule);
+  }
+
+  /// Clears all rules.
+  void clearRules() {
+    _rules.clear();
+  }
+
+  /// Gets all rules.
+  List<GeniusConditionalFormatRule> get rules => List.unmodifiable(_rules);
+
+  /// Gets the formatting to apply for a cell.
+  GeniusCellFormatting? getFormatting(
+    dynamic cellValue,
+    String columnId,
+    Map<String, dynamic> rowData,
+  ) {
+    Color? backgroundColor;
+    Color? textColor;
+    material.FontWeight? fontWeight;
+    String? prefix;
+    String? suffix;
+
+    for (final rule in _rules) {
+      if (rule.evaluate(cellValue, columnId, rowData)) {
+        backgroundColor = rule.backgroundColor ?? backgroundColor;
+        textColor = rule.textColor ?? textColor;
+        fontWeight = rule.fontWeight ?? fontWeight;
+        prefix = rule.prefix ?? prefix;
+        suffix = rule.suffix ?? suffix;
+      }
+    }
+
+    if (backgroundColor == null && textColor == null && fontWeight == null && prefix == null && suffix == null) {
+      return null;
+    }
+
+    return GeniusCellFormatting(
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      fontWeight: fontWeight,
+      prefix: prefix,
+      suffix: suffix,
+    );
+  }
+}
+
+/// Formatting to apply to a cell.
+class GeniusCellFormatting {
+  const GeniusCellFormatting({
+    this.backgroundColor,
+    this.textColor,
+    this.fontWeight,
+    this.prefix,
+    this.suffix,
+  });
+
+  final Color? backgroundColor;
+  final Color? textColor;
+  final material.FontWeight? fontWeight;
+  final String? prefix;
+  final String? suffix;
+
+  /// Applies prefix and suffix to a value.
+  String formatValue(dynamic value) {
+    final stringValue = value?.toString() ?? '';
+    final p = prefix ?? '';
+    final s = suffix ?? '';
+    return '$p$stringValue$s';
+  }
+}
+
+// ============================================================================
+// Data Grid with Conditional Formatting
+// ============================================================================
+
+/// Extension to add conditional formatting support to GeniusPdfDataGrid.
+extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
+  /// Creates a grid with conditional formatting rules.
+  static GeniusPdfDataGrid withFormatting({
+    required List<GeniusPdfGridColumn> columns,
+    required List<GeniusPdfGridRow> rows,
+    required List<GeniusConditionalFormatRule> rules,
+    GeniusPdfGridStyle style = const GeniusPdfGridStyle.classic(),
+    required PdfFont baseFont,
+    required PdfFont boldFont,
+    bool isRTL = true,
+    List<GeniusPdfGridGroup>? groups,
+  }) {
+    // Apply formatting to rows
+    final formatManager = GeniusConditionalFormatManager(rules: rules);
+    final formattedRows = rows.map((row) {
+      final newCells = <String, dynamic>{};
+      for (final entry in row.cells.entries) {
+        final formatting = formatManager.getFormatting(
+          entry.value,
+          entry.key,
+          row.cells,
+        );
+
+        if (formatting != null) {
+          newCells[entry.key] = formatting.formatValue(entry.value);
+        } else {
+          newCells[entry.key] = entry.value;
+        }
+      }
+
+      return GeniusPdfGridRow(
+        cells: newCells,
+        type: row.type,
+        height: row.height,
+        style: row.style,
+        spanColumns: row.spanColumns,
+        customRenderer: row.customRenderer,
+        isPageBreakBefore: row.isPageBreakBefore,
+      );
+    }).toList();
+
+    return GeniusPdfDataGrid(
+      columns: columns,
+      rows: formattedRows,
+      style: style,
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: isRTL,
+      groups: groups,
+    );
+  }
+}
+
+// ============================================================================
+// Data Grid Utilities
+// ============================================================================
+
+/// Utilities for working with data grids.
+class GeniusDataGridUtils {
+  GeniusDataGridUtils._();
+
+  /// Calculates column totals from rows.
+  static Map<String, num> calculateTotals(
+    List<GeniusPdfGridRow> rows,
+    List<String> columnIds,
+  ) {
+    final totals = <String, num>{};
+    for (final columnId in columnIds) {
+      totals[columnId] = 0;
+    }
+
+    for (final row in rows) {
+      if (row.type == GeniusPdfGridRowType.data) {
+        for (final columnId in columnIds) {
+          final value = row.cells[columnId];
+          if (value is num) {
+            totals[columnId] = (totals[columnId] ?? 0) + value;
+          }
+        }
+      }
+    }
+
+    return totals;
+  }
+
+  /// Calculates column averages from rows.
+  static Map<String, double> calculateAverages(
+    List<GeniusPdfGridRow> rows,
+    List<String> columnIds,
+  ) {
+    final totals = calculateTotals(rows, columnIds);
+    final dataRowCount = rows.where((r) => r.type == GeniusPdfGridRowType.data).length;
+
+    if (dataRowCount == 0) {
+      return columnIds.asMap().map((_, id) => MapEntry(id, 0.0));
+    }
+
+    return totals.map((key, value) => MapEntry(key, value / dataRowCount));
+  }
+
+  /// Creates a total row from calculated totals.
+  static GeniusPdfGridRow createTotalRow(
+    Map<String, dynamic> totals, {
+    String? labelColumnId,
+    String label = 'Total',
+    String labelAr = 'الإجمالي',
+    bool isRTL = true,
+  }) {
+    final cells = Map<String, dynamic>.from(totals);
+    if (labelColumnId != null) {
+      cells[labelColumnId] = isRTL ? labelAr : label;
+    }
+    return GeniusPdfGridRow.total(cells);
+  }
+
+  /// Groups rows by a column value.
+  static Map<dynamic, List<GeniusPdfGridRow>> groupBy(
+    List<GeniusPdfGridRow> rows,
+    String columnId,
+  ) {
+    final groups = <dynamic, List<GeniusPdfGridRow>>{};
+
+    for (final row in rows) {
+      final key = row.cells[columnId];
+      groups.putIfAbsent(key, () => []).add(row);
+    }
+
+    return groups;
+  }
+
+  /// Sorts rows by a column value.
+  static List<GeniusPdfGridRow> sortBy(
+    List<GeniusPdfGridRow> rows,
+    String columnId, {
+    bool ascending = true,
+  }) {
+    final sorted = List<GeniusPdfGridRow>.from(rows);
+    sorted.sort((a, b) {
+      final valueA = a.cells[columnId];
+      final valueB = b.cells[columnId];
+
+      int comparison;
+      if (valueA is Comparable && valueB is Comparable) {
+        comparison = valueA.compareTo(valueB);
+      } else {
+        comparison = valueA.toString().compareTo(valueB.toString());
+      }
+
+      return ascending ? comparison : -comparison;
+    });
+    return sorted;
+  }
+
+  /// Filters rows by a condition.
+  static List<GeniusPdfGridRow> filter(
+    List<GeniusPdfGridRow> rows,
+    bool Function(GeniusPdfGridRow row) condition,
+  ) {
+    return rows.where(condition).toList();
+  }
+}

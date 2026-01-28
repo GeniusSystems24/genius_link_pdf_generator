@@ -60,6 +60,18 @@ A comprehensive PDF generation and preview library for Flutter applications with
 📊 **Barcode Groups** (v2.3.3+4) - Arrange multiple barcodes in rows, columns, or grids
 🏷️ **Batch Barcodes** (v2.3.3+4) - Generate sequences of barcodes with auto-incrementing data
 👁️ **Enhanced Preview** (v2.3.3+4) - Print preview with share, save, and settings options
+🔀 **PDF Merge/Split** (v2.3.3+5) - Combine or split PDF documents
+📄 **Page Extraction** (v2.3.3+5) - Extract specific pages from PDFs
+💧 **Watermark Pages** (v2.3.3+5) - Add text watermarks with custom position and opacity
+🔄 **Page Rotation** (v2.3.3+5) - Rotate pages by 90, 180, or 270 degrees
+📊 **PDF Info** (v2.3.3+5) - Get document metadata and page information
+⏰ **Job Scheduling** (v2.3.3+5) - Schedule PDF generation for later execution
+📈 **Job Statistics** (v2.3.3+5) - Track generation metrics and success rates
+🔗 **Job Chains** (v2.3.3+5) - Chain jobs with dependencies
+✅ **Export Validation** (v2.3.3+5) - Validate export configuration before processing
+📦 **Export Presets** (v2.3.3+5) - Pre-configured export settings for common use cases
+🎨 **Conditional Formatting** (v2.3.3+5) - Excel-like conditional formatting for data grids
+🔢 **Grid Calculations** (v2.3.3+5) - Calculate totals, averages, sort and filter grid data
 
 ---
 

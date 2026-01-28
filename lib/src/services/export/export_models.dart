@@ -147,6 +147,15 @@ class GeniusExportConfiguration {
   /// Image quality for image exports.
   final GeniusImageQuality quality;
 
+  /// Alias for quality (for API consistency).
+  GeniusImageQuality get imageQuality => quality;
+
+  /// Start page for page range (1-indexed).
+  int? get startPage => pageRange?.start;
+
+  /// End page for page range (1-indexed).
+  int? get endPage => pageRange?.end;
+
   /// Page range to export. If null, all pages are exported.
   final GeniusPageRange? pageRange;
 
