@@ -895,18 +895,71 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       config: geniusPdfConfig,
       testName: 'RichText Test',
       buildContent: (builder) {
-        final richText = GeniusPdfRichTextBuilder(
-                baseFont: geniusPdfConfig.baseFont,
-                boldFont: geniusPdfConfig.boldFont,
-                isRTL: geniusPdfConfig.isRTL)
-            .text('Invoice ')
+        final w = builder.pageWidth;
+        var y = builder.currentY;
+
+        // 1. Builder with heading, badge, currency, strikethrough
+        final heading = GeniusPdfRichTextBuilder(
+          baseFont: geniusPdfConfig.baseFont,
+          boldFont: geniusPdfConfig.boldFont,
+          isRTL: geniusPdfConfig.isRTL,
+        )
+            .heading('Invoice Summary')
+            .space()
+            .badge('PAID', backgroundColor: const Color(0xFF4CAF50))
+            .newLine()
+            .label('Invoice No')
+            .separator(': ')
             .bold('#INV-2024-001', color: const Color(0xFF1565C0))
-            .text(' - Status: ')
-            .positive('Paid')
+            .newLine()
+            .text('Total: ')
+            .currency('34,615.00', symbol: 'SAR')
+            .newLine()
+            .text('Previous: ')
+            .strikethrough('28,500.00')
+            .space()
+            .positive('34,615.00')
+            .superscript('*')
             .build();
-        richText.drawSimple(
+        heading.draw(
           page: builder.currentPage,
-          bounds: Rect.fromLTWH(0, builder.currentY, builder.pageWidth, 30),
+          bounds: Rect.fromLTWH(0, y, w, 100),
+        );
+        y += 100;
+
+        // 2. Bullet list
+        final bulletList = GeniusPdfBulletList(
+          items: [
+            GeniusPdfBulletItem.simple('Consulting services'),
+            GeniusPdfBulletItem.simple('Software development'),
+            GeniusPdfBulletItem(text: 'Maintenance', subItems: [
+              GeniusPdfBulletItem.simple('Monthly support'),
+            ]),
+          ],
+          style: GeniusPdfBulletStyle.disc,
+          baseFont: geniusPdfConfig.baseFont,
+          boldFont: geniusPdfConfig.boldFont,
+          isRTL: false,
+        );
+        bulletList.draw(
+          page: builder.currentPage,
+          bounds: Rect.fromLTWH(0, y, w, 80),
+        );
+        y += 80;
+
+        // 3. Markdown parsed text
+        final mdSpans = GeniusPdfSimpleMarkdownParser.parse(
+          'This is **bold** and *italic* with `code` and ~~deleted~~',
+        );
+        final mdRichText = GeniusPdfRichText(
+          spans: mdSpans,
+          baseFont: geniusPdfConfig.baseFont,
+          boldFont: geniusPdfConfig.boldFont,
+          isRTL: false,
+        );
+        mdRichText.draw(
+          page: builder.currentPage,
+          bounds: Rect.fromLTWH(0, y, w, 25),
         );
       },
     );

@@ -1047,7 +1047,15 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
           .text(', ')
           .bold('bold')
           .text(', ')
-          // .italic('italic')
+          .italic('italic')
+          .text(', ')
+          .highlight('highlighted')
+          .text(', ')
+          .strikethrough('deleted text')
+          .text(', ')
+          .code('inline code')
+          .text(', ')
+          .superscript('superscript')
           .text(', and ')
           .link('clickable links', 'https://example.com')
           .text('.')
@@ -1055,7 +1063,7 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
 
       final textResult = richText.draw(
         page: page,
-        bounds: Rect.fromLTWH(margin, yOffset, contentWidth, 0),
+        bounds: Rect.fromLTWH(margin, yOffset, contentWidth, 60),
       );
       yOffset = (textResult?.bounds.bottom ?? 0) + 20;
     }

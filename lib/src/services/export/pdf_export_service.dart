@@ -532,7 +532,7 @@ class GeniusExportPresets {
   static GeniusExportConfiguration highQualityImage() {
     return const GeniusExportConfiguration(
       format: GeniusExportFormat.png,
-      imageQuality: GeniusImageQuality.high,
+      quality: GeniusImageQuality.high,
       compress: false,
     );
   }
@@ -541,7 +541,7 @@ class GeniusExportPresets {
   static GeniusExportConfiguration webImage() {
     return const GeniusExportConfiguration(
       format: GeniusExportFormat.jpeg,
-      imageQuality: GeniusImageQuality.medium,
+      quality: GeniusImageQuality.medium,
       compress: true,
     );
   }
@@ -550,7 +550,7 @@ class GeniusExportPresets {
   static GeniusExportConfiguration thumbnail() {
     return const GeniusExportConfiguration(
       format: GeniusExportFormat.jpeg,
-      imageQuality: GeniusImageQuality.low,
+      quality: GeniusImageQuality.low,
       compress: true,
     );
   }
@@ -559,7 +559,7 @@ class GeniusExportPresets {
   static GeniusExportConfiguration printQuality() {
     return const GeniusExportConfiguration(
       format: GeniusExportFormat.png,
-      imageQuality: GeniusImageQuality.maximum,
+      quality: GeniusImageQuality.maximum,
       compress: false,
     );
   }
@@ -590,7 +590,7 @@ class GeniusExportPresets {
   static GeniusExportConfiguration emailAttachment() {
     return const GeniusExportConfiguration(
       format: GeniusExportFormat.jpeg,
-      imageQuality: GeniusImageQuality.medium,
+      quality: GeniusImageQuality.medium,
       compress: true,
     );
   }

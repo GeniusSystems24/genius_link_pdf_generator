@@ -97,6 +97,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Letter spacing property was ignored during drawing
 - `_createLayoutResult` used hardcoded `PdfStandardFont(PdfFontFamily.helvetica, 1)` instead of `baseFont`
 - Multi-column `GeniusPdfKeyValueList` could crash when `startIndex >= items.length`
+- **Duplicate `GeniusPrinterService` class** causing "name already defined" error — removed old version, kept enhanced version with share/raster/save methods
+- **`GeniusPdfGridRow` missing properties** — `GeniusConditionalFormattingExtension.withFormatting()` used non-existent `type`, `spanColumns`, `customRenderer`, `isPageBreakBefore` — now uses `copyWith()`
+- **`GeniusPdfGridRowType` undefined** — `GeniusDataGridUtils.calculateTotals/Averages` referenced non-existent enum — now uses `!row.isSpecialRow`
+- **`imageQuality` parameter** — `GeniusExportPresets` used `imageQuality:` instead of `quality:` as named parameter
+- Updated example screens (`components_demo_screen`, `custom_report_screen`, `job_manager_demo_screen`) to use new Rich Text features
 
 ### Example
 

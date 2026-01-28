@@ -929,15 +929,7 @@ extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
         }
       }
 
-      return GeniusPdfGridRow(
-        cells: newCells,
-        type: row.type,
-        height: row.height,
-        style: row.style,
-        spanColumns: row.spanColumns,
-        customRenderer: row.customRenderer,
-        isPageBreakBefore: row.isPageBreakBefore,
-      );
+      return row.copyWith(cells: newCells);
     }).toList();
 
     return GeniusPdfDataGrid(
@@ -971,7 +963,7 @@ class GeniusDataGridUtils {
     }
 
     for (final row in rows) {
-      if (row.type == GeniusPdfGridRowType.data) {
+      if (!row.isSpecialRow) {
         for (final columnId in columnIds) {
           final value = row.cells[columnId];
           if (value is num) {
@@ -990,7 +982,7 @@ class GeniusDataGridUtils {
     List<String> columnIds,
   ) {
     final totals = calculateTotals(rows, columnIds);
-    final dataRowCount = rows.where((r) => r.type == GeniusPdfGridRowType.data).length;
+    final dataRowCount = rows.where((r) => !r.isSpecialRow).length;
 
     if (dataRowCount == 0) {
       return columnIds.asMap().map((_, id) => MapEntry(id, 0.0));

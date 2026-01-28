@@ -283,30 +283,53 @@ final grid = GeniusPdfDataGrid(
       isGenerating: _isGenerating,
       onGenerate: () => _generatePdf('rich_text'),
       codeExample: '''
-final richText = GeniusPdfRichText(
-  spans: [
-    GeniusPdfTextSpan(text: 'رقم الفاتورة: '),
-    GeniusPdfTextSpan(
-      text: '#INV-2024-001',
-      style: GeniusPdfTextStyle(
-        color: PdfColors.blue,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    GeniusPdfTextSpan(text: ' - المجموع: '),
-    GeniusPdfTextSpan(
-      text: '34,615.00 ر.س',
-      style: GeniusPdfTextStyle(color: PdfColors.green),
-    ),
-  ],
+// ─── Fluent Builder API ────────────────────────
+final richText = GeniusPdfRichTextBuilder(
   baseFont: config.baseFont,
   boldFont: config.boldFont,
-);''',
+  isRTL: true,
+)
+  .heading('ملخص الفاتورة')
+  .newLine()
+  .label('رقم الفاتورة')
+  .separator(': ')
+  .bold('#INV-2024-001', color: Colors.blue)
+  .newLine()
+  .text('الإجمالي: ')
+  .currency('34,615.00', symbol: 'ر.س')
+  .space()
+  .badge('مدفوعة', backgroundColor: Colors.green)
+  .newLine()
+  .text('السعر السابق: ')
+  .strikethrough('28,500.00')
+  .space()
+  .positive('34,615.00')
+  .superscript('*')
+  .build(maxLines: 5, overflow: GeniusPdfTextOverflow.ellipsis);
+
+// ─── Markdown Parser ───────────────────────────
+final spans = 'This is **bold** and *italic*'.parseMarkdownSpans();
+
+// ─── Bullet List ───────────────────────────────
+final list = GeniusPdfBulletList(
+  items: [
+    GeniusPdfBulletItem.simple('البند الأول'),
+    GeniusPdfBulletItem.simple('البند الثاني'),
+  ],
+  style: GeniusPdfBulletStyle.disc,
+  baseFont: config.baseFont,
+  boldFont: config.boldFont,
+);
+
+// ─── String Extensions ─────────────────────────
+final span = 'مهم'.toBoldSpan(color: Colors.red);
+''',
       preview: _buildRichTextPreview(isDark),
     );
   }
 
   Widget _buildRichTextPreview(bool isDark) {
+    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -319,74 +342,145 @@ final richText = GeniusPdfRichText(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          RichText(
-            textDirection: TextDirection.rtl,
-            text: TextSpan(
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark ? AppColors.darkText : AppColors.lightText,
-                height: 1.8,
-              ),
-              children: const [
-                TextSpan(text: 'رقم الفاتورة: '),
-                TextSpan(
-                  text: '#INV-2024-001',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: AppColors.primary),
+          // Heading + badge
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.success,
+                  borderRadius: BorderRadius.circular(4),
                 ),
-              ],
-            ),
+                child: const Text('مدفوعة',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold)),
+              ),
+              const SizedBox(width: 8),
+              Text('ملخص الفاتورة',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: textColor)),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          // Label + bold value
           RichText(
             textDirection: TextDirection.rtl,
             text: TextSpan(
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark ? AppColors.darkText : AppColors.lightText,
-              ),
-              children: [
-                const TextSpan(text: 'المجموع الفرعي: '),
+              style: TextStyle(fontSize: 14, color: textColor, height: 1.8),
+              children: const [
                 TextSpan(
-                  text: '30,100.00 ر.س',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkText : AppColors.lightText,
-                  ),
-                ),
+                    text: 'رقم الفاتورة: ',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF424242))),
+                TextSpan(
+                    text: '#INV-2024-001',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary)),
               ],
             ),
           ),
           const SizedBox(height: 8),
+          // Currency value
           RichText(
             textDirection: TextDirection.rtl,
             text: TextSpan(
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark ? AppColors.darkText : AppColors.lightText,
-              ),
-              children: const [
-                TextSpan(text: 'ضريبة القيمة المضافة (15%): '),
-                TextSpan(
-                    text: '4,515.00 ر.س',
-                    style: TextStyle(color: AppColors.warning)),
-              ],
-            ),
-          ),
-          const Divider(height: 24),
-          RichText(
-            textDirection: TextDirection.rtl,
-            text: TextSpan(
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDark ? AppColors.darkText : AppColors.lightText,
-              ),
+              style: TextStyle(fontSize: 14, color: textColor),
               children: const [
                 TextSpan(text: 'الإجمالي: '),
                 TextSpan(
                     text: '34,615.00 ر.س',
-                    style: TextStyle(color: AppColors.success)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.success,
+                        letterSpacing: 0.3)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Strikethrough + positive
+          RichText(
+            textDirection: TextDirection.rtl,
+            text: TextSpan(
+              style: TextStyle(fontSize: 14, color: textColor),
+              children: const [
+                TextSpan(text: 'السعر السابق: '),
+                TextSpan(
+                  text: '28,500.00',
+                  style: TextStyle(
+                    decoration: TextDecoration.lineThrough,
+                    color: Colors.grey,
+                  ),
+                ),
+                TextSpan(text: '  '),
+                TextSpan(
+                    text: '34,615.00',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.success)),
+              ],
+            ),
+          ),
+          const Divider(height: 24),
+          // Bullet list preview
+          Text('عناصر البند:',
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: textColor)),
+          const SizedBox(height: 6),
+          for (final item in [
+            'خدمات استشارية',
+            'تطوير برمجيات',
+            'صيانة شهرية'
+          ])
+            Padding(
+              padding: const EdgeInsets.only(right: 12, bottom: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(item,
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(fontSize: 13, color: textColor)),
+                  const SizedBox(width: 8),
+                  Text('•',
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: textColor,
+                          fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          const SizedBox(height: 12),
+          // Highlighted text + superscript preview
+          RichText(
+            textDirection: TextDirection.rtl,
+            text: TextSpan(
+              style: TextStyle(fontSize: 13, color: textColor),
+              children: [
+                WidgetSpan(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    color: const Color(0xFFFFEB3B).withValues(alpha: 0.5),
+                    child: const Text('ملاحظة مهمة',
+                        style: TextStyle(fontSize: 13)),
+                  ),
+                ),
+                const TextSpan(text: '  '),
+                const TextSpan(
+                  text: 'شامل الضريبة',
+                  style: TextStyle(
+                      fontStyle: FontStyle.italic, color: Colors.grey),
+                ),
               ],
             ),
           ),
@@ -921,74 +1015,119 @@ final summary = GeniusPdfSummarySection(
   double _drawRichText(
       PdfPage page, double yOffset, PdfFont baseFont, PdfFont boldFont) {
     final pageSize = page.getClientSize();
+    final w = pageSize.width - 40;
 
-    // Invoice number line
-    final richText1 = GeniusPdfRichText(
-      spans: [
-        GeniusPdfTextSpan(text: _isRTL ? 'رقم الفاتورة: ' : 'Invoice Number: '),
-        GeniusPdfTextSpan(
-            text: '#INV-2024-001',
-            isBold: true,
-            color: const Color(0xFF2196F3)),
+    // ── 1. Heading with badge using Builder ───────────────────────
+    final heading = GeniusPdfRichTextBuilder(
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: _isRTL,
+    )
+        .heading(_isRTL ? 'ملخص الفاتورة' : 'Invoice Summary')
+        .space()
+        .badge(
+          _isRTL ? 'مدفوعة' : 'PAID',
+          backgroundColor: const Color(0xFF4CAF50),
+        )
+        .build();
+    heading.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset, w, 25));
+
+    // ── 2. Label + value using builder ────────────────────────────
+    final invoiceLine = GeniusPdfRichTextBuilder(
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: _isRTL,
+    )
+        .label(_isRTL ? 'رقم الفاتورة' : 'Invoice No')
+        .separator(': ')
+        .bold('#INV-2024-001', color: const Color(0xFF2196F3))
+        .build();
+    invoiceLine.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset + 30, w, 25));
+
+    // ── 3. Currency with symbol ───────────────────────────────────
+    final totalLine = GeniusPdfRichTextBuilder(
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: _isRTL,
+    )
+        .text(_isRTL ? 'الإجمالي: ' : 'Total: ')
+        .currency('34,615.00', symbol: _isRTL ? 'ر.س' : 'SAR')
+        .build();
+    totalLine.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset + 55, w, 25));
+
+    // ── 4. Strikethrough + positive ───────────────────────────────
+    final priceLine = GeniusPdfRichTextBuilder(
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: _isRTL,
+    )
+        .text(_isRTL ? 'السعر السابق: ' : 'Previous: ')
+        .strikethrough('28,500.00')
+        .space()
+        .positive('34,615.00')
+        .superscript('*')
+        .build();
+    priceLine.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset + 80, w, 25));
+
+    // ── 5. Highlighted + small text ───────────────────────────────
+    final noteLine = GeniusPdfRichTextBuilder(
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: _isRTL,
+    )
+        .highlight(_isRTL ? 'ملاحظة مهمة' : 'Important Note')
+        .space()
+        .small(_isRTL ? 'شامل الضريبة' : 'Tax inclusive',
+            color: const Color(0xFF9E9E9E))
+        .build();
+    noteLine.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset + 105, w, 25));
+
+    // ── 6. Bullet list ────────────────────────────────────────────
+    final bulletList = GeniusPdfBulletList(
+      items: [
+        GeniusPdfBulletItem.simple(
+            _isRTL ? 'خدمات استشارية' : 'Consulting services'),
+        GeniusPdfBulletItem.simple(
+            _isRTL ? 'تطوير برمجيات' : 'Software development'),
+        GeniusPdfBulletItem(
+          text: _isRTL ? 'الصيانة' : 'Maintenance',
+          subItems: [
+            GeniusPdfBulletItem.simple(
+                _isRTL ? 'صيانة شهرية' : 'Monthly maintenance'),
+            GeniusPdfBulletItem.simple(
+                _isRTL ? 'دعم فني' : 'Technical support'),
+          ],
+        ),
       ],
+      style: GeniusPdfBulletStyle.disc,
       baseFont: baseFont,
       boldFont: boldFont,
       isRTL: _isRTL,
     );
-    richText1.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 25));
+    bulletList.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset + 135, w, 120));
 
-    // Subtotal line
-    final richText2 = GeniusPdfRichText(
-      spans: [
-        GeniusPdfTextSpan(text: _isRTL ? 'المجموع الفرعي: ' : 'Subtotal: '),
-        GeniusPdfTextSpan(
-            text: _isRTL ? '30,100.00 ر.س' : 'SAR 30,100.00', isBold: true),
-      ],
+    // ── 7. Markdown parsed text ───────────────────────────────────
+    final mdSpans = GeniusPdfSimpleMarkdownParser.parse(
+      _isRTL
+          ? 'هذا **نص عريض** و *مائل* مع `كود` و ~~محذوف~~'
+          : 'This is **bold** and *italic* with `code` and ~~deleted~~',
+    );
+    final mdRichText = GeniusPdfRichText(
+      spans: mdSpans,
       baseFont: baseFont,
       boldFont: boldFont,
       isRTL: _isRTL,
     );
-    richText2.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset + 30, pageSize.width - 40, 25));
+    mdRichText.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset + 265, w, 25));
 
-    // VAT line
-    final richText3 = GeniusPdfRichText(
-      spans: [
-        GeniusPdfTextSpan(
-            text: _isRTL ? 'ضريبة القيمة المضافة (15%): ' : 'VAT (15%): '),
-        GeniusPdfTextSpan(
-            text: _isRTL ? '4,515.00 ر.س' : 'SAR 4,515.00',
-            color: const Color(0xFFFF9800)),
-      ],
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: _isRTL,
-    );
-    richText3.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset + 60, pageSize.width - 40, 25));
-
-    // Total line
-    final richText4 = GeniusPdfRichText(
-      spans: [
-        GeniusPdfTextSpan(
-            text: _isRTL ? 'الإجمالي: ' : 'Total: ', isBold: true),
-        GeniusPdfTextSpan(
-            text: _isRTL ? '34,615.00 ر.س' : 'SAR 34,615.00',
-            style: const GeniusPdfTextStyle(color: Color(0xFF4CAF50))),
-      ],
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: _isRTL,
-    );
-    richText4.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset + 100, pageSize.width - 40, 25));
-
-    return yOffset + 150;
+    return yOffset + 300;
   }
 
   double _drawInfoBox(
