@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.3+9] - 2026-01-29
+
+### Added
+
+#### GeniusPdfReportHeader Overhaul
+- **Direction-Aware Enums** - `GeniusPdfLogoPosition` now uses `start`, `end`, `center`, `centerTop`, `centerBottom`, `background` (resolves based on RTL/LTR)
+- **Direction-Aware Title Alignment** - `GeniusPdfTitleAlignment` now uses `start`, `end`, `center` (resolves based on RTL/LTR)
+- **Bilingual Split Layout** - New `GeniusPdfReportHeaderLayout.bilingualSplit` with English info on left, logo centered, Arabic info on right
+- **`GeniusPdfReportHeader.bilingualSplit()` factory** - Pre-configured bilingual split header
+- **`GeniusPdfReportHeaderStyle.bilingualSplit()` style preset** - Saudi-themed bilingual style
+- **Alignment Helpers** - `_resolveTextAlignment()`, `_resolveLogoX()`, `_textFormat()` for direction-aware rendering
+- **Logo Positions** - `centerBottom` for logo below content, `center` for horizontally centered logo
+- **Background Logo** - Watermark-style logo rendering with transparency
+- **Title Underline** - `showTitleUnderline`, `titleUnderlineColor`, `titleUnderlineWidth` properties
+- **Date Spacing** - New `dateSpacing` property on style to control gap between date and border
+- **Shadow Support** - `shadowEnabled`, `shadowColor`, `shadowOffset` properties
+- **Logger Integration** - Debug logging for header draw operations
+
+### Fixed
+- **Border overlapping date** - Print date was drawn overlapping the bottom border line; now date is drawn above the border with proper `dateSpacing`
+- **Logo position not applied** - `logoPosition` property was ignored in draw methods; now properly used to position logo via `_resolveLogoX()`
+- **Title alignment not applied** - `titleAlignment` and `companyInfoAlignment` were ignored; now properly resolved via `_resolveTextAlignment()`
+
+### Changed
+- **Spacing improvements** - Proper spacing between logo/company info row, title section, subtitle section, and date/border
+- **Extracted reusable helpers** - `_drawBackground`, `_drawDateSection`, `_drawBottomBorder`, `_drawCompanyInfoBlock`, `_drawTitleBlock`, `_drawSubtitleBlock`, `_drawDocumentInfo`
+- **Layout enum expanded** - Added `bilingualSplit`, `letterhead`, `reportCard`, `minimal`, `fullWidth` values
+
+---
+
 ## [2.3.3+8] - 2026-01-29
 
 ### Added

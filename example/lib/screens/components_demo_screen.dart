@@ -611,17 +611,22 @@ final dualBox = GeniusPdfDualInfoBox(
       isGenerating: _isGenerating,
       onGenerate: () => _generatePdf('headers'),
       codeExample: '''
+// Standard invoice header
 final header = GeniusPdfReportHeader(
   title: 'Tax Invoice',
   titleAr: 'فاتورة ضريبية',
-  company: GeniusPdfCompanyInfo(
-    name: 'Al-Amal Trading Co.',
-    nameAr: 'شركة الأمل للتجارة',
-    address: 'Riyadh, KSA',
-    phone: '+966 11 123 4567',
-    vatNumber: '300123456789003',
-  ),
+  company: companyInfo,
+  printDate: DateTime.now(),
   style: GeniusPdfReportHeaderStyle.invoice(),
+  baseFont: config.baseFont,
+  boldFont: config.boldFont,
+);
+
+// Bilingual split: English left, logo center, Arabic right
+final bilingualHeader = GeniusPdfReportHeader.bilingualSplit(
+  title: 'Trial Balance',
+  titleAr: 'ميزان المراجعة',
+  company: companyInfo,
   baseFont: config.baseFont,
   boldFont: config.boldFont,
 );''',
@@ -1300,24 +1305,29 @@ final summary = GeniusPdfSummarySection(
       PdfPage page, double yOffset, PdfFont baseFont, PdfFont boldFont) {
     final pageSize = page.getClientSize();
 
+    final companyInfo = GeniusPdfCompanyInfo(
+      name: 'Al-Amal Trading Company',
+      nameAr: 'شركة الأمل للتجارة',
+      vatNumber: '300123456789003',
+      crNumber: '1010123456',
+      address: 'King Fahd Road',
+      addressAr: 'طريق الملك فهد',
+      city: 'Riyadh',
+      cityAr: 'الرياض',
+      country: 'Saudi Arabia',
+      countryAr: 'المملكة العربية السعودية',
+      phone: '+966 11 123 4567',
+      email: 'info@alamal.com',
+    );
+
+    // Standard header
     final header = GeniusPdfReportHeader(
       title: 'Tax Invoice',
       titleAr: 'فاتورة ضريبية',
       subtitle: 'Invoice #INV-2024-001',
       subtitleAr: 'فاتورة رقم #INV-2024-001',
-      company: GeniusPdfCompanyInfo(
-        name: 'Al-Amal Trading Company',
-        nameAr: 'شركة الأمل للتجارة',
-        vatNumber: '300123456789003',
-        address: 'King Fahd Road',
-        addressAr: 'طريق الملك فهد',
-        city: 'Riyadh',
-        cityAr: 'الرياض',
-        country: 'Saudi Arabia',
-        countryAr: 'المملكة العربية السعودية',
-        phone: '+966 11 123 4567',
-        email: 'info@alamal.com',
-      ),
+      company: companyInfo,
+      printDate: DateTime.now(),
       style: GeniusPdfReportHeaderStyle.invoice(),
       baseFont: baseFont,
       boldFont: boldFont,
@@ -1326,9 +1336,26 @@ final summary = GeniusPdfSummarySection(
 
     final result = header.draw(
         page: page,
-        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 150));
+        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 200));
+    yOffset = result + 15;
 
-    return result + 20;
+    // Bilingual split header (Arabic right, logo center, English left)
+    final bilingualHeader = GeniusPdfReportHeader.bilingualSplit(
+      title: 'Trial Balance',
+      titleAr: 'ميزان المراجعة',
+      subtitle: 'As of December 31, 2025',
+      subtitleAr: 'كما في 31 ديسمبر 2025',
+      company: companyInfo,
+      date: DateTime.now(),
+      baseFont: baseFont,
+      boldFont: boldFont,
+    );
+
+    final bilingualResult = bilingualHeader.draw(
+        page: page,
+        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 200));
+
+    return bilingualResult + 20;
   }
 
   double _drawSummary(
