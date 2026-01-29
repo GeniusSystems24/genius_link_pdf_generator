@@ -5,6 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.3+8] - 2026-01-29
+
+### Added
+
+#### GeniusPdfInfoBox Overhaul
+- **Status-Themed Style Presets** - 4 new factory constructors: `GeniusPdfInfoBoxStyle.info()`, `.warning()`, `.success()`, `.error()` with distinct colors and icons
+- **New Style Factories** - `GeniusPdfInfoBoxStyle.corporate()`, `.minimal()`, `.saudi()`, `.invoice()` for professional presets
+- **Item Separators** - `showItemSeparators`, `itemSeparatorColor`, `itemSeparatorWidth` properties on style
+- **Min/Max Height** - `minHeight` and `maxHeight` constraints on `GeniusPdfInfoBoxStyle`
+- **RTL-Aware Alignment** - `effectiveLabelAlign()` and `effectiveValueAlign()` methods auto-swap left↔right in RTL mode
+- **copyWith()** - Full `copyWith()` on both `GeniusPdfInfoBoxStyle` and `GeniusPdfInfoBox`
+- **Icon Rendering** - Actual PDF icon drawing using `PdfBitmap` with RTL-aware positioning (previously was a placeholder)
+- **Subtitle Rendering** - New `subtitle` / `subtitleAr` support rendered below the title
+- **Footer Rendering** - New `footerStyle` property with footer text drawing
+- **Multi-Column Layout** - `columns` and `columnSpacing` properties for multi-column item arrangement
+- **Shadow Drawing** - Box shadow support when `hasShadow` is enabled
+- **Empty Item Handling** - `showEmptyItems` and `emptyItemPlaceholder` properties
+- **Tag Support** - `tag` property for component identification
+
+#### GeniusPdfInfoBox Factories
+- `GeniusPdfInfoBox.company()` - Pre-configured company info box with name, VAT, CR, city, phone, email fields
+- `GeniusPdfInfoBox.contact()` - Pre-configured contact info box with name, phone, email, address fields
+
+#### GeniusPdfDualInfoBox Enhancements
+- **equalHeight Implementation** - Pre-calculates both box heights and forces the max via `copyWith` on style's `minHeight`
+- `GeniusPdfDualInfoBox.customerInvoice()` - Pre-configured customer + invoice dual box
+- `GeniusPdfDualInfoBox.shippingBilling()` - Pre-configured shipping + billing dual box
+- **Background Color** - `backgroundColor` property for combined area
+- **Border Style** - `borderStyle` property for outer border
+- **Padding & Alignment** - `padding` and `alignment` properties
+
+#### GeniusPdfSection Enhancements
+- New `GeniusPdfSectionStyle` class with `copyWith()` and factory constructors (`corporate`, `minimal`, `card`, `saudi`)
+- `GeniusPdfSection.corporate()` and `GeniusPdfSection.card()` factory constructors
+- Subtitle support, shadow support, title background, title underline
+- `keepTogether`, `pageBreakBefore`, `minHeight`, `maxHeight` properties
+
+### Fixed
+- **Missing style presets** - `GeniusPdfInfoBoxStyle.info()` and `.warning()` were referenced in examples but didn't exist (compilation error)
+- **Null-safety issues** - Removed all unnecessary `!` operators on non-nullable `baseFont` / `boldFont` fields
+- **Color null-safety** - Added null-coalescing for `style.contentStyle.color` before `.withValues()` call
+- **draw() wrong bounds** - `draw()` now returns actual drawn bounds instead of pre-calculated `boxBounds`
+- **Unused variables** - Removed unused `graphics` variable in `_drawVertical` and `_drawDiagonal` methods
+- **equalHeight not implemented** - `equalHeight` property in `GeniusPdfDualInfoBox` was declared but never used in draw methods
+
+### Changed
+- Logger integration added across all InfoBox, DualInfoBox, and Section components
+- `GeniusPdfSection` old constructor parameters deprecated in favor of new `style` parameter
+
+---
+
 ## [2.3.3+7] - 2026-01-29
 
 ### Added

@@ -86,6 +86,11 @@ A comprehensive PDF generation and preview library for Flutter applications with
 ⏱️ **Performance Timers** (v2.3.3+7) - Built-in timer support to measure operation durations
 🎯 **Library-Wide Logging** (v2.3.3+7) - Logger integrated across all modules (printing, services, components)
 ⚙️ **Logger Configuration** (v2.3.3+7) - Enable/disable logging, filter by level, toggle timestamps and locations
+📦 **InfoBox Overhaul** (v2.3.3+8) - Complete rewrite with bug fixes, icon rendering, RTL alignment, actual bounds
+🎨 **Status Presets** (v2.3.3+8) - Info, warning, success, error style presets for info boxes
+🏢 **Company/Contact Factories** (v2.3.3+8) - Pre-configured info box factories for common use cases
+⚖️ **Equal Height** (v2.3.3+8) - DualInfoBox equalHeight synchronization between paired boxes
+📐 **Section Styles** (v2.3.3+8) - New GeniusPdfSectionStyle class with corporate, minimal, card, saudi presets
 
 ---
 

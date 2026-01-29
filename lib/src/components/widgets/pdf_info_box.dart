@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfBorderStyle, PdfTextStyle;
 
+import '../../core/pdf_logger.dart';
 import '../../extensions/color_extensions.dart';
 import '../../models/pdf_image.dart';
 import '../models/pdf_styles.dart';
@@ -40,6 +41,7 @@ enum GeniusPdfLabelValueLayout {
 /// - Label-value pair formatting
 /// - Spacing and alignment control
 /// - Shadow and decoration effects
+/// - Status-themed presets (info, warning, success, error)
 ///
 /// ## Example
 /// ```dart
@@ -334,6 +336,130 @@ class GeniusPdfInfoBoxStyle {
     );
   }
 
+  /// Creates an information/neutral status style (blue accent).
+  factory GeniusPdfInfoBoxStyle.info({
+    Color accentColor = const Color(0xFF1976D2),
+  }) {
+    return GeniusPdfInfoBoxStyle(
+      backgroundColor: const Color(0xFFE3F2FD),
+      borderStyle: GeniusPdfBorderStyle(
+        width: 2,
+        color: accentColor,
+        left: true,
+        right: false,
+        top: false,
+        bottom: false,
+      ),
+      padding: const GeniusPdfCellPadding.all(10),
+      titleStyle: GeniusPdfTextStyle.header(
+        fontSize: 11,
+        color: accentColor,
+      ),
+      contentStyle: const GeniusPdfTextStyle.body(fontSize: 9),
+      labelStyle: const GeniusPdfTextStyle(
+        fontSize: 9,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF424242),
+      ),
+      valueStyle: const GeniusPdfTextStyle(fontSize: 9),
+      itemSpacing: 3,
+      iconColor: accentColor,
+    );
+  }
+
+  /// Creates a warning status style (amber/orange accent).
+  factory GeniusPdfInfoBoxStyle.warning({
+    Color accentColor = const Color(0xFFF57F17),
+  }) {
+    return GeniusPdfInfoBoxStyle(
+      backgroundColor: const Color(0xFFFFF8E1),
+      borderStyle: GeniusPdfBorderStyle(
+        width: 2,
+        color: accentColor,
+        left: true,
+        right: false,
+        top: false,
+        bottom: false,
+      ),
+      padding: const GeniusPdfCellPadding.all(10),
+      titleStyle: GeniusPdfTextStyle.header(
+        fontSize: 11,
+        color: accentColor,
+      ),
+      contentStyle: const GeniusPdfTextStyle.body(fontSize: 9),
+      labelStyle: const GeniusPdfTextStyle(
+        fontSize: 9,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF424242),
+      ),
+      valueStyle: const GeniusPdfTextStyle(fontSize: 9),
+      itemSpacing: 3,
+      iconColor: accentColor,
+    );
+  }
+
+  /// Creates a success status style (green accent).
+  factory GeniusPdfInfoBoxStyle.success({
+    Color accentColor = const Color(0xFF2E7D32),
+  }) {
+    return GeniusPdfInfoBoxStyle(
+      backgroundColor: const Color(0xFFE8F5E9),
+      borderStyle: GeniusPdfBorderStyle(
+        width: 2,
+        color: accentColor,
+        left: true,
+        right: false,
+        top: false,
+        bottom: false,
+      ),
+      padding: const GeniusPdfCellPadding.all(10),
+      titleStyle: GeniusPdfTextStyle.header(
+        fontSize: 11,
+        color: accentColor,
+      ),
+      contentStyle: const GeniusPdfTextStyle.body(fontSize: 9),
+      labelStyle: const GeniusPdfTextStyle(
+        fontSize: 9,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF424242),
+      ),
+      valueStyle: const GeniusPdfTextStyle(fontSize: 9),
+      itemSpacing: 3,
+      iconColor: accentColor,
+    );
+  }
+
+  /// Creates an error status style (red accent).
+  factory GeniusPdfInfoBoxStyle.error({
+    Color accentColor = const Color(0xFFC62828),
+  }) {
+    return GeniusPdfInfoBoxStyle(
+      backgroundColor: const Color(0xFFFFEBEE),
+      borderStyle: GeniusPdfBorderStyle(
+        width: 2,
+        color: accentColor,
+        left: true,
+        right: false,
+        top: false,
+        bottom: false,
+      ),
+      padding: const GeniusPdfCellPadding.all(10),
+      titleStyle: GeniusPdfTextStyle.header(
+        fontSize: 11,
+        color: accentColor,
+      ),
+      contentStyle: const GeniusPdfTextStyle.body(fontSize: 9),
+      labelStyle: const GeniusPdfTextStyle(
+        fontSize: 9,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF424242),
+      ),
+      valueStyle: const GeniusPdfTextStyle(fontSize: 9),
+      itemSpacing: 3,
+      iconColor: accentColor,
+    );
+  }
+
   /// Box background color.
   final Color? backgroundColor;
 
@@ -433,6 +559,24 @@ class GeniusPdfInfoBoxStyle {
   /// Width of item separators.
   final double itemSeparatorWidth;
 
+  /// Returns RTL-aware label alignment.
+  ///
+  /// When [isRTL] is true, swaps left↔right for proper bidirectional layout.
+  GeniusPdfTextAlign effectiveLabelAlign({bool isRTL = false}) {
+    if (!isRTL) return labelAlign;
+    if (labelAlign == GeniusPdfTextAlign.left) return GeniusPdfTextAlign.right;
+    if (labelAlign == GeniusPdfTextAlign.right) return GeniusPdfTextAlign.left;
+    return labelAlign;
+  }
+
+  /// Returns RTL-aware value alignment.
+  GeniusPdfTextAlign effectiveValueAlign({bool isRTL = false}) {
+    if (!isRTL) return valueAlign;
+    if (valueAlign == GeniusPdfTextAlign.left) return GeniusPdfTextAlign.right;
+    if (valueAlign == GeniusPdfTextAlign.right) return GeniusPdfTextAlign.left;
+    return valueAlign;
+  }
+
   /// Creates a copy with modified values.
   GeniusPdfInfoBoxStyle copyWith({
     Color? backgroundColor,
@@ -516,10 +660,12 @@ class GeniusPdfInfoBoxStyle {
 /// Enhanced features:
 /// - Bilingual support (English/Arabic)
 /// - Customizable styling and layout
-/// - Icon support in header
+/// - Icon support in header (draws from [GeniusPdfImage])
 /// - Subtitle support
 /// - Footer content
 /// - Multiple layout modes for label-value pairs
+/// - RTL-aware alignment
+/// - Status-themed presets (info, warning, success, error)
 ///
 /// ## Example
 /// ```dart
@@ -691,6 +837,191 @@ class GeniusPdfInfoBox {
     );
   }
 
+  /// Creates a company info box with common fields.
+  factory GeniusPdfInfoBox.company({
+    required String companyName,
+    String? companyNameAr,
+    String? taxNumber,
+    String? commercialReg,
+    String? phone,
+    String? email,
+    String? website,
+    String? address,
+    String title = 'Company Information',
+    String titleAr = 'معلومات الشركة',
+    GeniusPdfInfoBoxStyle? style,
+    required PdfFont baseFont,
+    required PdfFont boldFont,
+    bool isRTL = true,
+  }) {
+    final items = <GeniusPdfLabeledValue>[];
+
+    items.add(GeniusPdfLabeledValue(
+      label: 'Company',
+      labelAr: 'الشركة',
+      value: companyName,
+      baseFont: baseFont,
+      boldFont: boldFont,
+    ));
+
+    if (taxNumber != null && taxNumber.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Tax Number',
+        labelAr: 'الرقم الضريبي',
+        value: taxNumber,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    if (commercialReg != null && commercialReg.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Commercial Reg.',
+        labelAr: 'السجل التجاري',
+        value: commercialReg,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    if (phone != null && phone.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Phone',
+        labelAr: 'الهاتف',
+        value: phone,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    if (email != null && email.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Email',
+        labelAr: 'البريد',
+        value: email,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    if (website != null && website.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Website',
+        labelAr: 'الموقع',
+        value: website,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    if (address != null && address.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Address',
+        labelAr: 'العنوان',
+        value: address,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    return GeniusPdfInfoBox(
+      title: title,
+      titleAr: titleAr,
+      items: items,
+      style: style ?? GeniusPdfInfoBoxStyle.corporate(),
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: isRTL,
+    );
+  }
+
+  /// Creates a contact info box.
+  factory GeniusPdfInfoBox.contact({
+    required String name,
+    String? nameAr,
+    String? phone,
+    String? mobile,
+    String? email,
+    String? department,
+    String? position,
+    String title = 'Contact',
+    String titleAr = 'جهة الاتصال',
+    GeniusPdfInfoBoxStyle? style,
+    required PdfFont baseFont,
+    required PdfFont boldFont,
+    bool isRTL = true,
+  }) {
+    final items = <GeniusPdfLabeledValue>[];
+
+    items.add(GeniusPdfLabeledValue(
+      label: 'Name',
+      labelAr: 'الاسم',
+      value: name,
+      baseFont: baseFont,
+      boldFont: boldFont,
+    ));
+
+    if (position != null && position.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Position',
+        labelAr: 'المنصب',
+        value: position,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    if (department != null && department.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Department',
+        labelAr: 'القسم',
+        value: department,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    if (phone != null && phone.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Phone',
+        labelAr: 'الهاتف',
+        value: phone,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    if (mobile != null && mobile.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Mobile',
+        labelAr: 'الجوال',
+        value: mobile,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    if (email != null && email.isNotEmpty) {
+      items.add(GeniusPdfLabeledValue(
+        label: 'Email',
+        labelAr: 'البريد',
+        value: email,
+        baseFont: baseFont,
+        boldFont: boldFont,
+      ));
+    }
+
+    return GeniusPdfInfoBox(
+      title: title,
+      titleAr: titleAr,
+      items: items,
+      style: style ?? const GeniusPdfInfoBoxStyle.card(),
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: isRTL,
+    );
+  }
+
   /// Box title (English or default).
   final String? title;
 
@@ -769,18 +1100,65 @@ class GeniusPdfInfoBox {
     return items.where((item) => item.value.isNotEmpty).toList();
   }
 
+  /// Creates a copy of this info box with optional overrides.
+  GeniusPdfInfoBox copyWith({
+    String? title,
+    String? titleAr,
+    String? subtitle,
+    String? subtitleAr,
+    List<GeniusPdfLabeledValue>? items,
+    GeniusPdfInfoBoxStyle? style,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
+    GeniusPdfImage? icon,
+    String? footer,
+    String? footerAr,
+    GeniusPdfTextStyle? footerStyle,
+    bool? showEmptyItems,
+    String? emptyItemPlaceholder,
+    int? columns,
+    double? columnSpacing,
+    String? tag,
+  }) {
+    return GeniusPdfInfoBox(
+      title: title ?? this.title,
+      titleAr: titleAr ?? this.titleAr,
+      subtitle: subtitle ?? this.subtitle,
+      subtitleAr: subtitleAr ?? this.subtitleAr,
+      items: items ?? this.items,
+      style: style ?? this.style,
+      baseFont: baseFont ?? this.baseFont,
+      boldFont: boldFont ?? this.boldFont,
+      isRTL: isRTL ?? this.isRTL,
+      icon: icon ?? this.icon,
+      footer: footer ?? this.footer,
+      footerAr: footerAr ?? this.footerAr,
+      footerStyle: footerStyle ?? this.footerStyle,
+      showEmptyItems: showEmptyItems ?? this.showEmptyItems,
+      emptyItemPlaceholder: emptyItemPlaceholder ?? this.emptyItemPlaceholder,
+      columns: columns ?? this.columns,
+      columnSpacing: columnSpacing ?? this.columnSpacing,
+      tag: tag ?? this.tag,
+    );
+  }
+
   /// Draws the info box on a PDF page.
   ///
-  /// Returns the bounds of the drawn box for positioning.
+  /// Returns the actual bounds of the drawn content.
   Rect draw({
     required PdfPage page,
     required Rect bounds,
   }) {
+    GeniusPdfLogger.debug(
+      'Drawing InfoBox: "${getTitle() ?? 'untitled'}" with ${visibleItems.length} items',
+      tag: 'InfoBox',
+    );
     final graphics = page.graphics;
     double currentY = bounds.top;
 
     // Calculate content height for background
-    final contentHeight = _calculateHeight();
+    final contentHeight = _calculateHeight(bounds.width);
     var boxHeight = contentHeight + style.padding.top + style.padding.bottom;
 
     // Apply height constraints
@@ -820,37 +1198,7 @@ class GeniusPdfInfoBox {
     }
 
     // Draw border
-    if (style.borderStyle.width > 0) {
-      final pen = style.borderStyle.toPen();
-      if (style.borderStyle.top) {
-        graphics.drawLine(
-          pen,
-          Offset(boxBounds.left, boxBounds.top),
-          Offset(boxBounds.right, boxBounds.top),
-        );
-      }
-      if (style.borderStyle.bottom) {
-        graphics.drawLine(
-          pen,
-          Offset(boxBounds.left, boxBounds.bottom),
-          Offset(boxBounds.right, boxBounds.bottom),
-        );
-      }
-      if (style.borderStyle.left) {
-        graphics.drawLine(
-          pen,
-          Offset(boxBounds.left, boxBounds.top),
-          Offset(boxBounds.left, boxBounds.bottom),
-        );
-      }
-      if (style.borderStyle.right) {
-        graphics.drawLine(
-          pen,
-          Offset(boxBounds.right, boxBounds.top),
-          Offset(boxBounds.right, boxBounds.bottom),
-        );
-      }
-    }
+    _drawBorder(graphics, boxBounds, style.borderStyle);
 
     // Draw title and header
     final displayTitle = getTitle();
@@ -877,13 +1225,23 @@ class GeniusPdfInfoBox {
 
       // Draw icon if present
       if (icon != null) {
-        // Icon drawing logic would go here
-        titleLeft += style.iconSize + style.iconSpacing;
-        titleWidth -= style.iconSize + style.iconSpacing;
-      }
+        final iconY = currentY + (_getTitleHeight() - style.iconSize) / 2;
+        final iconX = isRTL
+            ? (titleLeft + titleWidth - style.iconSize)
+            : titleLeft;
 
-      // Font - baseFont and boldFont are required, no fallback to Helvetica
-      final titleFont = boldFont ?? baseFont!;
+        graphics.drawImage(
+          PdfBitmap(icon!.bytes),
+          Rect.fromLTWH(iconX, iconY, style.iconSize, style.iconSize),
+        );
+
+        if (isRTL) {
+          titleWidth -= style.iconSize + style.iconSpacing;
+        } else {
+          titleLeft += style.iconSize + style.iconSpacing;
+          titleWidth -= style.iconSize + style.iconSpacing;
+        }
+      }
 
       final titleFormat = PdfStringFormat(
         alignment: style.titleStyle.alignment.toPdfTextAlignment(),
@@ -893,7 +1251,7 @@ class GeniusPdfInfoBox {
 
       graphics.drawString(
         displayTitle,
-        titleFont,
+        boldFont,
         brush: style.titleStyle.toBrush(),
         bounds: Rect.fromLTWH(
           titleLeft,
@@ -910,13 +1268,13 @@ class GeniusPdfInfoBox {
       final displaySubtitle = getSubtitle();
       if (displaySubtitle != null && displaySubtitle.isNotEmpty) {
         currentY += 2;
+        final subtitleColor =
+            (style.titleStyle.color ?? const Color(0xFF424242))
+                .withValues(alpha: 0.7);
         graphics.drawString(
           displaySubtitle,
-          baseFont!,
-          brush: PdfSolidBrush(
-              (style.titleStyle.color ?? const Color(0xFF424242))
-                  .withValues(alpha: 0.7)
-                  .toPdfColor()),
+          baseFont,
+          brush: PdfSolidBrush(subtitleColor.toPdfColor()),
           bounds: Rect.fromLTWH(titleLeft, currentY, titleWidth, 0),
           format: titleFormat,
         );
@@ -1004,10 +1362,13 @@ class GeniusPdfInfoBox {
     final displayFooter = getFooter();
     if (displayFooter != null && displayFooter.isNotEmpty) {
       currentY += style.itemSpacing;
+      final defaultFooterColor =
+          (style.contentStyle.color ?? const Color(0xFF424242))
+              .withValues(alpha: 0.7);
       final effectiveFooterStyle = footerStyle ??
           GeniusPdfTextStyle(
             fontSize: style.contentStyle.fontSize * 0.9,
-            color: style.contentStyle.color.withValues(alpha: 0.7),
+            color: defaultFooterColor,
           );
 
       final footerFormat = PdfStringFormat(
@@ -1018,14 +1379,18 @@ class GeniusPdfInfoBox {
 
       graphics.drawString(
         displayFooter,
-        baseFont!,
+        baseFont,
         brush: effectiveFooterStyle.toBrush(),
         bounds: Rect.fromLTWH(contentLeft, currentY, contentWidth, 0),
         format: footerFormat,
       );
+      currentY += effectiveFooterStyle.fontSize * 1.2;
     }
 
-    return boxBounds;
+    // Return actual drawn bounds
+    final actualHeight = currentY - bounds.top + style.padding.bottom;
+    final finalHeight = boxHeight > actualHeight ? boxHeight : actualHeight;
+    return Rect.fromLTWH(bounds.left, bounds.top, bounds.width, finalHeight);
   }
 
   GeniusPdfLabeledValue _createLabeledValue(GeniusPdfLabeledValue item) {
@@ -1036,13 +1401,13 @@ class GeniusPdfInfoBox {
       labelStyle: style.labelStyle ?? item.labelStyle,
       valueStyle: style.valueStyle ?? item.valueStyle,
       separator: item.separator,
-      baseFont: baseFont ?? item.baseFont,
-      boldFont: boldFont ?? item.boldFont,
+      baseFont: baseFont,
+      boldFont: boldFont,
       isRTL: isRTL,
     );
   }
 
-  double _calculateHeight() {
+  double _calculateHeight([double? availableWidth]) {
     double height = 0;
 
     // Header height
@@ -1092,6 +1457,44 @@ class GeniusPdfInfoBox {
     }
     return style.contentStyle.fontSize * 1.4;
   }
+
+  /// Draws border lines around a rectangle based on [GeniusPdfBorderStyle].
+  static void _drawBorder(
+    PdfGraphics graphics,
+    Rect bounds,
+    GeniusPdfBorderStyle borderStyle,
+  ) {
+    if (borderStyle.width <= 0) return;
+    final pen = borderStyle.toPen();
+    if (borderStyle.top) {
+      graphics.drawLine(
+        pen,
+        Offset(bounds.left, bounds.top),
+        Offset(bounds.right, bounds.top),
+      );
+    }
+    if (borderStyle.bottom) {
+      graphics.drawLine(
+        pen,
+        Offset(bounds.left, bounds.bottom),
+        Offset(bounds.right, bounds.bottom),
+      );
+    }
+    if (borderStyle.left) {
+      graphics.drawLine(
+        pen,
+        Offset(bounds.left, bounds.top),
+        Offset(bounds.left, bounds.bottom),
+      );
+    }
+    if (borderStyle.right) {
+      graphics.drawLine(
+        pen,
+        Offset(bounds.right, bounds.top),
+        Offset(bounds.right, bounds.bottom),
+      );
+    }
+  }
 }
 
 /// Layout modes for dual info box.
@@ -1113,7 +1516,7 @@ enum GeniusPdfDualInfoBoxLayout {
 /// Enhanced features:
 /// - Multiple layout modes (horizontal, vertical, diagonal)
 /// - RTL support (boxes swap positions)
-/// - Equal height synchronization
+/// - Equal height synchronization (draws both boxes at the taller height)
 /// - Customizable proportions
 /// - Connecting line between boxes
 ///
@@ -1255,6 +1658,7 @@ class GeniusPdfDualInfoBox {
     required PdfPage page,
     required Rect bounds,
   }) {
+    GeniusPdfLogger.debug('Drawing DualInfoBox: layout=${layout.name}', tag: 'InfoBox');
     final graphics = page.graphics;
     final contentBounds = Rect.fromLTWH(
       bounds.left + padding.left,
@@ -1293,35 +1697,7 @@ class GeniusPdfDualInfoBox {
         bounds.width,
         resultBounds.height + padding.top + padding.bottom,
       );
-      final pen = borderStyle!.toPen();
-      if (borderStyle!.top) {
-        graphics.drawLine(
-          pen,
-          Offset(finalBounds.left, finalBounds.top),
-          Offset(finalBounds.right, finalBounds.top),
-        );
-      }
-      if (borderStyle!.bottom) {
-        graphics.drawLine(
-          pen,
-          Offset(finalBounds.left, finalBounds.bottom),
-          Offset(finalBounds.right, finalBounds.bottom),
-        );
-      }
-      if (borderStyle!.left) {
-        graphics.drawLine(
-          pen,
-          Offset(finalBounds.left, finalBounds.top),
-          Offset(finalBounds.left, finalBounds.bottom),
-        );
-      }
-      if (borderStyle!.right) {
-        graphics.drawLine(
-          pen,
-          Offset(finalBounds.right, finalBounds.top),
-          Offset(finalBounds.right, finalBounds.bottom),
-        );
-      }
+      GeniusPdfInfoBox._drawBorder(graphics, finalBounds, borderStyle!);
     }
 
     return Rect.fromLTWH(
@@ -1354,6 +1730,37 @@ class GeniusPdfDualInfoBox {
       rightW = availableWidth * rightFlex / totalFlex;
     }
 
+    // When equalHeight is enabled, pre-calculate heights and use the max
+    double? forcedHeight;
+    if (equalHeight) {
+      final leftH = effectiveLeft._calculateHeight(leftW) +
+          effectiveLeft.style.padding.top +
+          effectiveLeft.style.padding.bottom;
+      final rightH = effectiveRight._calculateHeight(rightW) +
+          effectiveRight.style.padding.top +
+          effectiveRight.style.padding.bottom;
+      forcedHeight = leftH > rightH ? leftH : rightH;
+
+      // Apply minHeight from styles
+      if (effectiveLeft.style.minHeight != null &&
+          forcedHeight < effectiveLeft.style.minHeight!) {
+        forcedHeight = effectiveLeft.style.minHeight!;
+      }
+      if (effectiveRight.style.minHeight != null &&
+          forcedHeight < effectiveRight.style.minHeight!) {
+        forcedHeight = effectiveRight.style.minHeight!;
+      }
+    }
+
+    final leftBoxWithHeight = equalHeight && forcedHeight != null
+        ? effectiveLeft.copyWith(
+            style: effectiveLeft.style.copyWith(minHeight: forcedHeight))
+        : effectiveLeft;
+    final rightBoxWithHeight = equalHeight && forcedHeight != null
+        ? effectiveRight.copyWith(
+            style: effectiveRight.style.copyWith(minHeight: forcedHeight))
+        : effectiveRight;
+
     final leftBounds = Rect.fromLTWH(
       bounds.left,
       bounds.top,
@@ -1368,22 +1775,21 @@ class GeniusPdfDualInfoBox {
       bounds.height,
     );
 
-    final leftResult = effectiveLeft.draw(page: page, bounds: leftBounds);
-    final rightResult = effectiveRight.draw(page: page, bounds: rightBounds);
+    final leftResult = leftBoxWithHeight.draw(page: page, bounds: leftBounds);
+    final rightResult =
+        rightBoxWithHeight.draw(page: page, bounds: rightBounds);
 
     // Draw connecting line if enabled
     if (showConnectingLine) {
       final lineX = bounds.left + leftW + spacing / 2;
       final lineColor = connectingLineColor ?? const Color(0xFFE0E0E0);
+      final maxH = leftResult.height > rightResult.height
+          ? leftResult.height
+          : rightResult.height;
       graphics.drawLine(
         PdfPen(lineColor.toPdfColor(), width: connectingLineWidth),
         Offset(lineX, bounds.top),
-        Offset(
-            lineX,
-            bounds.top +
-                (leftResult.height > rightResult.height
-                    ? leftResult.height
-                    : rightResult.height)),
+        Offset(lineX, bounds.top + maxH),
       );
     }
 
@@ -1401,7 +1807,6 @@ class GeniusPdfDualInfoBox {
   }
 
   Rect _drawVertical(PdfPage page, Rect bounds) {
-    final graphics = page.graphics;
     final effectiveLeft = _getLeftBox();
     final effectiveRight = _getRightBox();
 
@@ -1427,7 +1832,7 @@ class GeniusPdfDualInfoBox {
     if (showConnectingLine) {
       final lineY = bounds.top + topResult.height + verticalSpacing / 2;
       final lineColor = connectingLineColor ?? const Color(0xFFE0E0E0);
-      graphics.drawLine(
+      page.graphics.drawLine(
         PdfPen(lineColor.toPdfColor(), width: connectingLineWidth),
         Offset(bounds.left, lineY),
         Offset(bounds.right, lineY),
@@ -1891,8 +2296,6 @@ class GeniusPdfSection {
     final hasTitle = displayTitle != null && displayTitle.isNotEmpty;
 
     if (hasTitle) {
-      final titleFont = boldFont ?? baseFont!;
-
       final titleFormat = PdfStringFormat(
         alignment: style.titleStyle.alignment.toPdfTextAlignment(),
         textDirection:
@@ -1919,7 +2322,7 @@ class GeniusPdfSection {
 
         graphics.drawString(
           displayTitle,
-          titleFont,
+          boldFont,
           brush: style.titleStyle.toBrush(),
           bounds: Rect.fromLTWH(bounds.left, currentY, bounds.width, 0),
           format: titleFormat,
@@ -1933,11 +2336,12 @@ class GeniusPdfSection {
           final subtitleTextStyle = style.subtitleStyle ??
               GeniusPdfTextStyle(
                 fontSize: style.titleStyle.fontSize * 0.85,
-                color: style.titleStyle.color.withValues(alpha: 0.7),
+                color: (style.titleStyle.color ?? const Color(0xFF424242))
+                    .withValues(alpha: 0.7),
               );
           graphics.drawString(
             displaySubtitle,
-            baseFont!,
+            baseFont,
             brush: subtitleTextStyle.toBrush(),
             bounds: Rect.fromLTWH(bounds.left, currentY, bounds.width, 0),
             format: titleFormat,
@@ -2039,7 +2443,6 @@ class GeniusPdfSection {
     // Draw title inside box if applicable
     if (hasTitle &&
         style.titlePosition == GeniusPdfSectionTitlePosition.inside) {
-      final titleFont = boldFont ?? baseFont!;
       final titleFormat = PdfStringFormat(
         alignment: style.titleStyle.alignment.toPdfTextAlignment(),
         textDirection:
@@ -2062,7 +2465,7 @@ class GeniusPdfSection {
       var titleY = boxBounds.top + style.padding.top;
       graphics.drawString(
         displayTitle!,
-        titleFont,
+        boldFont,
         brush: style.titleStyle.toBrush(),
         bounds: Rect.fromLTWH(
           boxBounds.left + style.padding.left,
@@ -2080,11 +2483,12 @@ class GeniusPdfSection {
         final subtitleTextStyle = style.subtitleStyle ??
             GeniusPdfTextStyle(
               fontSize: style.titleStyle.fontSize * 0.85,
-              color: style.titleStyle.color.withValues(alpha: 0.7),
+              color: (style.titleStyle.color ?? const Color(0xFF424242))
+                  .withValues(alpha: 0.7),
             );
         graphics.drawString(
           displaySubtitle,
-          baseFont!,
+          baseFont,
           brush: subtitleTextStyle.toBrush(),
           bounds: Rect.fromLTWH(
             boxBounds.left + style.padding.left,
@@ -2112,37 +2516,7 @@ class GeniusPdfSection {
     }
 
     // Draw border
-    if (style.borderStyle.width > 0) {
-      final pen = style.borderStyle.toPen();
-      if (style.borderStyle.top) {
-        graphics.drawLine(
-          pen,
-          Offset(boxBounds.left, boxBounds.top),
-          Offset(boxBounds.right, boxBounds.top),
-        );
-      }
-      if (style.borderStyle.bottom) {
-        graphics.drawLine(
-          pen,
-          Offset(boxBounds.left, boxBounds.bottom),
-          Offset(boxBounds.right, boxBounds.bottom),
-        );
-      }
-      if (style.borderStyle.left) {
-        graphics.drawLine(
-          pen,
-          Offset(boxBounds.left, boxBounds.top),
-          Offset(boxBounds.left, boxBounds.bottom),
-        );
-      }
-      if (style.borderStyle.right) {
-        graphics.drawLine(
-          pen,
-          Offset(boxBounds.right, boxBounds.top),
-          Offset(boxBounds.right, boxBounds.bottom),
-        );
-      }
-    }
+    GeniusPdfInfoBox._drawBorder(graphics, boxBounds, style.borderStyle);
 
     return Rect.fromLTWH(
       bounds.left,

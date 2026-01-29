@@ -502,6 +502,7 @@ final span = 'مهم'.toBoldSpan(color: Colors.red);
       isGenerating: _isGenerating,
       onGenerate: () => _generatePdf('info_box'),
       codeExample: '''
+// Status-themed info boxes
 final infoBox = GeniusPdfInfoBox(
   title: 'ملاحظة هامة',
   style: GeniusPdfInfoBoxStyle.info(),
@@ -515,17 +516,20 @@ final infoBox = GeniusPdfInfoBox(
   boldFont: config.boldFont,
 );
 
-final warningBox = GeniusPdfInfoBox(
-  title: 'تحذير',
-  style: GeniusPdfInfoBoxStyle.warning(),
-  items: [
-    GeniusPdfLabeledValue(
-      label: 'تنبيه',
-      value: 'هذا المستند للمعاينة فقط',
-    ),
-  ],
+// Pre-configured company factory
+final companyBox = GeniusPdfInfoBox.company(
+  companyName: 'شركة الأمل للتجارة',
+  taxNumber: '300123456789003',
+  commercialReg: '1010123456',
   baseFont: config.baseFont,
   boldFont: config.boldFont,
+);
+
+// Equal-height dual info box
+final dualBox = GeniusPdfDualInfoBox(
+  leftBox: customerBox,
+  rightBox: companyBox,
+  equalHeight: true,
 );''',
       preview: _buildInfoBoxPreview(isDark),
     );
@@ -1135,7 +1139,7 @@ final summary = GeniusPdfSummarySection(
     final pageSize = page.getClientSize();
     final boxWidth = (pageSize.width - 60) / 2;
 
-    // Customer info box
+    // --- Dual Info Box with equalHeight ---
     final customerBox = GeniusPdfInfoBox(
       title: 'Customer Info',
       titleAr: 'بيانات العميل',
@@ -1174,53 +1178,122 @@ final summary = GeniusPdfSummarySection(
       boldFont: boldFont,
       isRTL: _isRTL,
     );
-    customerBox.draw(
-        page: page, bounds: Rect.fromLTWH(20, yOffset, boxWidth, 150));
 
-    // Company info box
-    final companyBox = GeniusPdfInfoBox(
-      title: 'Company Info',
-      titleAr: 'بيانات الشركة',
-      items: [
-        GeniusPdfLabeledValue(
-            label: 'Company',
-            labelAr: 'الشركة',
-            value: _isRTL ? 'شركة الأمل' : 'Al-Amal Co.',
-            baseFont: baseFont,
-            boldFont: boldFont,
-            isRTL: _isRTL),
-        GeniusPdfLabeledValue(
-            label: 'VAT',
-            labelAr: 'الضريبة',
-            value: '300123456789003',
-            baseFont: baseFont,
-            boldFont: boldFont,
-            isRTL: _isRTL),
-        GeniusPdfLabeledValue(
-            label: 'CR',
-            labelAr: 'السجل',
-            value: '1010123456',
-            baseFont: baseFont,
-            boldFont: boldFont,
-            isRTL: _isRTL),
-        GeniusPdfLabeledValue(
-            label: 'City',
-            labelAr: 'المدينة',
-            value: _isRTL ? 'الرياض' : 'Riyadh',
-            baseFont: baseFont,
-            boldFont: boldFont,
-            isRTL: _isRTL),
-      ],
-      style: GeniusPdfInfoBoxStyle.highlighted(),
+    // Company box using .company() factory
+    final companyBox = GeniusPdfInfoBox.company(
+      companyName: _isRTL ? 'شركة الأمل للتجارة' : 'Al-Amal Trading Co.',
+      taxNumber: '300123456789003',
+      commercialReg: '1010123456',
+      address: _isRTL ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia',
+      phone: '+966 11 123 4567',
+      email: 'info@alamal.com',
       baseFont: baseFont,
       boldFont: boldFont,
       isRTL: _isRTL,
     );
-    companyBox.draw(
-        page: page,
-        bounds: Rect.fromLTWH(40 + boxWidth, yOffset, boxWidth, 150));
 
-    return yOffset + 170;
+    // Use DualInfoBox with equalHeight
+    final dualBox = GeniusPdfDualInfoBox(
+      leftBox: _isRTL ? companyBox : customerBox,
+      rightBox: _isRTL ? customerBox : companyBox,
+      equalHeight: true,
+      spacing: 20,
+      swapForRTL: false,
+    );
+    final dualResult = dualBox.draw(
+        page: page,
+        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 160));
+    yOffset = dualResult.bottom + 15;
+
+    // --- Status-themed info boxes ---
+    final statusWidth = (pageSize.width - 70) / 2;
+
+    final infoBox = GeniusPdfInfoBox(
+      title: _isRTL ? 'معلومة' : 'Info',
+      titleAr: 'معلومة',
+      items: [
+        GeniusPdfLabeledValue(
+            label: _isRTL ? 'ملاحظة' : 'Note',
+            labelAr: 'ملاحظة',
+            value: _isRTL
+                ? 'يرجى الاحتفاظ بهذه الفاتورة'
+                : 'Please keep this invoice',
+            baseFont: baseFont,
+            boldFont: boldFont,
+            isRTL: _isRTL),
+      ],
+      style: GeniusPdfInfoBoxStyle.info(),
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: _isRTL,
+    );
+    infoBox.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset, statusWidth, 70));
+
+    final warningBox = GeniusPdfInfoBox(
+      title: _isRTL ? 'تحذير' : 'Warning',
+      titleAr: 'تحذير',
+      items: [
+        GeniusPdfLabeledValue(
+            label: _isRTL ? 'تنبيه' : 'Alert',
+            labelAr: 'تنبيه',
+            value: _isRTL ? 'مستند للمعاينة فقط' : 'Preview only document',
+            baseFont: baseFont,
+            boldFont: boldFont,
+            isRTL: _isRTL),
+      ],
+      style: GeniusPdfInfoBoxStyle.warning(),
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: _isRTL,
+    );
+    warningBox.draw(
+        page: page,
+        bounds: Rect.fromLTWH(40 + statusWidth, yOffset, statusWidth, 70));
+    yOffset += 85;
+
+    final successBox = GeniusPdfInfoBox(
+      title: _isRTL ? 'نجاح' : 'Success',
+      titleAr: 'نجاح',
+      items: [
+        GeniusPdfLabeledValue(
+            label: _isRTL ? 'الحالة' : 'Status',
+            labelAr: 'الحالة',
+            value: _isRTL ? 'تم إتمام العملية بنجاح' : 'Operation completed',
+            baseFont: baseFont,
+            boldFont: boldFont,
+            isRTL: _isRTL),
+      ],
+      style: GeniusPdfInfoBoxStyle.success(),
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: _isRTL,
+    );
+    successBox.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset, statusWidth, 70));
+
+    final errorBox = GeniusPdfInfoBox(
+      title: _isRTL ? 'خطأ' : 'Error',
+      titleAr: 'خطأ',
+      items: [
+        GeniusPdfLabeledValue(
+            label: _isRTL ? 'المشكلة' : 'Issue',
+            labelAr: 'المشكلة',
+            value: _isRTL ? 'فشل في معالجة الطلب' : 'Failed to process',
+            baseFont: baseFont,
+            boldFont: boldFont,
+            isRTL: _isRTL),
+      ],
+      style: GeniusPdfInfoBoxStyle.error(),
+      baseFont: baseFont,
+      boldFont: boldFont,
+      isRTL: _isRTL,
+    );
+    errorBox.draw(
+        page: page,
+        bounds: Rect.fromLTWH(40 + statusWidth, yOffset, statusWidth, 70));
+
+    return yOffset + 90;
   }
 
   double _drawHeaders(
