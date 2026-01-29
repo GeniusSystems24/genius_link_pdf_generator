@@ -200,14 +200,7 @@ class GeniusPdfConfig {
 
     // Configure logger if provided (logger is a global service)
     if (loggerConfig != null) {
-      GeniusPdfLogger.configure(
-        enabled: loggerConfig.enabled,
-        minLevel: loggerConfig.minLevel,
-        useConsole: loggerConfig.useConsole,
-        coloredConsole: loggerConfig.coloredConsole,
-        keepHistory: loggerConfig.keepHistory,
-        historySize: loggerConfig.historySize,
-      );
+      GeniusPdfLogger.configureFrom(loggerConfig);
     }
 
     // Create and return new config instance
@@ -267,14 +260,7 @@ class GeniusPdfConfig {
 
     // Configure logger if provided (logger is a global service)
     if (loggerConfig != null) {
-      GeniusPdfLogger.configure(
-        enabled: loggerConfig.enabled,
-        minLevel: loggerConfig.minLevel,
-        useConsole: loggerConfig.useConsole,
-        coloredConsole: loggerConfig.coloredConsole,
-        keepHistory: loggerConfig.keepHistory,
-        historySize: loggerConfig.historySize,
-      );
+      GeniusPdfLogger.configureFrom(loggerConfig);
     }
 
     // Create and return new config instance

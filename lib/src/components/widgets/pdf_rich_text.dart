@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import '../../../genius_link_pdf_generator.dart';
+import '../../core/pdf_logger.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Text Span
@@ -712,6 +713,7 @@ class GeniusPdfRichText {
     PdfLayoutFormat? layoutFormat,
   }) {
     if (spans.isEmpty) return null;
+    GeniusPdfLogger.debug('Drawing rich text: ${spans.length} spans', tag: 'RichText');
 
     final graphics = page.graphics;
     final textDirection =

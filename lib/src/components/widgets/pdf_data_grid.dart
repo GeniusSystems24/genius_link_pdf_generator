@@ -6,6 +6,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../../extensions/color_extensions.dart';
 import '../models/grid_models.dart';
 import '../models/pdf_styles.dart';
+import '../../core/pdf_logger.dart';
 
 /// A powerful data grid component for PDF documents.
 ///
@@ -79,6 +80,7 @@ class GeniusPdfDataGrid {
     required Rect bounds,
     PdfLayoutFormat? layoutFormat,
   }) {
+    GeniusPdfLogger.debug('Drawing grid: ${columns.length} columns, ${rows.length} rows', tag: 'DataGrid');
     final grid = _buildGrid(page);
 
     return grid.draw(

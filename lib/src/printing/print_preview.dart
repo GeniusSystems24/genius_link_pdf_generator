@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 
+import '../core/pdf_logger.dart';
 import 'printer_models.dart';
 import 'printer_service.dart';
 
@@ -285,6 +286,7 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
       return;
     }
 
+    GeniusPdfLogger.info('Preview print: "${widget.documentName}"', tag: 'PrintPreview');
     setState(() {
       _isPrinting = true;
     });
@@ -302,6 +304,7 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
         });
 
         if (result.success) {
+          GeniusPdfLogger.info('Preview print completed: "${widget.documentName}"', tag: 'PrintPreview');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Print job sent successfully!'),
@@ -312,6 +315,7 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
         }
       }
     } catch (e) {
+      GeniusPdfLogger.error('Preview print failed: "${widget.documentName}"', tag: 'PrintPreview', error: e);
       if (mounted) {
         setState(() {
           _isPrinting = false;
@@ -1033,6 +1037,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
       return;
     }
 
+    GeniusPdfLogger.info('Enhanced preview print: "${widget.documentName}"', tag: 'PrintPreview');
     setState(() {
       _isProcessing = true;
       _processingMessage = 'Sending to printer... / جاري الإرسال للطابعة...';
@@ -1051,6 +1056,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
         });
 
         if (result.success) {
+          GeniusPdfLogger.info('Enhanced preview print completed: "${widget.documentName}"', tag: 'PrintPreview');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Print job sent successfully! / تم إرسال الطباعة بنجاح'),
@@ -1061,6 +1067,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
         }
       }
     } catch (e) {
+      GeniusPdfLogger.error('Enhanced preview print failed: "${widget.documentName}"', tag: 'PrintPreview', error: e);
       if (mounted) {
         setState(() {
           _isProcessing = false;
@@ -1082,6 +1089,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
       return;
     }
 
+    GeniusPdfLogger.info('Share from preview: "${widget.documentName}"', tag: 'PrintPreview');
     setState(() {
       _isProcessing = true;
       _processingMessage = 'Preparing to share... / جاري التحضير للمشاركة...';
@@ -1099,6 +1107,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
         });
 
         if (result.success) {
+          GeniusPdfLogger.info('Share from preview completed: "${widget.documentName}"', tag: 'PrintPreview');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Shared successfully! / تمت المشاركة بنجاح'),
@@ -1106,6 +1115,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
             ),
           );
         } else {
+          GeniusPdfLogger.warning('Share from preview failed: ${result.error}', tag: 'PrintPreview');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Share failed: ${result.error}'),
@@ -1115,6 +1125,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
         }
       }
     } catch (e) {
+      GeniusPdfLogger.error('Share from preview error: "${widget.documentName}"', tag: 'PrintPreview', error: e);
       if (mounted) {
         setState(() {
           _isProcessing = false;
@@ -1136,6 +1147,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
       return;
     }
 
+    GeniusPdfLogger.info('Save from preview: "${widget.documentName}"', tag: 'PrintPreview');
     setState(() {
       _isProcessing = true;
       _processingMessage = 'Saving file... / جاري حفظ الملف...';
@@ -1153,6 +1165,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
         });
 
         if (result.success) {
+          GeniusPdfLogger.info('Save from preview completed: "${result.filePath}"', tag: 'PrintPreview');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Saved to: ${result.filePath}'),
@@ -1165,6 +1178,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
             ),
           );
         } else {
+          GeniusPdfLogger.warning('Save from preview failed: ${result.error}', tag: 'PrintPreview');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Save failed: ${result.error}'),
@@ -1174,6 +1188,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
         }
       }
     } catch (e) {
+      GeniusPdfLogger.error('Save from preview error: "${widget.documentName}"', tag: 'PrintPreview', error: e);
       if (mounted) {
         setState(() {
           _isProcessing = false;

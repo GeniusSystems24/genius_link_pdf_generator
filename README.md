@@ -81,6 +81,11 @@ A comprehensive PDF generation and preview library for Flutter applications with
 🔤 **String Extensions** (v2.3.3+6) - Quick span conversion methods on String
 📄 **Multi-Paragraph** (v2.3.3+6) - Multi-paragraph component with spacing and indent
 ✂️ **Text Overflow** (v2.3.3+6) - Max lines with ellipsis or clip overflow
+📋 **Enhanced Logger** (v2.3.3+7) - Source location tracking with clickable file:line paths
+🔍 **Automatic Source Location** (v2.3.3+7) - StackTrace-based caller detection for precise navigation
+⏱️ **Performance Timers** (v2.3.3+7) - Built-in timer support to measure operation durations
+🎯 **Library-Wide Logging** (v2.3.3+7) - Logger integrated across all modules (printing, services, components)
+⚙️ **Logger Configuration** (v2.3.3+7) - Enable/disable logging, filter by level, toggle timestamps and locations
 
 ---
 

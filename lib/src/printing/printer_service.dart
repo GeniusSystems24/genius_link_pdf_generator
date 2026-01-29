@@ -24,6 +24,8 @@ import 'package:path_provider/path_provider.dart';
 import 'printer_models.dart';
 import 'printer_discovery.dart';
 
+import '../core/pdf_logger.dart';
+
 /// Callback for print job progress
 typedef GeniusPrintProgressCallback = void Function(GeniusPrintJob job);
 
@@ -228,6 +230,7 @@ class GeniusPrinterService {
 
     _activeJobs[job.id] = job;
     _notifyJobUpdate(job);
+    GeniusPdfLogger.info('Print with dialog: "$documentName"', tag: 'PrinterService');
 
     try {
       job.status = GeniusPrintJobStatus.sending;
@@ -246,6 +249,7 @@ class GeniusPrinterService {
         job.status = GeniusPrintJobStatus.completed;
         job.progress = 1.0;
         job.completedAt = DateTime.now();
+        GeniusPdfLogger.info('Print completed: "$documentName"', tag: 'PrinterService');
         _notifyJobUpdate(job);
         onComplete?.call(job);
         _addToHistory(job);
@@ -253,6 +257,7 @@ class GeniusPrinterService {
       } else {
         job.status = GeniusPrintJobStatus.cancelled;
         job.completedAt = DateTime.now();
+        GeniusPdfLogger.warning('Print cancelled: "$documentName"', tag: 'PrinterService');
         _notifyJobUpdate(job);
         _addToHistory(job);
         return GeniusPrintResult.failure('Print cancelled by user', job);
@@ -261,6 +266,7 @@ class GeniusPrinterService {
       job.status = GeniusPrintJobStatus.failed;
       job.errorMessage = e.toString();
       job.completedAt = DateTime.now();
+      GeniusPdfLogger.error('Print failed: "$documentName"', tag: 'PrinterService', error: e);
       _notifyJobUpdate(job);
       onError?.call(job, e.toString());
       _addToHistory(job);
@@ -295,6 +301,7 @@ class GeniusPrinterService {
 
     _activeJobs[job.id] = job;
     _notifyJobUpdate(job);
+    GeniusPdfLogger.info('Direct print: "$documentName" to $effectivePrinterId', tag: 'PrinterService');
 
     try {
       job.status = GeniusPrintJobStatus.sending;
@@ -317,6 +324,7 @@ class GeniusPrinterService {
           job.status = GeniusPrintJobStatus.completed;
           job.progress = 1.0;
           job.completedAt = DateTime.now();
+          GeniusPdfLogger.info('Direct print completed: "$documentName"', tag: 'PrinterService');
           _notifyJobUpdate(job);
           onComplete?.call(job);
           _addToHistory(job);
@@ -325,6 +333,7 @@ class GeniusPrinterService {
           job.status = GeniusPrintJobStatus.failed;
           job.errorMessage = 'Direct print failed';
           job.completedAt = DateTime.now();
+          GeniusPdfLogger.warning('Direct print failed, falling back to dialog: "$documentName"', tag: 'PrinterService');
           _notifyJobUpdate(job);
           onError?.call(job, 'Direct print failed');
           _addToHistory(job);
@@ -346,6 +355,7 @@ class GeniusPrinterService {
       job.status = GeniusPrintJobStatus.failed;
       job.errorMessage = e.toString();
       job.completedAt = DateTime.now();
+      GeniusPdfLogger.error('Direct print error: "$documentName"', tag: 'PrinterService', error: e);
       _notifyJobUpdate(job);
       onError?.call(job, e.toString());
       _addToHistory(job);
@@ -391,6 +401,7 @@ class GeniusPrinterService {
     Rect? sharePositionOrigin,
   }) async {
     try {
+      GeniusPdfLogger.info('Sharing PDF: "$fileName"', tag: 'PrinterService');
       // Ensure fileName has .pdf extension
       final effectiveFileName =
           fileName.endsWith('.pdf') ? fileName : '$fileName.pdf';
@@ -410,11 +421,13 @@ class GeniusPrinterService {
         ),
       );
 
+      GeniusPdfLogger.info('PDF shared successfully: "$effectiveFileName"', tag: 'PrinterService');
       return GeniusPdfShareResult.success(
         shareResult: result,
         filePath: tempFile.path,
       );
     } catch (e) {
+      GeniusPdfLogger.error('Share failed: "$fileName"', tag: 'PrinterService', error: e);
       return GeniusPdfShareResult.failure(e.toString());
     }
   }
@@ -448,6 +461,7 @@ class GeniusPrinterService {
     String? directory,
   }) async {
     try {
+      GeniusPdfLogger.info('Saving PDF: "$fileName"', tag: 'PrinterService');
       final effectiveFileName =
           fileName.endsWith('.pdf') ? fileName : '$fileName.pdf';
 
@@ -463,9 +477,11 @@ class GeniusPrinterService {
 
       final file = File('${targetDir.path}/$effectiveFileName');
       await file.writeAsBytes(pdfBytes);
+      GeniusPdfLogger.info('PDF saved: "${file.path}"', tag: 'PrinterService');
 
       return GeniusPdfShareResult.success(filePath: file.path);
     } catch (e) {
+      GeniusPdfLogger.error('Save failed: "$fileName"', tag: 'PrinterService', error: e);
       return GeniusPdfShareResult.failure(e.toString());
     }
   }
@@ -481,6 +497,7 @@ class GeniusPrinterService {
     void Function(int current, int total)? onProgress,
   }) async {
     try {
+      GeniusPdfLogger.info('Rasterizing PDF at ${dpi}dpi', tag: 'PrinterService');
       final info = await Printing.info();
       if (!info.canRaster) {
         throw UnsupportedError('PDF rasterization not supported on this platform');
@@ -498,6 +515,7 @@ class GeniusPrinterService {
         onProgress?.call(pageIndex, pages?.length ?? pageIndex);
       }
 
+      GeniusPdfLogger.info('Rasterized ${renderedPages.length} pages', tag: 'PrinterService');
       return GeniusPdfRasterResult(
         pages: renderedPages,
         dpi: dpi,
@@ -529,6 +547,7 @@ class GeniusPrinterService {
     required Uint8List pdfBytes,
     double dpi = 72,
   }) async {
+    GeniusPdfLogger.debug('Generating thumbnail at ${dpi}dpi', tag: 'PrinterService');
     return getPageImage(pdfBytes: pdfBytes, pageIndex: 0, dpi: dpi);
   }
 
@@ -580,6 +599,7 @@ class GeniusPrinterService {
 
     job.status = GeniusPrintJobStatus.cancelled;
     job.completedAt = DateTime.now();
+    GeniusPdfLogger.info('Job cancelled: $jobId', tag: 'PrinterService');
     _notifyJobUpdate(job);
     _activeJobs.remove(jobId);
     _addToHistory(job);

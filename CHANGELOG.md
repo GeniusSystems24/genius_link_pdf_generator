@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.3+7] - 2026-01-29
+
+### Added
+
+#### Enhanced Logger System (`GeniusPdfLogger`)
+- **Automatic Source Location** - Logger automatically detects caller file and line via `StackTrace.current`
+  - Console output includes clickable `→ lib/src/xxx.dart:42` paths for IDE navigation
+  - `GeniusSourceLocation` class with `file` and `line` properties
+- **Enhanced Log Entries** - `GeniusLogEntry` now includes `location`, `duration`, and `data` fields
+  - `format()` method produces human-readable output with timestamps and source locations
+- **Performance Timers** - `startTimer(name)` / `stopTimer(name)` for measuring operation durations
+  - Timer results logged with elapsed milliseconds
+  - Used across job processing, export, and print operations
+- **Configuration Enhancements**
+  - `showLocation` flag to enable/disable source location in output (default: true)
+  - `showTimestamp` flag to enable/disable timestamps in output (default: true)
+  - `GeniusPdfLoggerConfig.enabled()` convenience constructor
+  - `GeniusPdfLoggerConfig.errorsOnly()` convenience constructor
+  - `configureFrom(GeniusPdfLoggerConfig)` method for simplified setup
+- **Zero-Cost When Disabled** - Early return before any StackTrace parsing when logging is off
+- **ANSI Color Improvements** - Gray for debug, cyan for info, yellow for warning, red for error
+
+#### Library-Wide Logger Integration
+- **Printing Module** - Logging in `GeniusPrinterService` (print, share, raster, save, cancel), `GeniusPrintPreview` (print, share, save actions)
+- **Services Module** - Logging in `GeniusPdfService` (generate, merge, split, watermark, rotate, extract), `GeniusPdfGenerationManager` (add/process/cancel/pause/resume jobs), `GeniusPdfExportService` (export, batch export)
+- **Components Module** - Logging in `GeniusPdfDataGrid` (grid drawing), `GeniusPdfRichText` (rich text drawing), `GeniusPdfBarcode` (barcode/QR generation with error logging)
+
+### Changed
+- `pdf_config.dart` now uses `GeniusPdfLogger.configureFrom(loggerConfig)` instead of manual parameter passing
+- Replaced all `Logger()` (from `logger` package) usage in `pdf_service.dart` with `GeniusPdfLogger`
+- Removed `logger` package dependency from `pubspec.yaml` (no longer needed)
+
+---
+
 ## [2.3.3+6] - 2026-01-28
 
 ### Added

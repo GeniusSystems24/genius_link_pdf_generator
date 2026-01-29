@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:logger/logger.dart';
+import '../core/pdf_logger.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
@@ -215,6 +215,7 @@ class GeniusPdfService {
     bool runInBackground = true,
   }) async {
     try {
+      GeniusPdfLogger.info('Generating PDF: "$fileName"', tag: 'PdfService');
       List<int> bytes;
 
       if (runInBackground) {
@@ -228,7 +229,7 @@ class GeniusPdfService {
         fileName: fileName,
       );
     } catch (e, st) {
-      Logger().e('Error generating PDF: $e', stackTrace: st);
+      GeniusPdfLogger.error('Error generating PDF', tag: 'PdfService', error: e, stackTrace: st);
       return GeniusPdfFailure.fromException(e, st);
     } finally {
       builder.dispose();
@@ -250,6 +251,7 @@ class GeniusPdfService {
     bool runInBackground = true,
   }) async {
     try {
+      GeniusPdfLogger.info('Generating and saving PDF: "$fileName"', tag: 'PdfService');
       List<int> bytes;
 
       if (runInBackground) {
@@ -269,7 +271,7 @@ class GeniusPdfService {
         filePath: filePath,
       );
     } catch (e, st) {
-      Logger().e('Error generating PDF: $e', stackTrace: st);
+      GeniusPdfLogger.error('Error generating PDF', tag: 'PdfService', error: e, stackTrace: st);
       return GeniusPdfFailure.fromException(e, st);
     } finally {
       builder.dispose();
@@ -297,6 +299,7 @@ class GeniusPdfService {
     bool runInBackground = true,
   }) async {
     onStart?.call();
+    GeniusPdfLogger.info('Generating and opening PDF: "$fileName"', tag: 'PdfService');
 
     try {
       final result = await generateAndSave(
@@ -317,7 +320,7 @@ class GeniusPdfService {
         },
       );
     } catch (e, st) {
-      Logger().e('Error generating PDF: $e', stackTrace: st);
+      GeniusPdfLogger.error('Error generating PDF', tag: 'PdfService', error: e, stackTrace: st);
       final failure = GeniusPdfFailure.fromException(e, st);
       onError?.call(failure);
       return failure;
@@ -345,6 +348,7 @@ class GeniusPdfService {
     bool runInBackground = true,
   }) async {
     onStart?.call();
+    GeniusPdfLogger.info('Generating and sharing PDF: "$fileName"', tag: 'PdfService');
 
     try {
       final result = await generate(
@@ -368,7 +372,7 @@ class GeniusPdfService {
         },
       );
     } catch (e, st) {
-      Logger().e('Error generating PDF: $e', stackTrace: st);
+      GeniusPdfLogger.error('Error generating PDF', tag: 'PdfService', error: e, stackTrace: st);
       final failure = GeniusPdfFailure.fromException(e, st);
       onError?.call(failure);
       return failure;
@@ -434,7 +438,7 @@ class GeniusPdfService {
 
       return result;
     } catch (e) {
-      Logger().e('Error sharing PDF: $e');
+      GeniusPdfLogger.error('Error sharing PDF', tag: 'PdfService', error: e);
       return null;
     }
   }
@@ -464,6 +468,8 @@ class GeniusPdfService {
         mergedCount: 1,
       );
     }
+
+    GeniusPdfLogger.info('Merging ${pdfBytesList.length} PDFs into "$outputFileName"', tag: 'PdfService');
 
     try {
       onProgress?.call(0.0, 'Starting merge...');
@@ -522,7 +528,7 @@ class GeniusPdfService {
     } on GeniusPdfCancelledException {
       return GeniusPdfMergeResult.failure('Merge cancelled');
     } catch (e) {
-      Logger().e('Error merging PDFs: $e');
+      GeniusPdfLogger.error('Error merging PDFs', tag: 'PdfService', error: e);
       return GeniusPdfMergeResult.failure(e.toString());
     }
   }
@@ -545,6 +551,7 @@ class GeniusPdfService {
     GeniusPdfProgressCallback? onProgress,
   }) async {
     try {
+      GeniusPdfLogger.info('Splitting PDF: "$baseFileName"', tag: 'PdfService');
       onProgress?.call(0.0, 'Loading PDF...');
 
       final sourceDoc = sf.PdfDocument(inputBytes: pdfBytes);
@@ -619,7 +626,7 @@ class GeniusPdfService {
 
       return GeniusPdfSplitResult.success(splitFiles);
     } catch (e) {
-      Logger().e('Error splitting PDF: $e');
+      GeniusPdfLogger.error('Error splitting PDF', tag: 'PdfService', error: e);
       return GeniusPdfSplitResult.failure(e.toString());
     }
   }
@@ -652,7 +659,7 @@ class GeniusPdfService {
       doc.dispose();
       return info;
     } catch (e) {
-      Logger().e('Error getting PDF info: $e');
+      GeniusPdfLogger.error('Error getting PDF info', tag: 'PdfService', error: e);
       return null;
     }
   }
@@ -704,7 +711,7 @@ class GeniusPdfService {
         fileName: outputFileName,
       );
     } catch (e, st) {
-      Logger().e('Error extracting pages: $e', stackTrace: st);
+      GeniusPdfLogger.error('Error extracting pages', tag: 'PdfService', error: e, stackTrace: st);
       return GeniusPdfFailure.fromException(e, st);
     }
   }
@@ -726,6 +733,7 @@ class GeniusPdfService {
     String outputFileName = 'watermarked',
   }) async {
     try {
+      GeniusPdfLogger.info('Adding watermark: "$watermarkText"', tag: 'PdfService');
       final doc = sf.PdfDocument(inputBytes: pdfBytes);
 
       final brush = sf.PdfSolidBrush(
@@ -773,7 +781,7 @@ class GeniusPdfService {
         fileName: outputFileName,
       );
     } catch (e, st) {
-      Logger().e('Error adding watermark: $e', stackTrace: st);
+      GeniusPdfLogger.error('Error adding watermark', tag: 'PdfService', error: e, stackTrace: st);
       return GeniusPdfFailure.fromException(e, st);
     }
   }
@@ -797,6 +805,7 @@ class GeniusPdfService {
     }
 
     try {
+      GeniusPdfLogger.info('Rotating pages by $rotation degrees', tag: 'PdfService');
       final doc = sf.PdfDocument(inputBytes: pdfBytes);
 
       final pagesToRotate =
@@ -820,7 +829,7 @@ class GeniusPdfService {
         fileName: outputFileName,
       );
     } catch (e, st) {
-      Logger().e('Error rotating pages: $e', stackTrace: st);
+      GeniusPdfLogger.error('Error rotating pages', tag: 'PdfService', error: e, stackTrace: st);
       return GeniusPdfFailure.fromException(e, st);
     }
   }

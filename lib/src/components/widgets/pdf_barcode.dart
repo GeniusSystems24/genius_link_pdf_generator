@@ -7,6 +7,7 @@ import 'package:image/image.dart' as img;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../models/barcode_models.dart';
+import '../../core/pdf_logger.dart';
 
 // ============================================================================
 // GeniusPdfBarcode - 1D and 2D Barcode Component
@@ -141,6 +142,7 @@ class GeniusPdfBarcode {
     required PdfPage page,
     required Rect bounds,
   }) {
+    GeniusPdfLogger.debug('Drawing barcode: ${type.name} data="${data.length > 20 ? '${data.substring(0, 20)}...' : data}"', tag: 'Barcode');
     final graphics = page.graphics;
     final pad = style.padding;
 
@@ -221,6 +223,7 @@ class GeniusPdfBarcode {
       currentY += barcodeHeight;
     } catch (e) {
       // Draw error text if barcode generation fails
+      GeniusPdfLogger.error('Barcode generation failed: ${type.name}', tag: 'Barcode', error: e);
       graphics.drawString(
         'Error: $e',
         baseFont,
@@ -547,6 +550,7 @@ class GeniusPdfQRCodeGenerator {
     required PdfPage page,
     required Rect bounds,
   }) {
+    GeniusPdfLogger.debug('Drawing QR code: data="${data.length > 30 ? '${data.substring(0, 30)}...' : data}"', tag: 'QRCode');
     final graphics = page.graphics;
     final qrSize = style.size;
     final pad = style.padding;
@@ -595,6 +599,7 @@ class GeniusPdfQRCodeGenerator {
       currentY += qrSize;
     } catch (e) {
       // Draw error placeholder
+      GeniusPdfLogger.error('QR code generation failed', tag: 'QRCode', error: e);
       graphics.drawString(
         'QR Error: $e',
         baseFont,

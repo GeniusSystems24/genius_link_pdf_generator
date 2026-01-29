@@ -8,6 +8,7 @@ import 'export_models.dart';
 import 'pdf_to_html_exporter.dart';
 import 'pdf_to_image_exporter.dart';
 import 'pdf_to_text_exporter.dart';
+import '../../core/pdf_logger.dart';
 
 /// Unified service for exporting PDF documents to various formats.
 ///
@@ -54,6 +55,8 @@ class GeniusPdfExportService {
     GeniusExportConfiguration config, {
     void Function(GeniusExportProgress)? onProgress,
   }) async {
+    GeniusPdfLogger.info('Exporting to ${config.format.name}', tag: 'ExportService');
+    GeniusPdfLogger.startTimer('export_${config.format.name}');
     switch (config.format) {
       case GeniusExportFormat.png:
       case GeniusExportFormat.jpeg:
@@ -91,6 +94,7 @@ class GeniusPdfExportService {
     String outputPath, {
     void Function(GeniusExportProgress)? onProgress,
   }) async {
+    GeniusPdfLogger.info('Exporting and saving to: "$outputPath"', tag: 'ExportService');
     final result = await export(document, config, onProgress: onProgress);
 
     if (result is GeniusExportSuccess) {
@@ -122,6 +126,7 @@ class GeniusPdfExportService {
     void Function(GeniusExportProgress)? onProgress,
   }) async {
     try {
+      GeniusPdfLogger.info('Exporting to documents directory', tag: 'ExportService');
       final directory = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final name = config.outputFileName ??
@@ -412,6 +417,7 @@ extension GeniusBatchExportExtension on GeniusPdfExportService {
     void Function(int current, int total, GeniusExportProgress?)? onProgress,
     bool stopOnError = false,
   }) async {
+    GeniusPdfLogger.info('Batch export: ${documents.length} documents to ${config.format.name}', tag: 'ExportService');
     final startTime = DateTime.now();
     final results = <GeniusExportResult>[];
     int successCount = 0;

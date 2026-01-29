@@ -50,11 +50,14 @@ void main() async {
       ),
     ),
 
-    // Logger Configuration
+    // Logger Configuration (v2.3.3+7 - with source location tracking)
     loggerConfig: const GeniusPdfLoggerConfig(
       enabled: true,
       useConsole: true,
       minLevel: GeniusLogLevel.debug,
+      showLocation: true,
+      showTimestamp: true,
+      keepHistory: true,
     ),
   );
 

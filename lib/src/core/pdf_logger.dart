@@ -1,8 +1,20 @@
 /// PDF Logger
 ///
-/// Use [GeniusPdfConfig.logger] for logging access:
+/// Comprehensive logging system for the Genius Link PDF Generator library.
+///
+/// ## Features
+/// - **Source Location Tracking** — automatically captures file path and
+///   line number so you can click-to-navigate in IDE/console.
+/// - **Enable/Disable** — zero cost when disabled (early return, no StackTrace parsing).
+/// - **Multiple Log Levels** — debug, info, warning, error.
+/// - **Colored Console Output** — ANSI color codes for terminal clarity.
+/// - **History** — keep recent log entries for inspection.
+/// - **Stream** — listen to log events in real-time.
+/// - **Custom Handlers** — add your own log destinations.
+/// - **Stopwatch** — time operations with `startTimer` / `stopTimer`.
+///
+/// ## Usage
 /// ```dart
-/// // Create config with logger settings
 /// final config = await GeniusPdfConfig.create(
 ///   baseFont: myFont,
 ///   loggerConfig: GeniusPdfLoggerConfig(
@@ -11,10 +23,8 @@
 ///   ),
 /// );
 ///
-/// // Access logger (static global service)
-/// GeniusPdfConfig.logger.debug('Starting PDF generation');
-/// GeniusPdfConfig.logger.info('PDF generated successfully');
-/// GeniusPdfConfig.logger.error('Failed', error: e);
+/// // Logs show: [INFO] [PrinterService] Printing "Invoice.pdf"
+/// //            → lib/src/printing/printer_service.dart:154
 /// ```
 ///
 /// @see [GeniusPdfConfig] for configuration management.
@@ -24,19 +34,53 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:genius_link_pdf_generator/src/core/pdf_config.dart';
 
-// ==================== Logger Configuration Classes ====================
+// ─────────────────────────────────────────────────────────────────────────────
+// Configuration
+// ─────────────────────────────────────────────────────────────────────────────
 
 /// Configuration for the PDF logger.
+///
+/// ```dart
+/// GeniusPdfLoggerConfig(
+///   enabled: true,       // turn on
+///   useConsole: true,    // print to console
+///   showLocation: true,  // show file:line
+///   minLevel: GeniusLogLevel.debug,
+/// )
+/// ```
 class GeniusPdfLoggerConfig {
-  /// Creates a logger configuration.
   const GeniusPdfLoggerConfig({
     this.enabled = false,
     this.minLevel = GeniusLogLevel.debug,
     this.useConsole = false,
     this.coloredConsole = true,
+    this.showLocation = true,
+    this.showTimestamp = true,
     this.keepHistory = false,
     this.historySize = 100,
   });
+
+  /// Quickly enable full logging.
+  const GeniusPdfLoggerConfig.enabled()
+      : enabled = true,
+        minLevel = GeniusLogLevel.debug,
+        useConsole = true,
+        coloredConsole = true,
+        showLocation = true,
+        showTimestamp = true,
+        keepHistory = true,
+        historySize = 200;
+
+  /// Errors-only configuration.
+  const GeniusPdfLoggerConfig.errorsOnly()
+      : enabled = true,
+        minLevel = GeniusLogLevel.error,
+        useConsole = true,
+        coloredConsole = true,
+        showLocation = true,
+        showTimestamp = true,
+        keepHistory = false,
+        historySize = 100;
 
   /// Whether logging is enabled.
   final bool enabled;
@@ -47,162 +91,116 @@ class GeniusPdfLoggerConfig {
   /// Whether to use console handler.
   final bool useConsole;
 
-  /// Whether to use colored console output.
+  /// Whether to use ANSI color codes in console.
   final bool coloredConsole;
 
-  /// Whether to keep log history.
+  /// Whether to show source file:line in output.
+  final bool showLocation;
+
+  /// Whether to show timestamp in output.
+  final bool showTimestamp;
+
+  /// Whether to keep log history in memory.
   final bool keepHistory;
 
   /// Maximum history size.
   final int historySize;
 }
 
-/// Logger access wrapper for convenient method access through GeniusPdfConfig.
-class GeniusPdfLoggerAccess {
-  @internal
-  GeniusPdfLoggerAccess();
+// ─────────────────────────────────────────────────────────────────────────────
+// Log Level
+// ─────────────────────────────────────────────────────────────────────────────
 
-  /// Enable logging.
-  void enable() => GeniusPdfLogger.enable();
-
-  /// Disable logging.
-  void disable() => GeniusPdfLogger.disable();
-
-  /// Check if logging is enabled.
-  bool get isEnabled => GeniusPdfLogger.isEnabled;
-
-  /// Set the minimum log level.
-  void setMinLevel(GeniusLogLevel level) => GeniusPdfLogger.setMinLevel(level);
-
-  /// Get the current minimum log level.
-  GeniusLogLevel get minLevel => GeniusPdfLogger.minLevel;
-
-  /// Log a debug message.
-  void debug(String message, {String? tag}) =>
-      GeniusPdfLogger.debug(message, tag: tag);
-
-  /// Log an info message.
-  void info(String message, {String? tag}) =>
-      GeniusPdfLogger.info(message, tag: tag);
-
-  /// Log a warning message.
-  void warning(String message, {String? tag}) =>
-      GeniusPdfLogger.warning(message, tag: tag);
-
-  /// Log an error message.
-  void error(
-    String message, {
-    String? tag,
-    Object? error,
-    StackTrace? stackTrace,
-  }) =>
-      GeniusPdfLogger.error(message,
-          tag: tag, error: error, stackTrace: stackTrace);
-
-  /// Add a custom log handler.
-  void addHandler(GeniusLogHandler handler) =>
-      GeniusPdfLogger.addHandler(handler);
-
-  /// Remove a custom log handler.
-  void removeHandler(GeniusLogHandler handler) =>
-      GeniusPdfLogger.removeHandler(handler);
-
-  /// Clear all custom handlers.
-  void clearHandlers() => GeniusPdfLogger.clearHandlers();
-
-  /// Use the console handler.
-  void useConsoleHandler({bool colored = true}) =>
-      GeniusPdfLogger.useConsoleHandler(colored: colored);
-
-  /// Enable log history.
-  void enableHistory({int maxSize = 100}) =>
-      GeniusPdfLogger.enableHistory(maxSize: maxSize);
-
-  /// Disable log history.
-  void disableHistory() => GeniusPdfLogger.disableHistory();
-
-  /// Get log history.
-  List<GeniusLogEntry> get history => GeniusPdfLogger.history;
-
-  /// Clear log history.
-  void clearHistory() => GeniusPdfLogger.clearHistory();
-
-  /// Get a stream of log entries.
-  Stream<GeniusLogEntry> get stream => GeniusPdfLogger.stream;
-
-  /// Configure the logger.
-  void configure({
-    bool? enabled,
-    GeniusLogLevel? minLevel,
-    bool useConsole = false,
-    bool coloredConsole = true,
-    bool keepHistory = false,
-    int historySize = 100,
-  }) =>
-      GeniusPdfLogger.configure(
-        enabled: enabled,
-        minLevel: minLevel,
-        useConsole: useConsole,
-        coloredConsole: coloredConsole,
-        keepHistory: keepHistory,
-        historySize: historySize,
-      );
-
-  /// Reset the logger to default settings.
-  void reset() => GeniusPdfLogger.reset();
-}
-
-// ==================== Logger Classes ====================
-
-/// Log levels for the PDF generator library
+/// Log levels for the PDF generator library.
 enum GeniusLogLevel {
-  /// Debug level - detailed information for debugging
+  /// Detailed information for debugging.
   debug,
 
-  /// Info level - general information messages
+  /// General information messages.
   info,
 
-  /// Warning level - potential issues
+  /// Potential issues worth noting.
   warning,
 
-  /// Error level - errors that occurred
+  /// Errors that occurred.
   error,
 
-  /// None - disable all logging
+  /// Disable all logging.
   none,
 }
 
-/// Log entry containing all log information
+// ─────────────────────────────────────────────────────────────────────────────
+// Source Location
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Represents a source code location (file + line).
+class GeniusSourceLocation {
+  const GeniusSourceLocation({
+    required this.file,
+    required this.line,
+    this.function_,
+  });
+
+  /// The file path (relative to project root).
+  final String file;
+
+  /// The line number.
+  final int line;
+
+  /// The function/method name (if available).
+  final String? function_;
+
+  /// IDE-clickable format: `file_path:line_number`.
+  @override
+  String toString() => '$file:$line';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Log Entry
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A single log entry with all associated information.
 class GeniusLogEntry {
-  /// Creates a new log entry
   GeniusLogEntry({
     required this.timestamp,
     required this.level,
     required this.message,
     this.tag,
+    this.location,
     this.error,
     this.stackTrace,
+    this.duration,
+    this.data,
   });
 
-  /// Timestamp when the log was created
+  /// When the log was created.
   final DateTime timestamp;
 
-  /// Log level
+  /// Log severity level.
   final GeniusLogLevel level;
 
-  /// Log message
+  /// The log message.
   final String message;
 
-  /// Optional tag for categorizing logs
+  /// Category tag (e.g. "PrinterService", "PdfExport").
   final String? tag;
 
-  /// Optional error object
+  /// Source code location where the log was created.
+  final GeniusSourceLocation? location;
+
+  /// Optional error object.
   final Object? error;
 
-  /// Optional stack trace
+  /// Optional stack trace.
   final StackTrace? stackTrace;
 
-  /// String representation of the log level
+  /// Optional duration for timed operations.
+  final Duration? duration;
+
+  /// Optional structured data attached to the log.
+  final Map<String, dynamic>? data;
+
+  /// Level name as short string.
   String get levelName {
     switch (level) {
       case GeniusLogLevel.debug:
@@ -210,172 +208,181 @@ class GeniusLogEntry {
       case GeniusLogLevel.info:
         return 'INFO';
       case GeniusLogLevel.warning:
-        return 'WARNING';
+        return 'WARN';
       case GeniusLogLevel.error:
         return 'ERROR';
       case GeniusLogLevel.none:
-        return 'NONE';
+        return '';
     }
   }
 
-  /// Formatted timestamp string
-  String get formattedTimestamp {
-    return '${timestamp.year}-${_pad(timestamp.month)}-${_pad(timestamp.day)} '
-        '${_pad(timestamp.hour)}:${_pad(timestamp.minute)}:${_pad(timestamp.second)}';
+  /// Level emoji for quick visual scanning.
+  String get levelIcon {
+    switch (level) {
+      case GeniusLogLevel.debug:
+        return '🔍';
+      case GeniusLogLevel.info:
+        return '📋';
+      case GeniusLogLevel.warning:
+        return '⚠️';
+      case GeniusLogLevel.error:
+        return '❌';
+      case GeniusLogLevel.none:
+        return '';
+    }
   }
 
-  String _pad(int value) => value.toString().padLeft(2, '0');
+  /// Formatted timestamp `HH:mm:ss.SSS`.
+  String get formattedTimestamp {
+    return '${_p(timestamp.hour)}:${_p(timestamp.minute)}:'
+        '${_p(timestamp.second)}.${timestamp.millisecond.toString().padLeft(3, '0')}';
+  }
+
+  String _p(int v) => v.toString().padLeft(2, '0');
+
+  /// Full formatted string for console output.
+  String format({bool showLocation = true, bool showTimestamp = true}) {
+    final buf = StringBuffer();
+    if (showTimestamp) buf.write('[$formattedTimestamp] ');
+    buf.write('[$levelName]');
+    if (tag != null) buf.write(' [$tag]');
+    buf.write(' $message');
+    if (duration != null) buf.write(' (${duration!.inMilliseconds}ms)');
+    if (data != null && data!.isNotEmpty) buf.write(' $data');
+    if (showLocation && location != null) {
+      buf.write('\n    → ${location!}');
+    }
+    if (error != null) buf.write('\n    Error: $error');
+    if (stackTrace != null) buf.write('\n    StackTrace: $stackTrace');
+    return buf.toString();
+  }
 
   @override
-  String toString() {
-    final buffer = StringBuffer();
-    buffer.write('[$formattedTimestamp] ');
-    buffer.write('[$levelName] ');
-    if (tag != null) {
-      buffer.write('[$tag] ');
-    }
-    buffer.write(message);
-    if (error != null) {
-      buffer.write('\nError: $error');
-    }
-    if (stackTrace != null) {
-      buffer.write('\nStackTrace: $stackTrace');
-    }
-    return buffer.toString();
-  }
+  String toString() => format();
 }
 
-/// Custom log handler function type
+/// Custom log handler function type.
 typedef GeniusLogHandler = void Function(GeniusLogEntry entry);
 
-/// Logger for the Genius PDF Generator library
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Logger
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Global logger for the Genius Link PDF Generator library.
 ///
-/// **Note**: Access this through [GeniusPdfConfig.logger] for centralized configuration.
-///
-/// ## Basic Usage
+/// Access through [GeniusPdfConfig.logger] or call static methods directly.
 ///
 /// ```dart
-/// // Enable logging through config
-/// GeniusPdfConfig.logger.enable();
-///
-/// // Log messages
-/// GeniusPdfConfig.logger.debug('Starting PDF generation');
-/// GeniusPdfConfig.logger.info('Page 1 created');
-/// GeniusPdfConfig.logger.warning('Large image detected');
-/// GeniusPdfConfig.logger.error('Failed to load font', error: e);
-///
-/// // Disable logging
-/// GeniusPdfConfig.logger.disable();
+/// GeniusPdfLogger.enable();
+/// GeniusPdfLogger.info('Generating PDF', tag: 'PdfService');
+/// // Output:
+/// // [14:30:05.123] [INFO] [PdfService] Generating PDF
+/// //     → lib/src/services/pdf_service.dart:42
 /// ```
 class GeniusPdfLogger {
   GeniusPdfLogger._();
 
-  /// Whether logging is enabled
+  // ─── State ──────────────────────────────────────────────────────────
+
   static bool _enabled = false;
-
-  /// Minimum log level to output
   static GeniusLogLevel _minLevel = GeniusLogLevel.debug;
-
-  /// Custom log handlers
-  static final List<GeniusLogHandler> _handlers = [];
-
-  /// Log history (if enabled)
-  static final List<GeniusLogEntry> _history = [];
-
-  /// Maximum history size
+  static bool _showLocation = true;
+  static bool _showTimestamp = true;
+  static bool _keepHistory = false;
   static int _maxHistorySize = 100;
 
-  /// Whether to keep log history
-  static bool _keepHistory = false;
-
-  /// Stream controller for log events
+  static final List<GeniusLogHandler> _handlers = [];
+  static final List<GeniusLogEntry> _history = [];
+  static final Map<String, Stopwatch> _timers = {};
   static final StreamController<GeniusLogEntry> _streamController =
       StreamController<GeniusLogEntry>.broadcast();
 
-  // ==================== Configuration ====================
+  // ─── Configuration ──────────────────────────────────────────────────
 
-  /// Enable logging
-  static void enable() {
-    _enabled = true;
-  }
-
-  /// Disable logging
-  static void disable() {
-    _enabled = false;
-  }
-
-  /// Check if logging is enabled
+  /// Whether logging is enabled.
   static bool get isEnabled => _enabled;
 
-  /// Set the minimum log level
-  static void setMinLevel(GeniusLogLevel level) {
-    _minLevel = level;
-  }
-
-  /// Get the current minimum log level
+  /// Current minimum log level.
   static GeniusLogLevel get minLevel => _minLevel;
 
-  /// Enable log history
-  static void enableHistory({int maxSize = 100}) {
-    _keepHistory = true;
-    _maxHistorySize = maxSize;
+  /// Enable logging.
+  static void enable() => _enabled = true;
+
+  /// Disable logging.
+  static void disable() => _enabled = false;
+
+  /// Set the minimum log level.
+  static void setMinLevel(GeniusLogLevel level) => _minLevel = level;
+
+  /// Configure the logger from a [GeniusPdfLoggerConfig].
+  static void configure({
+    bool? enabled,
+    GeniusLogLevel? minLevel,
+    bool useConsole = false,
+    bool coloredConsole = true,
+    bool showLocation = true,
+    bool showTimestamp = true,
+    bool keepHistory = false,
+    int historySize = 100,
+  }) {
+    if (enabled != null) _enabled = enabled;
+    if (minLevel != null) _minLevel = minLevel;
+    _showLocation = showLocation;
+    _showTimestamp = showTimestamp;
+    if (useConsole) useConsoleHandler(colored: coloredConsole);
+    if (keepHistory) enableHistory(maxSize: historySize);
   }
 
-  /// Disable log history
-  static void disableHistory() {
-    _keepHistory = false;
-    _history.clear();
+  /// Configure from a [GeniusPdfLoggerConfig] object.
+  static void configureFrom(GeniusPdfLoggerConfig config) {
+    configure(
+      enabled: config.enabled,
+      minLevel: config.minLevel,
+      useConsole: config.useConsole,
+      coloredConsole: config.coloredConsole,
+      showLocation: config.showLocation,
+      showTimestamp: config.showTimestamp,
+      keepHistory: config.keepHistory,
+      historySize: config.historySize,
+    );
   }
 
-  /// Get log history
-  static List<GeniusLogEntry> get history => List.unmodifiable(_history);
+  // ─── Handlers ───────────────────────────────────────────────────────
 
-  /// Clear log history
-  static void clearHistory() {
-    _history.clear();
-  }
+  /// Add a custom log handler.
+  static void addHandler(GeniusLogHandler handler) =>
+      _handlers.add(handler);
 
-  /// Get a stream of log entries
-  static Stream<GeniusLogEntry> get stream => _streamController.stream;
+  /// Remove a custom log handler.
+  static void removeHandler(GeniusLogHandler handler) =>
+      _handlers.remove(handler);
 
-  // ==================== Handlers ====================
+  /// Clear all custom handlers.
+  static void clearHandlers() => _handlers.clear();
 
-  /// Add a custom log handler
-  static void addHandler(GeniusLogHandler handler) {
-    _handlers.add(handler);
-  }
-
-  /// Remove a custom log handler
-  static void removeHandler(GeniusLogHandler handler) {
-    _handlers.remove(handler);
-  }
-
-  /// Clear all custom handlers
-  static void clearHandlers() {
-    _handlers.clear();
-  }
-
-  /// Set the default console handler
+  /// Add the built-in console handler.
   static void useConsoleHandler({bool colored = true}) {
     addHandler((entry) {
+      final formatted =
+          entry.format(showLocation: _showLocation, showTimestamp: _showTimestamp);
       if (colored) {
-        final color = _getColorCode(entry.level);
+        final color = _ansi(entry.level);
         const reset = '\x1B[0m';
         // ignore: avoid_print
-        print('$color${entry.toString()}$reset');
+        print('$color$formatted$reset');
       } else {
         // ignore: avoid_print
-        print(entry.toString());
+        print(formatted);
       }
     });
   }
 
-  static String _getColorCode(GeniusLogLevel level) {
+  static String _ansi(GeniusLogLevel level) {
     switch (level) {
       case GeniusLogLevel.debug:
-        return '\x1B[37m'; // White
+        return '\x1B[90m'; // Gray
       case GeniusLogLevel.info:
-        return '\x1B[34m'; // Blue
+        return '\x1B[36m'; // Cyan
       case GeniusLogLevel.warning:
         return '\x1B[33m'; // Yellow
       case GeniusLogLevel.error:
@@ -385,49 +392,95 @@ class GeniusPdfLogger {
     }
   }
 
-  // ==================== Logging Methods ====================
+  // ─── History ────────────────────────────────────────────────────────
 
-  /// Log a debug message
-  static void debug(String message, {String? tag}) {
-    _log(GeniusLogLevel.debug, message, tag: tag);
+  /// Enable log history.
+  static void enableHistory({int maxSize = 100}) {
+    _keepHistory = true;
+    _maxHistorySize = maxSize;
   }
 
-  /// Log an info message
-  static void info(String message, {String? tag}) {
-    _log(GeniusLogLevel.info, message, tag: tag);
+  /// Disable log history and clear it.
+  static void disableHistory() {
+    _keepHistory = false;
+    _history.clear();
   }
 
-  /// Log a warning message
-  static void warning(String message, {String? tag}) {
-    _log(GeniusLogLevel.warning, message, tag: tag);
+  /// Get immutable copy of log history.
+  static List<GeniusLogEntry> get history => List.unmodifiable(_history);
+
+  /// Clear log history.
+  static void clearHistory() => _history.clear();
+
+  /// Get a stream of log entries.
+  static Stream<GeniusLogEntry> get stream => _streamController.stream;
+
+  // ─── Logging Methods ────────────────────────────────────────────────
+
+  /// Log a debug message.
+  static void debug(String message, {String? tag, Map<String, dynamic>? data}) {
+    if (!_enabled) return;
+    _log(GeniusLogLevel.debug, message, tag: tag, data: data);
   }
 
-  /// Log an error message
+  /// Log an info message.
+  static void info(String message, {String? tag, Map<String, dynamic>? data}) {
+    if (!_enabled) return;
+    _log(GeniusLogLevel.info, message, tag: tag, data: data);
+  }
+
+  /// Log a warning message.
+  static void warning(String message, {String? tag, Map<String, dynamic>? data}) {
+    if (!_enabled) return;
+    _log(GeniusLogLevel.warning, message, tag: tag, data: data);
+  }
+
+  /// Log an error message.
   static void error(
     String message, {
     String? tag,
     Object? error,
     StackTrace? stackTrace,
+    Map<String, dynamic>? data,
   }) {
-    _log(
-      GeniusLogLevel.error,
-      message,
-      tag: tag,
-      error: error,
-      stackTrace: stackTrace,
-    );
+    if (!_enabled) return;
+    _log(GeniusLogLevel.error, message,
+        tag: tag, error: error, stackTrace: stackTrace, data: data);
   }
 
-  /// Log a message with a specific level
+  /// Log with explicit level.
   static void log(
     GeniusLogLevel level,
     String message, {
     String? tag,
     Object? error,
     StackTrace? stackTrace,
+    Map<String, dynamic>? data,
   }) {
-    _log(level, message, tag: tag, error: error, stackTrace: stackTrace);
+    if (!_enabled) return;
+    _log(level, message,
+        tag: tag, error: error, stackTrace: stackTrace, data: data);
   }
+
+  // ─── Timers ─────────────────────────────────────────────────────────
+
+  /// Start a named timer. Call [stopTimer] with the same [name] to log duration.
+  static void startTimer(String name) {
+    if (!_enabled) return;
+    _timers[name] = Stopwatch()..start();
+  }
+
+  /// Stop a named timer and log its duration.
+  static void stopTimer(String name, {String? tag, GeniusLogLevel level = GeniusLogLevel.info}) {
+    if (!_enabled) return;
+    final sw = _timers.remove(name);
+    if (sw == null) return;
+    sw.stop();
+    _log(level, '$name completed',
+        tag: tag, duration: sw.elapsed);
+  }
+
+  // ─── Internal ───────────────────────────────────────────────────────
 
   static void _log(
     GeniusLogLevel level,
@@ -435,83 +488,124 @@ class GeniusPdfLogger {
     String? tag,
     Object? error,
     StackTrace? stackTrace,
+    Map<String, dynamic>? data,
+    Duration? duration,
   }) {
-    // Check if logging is enabled
-    if (!_enabled) return;
-
-    // Check if level is high enough
     if (level.index < _minLevel.index) return;
 
-    // Create log entry
+    // Extract caller location from StackTrace
+    GeniusSourceLocation? location;
+    if (_showLocation) {
+      location = _extractCallerLocation();
+    }
+
     final entry = GeniusLogEntry(
       timestamp: DateTime.now(),
       level: level,
       message: message,
       tag: tag,
+      location: location,
       error: error,
       stackTrace: stackTrace,
+      duration: duration,
+      data: data,
     );
 
-    // Add to history if enabled
+    // History
     if (_keepHistory) {
       _history.add(entry);
-      // Trim history if needed
       while (_history.length > _maxHistorySize) {
         _history.removeAt(0);
       }
     }
 
-    // Notify stream listeners
+    // Stream
     if (!_streamController.isClosed) {
       _streamController.add(entry);
     }
 
-    // Call handlers
+    // Handlers
     for (final handler in _handlers) {
       try {
         handler(entry);
-      } catch (_) {
-        // Ignore handler errors
+      } catch (_) {}
+    }
+  }
+
+  /// Extracts the caller's file:line from [StackTrace.current].
+  ///
+  /// Walks up the stack to skip internal logger frames and finds
+  /// the first frame that belongs to the library (or caller).
+  static GeniusSourceLocation? _extractCallerLocation() {
+    try {
+      final trace = StackTrace.current.toString();
+      final lines = trace.split('\n');
+
+      // Skip frames belonging to GeniusPdfLogger itself and GeniusLoggable
+      for (final line in lines) {
+        // Skip empty lines and logger frames
+        if (line.isEmpty) continue;
+        if (line.contains('pdf_logger.dart')) continue;
+        if (line.contains('GeniusPdfLogger')) continue;
+        if (line.contains('GeniusLoggable')) continue;
+        if (line.contains('GeniusPdfLoggerAccess')) continue;
+
+        // Try to parse: #N   ClassName.method (package:xxx/path.dart:LINE:COL)
+        final match = RegExp(
+          r'\(package:genius_link_pdf_generator/(.+?):(\d+):\d+\)',
+        ).firstMatch(line);
+        if (match != null) {
+          return GeniusSourceLocation(
+            file: 'lib/${match.group(1)!}',
+            line: int.parse(match.group(2)!),
+          );
+        }
+
+        // Try to parse: #N   function (file:///path/lib/xxx.dart:LINE:COL)
+        final fileMatch = RegExp(
+          r'\(file://.+?/lib/(.+?):(\d+):\d+\)',
+        ).firstMatch(line);
+        if (fileMatch != null) {
+          return GeniusSourceLocation(
+            file: 'lib/${fileMatch.group(1)!}',
+            line: int.parse(fileMatch.group(2)!),
+          );
+        }
+
+        // Try simpler format: package:xxx/path.dart LINE:COL
+        final simpleMatch = RegExp(
+          r'package:genius_link_pdf_generator/(.+?):(\d+)',
+        ).firstMatch(line);
+        if (simpleMatch != null) {
+          return GeniusSourceLocation(
+            file: 'lib/${simpleMatch.group(1)!}',
+            line: int.parse(simpleMatch.group(2)!),
+          );
+        }
+
+        // If we found a non-logger frame but couldn't parse it, stop
+        if (line.contains('#')) break;
       }
-    }
+    } catch (_) {}
+    return null;
   }
 
-  // ==================== Convenience ====================
+  // ─── Reset / Dispose ────────────────────────────────────────────────
 
-  /// Configure the logger with common settings
-  static void configure({
-    bool? enabled,
-    GeniusLogLevel? minLevel,
-    bool useConsole = false,
-    bool coloredConsole = true,
-    bool keepHistory = false,
-    int historySize = 100,
-  }) {
-    if (enabled != null) {
-      _enabled = enabled;
-    }
-    if (minLevel != null) {
-      _minLevel = minLevel;
-    }
-    if (useConsole) {
-      useConsoleHandler(colored: coloredConsole);
-    }
-    if (keepHistory) {
-      enableHistory(maxSize: historySize);
-    }
-  }
-
-  /// Reset the logger to default settings
+  /// Reset the logger to default settings.
   static void reset() {
     _enabled = false;
     _minLevel = GeniusLogLevel.debug;
+    _showLocation = true;
+    _showTimestamp = true;
     _handlers.clear();
     _history.clear();
     _keepHistory = false;
     _maxHistorySize = 100;
+    _timers.clear();
   }
 
-  /// Dispose resources
+  /// Dispose resources.
   static void dispose() {
     reset();
     if (!_streamController.isClosed) {
@@ -520,43 +614,116 @@ class GeniusPdfLogger {
   }
 }
 
-/// Mixin to add logging capabilities to any class
+// ─────────────────────────────────────────────────────────────────────────────
+// Logger Access Wrapper
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Wrapper for convenient access through [GeniusPdfConfig.logger].
+class GeniusPdfLoggerAccess {
+  @internal
+  GeniusPdfLoggerAccess();
+
+  void enable() => GeniusPdfLogger.enable();
+  void disable() => GeniusPdfLogger.disable();
+  bool get isEnabled => GeniusPdfLogger.isEnabled;
+  void setMinLevel(GeniusLogLevel level) => GeniusPdfLogger.setMinLevel(level);
+  GeniusLogLevel get minLevel => GeniusPdfLogger.minLevel;
+
+  void debug(String message, {String? tag, Map<String, dynamic>? data}) =>
+      GeniusPdfLogger.debug(message, tag: tag, data: data);
+  void info(String message, {String? tag, Map<String, dynamic>? data}) =>
+      GeniusPdfLogger.info(message, tag: tag, data: data);
+  void warning(String message, {String? tag, Map<String, dynamic>? data}) =>
+      GeniusPdfLogger.warning(message, tag: tag, data: data);
+  void error(String message,
+          {String? tag,
+          Object? error,
+          StackTrace? stackTrace,
+          Map<String, dynamic>? data}) =>
+      GeniusPdfLogger.error(message,
+          tag: tag, error: error, stackTrace: stackTrace, data: data);
+
+  void addHandler(GeniusLogHandler handler) =>
+      GeniusPdfLogger.addHandler(handler);
+  void removeHandler(GeniusLogHandler handler) =>
+      GeniusPdfLogger.removeHandler(handler);
+  void clearHandlers() => GeniusPdfLogger.clearHandlers();
+  void useConsoleHandler({bool colored = true}) =>
+      GeniusPdfLogger.useConsoleHandler(colored: colored);
+
+  void enableHistory({int maxSize = 100}) =>
+      GeniusPdfLogger.enableHistory(maxSize: maxSize);
+  void disableHistory() => GeniusPdfLogger.disableHistory();
+  List<GeniusLogEntry> get history => GeniusPdfLogger.history;
+  void clearHistory() => GeniusPdfLogger.clearHistory();
+  Stream<GeniusLogEntry> get stream => GeniusPdfLogger.stream;
+
+  void startTimer(String name) => GeniusPdfLogger.startTimer(name);
+  void stopTimer(String name, {String? tag}) =>
+      GeniusPdfLogger.stopTimer(name, tag: tag);
+
+  void configure({
+    bool? enabled,
+    GeniusLogLevel? minLevel,
+    bool useConsole = false,
+    bool coloredConsole = true,
+    bool showLocation = true,
+    bool showTimestamp = true,
+    bool keepHistory = false,
+    int historySize = 100,
+  }) =>
+      GeniusPdfLogger.configure(
+        enabled: enabled,
+        minLevel: minLevel,
+        useConsole: useConsole,
+        coloredConsole: coloredConsole,
+        showLocation: showLocation,
+        showTimestamp: showTimestamp,
+        keepHistory: keepHistory,
+        historySize: historySize,
+      );
+
+  void reset() => GeniusPdfLogger.reset();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Loggable Mixin
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Mixin that adds logging convenience methods to any class.
 ///
-/// Example:
 /// ```dart
-/// class MyPdfBuilder with GeniusLoggable {
+/// class MyService with GeniusLoggable {
 ///   @override
-///   String get logTag => 'MyPdfBuilder';
+///   String get logTag => 'MyService';
 ///
-///   void build() {
-///     logDebug('Starting build');
-///     // ...
-///     logInfo('Build completed');
+///   void doWork() {
+///     logInfo('Starting work');
+///     // Output: [INFO] [MyService] Starting work
+///     //             → lib/src/services/my_service.dart:12
 ///   }
 /// }
 /// ```
 mixin GeniusLoggable {
-  /// Tag to use for logs from this class
+  /// Tag to use for all logs from this class.
   String get logTag => runtimeType.toString();
 
-  /// Log a debug message
-  void logDebug(String message) {
-    GeniusPdfLogger.debug(message, tag: logTag);
-  }
+  void logDebug(String message, {Map<String, dynamic>? data}) =>
+      GeniusPdfLogger.debug(message, tag: logTag, data: data);
 
-  /// Log an info message
-  void logInfo(String message) {
-    GeniusPdfLogger.info(message, tag: logTag);
-  }
+  void logInfo(String message, {Map<String, dynamic>? data}) =>
+      GeniusPdfLogger.info(message, tag: logTag, data: data);
 
-  /// Log a warning message
-  void logWarning(String message) {
-    GeniusPdfLogger.warning(message, tag: logTag);
-  }
+  void logWarning(String message, {Map<String, dynamic>? data}) =>
+      GeniusPdfLogger.warning(message, tag: logTag, data: data);
 
-  /// Log an error message
-  void logError(String message, {Object? error, StackTrace? stackTrace}) {
-    GeniusPdfLogger.error(message,
-        tag: logTag, error: error, stackTrace: stackTrace);
-  }
+  void logError(String message,
+          {Object? error, StackTrace? stackTrace, Map<String, dynamic>? data}) =>
+      GeniusPdfLogger.error(message,
+          tag: logTag, error: error, stackTrace: stackTrace, data: data);
+
+  void logStartTimer(String name) => GeniusPdfLogger.startTimer(name);
+
+  void logStopTimer(String name) =>
+      GeniusPdfLogger.stopTimer(name, tag: logTag);
 }

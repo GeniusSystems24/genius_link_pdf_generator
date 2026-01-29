@@ -9,6 +9,7 @@ import 'package:printing/printing.dart';
 
 import '../builders/pdf_document_builder.dart';
 import '../models/pdf_result.dart';
+import '../core/pdf_logger.dart';
 
 /// Status of a PDF generation job.
 enum GeniusPdfJobStatus {
@@ -345,6 +346,7 @@ class GeniusPdfGenerationManager {
     );
 
     _jobs[id] = job;
+    GeniusPdfLogger.info('Job added: "$fileName" (priority: ${priority.name})', tag: 'JobManager', data: {'jobId': id});
     _addToQueue(job);
 
     _notifyQueueUpdate();
@@ -400,11 +402,13 @@ class GeniusPdfGenerationManager {
       job.isPaused = false;
       _queue.removeWhere((j) => j.id == id);
       _markCancelled(job);
+      GeniusPdfLogger.info('Job cancelled (queued): "${job.fileName}"', tag: 'JobManager', data: {'jobId': id});
       return true;
     }
 
     if (job.status == GeniusPdfJobStatus.processing) {
       job.cancelRequested = true;
+      GeniusPdfLogger.info('Job cancel requested (processing): "${job.fileName}"', tag: 'JobManager', data: {'jobId': id});
       _notifyJobUpdate(job);
       return true;
     }
@@ -423,6 +427,7 @@ class GeniusPdfGenerationManager {
     }
 
     job.isPaused = true;
+    GeniusPdfLogger.info('Job paused: "${job.fileName}"', tag: 'JobManager', data: {'jobId': id});
     _queue.removeWhere((j) => j.id == id);
     _notifyJobUpdate(job);
     _notifyQueueUpdate();
@@ -437,6 +442,7 @@ class GeniusPdfGenerationManager {
     if (job == null || job.isPaused != true) return false;
 
     job.isPaused = false;
+    GeniusPdfLogger.info('Job resumed: "${job.fileName}"', tag: 'JobManager', data: {'jobId': id});
     _addToQueue(job);
     _notifyJobUpdate(job);
     _notifyQueueUpdate();
@@ -681,6 +687,8 @@ class GeniusPdfGenerationManager {
 
   Future<void> _processJob(GeniusPdfJob job) async {
     job.status = GeniusPdfJobStatus.processing;
+    GeniusPdfLogger.info('Processing job: "${job.fileName}"', tag: 'JobManager', data: {'jobId': job.id});
+    GeniusPdfLogger.startTimer('job_${job.id}');
     job.startedAt = DateTime.now();
     job.onStart?.call();
     _notifyJobUpdate(job);
@@ -761,12 +769,16 @@ class GeniusPdfGenerationManager {
       job.progress = 1.0;
       job.onProgress?.call(job.progress);
       job.status = GeniusPdfJobStatus.completed;
+      GeniusPdfLogger.stopTimer('job_${job.id}', tag: 'JobManager');
+      GeniusPdfLogger.info('Job completed: "${job.fileName}"', tag: 'JobManager', data: {'jobId': job.id});
       job.completedAt = DateTime.now();
       job.result = success;
       job.onComplete?.call(success);
     } catch (e, st) {
       final failure = GeniusPdfFailure.fromException(e, st);
       job.status = GeniusPdfJobStatus.failed;
+      GeniusPdfLogger.stopTimer('job_${job.id}', tag: 'JobManager');
+      GeniusPdfLogger.error('Job failed: "${job.fileName}"', tag: 'JobManager', error: e, data: {'jobId': job.id});
       job.completedAt = DateTime.now();
       job.result = failure;
       job.errorMessage = failure.message;
@@ -971,6 +983,7 @@ class GeniusPdfScheduler {
     _scheduledJobs[id] = job;
     _scheduleExecution(job);
 
+    GeniusPdfLogger.info('Job scheduled: "$fileName" at $scheduledTime', tag: 'Scheduler', data: {'jobId': id});
     return id;
   }
 
