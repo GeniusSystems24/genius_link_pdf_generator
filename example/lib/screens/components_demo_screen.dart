@@ -854,50 +854,33 @@ final summary = GeniusPdfSummarySection(
   Future<void> _generatePdf(String component) async {
     setState(() => _isGenerating = true);
     try {
-      final document = PdfDocument();
-      final page = document.pages.add();
-      final pageSize = page.getClientSize();
-      final baseFont = geniusPdfConfig.fontBuild(fontSize: 10);
-      final boldFont = geniusPdfConfig.fontBuild(fontSize: 10);
-      final titleFont = geniusPdfConfig.fontBuild(fontSize: 16);
-
-      // Draw title
-      final titleText = _getComponentTitle(component);
-      page.graphics.drawString(
-        titleText,
-        titleFont,
-        brush: PdfSolidBrush(PdfColor(33, 150, 243)),
-        bounds: Rect.fromLTWH(20, 20, pageSize.width - 40, 30),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: _isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
-        ),
+      final effectiveConfig = geniusPdfConfig.copyWith(
+        textDirection: _isRTL ? TextDirection.rtl : TextDirection.ltr,
       );
 
-      double yOffset = 70;
-
+      final GeniusPdfDocumentBuilder builder;
       switch (component) {
         case 'data_grid':
-          yOffset = _drawDataGrid(page, yOffset, baseFont, boldFont);
+          builder = _DataGridDemoBuilder(effectiveConfig);
           break;
         case 'rich_text':
-          yOffset = _drawRichText(page, yOffset, baseFont, boldFont);
+          builder = _RichTextDemoBuilder(effectiveConfig);
           break;
         case 'info_box':
-          yOffset = _drawInfoBox(page, yOffset, baseFont, boldFont);
+          builder = _InfoBoxDemoBuilder(effectiveConfig);
           break;
         case 'headers':
-          yOffset = _drawHeaders(page, yOffset, baseFont, boldFont);
+          builder = _HeadersDemoBuilder(effectiveConfig);
           break;
         case 'summary':
-          yOffset = _drawSummary(page, yOffset, baseFont, boldFont);
+          builder = _SummaryDemoBuilder(effectiveConfig);
           break;
+        default:
+          return;
       }
 
-      final bytes = await document.save();
-      document.dispose();
+      final bytes = builder.generate();
+      builder.dispose();
 
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/component_$component.pdf');
@@ -926,44 +909,53 @@ final summary = GeniusPdfSummarySection(
     }
   }
 
-  String _getComponentTitle(String component) {
-    switch (component) {
-      case 'data_grid':
-        return _isRTL
-            ? 'جدول البيانات - GeniusPdfDataGrid'
-            : 'Data Grid - GeniusPdfDataGrid';
-      case 'rich_text':
-        return _isRTL
-            ? 'نص منسق - GeniusPdfRichText'
-            : 'Rich Text - GeniusPdfRichText';
-      case 'info_box':
-        return _isRTL
-            ? 'صندوق المعلومات - GeniusPdfInfoBox'
-            : 'Info Box - GeniusPdfInfoBox';
-      case 'headers':
-        return _isRTL
-            ? 'رأس التقرير - GeniusPdfReportHeader'
-            : 'Report Header - GeniusPdfReportHeader';
-      case 'summary':
-        return _isRTL
-            ? 'ملخص المبالغ - GeniusPdfSummary'
-            : 'Summary Section - GeniusPdfSummary';
-      default:
-        return component;
-    }
-  }
+}
 
-  double _drawDataGrid(
-      PdfPage page, double yOffset, PdfFont baseFont, PdfFont boldFont) {
+// ---------------------------------------------------------------------------
+// Document Builders
+// ---------------------------------------------------------------------------
+
+/// Builds a Data Grid demo PDF document.
+class _DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
+  _DataGridDemoBuilder(GeniusPdfConfig config) : super(config);
+
+  bool get _isRTL => config.isRTL;
+
+  @override
+  void build() {
+    newPage();
+    final page = currentPage;
     final pageSize = page.getClientSize();
+    final bFont = config.boldFont;
 
+    // Title
+    page.graphics.drawString(
+      _isRTL
+          ? 'جدول البيانات - GeniusPdfDataGrid'
+          : 'Data Grid - GeniusPdfDataGrid',
+      bFont,
+      brush: PdfSolidBrush(PdfColor(33, 150, 243)),
+      bounds: Rect.fromLTWH(20, 20, pageSize.width - 40, 30),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: _isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    );
+
+    // Data Grid
     final grid = GeniusPdfDataGrid(
       columns: [
         GeniusPdfGridColumn(
             id: 'code', title: 'Code', titleAr: 'الكود', width: 60),
         GeniusPdfGridColumn(
-            id: 'desc', title: 'Description', titleAr: 'الوصف', flexFactor: 2),
-        GeniusPdfGridColumn.numeric(id: 'qty', title: 'Qty', titleAr: 'الكمية'),
+            id: 'desc',
+            title: 'Description',
+            titleAr: 'الوصف',
+            flexFactor: 2),
+        GeniusPdfGridColumn.numeric(
+            id: 'qty', title: 'Qty', titleAr: 'الكمية'),
         GeniusPdfGridColumn.currency(
             id: 'price',
             title: 'Price',
@@ -981,71 +973,92 @@ final summary = GeniusPdfSummarySection(
           'desc': _isRTL ? 'منتج أول' : 'First Product',
           'qty': '10',
           'price': '100.00',
-          'total': '1,000.00'
+          'total': '1,000.00',
         }),
         GeniusPdfGridRow(cells: {
           'code': '002',
           'desc': _isRTL ? 'منتج ثاني' : 'Second Product',
           'qty': '5',
           'price': '200.00',
-          'total': '1,000.00'
+          'total': '1,000.00',
         }),
         GeniusPdfGridRow(cells: {
           'code': '003',
           'desc': _isRTL ? 'منتج ثالث' : 'Third Product',
           'qty': '8',
           'price': '150.00',
-          'total': '1,200.00'
+          'total': '1,200.00',
         }),
         GeniusPdfGridRow(cells: {
           'code': '004',
           'desc': _isRTL ? 'منتج رابع' : 'Fourth Product',
           'qty': '3',
           'price': '500.00',
-          'total': '1,500.00'
+          'total': '1,500.00',
         }),
         GeniusPdfGridRow.total(
             {'desc': _isRTL ? 'المجموع' : 'Total', 'total': '4,700.00'}),
       ],
       style: GeniusPdfGridStyle.corporate(),
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
 
-    final result = grid.draw(
+    grid.draw(
       page: page,
-      bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 300),
+      bounds: Rect.fromLTWH(20, 70, pageSize.width - 40, 300),
     );
-
-    return (result?.bounds.bottom ?? 0) + 20;
   }
+}
 
-  double _drawRichText(
-      PdfPage page, double yOffset, PdfFont baseFont, PdfFont boldFont) {
+/// Builds a Rich Text demo PDF document.
+class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
+  _RichTextDemoBuilder(GeniusPdfConfig config) : super(config);
+
+  bool get _isRTL => config.isRTL;
+
+  @override
+  void build() {
+    newPage();
+    final page = currentPage;
     final pageSize = page.getClientSize();
+    final bFont = config.boldFont;
     final w = pageSize.width - 40;
 
-    // ── 1. Heading with badge using Builder ───────────────────────
+    // Title
+    page.graphics.drawString(
+      _isRTL ? 'نص منسق - GeniusPdfRichText' : 'Rich Text - GeniusPdfRichText',
+      bFont,
+      brush: PdfSolidBrush(PdfColor(33, 150, 243)),
+      bounds: Rect.fromLTWH(20, 20, w, 30),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: _isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    );
+
+    double yOffset = 70;
+
+    // 1. Heading with badge
     final heading = GeniusPdfRichTextBuilder(
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     )
         .heading(_isRTL ? 'ملخص الفاتورة' : 'Invoice Summary')
         .space()
-        .badge(
-          _isRTL ? 'مدفوعة' : 'PAID',
-          backgroundColor: const Color(0xFF4CAF50),
-        )
+        .badge(_isRTL ? 'مدفوعة' : 'PAID',
+            backgroundColor: const Color(0xFF4CAF50))
         .build();
-    heading.draw(
-        page: page, bounds: Rect.fromLTWH(20, yOffset, w, 25));
+    heading.draw(page: page, bounds: Rect.fromLTWH(20, yOffset, w, 25));
 
-    // ── 2. Label + value using builder ────────────────────────────
+    // 2. Label + value
     final invoiceLine = GeniusPdfRichTextBuilder(
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     )
         .label(_isRTL ? 'رقم الفاتورة' : 'Invoice No')
@@ -1055,10 +1068,10 @@ final summary = GeniusPdfSummarySection(
     invoiceLine.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 30, w, 25));
 
-    // ── 3. Currency with symbol ───────────────────────────────────
+    // 3. Currency with symbol
     final totalLine = GeniusPdfRichTextBuilder(
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     )
         .text(_isRTL ? 'الإجمالي: ' : 'Total: ')
@@ -1067,10 +1080,10 @@ final summary = GeniusPdfSummarySection(
     totalLine.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 55, w, 25));
 
-    // ── 4. Strikethrough + positive ───────────────────────────────
+    // 4. Strikethrough + positive
     final priceLine = GeniusPdfRichTextBuilder(
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     )
         .text(_isRTL ? 'السعر السابق: ' : 'Previous: ')
@@ -1082,10 +1095,10 @@ final summary = GeniusPdfSummarySection(
     priceLine.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 80, w, 25));
 
-    // ── 5. Highlighted + small text ───────────────────────────────
+    // 5. Highlighted + small text
     final noteLine = GeniusPdfRichTextBuilder(
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     )
         .highlight(_isRTL ? 'ملاحظة مهمة' : 'Important Note')
@@ -1096,7 +1109,7 @@ final summary = GeniusPdfSummarySection(
     noteLine.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 105, w, 25));
 
-    // ── 6. Bullet list ────────────────────────────────────────────
+    // 6. Bullet list
     final bulletList = GeniusPdfBulletList(
       items: [
         GeniusPdfBulletItem.simple(
@@ -1115,13 +1128,13 @@ final summary = GeniusPdfSummarySection(
       ],
       style: GeniusPdfBulletStyle.disc,
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
     bulletList.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 135, w, 120));
 
-    // ── 7. Markdown parsed text ───────────────────────────────────
+    // 7. Markdown parsed text
     final mdSpans = GeniusPdfSimpleMarkdownParser.parse(
       _isRTL
           ? 'هذا **نص عريض** و *مائل* مع `كود` و ~~محذوف~~'
@@ -1130,21 +1143,46 @@ final summary = GeniusPdfSummarySection(
     final mdRichText = GeniusPdfRichText(
       spans: mdSpans,
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
     mdRichText.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 265, w, 25));
-
-    return yOffset + 300;
   }
+}
 
-  double _drawInfoBox(
-      PdfPage page, double yOffset, PdfFont baseFont, PdfFont boldFont) {
+/// Builds an Info Box demo PDF document.
+class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
+  _InfoBoxDemoBuilder(GeniusPdfConfig config) : super(config);
+
+  bool get _isRTL => config.isRTL;
+
+  @override
+  void build() {
+    newPage();
+    final page = currentPage;
     final pageSize = page.getClientSize();
-    final boxWidth = (pageSize.width - 60) / 2;
+    final bFont = config.boldFont;
 
-    // --- Dual Info Box with equalHeight ---
+    // Title
+    page.graphics.drawString(
+      _isRTL
+          ? 'صندوق المعلومات - GeniusPdfInfoBox'
+          : 'Info Box - GeniusPdfInfoBox',
+      bFont,
+      brush: PdfSolidBrush(PdfColor(33, 150, 243)),
+      bounds: Rect.fromLTWH(20, 20, pageSize.width - 40, 30),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: _isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    );
+
+    double yOffset = 70;
+
+    // Dual Info Box with equalHeight
     final customerBox = GeniusPdfInfoBox(
       title: 'Customer Info',
       titleAr: 'بيانات العميل',
@@ -1154,50 +1192,50 @@ final summary = GeniusPdfSummarySection(
             labelAr: 'الاسم',
             value: _isRTL ? 'أحمد محمد' : 'Ahmed Mohammed',
             baseFont: baseFont,
-            boldFont: boldFont,
+            boldFont: bFont,
             isRTL: _isRTL),
         GeniusPdfLabeledValue(
             label: 'Phone',
             labelAr: 'الهاتف',
             value: '+966 50 123 4567',
             baseFont: baseFont,
-            boldFont: boldFont,
+            boldFont: bFont,
             isRTL: _isRTL),
         GeniusPdfLabeledValue(
             label: 'Email',
             labelAr: 'البريد',
             value: 'ahmed@example.com',
             baseFont: baseFont,
-            boldFont: boldFont,
+            boldFont: bFont,
             isRTL: _isRTL),
         GeniusPdfLabeledValue(
             label: 'Address',
             labelAr: 'العنوان',
             value: _isRTL ? 'الرياض، السعودية' : 'Riyadh, Saudi Arabia',
             baseFont: baseFont,
-            boldFont: boldFont,
+            boldFont: bFont,
             isRTL: _isRTL),
       ],
       style: GeniusPdfInfoBoxStyle.card(),
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
 
-    // Company box using .company() factory
     final companyBox = GeniusPdfInfoBox.company(
       companyName: _isRTL ? 'شركة الأمل للتجارة' : 'Al-Amal Trading Co.',
       taxNumber: '300123456789003',
       commercialReg: '1010123456',
-      address: _isRTL ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia',
+      address: _isRTL
+          ? 'الرياض، المملكة العربية السعودية'
+          : 'Riyadh, Saudi Arabia',
       phone: '+966 11 123 4567',
       email: 'info@alamal.com',
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
 
-    // Use DualInfoBox with equalHeight
     final dualBox = GeniusPdfDualInfoBox(
       leftBox: _isRTL ? companyBox : customerBox,
       rightBox: _isRTL ? customerBox : companyBox,
@@ -1210,7 +1248,7 @@ final summary = GeniusPdfSummarySection(
         bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 160));
     yOffset = dualResult.bottom + 15;
 
-    // --- Status-themed info boxes ---
+    // Status-themed info boxes
     final statusWidth = (pageSize.width - 70) / 2;
 
     final infoBox = GeniusPdfInfoBox(
@@ -1224,12 +1262,12 @@ final summary = GeniusPdfSummarySection(
                 ? 'يرجى الاحتفاظ بهذه الفاتورة'
                 : 'Please keep this invoice',
             baseFont: baseFont,
-            boldFont: boldFont,
+            boldFont: bFont,
             isRTL: _isRTL),
       ],
       style: GeniusPdfInfoBoxStyle.info(),
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
     infoBox.draw(
@@ -1244,12 +1282,12 @@ final summary = GeniusPdfSummarySection(
             labelAr: 'تنبيه',
             value: _isRTL ? 'مستند للمعاينة فقط' : 'Preview only document',
             baseFont: baseFont,
-            boldFont: boldFont,
+            boldFont: bFont,
             isRTL: _isRTL),
       ],
       style: GeniusPdfInfoBoxStyle.warning(),
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
     warningBox.draw(
@@ -1266,12 +1304,12 @@ final summary = GeniusPdfSummarySection(
             labelAr: 'الحالة',
             value: _isRTL ? 'تم إتمام العملية بنجاح' : 'Operation completed',
             baseFont: baseFont,
-            boldFont: boldFont,
+            boldFont: bFont,
             isRTL: _isRTL),
       ],
       style: GeniusPdfInfoBoxStyle.success(),
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
     successBox.draw(
@@ -1286,24 +1324,50 @@ final summary = GeniusPdfSummarySection(
             labelAr: 'المشكلة',
             value: _isRTL ? 'فشل في معالجة الطلب' : 'Failed to process',
             baseFont: baseFont,
-            boldFont: boldFont,
+            boldFont: bFont,
             isRTL: _isRTL),
       ],
       style: GeniusPdfInfoBoxStyle.error(),
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
     errorBox.draw(
         page: page,
         bounds: Rect.fromLTWH(40 + statusWidth, yOffset, statusWidth, 70));
-
-    return yOffset + 90;
   }
+}
 
-  double _drawHeaders(
-      PdfPage page, double yOffset, PdfFont baseFont, PdfFont boldFont) {
+/// Builds a Headers demo PDF document.
+class _HeadersDemoBuilder extends GeniusPdfDocumentBuilder {
+  _HeadersDemoBuilder(GeniusPdfConfig config) : super(config);
+
+  bool get _isRTL => config.isRTL;
+
+  @override
+  void build() {
+    newPage();
+    final page = currentPage;
     final pageSize = page.getClientSize();
+    final bFont = config.boldFont;
+
+    // Title
+    page.graphics.drawString(
+      _isRTL
+          ? 'رأس التقرير - GeniusPdfReportHeader'
+          : 'Report Header - GeniusPdfReportHeader',
+      bFont,
+      brush: PdfSolidBrush(PdfColor(33, 150, 243)),
+      bounds: Rect.fromLTWH(20, 20, pageSize.width - 40, 30),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: _isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    );
+
+    double yOffset = 70;
 
     final companyInfo = GeniusPdfCompanyInfo(
       name: 'Al-Amal Trading Company',
@@ -1320,7 +1384,7 @@ final summary = GeniusPdfSummarySection(
       email: 'info@alamal.com',
     );
 
-    // Standard header
+    // Standard invoice header
     final header = GeniusPdfReportHeader(
       title: 'Tax Invoice',
       titleAr: 'فاتورة ضريبية',
@@ -1330,7 +1394,7 @@ final summary = GeniusPdfSummarySection(
       printDate: DateTime.now(),
       style: GeniusPdfReportHeaderStyle.invoice(),
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
 
@@ -1339,7 +1403,7 @@ final summary = GeniusPdfSummarySection(
         bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 200));
     yOffset = result + 15;
 
-    // Bilingual split header (Arabic right, logo center, English left)
+    // Bilingual split header
     final bilingualHeader = GeniusPdfReportHeader.bilingualSplit(
       title: 'Trial Balance',
       titleAr: 'ميزان المراجعة',
@@ -1348,20 +1412,45 @@ final summary = GeniusPdfSummarySection(
       company: companyInfo,
       date: DateTime.now(),
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
     );
 
-    final bilingualResult = bilingualHeader.draw(
+    bilingualHeader.draw(
         page: page,
         bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 200));
-
-    return bilingualResult + 20;
   }
+}
 
-  double _drawSummary(
-      PdfPage page, double yOffset, PdfFont baseFont, PdfFont boldFont) {
+/// Builds a Summary demo PDF document.
+class _SummaryDemoBuilder extends GeniusPdfDocumentBuilder {
+  _SummaryDemoBuilder(GeniusPdfConfig config) : super(config);
+
+  bool get _isRTL => config.isRTL;
+
+  @override
+  void build() {
+    newPage();
+    final page = currentPage;
     final pageSize = page.getClientSize();
+    final bFont = config.boldFont;
 
+    // Title
+    page.graphics.drawString(
+      _isRTL
+          ? 'ملخص المبالغ - GeniusPdfSummary'
+          : 'Summary Section - GeniusPdfSummary',
+      bFont,
+      brush: PdfSolidBrush(PdfColor(33, 150, 243)),
+      bounds: Rect.fromLTWH(20, 20, pageSize.width - 40, 30),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: _isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    );
+
+    // Summary section
     final summary = GeniusPdfSummarySection(
       items: [
         GeniusPdfSummaryItem(
@@ -1394,18 +1483,20 @@ final summary = GeniusPdfSummarySection(
       ],
       style: GeniusPdfSummaryStyle.invoice(),
       baseFont: baseFont,
-      boldFont: boldFont,
+      boldFont: bFont,
       isRTL: _isRTL,
     );
 
-    final result = summary.draw(
+    summary.draw(
         page: page,
         bounds: Rect.fromLTWH(
-            pageSize.width / 2 - 20, yOffset, pageSize.width / 2, 200));
-
-    return result.bottom + 20;
+            pageSize.width / 2 - 20, 70, pageSize.width / 2, 200));
   }
 }
+
+// ---------------------------------------------------------------------------
+// UI Support Classes
+// ---------------------------------------------------------------------------
 
 class _ComponentTab {
   final String id;
