@@ -64,6 +64,8 @@ class GeniusPdfPreviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPdf = pdfData.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
@@ -71,19 +73,19 @@ class GeniusPdfPreviewPage extends StatelessWidget {
           if (allowPrinting)
             IconButton(
               icon: const Icon(Icons.print),
-              onPressed: () => _printPdf(context),
+              onPressed: hasPdf ? () => _printPdf(context) : null,
               tooltip: 'Print',
             ),
           if (allowSharing)
             IconButton(
               icon: const Icon(Icons.share),
-              onPressed: () => _sharePdf(context),
+              onPressed: hasPdf ? () => _sharePdf(context) : null,
               tooltip: 'Share',
             ),
           if (allowDownload)
             IconButton(
               icon: const Icon(Icons.download),
-              onPressed: () => _downloadPdf(context),
+              onPressed: hasPdf ? () => _downloadPdf(context) : null,
               tooltip: 'Download',
             ),
         ],
@@ -93,6 +95,7 @@ class GeniusPdfPreviewPage extends StatelessWidget {
   }
 
   void _printPdf(BuildContext context) {
+    if (pdfData.isEmpty) return;
     Printing.layoutPdf(
       onLayout: (_) => pdfData,
       name: title,
@@ -101,11 +104,13 @@ class GeniusPdfPreviewPage extends StatelessWidget {
   }
 
   Future<void> _sharePdf(BuildContext context) async {
+    if (pdfData.isEmpty) return;
     await Printing.sharePdf(bytes: pdfData, filename: '$title.pdf');
     onShare?.call();
   }
 
   Future<void> _downloadPdf(BuildContext context) async {
+    if (pdfData.isEmpty) return;
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/$title.pdf');
     await file.writeAsBytes(pdfData);
@@ -183,6 +188,12 @@ class GeniusPdfPreviewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (pdfData.isEmpty) {
+      final error = StateError('PDF data is empty.');
+      return errorBuilder?.call(context, error) ??
+          _buildErrorState(context, error);
+    }
+
     return SizedBox(
       width: width,
       height: height,
@@ -195,6 +206,7 @@ class GeniusPdfPreviewWidget extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         actions: const [],
         loadingWidget: loadingWidget ?? _buildDefaultLoading(context),
+        onError: errorBuilder ?? _buildErrorState,
         useActions: false,
         shouldRepaint: false,
         pdfPreviewPageDecoration: const BoxDecoration(
@@ -223,6 +235,31 @@ class GeniusPdfPreviewWidget extends StatelessWidget {
             'Loading PDF...',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, Object? error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(
+            'Unable to load PDF preview.',
+            style: Theme.of(context).textTheme.titleMedium,
+            textAlign: TextAlign.center,
+          ),
+          if (error != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              error.toString(),
+              style: Theme.of(context).textTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
+          ],
         ],
       ),
     );
@@ -375,6 +412,8 @@ class GeniusPdfPreviewDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPdf = pdfData.isNotEmpty;
+
     return Dialog(
       child: Container(
         width: width,
@@ -406,12 +445,12 @@ class GeniusPdfPreviewDialog extends StatelessWidget {
                   if (showActions) ...[
                     IconButton(
                       icon: const Icon(Icons.print),
-                      onPressed: () => _print(),
+                      onPressed: hasPdf ? () => _print() : null,
                       tooltip: 'Print',
                     ),
                     IconButton(
                       icon: const Icon(Icons.share),
-                      onPressed: () => _share(),
+                      onPressed: hasPdf ? () => _share() : null,
                       tooltip: 'Share',
                     ),
                   ],
@@ -434,6 +473,7 @@ class GeniusPdfPreviewDialog extends StatelessWidget {
   }
 
   void _print() {
+    if (pdfData.isEmpty) return;
     Printing.layoutPdf(
       onLayout: (_) => pdfData,
       name: title,
@@ -441,6 +481,7 @@ class GeniusPdfPreviewDialog extends StatelessWidget {
   }
 
   Future<void> _share() async {
+    if (pdfData.isEmpty) return;
     await Printing.sharePdf(bytes: pdfData, filename: '$title.pdf');
   }
 }

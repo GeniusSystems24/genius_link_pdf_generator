@@ -66,6 +66,8 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
   final int _currentPage = 0;
   int _totalPages = 0;
 
+  bool get _hasPdf => widget.pdfBytes.isNotEmpty;
+
   @override
   void initState() {
     super.initState();
@@ -110,7 +112,7 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
                   )
                 : const Icon(Icons.print),
             tooltip: 'Print / طباعة',
-            onPressed: _isPrinting ? null : _handlePrint,
+            onPressed: _isPrinting || !_hasPdf ? null : _handlePrint,
           ),
         ],
       ),
@@ -121,34 +123,37 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
 
           // Preview area
           Expanded(
-            child: PdfPreview(
-              build: (format) => widget.pdfBytes,
-              allowPrinting: false,
-              allowSharing: false,
-              canChangeOrientation: false,
-              canChangePageFormat: false,
-              canDebug: false,
-              pdfFileName: widget.documentName,
-              initialPageFormat: _getPageFormat(),
-              onPageFormatChanged: (format) {
-                // Handle page format change
-              },
-              pages: _getPageRange(),
-              previewPageMargin: const EdgeInsets.all(8),
-              loadingWidget: const Center(
-                child: CircularProgressIndicator(),
-              ),
-              onError: (context, error) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text('Error loading preview: $error'),
-                  ],
-                ),
-              ),
-            ),
+            child: _hasPdf
+                ? PdfPreview(
+                    build: (format) => widget.pdfBytes,
+                    allowPrinting: false,
+                    allowSharing: false,
+                    canChangeOrientation: false,
+                    canChangePageFormat: false,
+                    canDebug: false,
+                    pdfFileName: widget.documentName,
+                    initialPageFormat: _getPageFormat(),
+                    onPageFormatChanged: (format) {
+                      // Handle page format change
+                    },
+                    pages: _getPageRange(),
+                    previewPageMargin: const EdgeInsets.all(8),
+                    loadingWidget: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    onError: (context, error) => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline,
+                              size: 48, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text('Error loading preview: $error'),
+                        ],
+                      ),
+                    ),
+                  )
+                : _buildEmptyPreview(context),
           ),
 
           // Bottom bar with page info and quick settings
@@ -247,7 +252,7 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
 
           // Print button
           FilledButton.icon(
-            onPressed: _isPrinting ? null : _handlePrint,
+            onPressed: _isPrinting || !_hasPdf ? null : _handlePrint,
             icon: _isPrinting
                 ? const SizedBox(
                     width: 20,
@@ -259,6 +264,29 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
                   )
                 : const Icon(Icons.print),
             label: Text(_isPrinting ? 'Printing...' : 'Print / طباعة'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyPreview(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(
+            'No PDF data to preview.',
+            style: Theme.of(context).textTheme.titleMedium,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Generate the document before opening print preview.',
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -816,6 +844,8 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
   bool _isProcessing = false;
   String? _processingMessage;
 
+  bool get _hasPdf => widget.pdfBytes.isNotEmpty;
+
   @override
   void initState() {
     super.initState();
@@ -832,13 +862,13 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
             IconButton(
               icon: const Icon(Icons.share),
               tooltip: 'Share / مشاركة',
-              onPressed: _isProcessing ? null : _handleShare,
+              onPressed: _isProcessing || !_hasPdf ? null : _handleShare,
             ),
           if (widget.showSaveButton)
             IconButton(
               icon: const Icon(Icons.save),
               tooltip: 'Save / حفظ',
-              onPressed: _isProcessing ? null : _handleSave,
+              onPressed: _isProcessing || !_hasPdf ? null : _handleSave,
             ),
           if (widget.showSettings)
             IconButton(
@@ -857,30 +887,33 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
 
               // Preview area
               Expanded(
-                child: PdfPreview(
-                  build: (format) => widget.pdfBytes,
-                  allowPrinting: false,
-                  allowSharing: false,
-                  canChangeOrientation: false,
-                  canChangePageFormat: false,
-                  canDebug: false,
-                  pdfFileName: widget.documentName,
-                  initialPageFormat: _getPageFormat(),
-                  previewPageMargin: const EdgeInsets.all(8),
-                  loadingWidget: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  onError: (context, error) => Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                        const SizedBox(height: 16),
-                        Text('Error loading preview: $error'),
-                      ],
-                    ),
-                  ),
-                ),
+                child: _hasPdf
+                    ? PdfPreview(
+                        build: (format) => widget.pdfBytes,
+                        allowPrinting: false,
+                        allowSharing: false,
+                        canChangeOrientation: false,
+                        canChangePageFormat: false,
+                        canDebug: false,
+                        pdfFileName: widget.documentName,
+                        initialPageFormat: _getPageFormat(),
+                        previewPageMargin: const EdgeInsets.all(8),
+                        loadingWidget: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        onError: (context, error) => Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.error_outline,
+                                  size: 48, color: Colors.red),
+                              const SizedBox(height: 16),
+                              Text('Error loading preview: $error'),
+                            ],
+                          ),
+                        ),
+                      )
+                    : _buildEmptyPreview(context),
               ),
 
               // Bottom bar with actions
@@ -998,7 +1031,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
           // Share button (small)
           if (widget.showShareButton) ...[
             OutlinedButton.icon(
-              onPressed: _isProcessing ? null : _handleShare,
+              onPressed: _isProcessing || !_hasPdf ? null : _handleShare,
               icon: const Icon(Icons.share, size: 18),
               label: const Text('Share'),
             ),
@@ -1007,7 +1040,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
 
           // Print button
           FilledButton.icon(
-            onPressed: _isProcessing ? null : _handlePrint,
+            onPressed: _isProcessing || !_hasPdf ? null : _handlePrint,
             icon: const Icon(Icons.print),
             label: const Text('Print / طباعة'),
           ),
@@ -1016,6 +1049,29 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
     );
   }
 
+
+  Widget _buildEmptyPreview(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(
+            'No PDF data to preview.',
+            style: Theme.of(context).textTheme.titleMedium,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Generate the document before opening print preview.',
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
   void _showSettingsDialog() {
     showModalBottomSheet(
       context: context,

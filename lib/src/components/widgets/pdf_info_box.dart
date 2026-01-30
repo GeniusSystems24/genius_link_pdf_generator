@@ -1231,7 +1231,7 @@ class GeniusPdfInfoBox {
             : titleLeft;
 
         graphics.drawImage(
-          PdfBitmap(icon!.bytes),
+          PdfBitmap(icon!.data),
           Rect.fromLTWH(iconX, iconY, style.iconSize, style.iconSize),
         );
 

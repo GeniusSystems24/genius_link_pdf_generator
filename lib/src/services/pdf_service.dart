@@ -388,6 +388,11 @@ class GeniusPdfService {
     required Uint8List bytes,
     required String documentName,
   }) async {
+    if (bytes.isEmpty) {
+      GeniusPdfLogger.error('Print failed: PDF data is empty.', tag: 'PdfService');
+      return false;
+    }
+
     return Printing.layoutPdf(
       onLayout: (_) => bytes,
       name: documentName,

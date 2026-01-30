@@ -232,6 +232,19 @@ class GeniusPrinterService {
     _notifyJobUpdate(job);
     GeniusPdfLogger.info('Print with dialog: "$documentName"', tag: 'PrinterService');
 
+    if (pdfBytes.isEmpty) {
+      final message = 'Print failed: PDF data is empty.';
+      job.status = GeniusPrintJobStatus.failed;
+      job.errorMessage = message;
+      job.completedAt = DateTime.now();
+      GeniusPdfLogger.error(message, tag: 'PrinterService');
+      _notifyJobUpdate(job);
+      onError?.call(job, message);
+      _addToHistory(job);
+      _activeJobs.remove(job.id);
+      return GeniusPrintResult.failure(message, job);
+    }
+
     try {
       job.status = GeniusPrintJobStatus.sending;
       job.startedAt = DateTime.now();
@@ -302,6 +315,19 @@ class GeniusPrinterService {
     _activeJobs[job.id] = job;
     _notifyJobUpdate(job);
     GeniusPdfLogger.info('Direct print: "$documentName" to $effectivePrinterId', tag: 'PrinterService');
+
+    if (pdfBytes.isEmpty) {
+      final message = 'Direct print failed: PDF data is empty.';
+      job.status = GeniusPrintJobStatus.failed;
+      job.errorMessage = message;
+      job.completedAt = DateTime.now();
+      GeniusPdfLogger.error(message, tag: 'PrinterService');
+      _notifyJobUpdate(job);
+      onError?.call(job, message);
+      _addToHistory(job);
+      _activeJobs.remove(job.id);
+      return GeniusPrintResult.failure(message, job);
+    }
 
     try {
       job.status = GeniusPrintJobStatus.sending;
@@ -400,6 +426,12 @@ class GeniusPrinterService {
     String? text,
     Rect? sharePositionOrigin,
   }) async {
+    if (pdfBytes.isEmpty) {
+      const message = 'Share failed: PDF data is empty.';
+      GeniusPdfLogger.error(message, tag: 'PrinterService');
+      return GeniusPdfShareResult.failure(message);
+    }
+
     try {
       GeniusPdfLogger.info('Sharing PDF: "$fileName"', tag: 'PrinterService');
       // Ensure fileName has .pdf extension
@@ -438,6 +470,12 @@ class GeniusPrinterService {
     required String fileName,
     Rect? bounds,
   }) async {
+    if (pdfBytes.isEmpty) {
+      const message = 'Share failed: PDF data is empty.';
+      GeniusPdfLogger.error(message, tag: 'PrinterService');
+      return GeniusPdfShareResult.failure(message);
+    }
+
     try {
       final effectiveFileName =
           fileName.endsWith('.pdf') ? fileName : '$fileName.pdf';
@@ -460,6 +498,12 @@ class GeniusPrinterService {
     required String fileName,
     String? directory,
   }) async {
+    if (pdfBytes.isEmpty) {
+      const message = 'Save failed: PDF data is empty.';
+      GeniusPdfLogger.error(message, tag: 'PrinterService');
+      return GeniusPdfShareResult.failure(message);
+    }
+
     try {
       GeniusPdfLogger.info('Saving PDF: "$fileName"', tag: 'PrinterService');
       final effectiveFileName =
@@ -496,6 +540,18 @@ class GeniusPrinterService {
     List<int>? pages,
     void Function(int current, int total)? onProgress,
   }) async {
+    if (pdfBytes.isEmpty) {
+      GeniusPdfLogger.warning(
+        'Rasterization skipped: PDF data is empty.',
+        tag: 'PrinterService',
+      );
+      return GeniusPdfRasterResult(
+        pages: const [],
+        dpi: dpi,
+        format: format,
+      );
+    }
+
     try {
       GeniusPdfLogger.info('Rasterizing PDF at ${dpi}dpi', tag: 'PrinterService');
       final info = await Printing.info();
@@ -532,6 +588,14 @@ class GeniusPrinterService {
     required int pageIndex,
     double dpi = 150,
   }) async {
+    if (pdfBytes.isEmpty) {
+      GeniusPdfLogger.warning(
+        'Thumbnail generation skipped: PDF data is empty.',
+        tag: 'PrinterService',
+      );
+      return null;
+    }
+
     try {
       await for (final page in Printing.raster(pdfBytes, dpi: dpi, pages: [pageIndex])) {
         return await page.toPng();
