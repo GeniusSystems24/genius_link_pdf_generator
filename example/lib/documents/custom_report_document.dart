@@ -93,9 +93,8 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
       bounds: Rect.fromLTWH(margin + 10, yOffset + 15, contentWidth - 20, 30),
       format: PdfStringFormat(
         alignment: isRtl ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: isRtl
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight,
+        textDirection:
+            isRtl ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
       ),
     );
 
@@ -106,9 +105,8 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
       bounds: Rect.fromLTWH(margin + 10, yOffset + 45, contentWidth - 20, 20),
       format: PdfStringFormat(
         alignment: isRtl ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: isRtl
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight,
+        textDirection:
+            isRtl ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
       ),
     );
 
@@ -131,9 +129,11 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
   if (data.includeInfoBox) {
     final infoBoxStyle = _getInfoBoxStyle(data.infoBoxStyleType);
     final infoBox = GeniusPdfInfoBox(
+      config: data.config,
       title: data.infoBoxTitle,
       items: [
         GeniusPdfLabeledValue(
+          config: data.config,
           label: data.infoBoxTitle,
           value: data.infoBoxContent,
           baseFont: regularFont,
@@ -156,7 +156,10 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
   // Draw Rich Text Section
   if (data.includeRichText) {
     final richText = GeniusPdfRichTextBuilder(
-          baseFont: regularFont, boldFont: boldFont, isRTL: isRtl)
+            config: data.config,
+            baseFont: regularFont,
+            boldFont: boldFont,
+            isRTL: isRtl)
         .text('This is a ')
         .bold('custom report ')
         .text('generated using the ')
@@ -194,6 +197,7 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
     final rows = _generateRows(data.gridRows);
 
     final dataGrid = GeniusPdfDataGrid(
+      config: data.config,
       columns: columns,
       rows: rows,
       style: GeniusPdfGridStyle(
@@ -218,6 +222,7 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
   // Draw Summary Section
   if (data.includeSummary) {
     final summary = GeniusPdfSummarySection(
+      config: data.config,
       items: [
         GeniusPdfSummaryItem(
           label: 'Subtotal',
@@ -317,7 +322,8 @@ List<GeniusPdfGridColumn> _generateColumns(int gridColumns) {
       title: columnNames[index].$1,
       titleAr: columnNames[index].$2,
       width: index == 0 ? 80 : (index == 1 ? 120 : 80),
-      alignment: index >= 2 ? GeniusPdfTextAlign.center : GeniusPdfTextAlign.left,
+      alignment:
+          index >= 2 ? GeniusPdfTextAlign.center : GeniusPdfTextAlign.left,
     ),
   );
 }

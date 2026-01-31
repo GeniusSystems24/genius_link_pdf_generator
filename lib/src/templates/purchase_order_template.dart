@@ -192,6 +192,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     _drawStatusBadge();
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Purchase Order',
       titleAr: 'أمر شراء',
       company: company,
@@ -247,10 +248,12 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawInfoSection() {
     final vendorBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Vendor',
       titleAr: 'المورد',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Name',
           labelAr: 'الاسم',
           value: config.isRTL ? (vendor.nameAr ?? vendor.name) : vendor.name,
@@ -260,6 +263,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (vendor.vendorCode != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Vendor Code',
             labelAr: 'كود المورد',
             value: vendor.vendorCode!,
@@ -269,6 +273,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (vendor.address != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Address',
             labelAr: 'العنوان',
             value: config.isRTL
@@ -280,6 +285,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (vendor.vatNumber != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'VAT No',
             labelAr: 'الرقم الضريبي',
             value: vendor.vatNumber!,
@@ -289,6 +295,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (vendor.phone != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Phone',
             labelAr: 'الهاتف',
             value: vendor.phone!,
@@ -298,6 +305,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (vendor.contactPerson != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Contact',
             labelAr: 'جهة الاتصال',
             value: vendor.contactPerson!,
@@ -313,10 +321,12 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     );
 
     final poBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Order Details',
       titleAr: 'تفاصيل الطلب',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'PO Number',
           labelAr: 'رقم الطلب',
           value: purchaseOrder.poNumber,
@@ -325,6 +335,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
           isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(purchaseOrder.poDate),
@@ -334,6 +345,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (purchaseOrder.expectedDeliveryDate != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Expected Delivery',
             labelAr: 'التسليم المتوقع',
             value: _formatDate(purchaseOrder.expectedDeliveryDate!),
@@ -343,6 +355,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (purchaseOrder.quotationRef != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Quotation Ref',
             labelAr: 'مرجع العرض',
             value: purchaseOrder.quotationRef!,
@@ -352,6 +365,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (purchaseOrder.paymentTerms != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Payment Terms',
             labelAr: 'شروط الدفع',
             value: config.isRTL
@@ -384,6 +398,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawItemsTable() {
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'no',
@@ -484,6 +499,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     ));
 
     final summary = GeniusPdfSummarySection(
+      config: config,
       items: items,
       style: const GeniusPdfSummaryStyle.bordered(),
       baseFont: baseFont,

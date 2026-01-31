@@ -4,6 +4,8 @@ import 'package:flutter/material.dart' as material;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../extensions/color_extensions.dart';
+import '../../core/pdf_config.dart';
+import '../../core/pdf_print_theme.dart';
 import '../models/grid_models.dart';
 import '../models/pdf_styles.dart';
 import '../../core/pdf_logger.dart';
@@ -40,12 +42,16 @@ class GeniusPdfDataGrid {
   GeniusPdfDataGrid({
     required this.columns,
     required this.rows,
-    this.style = const GeniusPdfGridStyle.classic(),
-    required this.baseFont,
-    required this.boldFont,
-    this.isRTL = true,
+    required this.config,
+    GeniusPdfGridStyle? style,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
     this.groups,
-  });
+  })  : style = _resolveGridStyle(style, config),
+        baseFont = _resolveBaseFont(baseFont, config),
+        boldFont = _resolveBoldFont(boldFont, baseFont, config),
+        isRTL = isRTL ?? config.isRTL;
 
   /// Column definitions.
   final List<GeniusPdfGridColumn> columns;
@@ -55,6 +61,9 @@ class GeniusPdfDataGrid {
 
   /// Grid styling configuration.
   final GeniusPdfGridStyle style;
+
+  /// PDF configuration.
+  final GeniusPdfConfig config;
 
   /// Base font for text.
   final PdfFont baseFont;
@@ -67,6 +76,96 @@ class GeniusPdfDataGrid {
 
   /// Optional grouped data.
   final List<GeniusPdfGridGroup>? groups;
+
+  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+    return baseFont ?? config.baseFont;
+  }
+
+  static PdfFont _resolveBoldFont(
+    PdfFont? boldFont,
+    PdfFont? baseFont,
+    GeniusPdfConfig config,
+  ) {
+    return boldFont ?? config.boldFont;
+  }
+
+  static GeniusPdfGridStyle _resolveGridStyle(
+    GeniusPdfGridStyle? style,
+    GeniusPdfConfig config,
+  ) {
+    if (style != null) return style;
+    return _gridStyleFromTheme(config.printTheme);
+  }
+
+  static GeniusPdfGridStyle _gridStyleFromTheme(GeniusPdfPrintTheme theme) {
+    final gridTheme = theme.gridTheme ?? const GeniusPdfGridTheme.defaults();
+    final typography = theme.typography;
+
+    return GeniusPdfGridStyle(
+      headerStyle: GeniusPdfCellStyle(
+        textStyle: GeniusPdfTextStyle(
+          fontSize: typography.headingSize,
+          fontWeight: material.FontWeight.bold,
+          color: gridTheme.headerTextColor,
+          alignment: GeniusPdfTextAlign.center,
+        ),
+        backgroundColor: gridTheme.headerBackgroundColor,
+        border: GeniusPdfBorderStyle.all(
+          width: gridTheme.headerBorderWidth,
+          color: gridTheme.borderColor,
+        ),
+        padding: gridTheme.headerPadding,
+      ),
+      cellStyle: GeniusPdfCellStyle(
+        textStyle: GeniusPdfTextStyle(
+          fontSize: typography.bodySize,
+          color: theme.colorScheme.onSurface,
+        ),
+        border: GeniusPdfBorderStyle.all(
+          width: gridTheme.cellBorderWidth,
+          color: gridTheme.borderColor,
+        ),
+        padding: gridTheme.cellPadding,
+      ),
+      alternateRowStyle: GeniusPdfCellStyle(
+        textStyle: GeniusPdfTextStyle(
+          fontSize: typography.bodySize,
+          color: theme.colorScheme.onSurface,
+        ),
+        backgroundColor: gridTheme.alternateRowColor,
+        padding: gridTheme.cellPadding,
+      ),
+      totalRowStyle: GeniusPdfCellStyle(
+        textStyle: GeniusPdfTextStyle(
+          fontSize: typography.bodySize,
+          fontWeight: material.FontWeight.bold,
+          color: gridTheme.totalRowTextColor,
+        ),
+        backgroundColor: gridTheme.totalRowBackgroundColor,
+        border: GeniusPdfBorderStyle.all(
+          width: gridTheme.headerBorderWidth,
+          color: gridTheme.borderColor,
+        ),
+        padding: gridTheme.cellPadding,
+      ),
+      groupHeaderStyle: GeniusPdfCellStyle(
+        textStyle: GeniusPdfTextStyle(
+          fontSize: typography.bodySize,
+          fontWeight: material.FontWeight.bold,
+          color: gridTheme.groupHeaderTextColor,
+        ),
+        backgroundColor: gridTheme.groupHeaderBackgroundColor,
+        padding: gridTheme.headerPadding,
+      ),
+      borderStyle: GeniusPdfBorderStyle.all(
+        width: theme.borders.normalWidth,
+        color: gridTheme.borderColor,
+      ),
+      showGridLines: gridTheme.showInnerBorder,
+      showVerticalLines: gridTheme.showInnerBorder,
+      showHorizontalLines: gridTheme.showInnerBorder,
+    );
+  }
 
   /// Gets visible columns only.
   List<GeniusPdfGridColumn> get visibleColumns =>
@@ -407,12 +506,14 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
     String labelHeaderAr = 'البيان',
     String valueHeader = 'Value',
     String valueHeaderAr = 'القيمة',
+    required GeniusPdfConfig config,
     GeniusPdfGridStyle? style,
     required PdfFont baseFont,
     required PdfFont boldFont,
     bool isRTL = true,
   }) {
     return GeniusPdfDataGrid(
+      config: config,
       columns: [
         GeniusPdfGridColumn(
           id: 'label',
@@ -457,12 +558,14 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
     String creditHeaderAr = 'دائن',
     String balanceHeader = 'Balance',
     String balanceHeaderAr = 'الرصيد',
+    required GeniusPdfConfig config,
     GeniusPdfGridStyle? style,
     required PdfFont baseFont,
     required PdfFont boldFont,
     bool isRTL = true,
   }) {
     return GeniusPdfDataGrid(
+      config: config,
       columns: [
         GeniusPdfGridColumn(
           id: dateColumn,
@@ -907,6 +1010,7 @@ extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
     required List<GeniusPdfGridColumn> columns,
     required List<GeniusPdfGridRow> rows,
     required List<GeniusConditionalFormatRule> rules,
+    required GeniusPdfConfig config,
     GeniusPdfGridStyle style = const GeniusPdfGridStyle.classic(),
     required PdfFont baseFont,
     required PdfFont boldFont,
@@ -935,6 +1039,7 @@ extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
     }).toList();
 
     return GeniusPdfDataGrid(
+      config: config,
       columns: columns,
       rows: formattedRows,
       style: style,

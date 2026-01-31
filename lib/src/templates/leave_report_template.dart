@@ -268,6 +268,7 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
         '${_formatDate(data.periodStart)} - ${_formatDate(data.periodEnd)}';
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: title,
       subtitle: 'Period: $periodText',
       subtitleAr: 'الفترة: $periodText',
@@ -391,6 +392,7 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
     addSpace(22);
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'id',
@@ -501,6 +503,7 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
     addSpace(22);
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'id',

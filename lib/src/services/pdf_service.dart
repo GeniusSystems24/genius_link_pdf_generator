@@ -260,7 +260,16 @@ class GeniusPdfService {
         bytes = builder.generate();
       }
 
-      final dir = await getApplicationDocumentsDirectory();
+      final configuredPath = builder.config.defaultOutputPath;
+      final Directory dir;
+      if (configuredPath != null && configuredPath.isNotEmpty) {
+        dir = Directory(configuredPath);
+        if (!await dir.exists()) {
+          await dir.create(recursive: true);
+        }
+      } else {
+        dir = await getApplicationDocumentsDirectory();
+      }
       final filePath = '${dir.path}/$fileName.pdf';
       final file = File(filePath);
       await file.writeAsBytes(bytes);

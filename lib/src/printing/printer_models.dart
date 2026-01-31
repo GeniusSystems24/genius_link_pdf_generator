@@ -3,7 +3,13 @@
 /// Data models for printer information and print jobs.
 library;
 
+import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui';
+
+import 'package:syncfusion_flutter_pdf/pdf.dart' as sf;
+
+import '../core/pdf_config.dart';
 
 /// Printer connection type
 enum GeniusPrinterConnectionType {
@@ -471,6 +477,23 @@ class GeniusPrintSettings {
   /// Default print settings
   factory GeniusPrintSettings.defaults() => const GeniusPrintSettings();
 
+  /// Creates print settings based on [GeniusPdfConfig].
+  factory GeniusPrintSettings.fromPdfConfig(
+    GeniusPdfConfig config, {
+    GeniusPrintSettings? base,
+  }) {
+    final baseSettings = base ?? const GeniusPrintSettings();
+    final paperSize = _mapPaperSize(config.pageSize);
+    final orientation = config.orientation == sf.PdfPageOrientation.landscape
+        ? GeniusPrintOrientation.landscape
+        : GeniusPrintOrientation.portrait;
+
+    return baseSettings.copyWith(
+      paperSize: paperSize,
+      orientation: orientation,
+    );
+  }
+
   /// Draft quality settings (fast, low quality)
   factory GeniusPrintSettings.draft() => const GeniusPrintSettings(
         quality: GeniusPrintQuality.draft,
@@ -556,6 +579,66 @@ class GeniusPrintSettings {
       scale: scale ?? this.scale,
     );
   }
+}
+
+GeniusPaperSize _mapPaperSize(Size pageSize) {
+  const tolerance = 1.0;
+
+  final normalized = _normalizeSize(pageSize);
+  final candidates = <GeniusPaperSize, Size>{
+    GeniusPaperSize.a3:
+        Size(GeniusPaperSize.a3.widthPoints, GeniusPaperSize.a3.heightPoints),
+    GeniusPaperSize.a4:
+        Size(GeniusPaperSize.a4.widthPoints, GeniusPaperSize.a4.heightPoints),
+    GeniusPaperSize.a5:
+        Size(GeniusPaperSize.a5.widthPoints, GeniusPaperSize.a5.heightPoints),
+    GeniusPaperSize.letter: Size(
+      GeniusPaperSize.letter.widthPoints,
+      GeniusPaperSize.letter.heightPoints,
+    ),
+    GeniusPaperSize.legal:
+        Size(GeniusPaperSize.legal.widthPoints, GeniusPaperSize.legal.heightPoints),
+    GeniusPaperSize.tabloid: Size(
+      GeniusPaperSize.tabloid.widthPoints,
+      GeniusPaperSize.tabloid.heightPoints,
+    ),
+    GeniusPaperSize.executive: Size(
+      GeniusPaperSize.executive.widthPoints,
+      GeniusPaperSize.executive.heightPoints,
+    ),
+    GeniusPaperSize.b4:
+        Size(GeniusPaperSize.b4.widthPoints, GeniusPaperSize.b4.heightPoints),
+    GeniusPaperSize.b5:
+        Size(GeniusPaperSize.b5.widthPoints, GeniusPaperSize.b5.heightPoints),
+    GeniusPaperSize.envelopeDL: Size(
+      GeniusPaperSize.envelopeDL.widthPoints,
+      GeniusPaperSize.envelopeDL.heightPoints,
+    ),
+    GeniusPaperSize.envelopeC5: Size(
+      GeniusPaperSize.envelopeC5.widthPoints,
+      GeniusPaperSize.envelopeC5.heightPoints,
+    ),
+  };
+
+  for (final entry in candidates.entries) {
+    final candidate = _normalizeSize(entry.value);
+    if (_isCloseSize(normalized, candidate, tolerance)) {
+      return entry.key;
+    }
+  }
+
+  return GeniusPaperSize.custom;
+}
+
+Size _normalizeSize(Size size) {
+  final width = math.min(size.width, size.height);
+  final height = math.max(size.width, size.height);
+  return Size(width, height);
+}
+
+bool _isCloseSize(Size a, Size b, double tolerance) {
+  return (a.width - b.width).abs() <= tolerance &&
+      (a.height - b.height).abs() <= tolerance;
 }
 
 /// Print orientation

@@ -156,6 +156,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
     _drawStatusIndicator();
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Delivery Note',
       titleAr: 'إشعار تسليم',
       company: company,
@@ -207,10 +208,12 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawInfoSection() {
     final recipientBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Deliver To',
       titleAr: 'التسليم إلى',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Name',
           labelAr: 'الاسم',
           value: config.isRTL
@@ -222,6 +225,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (recipient.company != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Company',
             labelAr: 'الشركة',
             value: config.isRTL
@@ -233,6 +237,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (recipient.address != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Address',
             labelAr: 'العنوان',
             value: config.isRTL
@@ -244,6 +249,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (recipient.phone != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Phone',
             labelAr: 'الهاتف',
             value: recipient.phone!,
@@ -259,10 +265,12 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
     );
 
     final deliveryBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Delivery Details',
       titleAr: 'تفاصيل التسليم',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Delivery No',
           labelAr: 'رقم التسليم',
           value: delivery.deliveryNumber,
@@ -271,6 +279,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
           isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(delivery.deliveryDate),
@@ -280,6 +289,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (delivery.salesOrderRef != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Sales Order',
             labelAr: 'أمر البيع',
             value: delivery.salesOrderRef!,
@@ -289,6 +299,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (delivery.invoiceRef != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Invoice Ref',
             labelAr: 'رقم الفاتورة',
             value: delivery.invoiceRef!,
@@ -298,6 +309,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (delivery.driverName != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Driver',
             labelAr: 'السائق',
             value: delivery.driverName!,
@@ -307,6 +319,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (delivery.vehicleNumber != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Vehicle',
             labelAr: 'المركبة',
             value: delivery.vehicleNumber!,
@@ -440,6 +453,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
     }).toList();
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.modern(),

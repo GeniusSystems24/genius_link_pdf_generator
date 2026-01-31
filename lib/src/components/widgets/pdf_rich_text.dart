@@ -4,6 +4,31 @@ import 'dart:ui';
 import '../../../genius_link_pdf_generator.dart';
 import '../../core/pdf_logger.dart';
 
+PdfFont _resolveRichTextBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+  return baseFont ?? config.baseFont;
+}
+
+PdfFont _resolveRichTextBoldFont(
+  PdfFont? boldFont,
+  PdfFont? baseFont,
+  GeniusPdfConfig config,
+) {
+  return boldFont ?? config.boldFont;
+}
+
+GeniusPdfTextStyle _resolveRichTextDefaultStyle(
+  GeniusPdfTextStyle? style,
+  GeniusPdfConfig config,
+) {
+  if (style != null) return style;
+  final typography = config.printTheme.typography;
+  return GeniusPdfTextStyle(
+    fontSize: typography.bodySize,
+    color: config.printTheme.colorScheme.onSurface,
+    alignment: GeniusPdfTextAlign.left,
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Text Span
 // ─────────────────────────────────────────────────────────────────────────────
@@ -600,25 +625,32 @@ enum GeniusPdfParagraphAlignment {
 class GeniusPdfRichText {
   GeniusPdfRichText({
     required this.spans,
-    required this.baseFont,
-    required this.boldFont,
+    required this.config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
     this.italicFont,
     this.boldItalicFont,
-    this.defaultStyle = const GeniusPdfTextStyle.body(),
-    this.isRTL = true,
+    GeniusPdfTextStyle? defaultStyle,
+    bool? isRTL,
     this.lineSpacing = 1.2,
     this.paragraphSpacing = 8,
     this.paragraphAlignment = GeniusPdfParagraphAlignment.start,
     this.maxLines,
     this.overflow = GeniusPdfTextOverflow.clip,
     this.backgroundPadding = 1.5,
-  });
+  })  : baseFont = _resolveRichTextBaseFont(baseFont, config),
+        boldFont = _resolveRichTextBoldFont(boldFont, baseFont, config),
+        defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config),
+      isRTL = isRTL ?? config.isRTL;
 
   /// Text spans to render.
   final List<GeniusPdfTextSpan> spans;
 
   /// Default text style.
   final GeniusPdfTextStyle defaultStyle;
+
+  /// PDF configuration.
+  final GeniusPdfConfig config;
 
   /// Base font for normal text.
   final PdfFont baseFont;
@@ -1106,16 +1138,21 @@ class _RichTextLine {
 /// ```
 class GeniusPdfRichTextBuilder {
   GeniusPdfRichTextBuilder({
-    this.defaultStyle = const GeniusPdfTextStyle.body(),
-    required this.baseFont,
-    required this.boldFont,
+    required this.config,
+    GeniusPdfTextStyle? defaultStyle,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
     this.italicFont,
     this.boldItalicFont,
-    this.isRTL = true,
+    bool? isRTL,
     this.paragraphAlignment = GeniusPdfParagraphAlignment.start,
-  });
+  })  : defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config),
+        baseFont = _resolveRichTextBaseFont(baseFont, config),
+        boldFont = _resolveRichTextBoldFont(boldFont, baseFont, config),
+      isRTL = isRTL ?? config.isRTL;
 
   final GeniusPdfTextStyle defaultStyle;
+  final GeniusPdfConfig config;
   final PdfFont baseFont;
   final PdfFont boldFont;
   final PdfFont? italicFont;
@@ -1336,6 +1373,7 @@ class GeniusPdfRichTextBuilder {
   }) {
     return GeniusPdfRichText(
       spans: List.unmodifiable(_spans),
+      config: config,
       defaultStyle: defaultStyle,
       baseFont: baseFont,
       boldFont: boldFont,
@@ -1363,6 +1401,7 @@ class GeniusPdfRichTextBuilder {
 /// Useful for displaying data like "Invoice No: INV-001" or "المجموع: 1,000 ريال".
 class GeniusPdfLabeledValue {
   const GeniusPdfLabeledValue({
+    required this.config,
     required this.label,
     required this.value,
     this.labelAr,
@@ -1380,11 +1419,13 @@ class GeniusPdfLabeledValue {
     required String label,
     required String value,
     String? labelAr,
+    required GeniusPdfConfig config,
     required PdfFont baseFont,
     required PdfFont boldFont,
     bool isRTL = true,
   }) {
     return GeniusPdfLabeledValue(
+      config: config,
       label: label,
       value: value,
       labelAr: labelAr,
@@ -1400,11 +1441,13 @@ class GeniusPdfLabeledValue {
     required String label,
     required String value,
     String? labelAr,
+    required GeniusPdfConfig config,
     required PdfFont baseFont,
     required PdfFont boldFont,
     bool isRTL = true,
   }) {
     return GeniusPdfLabeledValue(
+      config: config,
       label: label,
       value: value,
       labelAr: labelAr,
@@ -1415,6 +1458,7 @@ class GeniusPdfLabeledValue {
     );
   }
 
+  final GeniusPdfConfig config;
   final String label;
   final String? labelAr;
   final String value;
@@ -1450,6 +1494,7 @@ class GeniusPdfLabeledValue {
         GeniusPdfTextSpan.plain(separator),
         valueSpan,
       ],
+      config: config,
       baseFont: baseFont,
       boldFont: boldFont,
       isRTL: isRTL,
@@ -1468,6 +1513,7 @@ class GeniusPdfLabeledValue {
 class GeniusPdfKeyValueList {
   const GeniusPdfKeyValueList({
     required this.items,
+    required this.config,
     this.itemSpacing = 4,
     this.baseFont,
     this.boldFont,
@@ -1477,6 +1523,7 @@ class GeniusPdfKeyValueList {
   });
 
   final List<GeniusPdfLabeledValue> items;
+  final GeniusPdfConfig config;
   final double itemSpacing;
   final PdfFont? baseFont;
   final PdfFont? boldFont;
@@ -1499,6 +1546,7 @@ class GeniusPdfKeyValueList {
       // Single column layout
       for (final item in items) {
         final labeledValue = GeniusPdfLabeledValue(
+          config: config,
           label: item.label,
           labelAr: item.labelAr,
           value: item.value,
@@ -1543,6 +1591,7 @@ class GeniusPdfKeyValueList {
 
         for (final item in columnItems) {
           final labeledValue = GeniusPdfLabeledValue(
+            config: config,
             label: item.label,
             labelAr: item.labelAr,
             value: item.value,
@@ -1674,21 +1723,25 @@ class GeniusPdfBulletItem {
 /// list.draw(page: page, bounds: bounds);
 /// ```
 class GeniusPdfBulletList {
-  const GeniusPdfBulletList({
+  GeniusPdfBulletList({
     required this.items,
+    required this.config,
     this.style = GeniusPdfBulletStyle.disc,
-    required this.baseFont,
-    required this.boldFont,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
     this.fontSize = 10,
     this.itemSpacing = 4,
     this.indentWidth = 20,
     this.bulletColor,
     this.textColor,
-    this.isRTL = true,
+    bool? isRTL,
     this.startNumber = 1,
-  });
+  })  : baseFont = _resolveRichTextBaseFont(baseFont, config),
+        boldFont = _resolveRichTextBoldFont(boldFont, baseFont, config),
+        isRTL = isRTL ?? config.isRTL;
 
   final List<GeniusPdfBulletItem> items;
+  final GeniusPdfConfig config;
   final GeniusPdfBulletStyle style;
   final PdfFont baseFont;
   final PdfFont boldFont;
@@ -1832,6 +1885,7 @@ class GeniusPdfBulletList {
       if (item.hasSpans) {
         final richText = GeniusPdfRichText(
           spans: item.spans!,
+          config: config,
           baseFont: baseFont,
           boldFont: boldFont,
           isRTL: isRTL,
@@ -1903,11 +1957,13 @@ class GeniusPdfBulletList {
 /// ```
 class GeniusPdfParagraph {
   const GeniusPdfParagraph({
+    required this.config,
     required this.blocks,
     this.paragraphSpacing = 10,
     this.firstLineIndent = 0,
   });
 
+  final GeniusPdfConfig config;
   /// Rich text blocks, one per paragraph.
   final List<GeniusPdfRichText> blocks;
 
@@ -1979,13 +2035,16 @@ class GeniusPdfParagraph {
 /// final height = measurer.measureRichTextHeight(richText, availableWidth: 400);
 /// ```
 class GeniusPdfTextMeasurer {
-  const GeniusPdfTextMeasurer({
-    required this.baseFont,
-    required this.boldFont,
+  GeniusPdfTextMeasurer({
+    required this.config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
     this.italicFont,
     this.boldItalicFont,
-  });
+  })  : baseFont = _resolveRichTextBaseFont(baseFont, config),
+        boldFont = _resolveRichTextBoldFont(boldFont, baseFont, config);
 
+  final GeniusPdfConfig config;
   final PdfFont baseFont;
   final PdfFont boldFont;
   final PdfFont? italicFont;

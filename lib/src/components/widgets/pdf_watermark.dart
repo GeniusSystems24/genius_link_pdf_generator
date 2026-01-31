@@ -2,25 +2,42 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../core/pdf_config.dart';
 import '../models/security_models.dart';
+
+PdfFont _resolveWatermarkBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+  return baseFont ?? config.baseFont;
+}
+
+PdfFont _resolveWatermarkBoldFont(
+  PdfFont? boldFont,
+  PdfFont? baseFont,
+  GeniusPdfConfig config,
+) {
+  return boldFont ?? config.boldFont;
+}
 
 /// مكون العلامة المائية للـ PDF
 /// Watermark component for PDF documents
 class GeniusPdfWatermark {
-  const GeniusPdfWatermark({
+  GeniusPdfWatermark({
     required this.settings,
-    required this.baseFont,
-    required this.boldFont,
-  });
+    required this.config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+  })  : baseFont = _resolveWatermarkBaseFont(baseFont, config),
+        boldFont = _resolveWatermarkBoldFont(boldFont, baseFont, config);
 
   /// إنشاء علامة مائية نصية
   factory GeniusPdfWatermark.text(
     GeniusTextWatermarkSettings settings, {
-    required PdfFont baseFont,
-    required PdfFont boldFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
   }) =>
       GeniusPdfWatermark(
         settings: settings,
+        config: config,
         baseFont: baseFont,
         boldFont: boldFont,
       );
@@ -28,11 +45,13 @@ class GeniusPdfWatermark {
   /// إنشاء علامة مائية بصورة
   factory GeniusPdfWatermark.image(
     GeniusImageWatermarkSettings settings, {
-    required PdfFont baseFont,
-    required PdfFont boldFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
   }) =>
       GeniusPdfWatermark(
         settings: settings,
+        config: config,
         baseFont: baseFont,
         boldFont: boldFont,
       );
@@ -40,11 +59,13 @@ class GeniusPdfWatermark {
   /// إنشاء علامة مائية قطرية
   factory GeniusPdfWatermark.diagonal(
     GeniusDiagonalWatermarkSettings settings, {
-    required PdfFont baseFont,
-    required PdfFont boldFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
   }) =>
       GeniusPdfWatermark(
         settings: settings,
+        config: config,
         baseFont: baseFont,
         boldFont: boldFont,
       );
@@ -52,11 +73,13 @@ class GeniusPdfWatermark {
   /// إنشاء علامة مائية متكررة
   factory GeniusPdfWatermark.tiled(
     GeniusTiledWatermarkSettings settings, {
-    required PdfFont baseFont,
-    required PdfFont boldFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
   }) =>
       GeniusPdfWatermark(
         settings: settings,
+        config: config,
         baseFont: baseFont,
         boldFont: boldFont,
       );
@@ -65,12 +88,14 @@ class GeniusPdfWatermark {
   factory GeniusPdfWatermark.confidential({
     String text = 'CONFIDENTIAL',
     double opacity = 0.2,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
   }) =>
       GeniusPdfWatermark(
         settings: GeniusTextWatermarkSettings.confidential(
             text: text, opacity: opacity),
+        config: config,
         baseFont: baseFont,
         boldFont: boldFont,
       );
@@ -79,12 +104,14 @@ class GeniusPdfWatermark {
   factory GeniusPdfWatermark.draft({
     String text = 'DRAFT',
     double opacity = 0.2,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
   }) =>
       GeniusPdfWatermark(
         settings:
             GeniusTextWatermarkSettings.draft(text: text, opacity: opacity),
+        config: config,
         baseFont: baseFont,
         boldFont: boldFont,
       );
@@ -93,12 +120,14 @@ class GeniusPdfWatermark {
   factory GeniusPdfWatermark.copy({
     String text = 'COPY',
     double opacity = 0.2,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
   }) =>
       GeniusPdfWatermark(
         settings:
             GeniusTextWatermarkSettings.copy(text: text, opacity: opacity),
+        config: config,
         baseFont: baseFont,
         boldFont: boldFont,
       );
@@ -107,18 +136,23 @@ class GeniusPdfWatermark {
   factory GeniusPdfWatermark.cancelled({
     String text = 'CANCELLED',
     double opacity = 0.3,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
   }) =>
       GeniusPdfWatermark(
         settings:
             GeniusTextWatermarkSettings.cancelled(text: text, opacity: opacity),
+        config: config,
         baseFont: baseFont,
         boldFont: boldFont,
       );
 
   /// إعدادات العلامة المائية
   final GeniusWatermarkSettings settings;
+
+  /// PDF configuration.
+  final GeniusPdfConfig config;
 
   /// الخط الأساسي (مطلوب للنصوص العربية)
   final PdfFont baseFont;
@@ -446,31 +480,34 @@ extension PdfDocumentWatermarkExtension on PdfDocument {
 
   /// إضافة علامة مائية نصية
   void addTextWatermark(GeniusTextWatermarkSettings settings,
-      {required PdfFont baseFont, required PdfFont boldFont}) {
+      {required GeniusPdfConfig config}) {
     GeniusPdfWatermark.text(
+      config: config,
       settings,
-      baseFont: baseFont,
-      boldFont: boldFont,
+      baseFont: config.baseFont,
+      boldFont: config.boldFont,
     ).applyToDocument(this);
   }
 
   /// إضافة علامة مائية قطرية
   void addDiagonalWatermark(GeniusDiagonalWatermarkSettings settings,
-      {required PdfFont baseFont, required PdfFont boldFont}) {
+      {required GeniusPdfConfig config}) {
     GeniusPdfWatermark.diagonal(
       settings,
-      baseFont: baseFont,
-      boldFont: boldFont,
+      config: config,
+      baseFont: config.baseFont,
+      boldFont: config.boldFont,
     ).applyToDocument(this);
   }
 
   /// إضافة علامة مائية متكررة
   void addTiledWatermark(GeniusTiledWatermarkSettings settings,
-      {required PdfFont baseFont, required PdfFont boldFont}) {
+      {required GeniusPdfConfig config}) {
     GeniusPdfWatermark.tiled(
       settings,
-      baseFont: baseFont,
-      boldFont: boldFont,
+      config: config,
+      baseFont: config.baseFont,
+      boldFont: config.boldFont,
     ).applyToDocument(this);
   }
 }

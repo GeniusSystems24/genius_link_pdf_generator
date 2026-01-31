@@ -12,7 +12,7 @@ Future<sf.PdfDocument> buildExportSampleDocument(
 ) async {
   final isRtl = config.textDirection == TextDirection.rtl;
 
-  final builder = GeniusPdfBuilder(id: 'export-demo')
+  final builder = GeniusPdfBuilder(id: 'export-demo', config: config)
       .metadata(
         title: 'Export Demo Document',
         author: 'Genius PDF Generator',

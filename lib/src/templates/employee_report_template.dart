@@ -204,6 +204,7 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
         : data.reportTitle;
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: title,
       subtitle: 'As of ${_formatDate(data.reportDate)}',
       subtitleAr: 'كما في ${_formatDate(data.reportDate)}',
@@ -323,6 +324,7 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
 
     final summaries = data.departmentSummaries;
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'department',
@@ -483,6 +485,7 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
     }).toList();
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.modern(),

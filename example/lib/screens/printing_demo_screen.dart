@@ -1145,6 +1145,7 @@ Direct Print: ${info.directPrint}
 
     try {
       final result = await GeniusPrinterService.instance.printWithDialog(
+        config: geniusPdfConfig,
         pdfBytes: _samplePdfBytes!,
         documentName: 'Sample_Document',
         settings: _currentSettings,
@@ -1185,6 +1186,7 @@ Direct Print: ${info.directPrint}
     if (_samplePdfBytes == null) return;
 
     final result = await GeniusPrintPreviewDialog.show(
+      config: geniusPdfConfig,
       context: context,
       pdfBytes: _samplePdfBytes!,
       documentName: 'Sample_Document',

@@ -162,6 +162,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Quotation',
       titleAr: 'عرض سعر',
       company: company,
@@ -186,10 +187,12 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawInfoSection() {
     final customerBox = GeniusPdfInfoBox(
+      config: config,
       title: 'To',
       titleAr: 'إلى',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Name',
           labelAr: 'الاسم',
           value:
@@ -200,6 +203,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (customer.company != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Company',
             labelAr: 'الشركة',
             value: config.isRTL
@@ -211,6 +215,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (customer.address != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Address',
             labelAr: 'العنوان',
             value: config.isRTL
@@ -222,6 +227,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (customer.phone != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Phone',
             labelAr: 'الهاتف',
             value: customer.phone!,
@@ -231,6 +237,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (customer.email != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Email',
             labelAr: 'البريد',
             value: customer.email!,
@@ -246,10 +253,12 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
     );
 
     final quotationBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Quotation Details',
       titleAr: 'تفاصيل العرض',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Quotation No',
           labelAr: 'رقم العرض',
           value: quotation.quotationNumber,
@@ -258,6 +267,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(quotation.quotationDate),
@@ -267,6 +277,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (quotation.validUntil != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Valid Until',
             labelAr: 'صالح حتى',
             value: _formatDate(quotation.validUntil!),
@@ -276,6 +287,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (quotation.reference != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Reference',
             labelAr: 'المرجع',
             value: quotation.reference!,
@@ -285,6 +297,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (quotation.paymentTerms != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Payment Terms',
             labelAr: 'شروط الدفع',
             value: config.isRTL
@@ -317,6 +330,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawItemsTable() {
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'no',
@@ -407,6 +421,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
     ));
 
     final summary = GeniusPdfSummarySection(
+      config: config,
       items: items,
       style: const GeniusPdfSummaryStyle.bordered(),
       baseFont: baseFont,

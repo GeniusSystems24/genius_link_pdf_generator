@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:syncfusion_flutter_pdf/pdf.dart' as sf;
 
+import '../pdf_config.dart';
 import 'event_system.dart';
 
 /// Enhanced Fluent API for building PDF documents.
@@ -28,12 +30,20 @@ import 'event_system.dart';
 ///   .build();
 /// ```
 class GeniusPdfBuilder with GeniusEventEmitter {
-  GeniusPdfBuilder({String? id}) : _id = id ?? _generateId();
+  GeniusPdfBuilder({
+    String? id,
+    required GeniusPdfConfig config,
+    pw.Font? defaultFont,
+  })  : _id = id ?? _generateId(),
+        _config = GeniusDocumentConfig.fromPdfConfig(
+          config,
+          defaultFont: defaultFont,
+        );
 
   final String _id;
   final pw.Document _document = pw.Document();
   final List<pw.Page> _pages = [];
-  GeniusDocumentConfig _config = const GeniusDocumentConfig();
+  GeniusDocumentConfig _config;
 
   static int _idCounter = 0;
   static String _generateId() => 'doc_${++_idCounter}';
@@ -43,6 +53,18 @@ class GeniusPdfBuilder with GeniusEventEmitter {
 
   /// Current configuration.
   GeniusDocumentConfig get config => _config;
+
+  /// Applies a [GeniusPdfConfig] to this builder.
+  GeniusPdfBuilder applyPdfConfig(
+    GeniusPdfConfig config, {
+    pw.Font? defaultFont,
+  }) {
+    _config = GeniusDocumentConfig.fromPdfConfig(
+      config,
+      defaultFont: defaultFont,
+    );
+    return this;
+  }
 
   /// Configures the document.
   GeniusPdfBuilder configure(
@@ -181,6 +203,19 @@ class GeniusDocumentConfig {
     this.defaultFont,
   });
 
+  /// Creates a v2 config from [GeniusPdfConfig].
+  factory GeniusDocumentConfig.fromPdfConfig(
+    GeniusPdfConfig config, {
+    pw.Font? defaultFont,
+  }) {
+    return GeniusDocumentConfig(
+      pageFormat: _pageFormatFromConfig(config),
+      margin: _edgeInsetsFromMargins(config.margins),
+      isRtl: config.isRTL,
+      defaultFont: defaultFont,
+    );
+  }
+
   final String? title;
   final String? author;
   final String? subject;
@@ -214,6 +249,26 @@ class GeniusDocumentConfig {
       defaultFont: defaultFont ?? this.defaultFont,
     );
   }
+}
+
+PdfPageFormat _pageFormatFromConfig(GeniusPdfConfig config) {
+  final width = config.pageSize.width;
+  final height = config.pageSize.height;
+  final isLandscape = config.orientation == sf.PdfPageOrientation.landscape;
+
+  final effectiveWidth = isLandscape ? height : width;
+  final effectiveHeight = isLandscape ? width : height;
+
+  return PdfPageFormat(effectiveWidth, effectiveHeight);
+}
+
+pw.EdgeInsets _edgeInsetsFromMargins(sf.PdfMargins margins) {
+  return pw.EdgeInsets.fromLTRB(
+    margins.left,
+    margins.top,
+    margins.right,
+    margins.bottom,
+  );
 }
 
 /// Builder for document configuration.
@@ -266,6 +321,19 @@ class GeniusPageBuilder {
   final GeniusDocumentConfig _config;
   final List<pw.Widget> _widgets = [];
 
+  pw.TextStyle _textStyle({
+    double? fontSize,
+    pw.FontWeight? fontWeight,
+    PdfColor? color,
+  }) {
+    return pw.TextStyle(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      font: _config.defaultFont,
+    );
+  }
+
   /// Adds a header.
   GeniusPageBuilder header(
     String text, {
@@ -278,7 +346,7 @@ class GeniusPageBuilder {
         level: 0,
         child: pw.Text(
           text,
-          style: pw.TextStyle(
+          style: _textStyle(
             fontSize: fontSize,
             fontWeight: fontWeight,
             color: color,
@@ -294,7 +362,7 @@ class GeniusPageBuilder {
     _widgets.add(
       pw.Header(
         level: 1,
-        child: pw.Text(text, style: pw.TextStyle(fontSize: fontSize)),
+        child: pw.Text(text, style: _textStyle(fontSize: fontSize)),
       ),
     );
     return this;
@@ -309,7 +377,7 @@ class GeniusPageBuilder {
     _widgets.add(
       pw.Paragraph(
         text: text,
-        style: pw.TextStyle(fontSize: fontSize),
+        style: _textStyle(fontSize: fontSize),
         textAlign: textAlign ??
             (_config.isRtl ? pw.TextAlign.right : pw.TextAlign.left),
       ),
@@ -321,7 +389,7 @@ class GeniusPageBuilder {
   GeniusPageBuilder richText(List<pw.TextSpan> spans) {
     _widgets.add(
       pw.RichText(
-        text: pw.TextSpan(children: spans),
+        text: pw.TextSpan(style: _textStyle(), children: spans),
       ),
     );
     return this;
@@ -333,7 +401,7 @@ class GeniusPageBuilder {
       _widgets.add(
         pw.Bullet(
           text: item,
-          style: pw.TextStyle(fontSize: fontSize),
+          style: _textStyle(fontSize: fontSize),
         ),
       );
     }
@@ -353,13 +421,13 @@ class GeniusPageBuilder {
                 width: 20,
                 child: pw.Text(
                   '${i + 1}.',
-                  style: pw.TextStyle(fontSize: fontSize),
+                  style: _textStyle(fontSize: fontSize),
                 ),
               ),
               pw.Expanded(
                 child: pw.Text(
                   items[i],
-                  style: pw.TextStyle(fontSize: fontSize),
+                  style: _textStyle(fontSize: fontSize),
                 ),
               ),
             ],
@@ -384,7 +452,7 @@ class GeniusPageBuilder {
         headers
             .map((h) => pw.Text(
                   h.toString(),
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  style: _textStyle(fontWeight: pw.FontWeight.bold),
                 ))
             .toList(),
       );
@@ -401,7 +469,8 @@ class GeniusPageBuilder {
         data: data.map((row) => row.map((c) => c.toString()).toList()).toList(),
         headers: headers,
         border: border ?? pw.TableBorder.all(),
-        headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+        headerStyle: _textStyle(fontWeight: pw.FontWeight.bold),
+        cellStyle: _textStyle(),
       ),
     );
     return this;
@@ -509,7 +578,7 @@ class GeniusPageBuilder {
         alignment: pw.Alignment.bottomCenter,
         child: pw.Text(
           text,
-          style: pw.TextStyle(fontSize: fontSize),
+          style: _textStyle(fontSize: fontSize),
           textAlign: textAlign,
         ),
       ),
@@ -546,6 +615,19 @@ class GeniusMultiPageBuilder {
   pw.Widget Function(pw.Context)? _header;
   pw.Widget Function(pw.Context)? _footer;
 
+  pw.TextStyle _textStyle({
+    double? fontSize,
+    pw.FontWeight? fontWeight,
+    PdfColor? color,
+  }) {
+    return pw.TextStyle(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      font: config.defaultFont,
+    );
+  }
+
   /// Sets the header builder.
   GeniusMultiPageBuilder header(pw.Widget Function(pw.Context) builder) {
     _header = builder;
@@ -559,7 +641,7 @@ class GeniusMultiPageBuilder {
           margin: const pw.EdgeInsets.only(bottom: 10),
           child: pw.Text(
             text,
-            style: pw.TextStyle(fontSize: fontSize),
+            style: _textStyle(fontSize: fontSize),
           ),
         );
     return this;
@@ -581,7 +663,7 @@ class GeniusMultiPageBuilder {
             format
                 .replaceAll('{page}', (context.pageNumber).toString())
                 .replaceAll('{pages}', (context.pagesCount).toString()),
-            style: const pw.TextStyle(fontSize: 10),
+            style: _textStyle(fontSize: 10),
           ),
         );
     return this;
@@ -607,7 +689,7 @@ class GeniusMultiPageBuilder {
         level: level,
         child: pw.Text(
           text,
-          style: pw.TextStyle(
+          style: _textStyle(
             fontSize: fontSize,
             fontWeight: pw.FontWeight.bold,
           ),
@@ -619,7 +701,7 @@ class GeniusMultiPageBuilder {
 
   /// Adds a paragraph.
   GeniusMultiPageBuilder paragraph(String text) {
-    _children.add(pw.Paragraph(text: text));
+    _children.add(pw.Paragraph(text: text, style: _textStyle()));
     return this;
   }
 

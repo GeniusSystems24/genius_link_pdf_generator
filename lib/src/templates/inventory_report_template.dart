@@ -154,6 +154,7 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Inventory Valuation Report',
       titleAr: 'تقرير تقييم المخزون',
       subtitle: 'As of: ${_formatDate(data.asOfDate)}',
@@ -274,6 +275,7 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
     }
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.classic(),

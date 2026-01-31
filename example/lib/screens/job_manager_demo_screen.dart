@@ -855,6 +855,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'DataGrid Test',
       buildContent: (builder) {
         final grid = GeniusPdfDataGrid(
+          config: geniusPdfConfig,
           columns: [
             GeniusPdfGridColumn(
                 id: 'code', title: 'Code', titleAr: 'الرمز', width: 60),
@@ -902,6 +903,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
         // 1. Builder with heading, badge, currency, strikethrough
         final heading = GeniusPdfRichTextBuilder(
+          config: geniusPdfConfig,
           baseFont: geniusPdfConfig.baseFont,
           boldFont: geniusPdfConfig.boldFont,
           isRTL: geniusPdfConfig.isRTL,
@@ -938,6 +940,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
               GeniusPdfBulletItem.simple('Monthly support'),
             ]),
           ],
+          config: geniusPdfConfig,
           style: GeniusPdfBulletStyle.disc,
           baseFont: geniusPdfConfig.baseFont,
           boldFont: geniusPdfConfig.boldFont,
@@ -955,6 +958,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
         );
         final mdRichText = GeniusPdfRichText(
           spans: mdSpans,
+          config: geniusPdfConfig,
           baseFont: geniusPdfConfig.baseFont,
           boldFont: geniusPdfConfig.boldFont,
           isRTL: false,
@@ -974,12 +978,14 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'InfoBox Test',
       buildContent: (builder) {
         final box = GeniusPdfInfoBox(
+          config: geniusPdfConfig,
           title: 'Customer Details',
           titleAr: 'تفاصيل العميل',
           baseFont: geniusPdfConfig.baseFont,
           boldFont: geniusPdfConfig.boldFont,
           items: [
             GeniusPdfLabeledValue(
+                config: geniusPdfConfig,
                 label: 'Name',
                 labelAr: 'الاسم',
                 value: 'Ahmed Mohammed',
@@ -987,6 +993,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
                 boldFont: geniusPdfConfig.boldFont,
                 isRTL: geniusPdfConfig.isRTL),
             GeniusPdfLabeledValue(
+                config: geniusPdfConfig,
                 label: 'Phone',
                 labelAr: 'الهاتف',
                 value: '+966 12 345 6789',
@@ -1012,6 +1019,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'ReportHeader Test',
       buildContent: (builder) {
         final header = GeniusPdfReportHeader(
+          config: geniusPdfConfig,
           title: 'Sales Report',
           titleAr: 'تقرير المبيعات',
           subtitle: 'January 2025',
@@ -1041,6 +1049,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'SummarySection Test',
       buildContent: (builder) {
         final summary = GeniusPdfSummarySection(
+          config: builder.config,
           items: [
             GeniusPdfSummaryItem(
                 label: 'Subtotal',
@@ -1076,6 +1085,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'BarChart Test',
       buildChart: (page, bounds) {
         final chart = GeniusPdfBarChart(
+          config: geniusPdfConfig,
           title: 'Monthly Sales',
           titleAr: 'المبيعات الشهرية',
           series: [
@@ -1106,6 +1116,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'LineChart Test',
       buildChart: (page, bounds) {
         final chart = GeniusPdfLineChart(
+          config: geniusPdfConfig,
           title: 'Revenue Trend',
           titleAr: 'اتجاه الإيرادات',
           series: [
@@ -1137,6 +1148,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'PieChart Test',
       buildChart: (page, bounds) {
         final chart = GeniusPdfPieChart(
+          config: geniusPdfConfig,
           title: 'Expense Distribution',
           titleAr: 'توزيع المصروفات',
           dataPoints: [
@@ -1160,6 +1172,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'AreaChart Test',
       buildChart: (page, bounds) {
         final chart = GeniusPdfAreaChart(
+          config: geniusPdfConfig,
           title: 'Website Traffic',
           titleAr: 'حركة الموقع',
           series: [
@@ -1517,6 +1530,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'Watermark Test',
       applySecurityFeature: (document) {
         document.addWatermark(GeniusPdfWatermark.confidential(
+          config: geniusPdfConfig,
           baseFont: _font!,
           boldFont: _font!,
         ));
@@ -1530,6 +1544,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       testName: 'TiledWatermark Test',
       applySecurityFeature: (document) {
         GeniusPdfWatermark.tiled(
+          config: geniusPdfConfig,
           GeniusTiledWatermarkSettings(
             text: 'SAMPLE',
             fontSize: 20,
@@ -1971,6 +1986,7 @@ class _SignatureTestBuilder extends GeniusPdfDocumentBuilder {
     addSpace(50);
 
     final signature = GeniusPdfDigitalSignature(
+      config: config,
       baseFont: config.baseFont,
       boldFont: config.boldFont,
       settings: GeniusDigitalSignatureSettings(

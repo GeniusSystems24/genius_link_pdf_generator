@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfTextStyle, PdfBorderStyle;
 
+import '../../core/pdf_config.dart';
+import '../../core/pdf_print_theme.dart';
 import '../../core/pdf_logger.dart';
 import '../../extensions/color_extensions.dart';
 import '../../models/pdf_image.dart';
@@ -427,6 +429,48 @@ class GeniusPdfReportHeaderStyle {
     this.accentLineWidth = 4,
     this.dateSpacing = 6,
   });
+
+  /// Creates a header style from [GeniusPdfPrintTheme].
+  factory GeniusPdfReportHeaderStyle.fromTheme(GeniusPdfPrintTheme theme) {
+    final headerTheme = theme.headerTheme ?? const GeniusPdfHeaderTheme.defaults();
+    final typography = theme.typography;
+
+    return GeniusPdfReportHeaderStyle(
+      backgroundColor: headerTheme.backgroundColor,
+      titleStyle: GeniusPdfTextStyle.title(
+        fontSize: typography.titleSize,
+        color: headerTheme.titleColor,
+      ),
+      subtitleStyle: GeniusPdfTextStyle.subtitle(
+        fontSize: typography.subheadingSize,
+        color: headerTheme.subtitleColor,
+      ),
+      companyNameStyle: GeniusPdfTextStyle(
+        fontSize: typography.headingSize,
+        fontWeight: FontWeight.bold,
+        color: headerTheme.companyNameColor,
+      ),
+      companyInfoStyle: GeniusPdfTextStyle(
+        fontSize: typography.bodySize,
+        color: headerTheme.companyInfoColor,
+      ),
+      dateStyle: GeniusPdfTextStyle(
+        fontSize: typography.captionSize,
+        color: headerTheme.subtitleColor,
+      ),
+      borderStyle: headerTheme.showBorder
+          ? GeniusPdfBorderStyle.all(
+              width: headerTheme.borderWidth,
+              color: headerTheme.borderColor,
+            )
+          : const GeniusPdfBorderStyle.none(),
+      padding: headerTheme.padding,
+      spacing: headerTheme.spacing,
+      logoMaxWidth: headerTheme.logoMaxWidth,
+      logoMaxHeight: headerTheme.logoMaxHeight,
+      showBorder: headerTheme.showBorder,
+    );
+  }
 
   /// Creates a modern header style with accent colors.
   const GeniusPdfReportHeaderStyle.modern()
@@ -1024,10 +1068,11 @@ class GeniusPdfReportHeader {
     this.referenceNumber,
     this.referenceLabel,
     this.referenceLabelAr,
-    this.style = const GeniusPdfReportHeaderStyle(),
-    required this.baseFont,
-    required this.boldFont,
-    this.isRTL = true,
+    required this.config,
+    GeniusPdfReportHeaderStyle? style,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
     this.showPrintDate = true,
     this.showCompanyInfo = true,
     this.showBilingualTitle = true,
@@ -1038,7 +1083,10 @@ class GeniusPdfReportHeader {
     this.showPageNumber = false,
     this.customFields,
     this.tag,
-  });
+  })  : style = _resolveHeaderStyle(style, config),
+        baseFont = _resolveBaseFont(baseFont, config),
+        boldFont = _resolveBoldFont(boldFont, baseFont, config),
+        isRTL = isRTL ?? config.isRTL;
 
   /// Creates a report header for invoices/receipts.
   factory GeniusPdfReportHeader.invoice({
@@ -1052,11 +1100,16 @@ class GeniusPdfReportHeader {
     DateTime? date,
     String documentNumberLabel = 'Invoice No',
     String documentNumberLabelAr = 'رقم الفاتورة',
+    required GeniusPdfConfig config,
     GeniusPdfReportHeaderStyle? style,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
   }) {
+    final resolvedBase = _resolveBaseFont(baseFont, config);
+    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
+    final resolvedIsRtl = isRTL ?? config.isRTL;
+
     return GeniusPdfReportHeader(
       title: title,
       titleAr: titleAr,
@@ -1068,10 +1121,11 @@ class GeniusPdfReportHeader {
       documentNumber: documentNumber,
       documentNumberLabel: documentNumberLabel,
       documentNumberLabelAr: documentNumberLabelAr,
+      config: config,
       style: style ?? GeniusPdfReportHeaderStyle.invoice(),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
+      isRTL: resolvedIsRtl,
       layout: GeniusPdfReportHeaderLayout.invoice,
     );
   }
@@ -1083,21 +1137,27 @@ class GeniusPdfReportHeader {
     String? subtitle,
     String? subtitleAr,
     DateTime? date,
+    required GeniusPdfConfig config,
     GeniusPdfReportHeaderStyle? style,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
   }) {
+    final resolvedBase = _resolveBaseFont(baseFont, config);
+    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
+    final resolvedIsRtl = isRTL ?? config.isRTL;
+
     return GeniusPdfReportHeader(
       title: title,
       titleAr: titleAr,
       subtitle: subtitle,
       subtitleAr: subtitleAr,
       printDate: date,
+      config: config,
       style: style ?? GeniusPdfReportHeaderStyle.minimal(),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
+      isRTL: resolvedIsRtl,
       showCompanyInfo: false,
       layout: GeniusPdfReportHeaderLayout.compact,
     );
@@ -1111,11 +1171,16 @@ class GeniusPdfReportHeader {
     String? subtitle,
     String? subtitleAr,
     DateTime? date,
+    required GeniusPdfConfig config,
     GeniusPdfReportHeaderStyle? style,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
   }) {
+    final resolvedBase = _resolveBaseFont(baseFont, config);
+    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
+    final resolvedIsRtl = isRTL ?? config.isRTL;
+
     return GeniusPdfReportHeader(
       title: title,
       titleAr: titleAr,
@@ -1123,10 +1188,11 @@ class GeniusPdfReportHeader {
       subtitleAr: subtitleAr,
       company: company,
       printDate: date,
+      config: config,
       style: style ?? const GeniusPdfReportHeaderStyle.modern(),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
+      isRTL: resolvedIsRtl,
       showCompanyInfo: true,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
@@ -1140,10 +1206,14 @@ class GeniusPdfReportHeader {
     String? subtitle,
     String? subtitleAr,
     DateTime? date,
+    required GeniusPdfConfig config,
     GeniusPdfReportHeaderStyle? style,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
   }) {
+    final resolvedBase = _resolveBaseFont(baseFont, config);
+    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
+
     return GeniusPdfReportHeader(
       title: title,
       titleAr: titleAr,
@@ -1151,9 +1221,10 @@ class GeniusPdfReportHeader {
       subtitleAr: subtitleAr,
       company: company,
       printDate: date,
+      config: config,
       style: style ?? GeniusPdfReportHeaderStyle.bilingualSplit(),
-      baseFont: baseFont,
-      boldFont: boldFont,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
       isRTL: true,
       showCompanyInfo: true,
       showBilingualTitle: true,
@@ -1209,6 +1280,9 @@ class GeniusPdfReportHeader {
   /// Header style configuration.
   final GeniusPdfReportHeaderStyle style;
 
+  /// PDF configuration.
+  final GeniusPdfConfig config;
+
   /// Base font for text.
   final PdfFont baseFont;
 
@@ -1247,6 +1321,26 @@ class GeniusPdfReportHeader {
 
   /// Custom tag for identification.
   final String? tag;
+
+  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+    return baseFont ?? config.baseFont;
+  }
+
+  static PdfFont _resolveBoldFont(
+    PdfFont? boldFont,
+    PdfFont? baseFont,
+    GeniusPdfConfig config,
+  ) {
+    return boldFont ?? config.boldFont;
+  }
+
+  static GeniusPdfReportHeaderStyle _resolveHeaderStyle(
+    GeniusPdfReportHeaderStyle? style,
+    GeniusPdfConfig config,
+  ) {
+    if (style != null) return style;
+    return GeniusPdfReportHeaderStyle.fromTheme(config.printTheme);
+  }
 
   /// Gets the display title based on locale.
   String getTitle() {

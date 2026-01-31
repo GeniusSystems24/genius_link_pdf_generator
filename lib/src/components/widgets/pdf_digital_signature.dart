@@ -2,25 +2,43 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../core/pdf_config.dart';
 import '../models/security_models.dart';
 
 /// مكون التوقيع الرقمي للـ PDF
 /// Digital signature component for PDF documents
 class GeniusPdfDigitalSignature {
-  const GeniusPdfDigitalSignature({
+  GeniusPdfDigitalSignature({
     required this.settings,
-    required this.baseFont,
-    required this.boldFont,
-  });
+    required this.config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+  })  : baseFont = _resolveBaseFont(baseFont, config),
+        boldFont = _resolveBoldFont(boldFont, baseFont, config);
 
   /// إعدادات التوقيع
   final GeniusDigitalSignatureSettings settings;
+
+  /// PDF configuration.
+  final GeniusPdfConfig config;
 
   /// الخط الأساسي (مطلوب للنصوص العربية)
   final PdfFont baseFont;
 
   /// الخط العريض (مطلوب للعناوين)
   final PdfFont boldFont;
+
+  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+    return baseFont ?? config.baseFont;
+  }
+
+  static PdfFont _resolveBoldFont(
+    PdfFont? boldFont,
+    PdfFont? baseFont,
+    GeniusPdfConfig config,
+  ) {
+    return boldFont ?? config.boldFont;
+  }
 
   /// إضافة التوقيع للمستند
   /// Add signature to document
@@ -482,11 +500,15 @@ class GeniusSignatureInfo {
 extension PdfDocumentSignatureExtension on PdfDocument {
   /// إضافة توقيع رقمي
   void addDigitalSignature(
-      {required GeniusDigitalSignatureSettings settings,
-      required PdfFont baseFont,
-      required PdfFont boldFont}) {
+    {required GeniusDigitalSignatureSettings settings,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont}) {
     GeniusPdfDigitalSignature(
-            settings: settings, baseFont: baseFont, boldFont: boldFont)
+      settings: settings,
+      config: config,
+      baseFont: baseFont,
+      boldFont: boldFont)
         .addToDocument(this);
   }
 

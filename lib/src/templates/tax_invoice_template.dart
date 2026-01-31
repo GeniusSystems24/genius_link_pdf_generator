@@ -177,6 +177,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Tax Invoice',
       titleAr: 'فاتورة ضريبية',
       company: company,
@@ -201,10 +202,12 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawInfoSection() {
     final customerBox = GeniusPdfInfoBox(
+      config: config,
       title: 'To',
       titleAr: 'إلى',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Customer Name',
           labelAr: 'اسم العميل',
           value:
@@ -215,6 +218,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (customer.address != null || customer.addressAr != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Address',
             labelAr: 'العنوان',
             value: config.isRTL
@@ -226,6 +230,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (customer.vatNumber != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'VAT No',
             labelAr: 'الرقم الضريبي',
             value: customer.vatNumber!,
@@ -235,6 +240,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (customer.phone != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Phone',
             labelAr: 'رقم الهاتف',
             value: customer.phone!,
@@ -250,10 +256,12 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     );
 
     final invoiceBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Invoice Details',
       titleAr: 'بيانات الفاتورة',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Invoice No',
           labelAr: 'رقم الفاتورة',
           value: invoice.invoiceNumber,
@@ -262,6 +270,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(invoice.invoiceDate),
@@ -271,6 +280,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (invoice.paymentTerms != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Payment Terms',
             labelAr: 'شروط الدفع',
             value: config.isRTL
@@ -282,6 +292,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (invoice.poNumber != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'PO No',
             labelAr: 'رقم الطلب',
             value: invoice.poNumber!,
@@ -312,6 +323,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawItemsTable() {
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'no',
@@ -402,6 +414,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     ));
 
     final summary = GeniusPdfSummarySection(
+      config: config,
       items: items,
       style: const GeniusPdfSummaryStyle.bordered(),
       baseFont: baseFont,
@@ -425,6 +438,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
         _numberToWordsArabic(invoice.grandTotal, invoice.currency);
 
     final richText = GeniusPdfRichTextBuilder(
+      config: config,
       baseFont: baseFont,
       boldFont: _boldFont,
       isRTL: config.isRTL,

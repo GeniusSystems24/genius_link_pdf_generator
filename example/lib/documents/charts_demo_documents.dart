@@ -20,32 +20,33 @@ Future<Uint8List> buildBarChartPdf({
     'Bar Chart - ${type.name.toUpperCase()}',
   );
 
-  final series = (type == GeniusBarChartType.grouped ||
-          type == GeniusBarChartType.stacked)
-      ? [
-          GeniusChartSeries(
-            name: 'Sales',
-            nameAr: 'المبيعات',
-            color: const Color(0xFF2196F3),
-            dataPoints: _getMonthlySalesData(),
-          ),
-          GeniusChartSeries(
-            name: 'Expenses',
-            nameAr: 'المصروفات',
-            color: const Color(0xFFF44336),
-            dataPoints: _getMonthlyExpensesData(),
-          ),
-        ]
-      : [
-          GeniusChartSeries(
-            name: 'Revenue',
-            nameAr: 'الإيرادات',
-            color: const Color(0xFF4CAF50),
-            dataPoints: _getMonthlySalesData(),
-          ),
-        ];
+  final series =
+      (type == GeniusBarChartType.grouped || type == GeniusBarChartType.stacked)
+          ? [
+              GeniusChartSeries(
+                name: 'Sales',
+                nameAr: 'المبيعات',
+                color: const Color(0xFF2196F3),
+                dataPoints: _getMonthlySalesData(),
+              ),
+              GeniusChartSeries(
+                name: 'Expenses',
+                nameAr: 'المصروفات',
+                color: const Color(0xFFF44336),
+                dataPoints: _getMonthlyExpensesData(),
+              ),
+            ]
+          : [
+              GeniusChartSeries(
+                name: 'Revenue',
+                nameAr: 'الإيرادات',
+                color: const Color(0xFF4CAF50),
+                dataPoints: _getMonthlySalesData(),
+              ),
+            ];
 
   final chart = GeniusPdfBarChart(
+    config: config,
     title: 'Monthly Performance',
     titleAr: 'الأداء الشهري',
     series: series,
@@ -84,6 +85,7 @@ Future<Uint8List> buildLineChartPdf({
   );
 
   final chart = GeniusPdfLineChart(
+    config: config,
     title: 'Revenue Trend',
     titleAr: 'اتجاه الإيرادات',
     series: [
@@ -131,6 +133,7 @@ Future<Uint8List> buildPieChartPdf({
   _drawTitle(page, config.headerFont, isDonut ? 'Donut Chart' : 'Pie Chart');
 
   final chart = GeniusPdfPieChart(
+    config: config,
     title: 'Expense Distribution',
     titleAr: 'توزيع المصروفات',
     dataPoints: _getExpenseDistributionData(),
@@ -173,6 +176,7 @@ Future<Uint8List> buildAreaChartPdf({
   _drawTitle(page, config.headerFont, 'Area Chart');
 
   final chart = GeniusPdfAreaChart(
+    config: config,
     title: 'Website Traffic',
     titleAr: 'حركة الموقع',
     series: [
@@ -194,9 +198,8 @@ Future<Uint8List> buildAreaChartPdf({
     ],
     settings: GeniusAreaChartSettings(
       stacked: stacked,
-      lineType: curved
-          ? GeniusLineChartType.curved
-          : GeniusLineChartType.straight,
+      lineType:
+          curved ? GeniusLineChartType.curved : GeniusLineChartType.straight,
       fillOpacity: 0.4,
       showPoints: showPoints,
     ),

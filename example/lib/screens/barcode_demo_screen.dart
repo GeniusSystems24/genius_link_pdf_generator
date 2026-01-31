@@ -572,6 +572,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // EAN-13
       final ean13 = GeniusPdfBarcode.ean13(
+        config: geniusPdfConfig,
         data: '5901234123457',
         caption: 'Product Code',
         captionAr: 'رمز المنتج',
@@ -587,6 +588,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // Code 128
       final code128 = GeniusPdfBarcode.code128(
+        config: geniusPdfConfig,
         data: 'GENIUS-PDF-2025',
         caption: 'Reference Number',
         captionAr: 'الرقم المرجعي',
@@ -602,6 +604,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // Shipping barcode
       final shipping = GeniusPdfBarcode.shipping(
+        config: geniusPdfConfig,
         data: '1Z999AA10123456784',
         trackingLabel: 'Tracking Number',
         trackingLabelAr: 'رقم التتبع',
@@ -651,6 +654,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // URL QR Code
       final urlQR = GeniusPdfQRCodeGenerator.url(
+        config: geniusPdfConfig,
         url: 'https://github.com/GeniusSystems24',
         caption: 'Visit Website',
         captionAr: 'زيارة الموقع',
@@ -665,6 +669,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // ZATCA QR Code
       final zatcaQR = GeniusPdfQRCodeGenerator.zatca(
+        config: geniusPdfConfig,
         sellerName: 'شركة الأمل للتجارة',
         vatNumber: '300123456789003',
         timestamp: DateTime.now(),
@@ -683,6 +688,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // WiFi QR Code
       final wifiQR = GeniusPdfQRCodeGenerator.wifi(
+        config: geniusPdfConfig,
         ssid: 'GeniusOffice',
         password: 'Genius@2025',
         style: GeniusPdfQRCodeStyle.branded(
@@ -698,6 +704,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // vCard QR Code
       final vCardQR = GeniusPdfQRCodeGenerator.vCard(
+        config: geniusPdfConfig,
         name: _isRTL ? 'أحمد محمد' : 'Ahmed Mohammed',
         phone: '+966501234567',
         email: 'ahmed@example.com',
@@ -767,6 +774,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // EAN-13
       final ean13 = GeniusPdfBarcode.ean13(
+        config: geniusPdfConfig,
         data: '5901234123457',
         caption: 'EAN-13',
         style: const GeniusPdfBarcodeStyle.compact(),
@@ -780,6 +788,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // Code 128
       final code128 = GeniusPdfBarcode.code128(
+        config: geniusPdfConfig,
         data: 'GENIUS-2025',
         caption: 'Code 128',
         style: const GeniusPdfBarcodeStyle.compact(),
@@ -812,6 +821,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // URL QR
       final urlQR = GeniusPdfQRCodeGenerator.url(
+        config: geniusPdfConfig,
         url: 'https://genius.systems',
         caption: 'URL',
         captionAr: 'رابط',
@@ -826,6 +836,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // ZATCA QR
       final zatcaQR = GeniusPdfQRCodeGenerator.zatca(
+        config: geniusPdfConfig,
         sellerName: 'شركة الأمل',
         vatNumber: '300123456789003',
         timestamp: DateTime.now(),
@@ -842,6 +853,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
 
       // WiFi QR
       final wifiQR = GeniusPdfQRCodeGenerator.wifi(
+        config: geniusPdfConfig,
         ssid: 'Office',
         password: 'pass123',
         style: const GeniusPdfQRCodeStyle.compact(),

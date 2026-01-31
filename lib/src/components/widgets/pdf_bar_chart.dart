@@ -3,27 +3,33 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../core/pdf_config.dart';
+import '../../core/pdf_print_theme.dart';
 import '../models/chart_models.dart';
 import 'package:syncfusion_flutter_pdf/src/pdf/implementation/graphics/figures/base/text_layouter.dart';
 
 /// مخطط الأعمدة للـ PDF
 /// Bar chart component for PDF documents
 class GeniusPdfBarChart {
-  const GeniusPdfBarChart({
+  GeniusPdfBarChart({
     this.title,
     this.titleAr,
     required this.series,
     this.xAxis = const GeniusChartAxis(),
     this.yAxis = const GeniusChartAxis(),
     this.legend = const GeniusChartLegend(),
-    this.style = const GeniusChartStyle(),
+    required this.config,
+    GeniusChartStyle? style,
     this.settings = const GeniusBarChartSettings(),
     this.width,
     this.height = 250,
-    this.isRtl = false,
-    required this.baseFont,
-    required this.boldFont,
-  });
+    bool? isRtl,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+  })  : style = _resolveChartStyle(style, config),
+        baseFont = _resolveBaseFont(baseFont, config),
+        boldFont = _resolveBoldFont(boldFont, baseFont, config),
+        isRtl = isRtl ?? config.isRTL;
 
   /// عنوان المخطط
   final String? title;
@@ -46,6 +52,9 @@ class GeniusPdfBarChart {
   /// نمط المخطط
   final GeniusChartStyle style;
 
+  /// PDF configuration
+  final GeniusPdfConfig config;
+
   /// إعدادات المخطط الشريطي
   final GeniusBarChartSettings settings;
 
@@ -63,6 +72,43 @@ class GeniusPdfBarChart {
 
   /// الخط العريض (مطلوب للعناوين)
   final PdfFont boldFont;
+
+  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+    return baseFont ?? config.baseFont;
+  }
+
+  static PdfFont _resolveBoldFont(
+    PdfFont? boldFont,
+    PdfFont? baseFont,
+    GeniusPdfConfig config,
+  ) {
+    return boldFont ?? config.boldFont;
+  }
+
+  static GeniusChartStyle _resolveChartStyle(
+    GeniusChartStyle? style,
+    GeniusPdfConfig config,
+  ) {
+    if (style != null) return style;
+    return _chartStyleFromTheme(config.printTheme);
+  }
+
+  static GeniusChartStyle _chartStyleFromTheme(GeniusPdfPrintTheme theme) {
+    final colors = theme.colorScheme;
+    final typography = theme.typography;
+
+    return GeniusChartStyle(
+      backgroundColor: colors.surface,
+      textColor: colors.onSurface,
+      axisColor: colors.dividerColor,
+      titleFontSize: typography.headingSize,
+      labelFontSize: typography.bodySize,
+      valueFontSize: typography.captionSize,
+      padding: theme.spacing.md,
+      showBorder: true,
+      borderColor: colors.borderColor,
+    );
+  }
 
   /// الحصول على العنوان حسب اتجاه النص
   String? get displayTitle => isRtl ? (titleAr ?? title) : title;

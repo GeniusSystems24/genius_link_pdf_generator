@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfBorderStyle, PdfTextStyle;
 
+import '../../core/pdf_config.dart';
+import '../../core/pdf_print_theme.dart';
 import '../../core/pdf_logger.dart';
 import '../../extensions/color_extensions.dart';
 import '../../models/pdf_image.dart';
@@ -86,6 +88,43 @@ class GeniusPdfInfoBoxStyle {
     this.itemSeparatorColor,
     this.itemSeparatorWidth = 0.25,
   });
+
+  /// Creates a style from [GeniusPdfPrintTheme].
+  factory GeniusPdfInfoBoxStyle.fromTheme(GeniusPdfPrintTheme theme) {
+    final infoTheme =
+        theme.infoBoxTheme ?? const GeniusPdfInfoBoxTheme.defaults();
+    final typography = theme.typography;
+
+    return GeniusPdfInfoBoxStyle(
+      backgroundColor: infoTheme.backgroundColor,
+      borderStyle: GeniusPdfBorderStyle.all(
+        width: infoTheme.borderWidth,
+        color: infoTheme.borderColor,
+      ),
+      borderRadius: infoTheme.borderRadius,
+      padding: infoTheme.padding,
+      titleStyle: GeniusPdfTextStyle.header(
+        fontSize: typography.headingSize,
+        color: infoTheme.titleColor,
+      ),
+      contentStyle: GeniusPdfTextStyle(
+        fontSize: typography.bodySize,
+        color: infoTheme.valueColor,
+      ),
+      labelStyle: GeniusPdfTextStyle(
+        fontSize: typography.captionSize,
+        color: infoTheme.labelColor,
+      ),
+      valueStyle: GeniusPdfTextStyle(
+        fontSize: typography.bodySize,
+        color: infoTheme.valueColor,
+      ),
+      headerBackgroundColor: infoTheme.headerBackgroundColor,
+      showDivider: infoTheme.showDivider,
+      dividerColor: infoTheme.dividerColor,
+      dividerWidth: infoTheme.borderWidth,
+    );
+  }
 
   /// Creates a bordered card style.
   const GeniusPdfInfoBoxStyle.card({
@@ -683,15 +722,16 @@ class GeniusPdfInfoBoxStyle {
 /// ```
 class GeniusPdfInfoBox {
   GeniusPdfInfoBox({
+    required this.config,
     this.title,
     this.titleAr,
     this.subtitle,
     this.subtitleAr,
     this.items = const [],
-    this.style = const GeniusPdfInfoBoxStyle(),
-    required this.baseFont,
-    required this.boldFont,
-    this.isRTL = true,
+    GeniusPdfInfoBoxStyle? style,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
     this.icon,
     this.footer,
     this.footerAr,
@@ -701,7 +741,10 @@ class GeniusPdfInfoBox {
     this.columns = 1,
     this.columnSpacing = 16,
     this.tag,
-  });
+  })  : style = _resolveInfoBoxStyle(style, config),
+        baseFont = _resolveBaseFont(baseFont, config),
+        boldFont = _resolveBoldFont(boldFont, baseFont, config),
+        isRTL = isRTL ?? config.isRTL;
 
   /// Creates an info box from a map of key-value pairs.
   factory GeniusPdfInfoBox.fromMap({
@@ -709,29 +752,36 @@ class GeniusPdfInfoBox {
     Map<String, String>? labelTranslations,
     String? title,
     String? titleAr,
-    GeniusPdfInfoBoxStyle style = const GeniusPdfInfoBoxStyle(),
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
+    required GeniusPdfConfig config,
+    GeniusPdfInfoBoxStyle? style,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
   }) {
+    final resolvedBase = _resolveBaseFont(baseFont, config);
+    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
+    final resolvedIsRtl = isRTL ?? config.isRTL;
+
     final items = <GeniusPdfLabeledValue>[];
     for (final entry in data.entries) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: entry.key,
         labelAr: labelTranslations?[entry.key],
         value: entry.value?.toString() ?? '',
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
     return GeniusPdfInfoBox(
       title: title,
       titleAr: titleAr,
       items: items,
+      config: config,
       style: style,
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
+      isRTL: resolvedIsRtl,
     );
   }
 
@@ -749,37 +799,45 @@ class GeniusPdfInfoBox {
     String? email,
     String title = 'Address',
     String titleAr = 'العنوان',
+    required GeniusPdfConfig config,
     GeniusPdfInfoBoxStyle? style,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
   }) {
+    final resolvedBase = _resolveBaseFont(baseFont, config);
+    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
+    final resolvedIsRtl = isRTL ?? config.isRTL;
+
     final items = <GeniusPdfLabeledValue>[];
 
     items.add(GeniusPdfLabeledValue(
+      config: config,
       label: 'Name',
       labelAr: 'الاسم',
       value: name,
-      baseFont: baseFont,
-      boldFont: boldFont,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
     ));
 
     if (line1 != null && line1.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Address',
         labelAr: 'العنوان',
         value: line1,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (line2 != null && line2.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: '',
         value: line2,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
@@ -788,41 +846,45 @@ class GeniusPdfInfoBox {
         .join(', ');
     if (cityLine.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'City',
         labelAr: 'المدينة',
         value: cityLine,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (country != null && country.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Country',
         labelAr: 'الدولة',
         value: country,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (phone != null && phone.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Phone',
         labelAr: 'الهاتف',
         value: phone,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (email != null && email.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Email',
         labelAr: 'البريد',
         value: email,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
@@ -830,10 +892,11 @@ class GeniusPdfInfoBox {
       title: title,
       titleAr: titleAr,
       items: items,
+      config: config,
       style: style ?? const GeniusPdfInfoBoxStyle.card(),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
+      isRTL: resolvedIsRtl,
     );
   }
 
@@ -849,78 +912,90 @@ class GeniusPdfInfoBox {
     String? address,
     String title = 'Company Information',
     String titleAr = 'معلومات الشركة',
+    required GeniusPdfConfig config,
     GeniusPdfInfoBoxStyle? style,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
   }) {
+    final resolvedBase = _resolveBaseFont(baseFont, config);
+    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
+    final resolvedIsRtl = isRTL ?? config.isRTL;
+
     final items = <GeniusPdfLabeledValue>[];
 
     items.add(GeniusPdfLabeledValue(
+      config: config,
       label: 'Company',
       labelAr: 'الشركة',
       value: companyName,
-      baseFont: baseFont,
-      boldFont: boldFont,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
     ));
 
     if (taxNumber != null && taxNumber.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Tax Number',
         labelAr: 'الرقم الضريبي',
         value: taxNumber,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (commercialReg != null && commercialReg.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Commercial Reg.',
         labelAr: 'السجل التجاري',
         value: commercialReg,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (phone != null && phone.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Phone',
         labelAr: 'الهاتف',
         value: phone,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (email != null && email.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Email',
         labelAr: 'البريد',
         value: email,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (website != null && website.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Website',
         labelAr: 'الموقع',
         value: website,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (address != null && address.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Address',
         labelAr: 'العنوان',
         value: address,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
@@ -928,10 +1003,11 @@ class GeniusPdfInfoBox {
       title: title,
       titleAr: titleAr,
       items: items,
+      config: config,
       style: style ?? GeniusPdfInfoBoxStyle.corporate(),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
+      isRTL: resolvedIsRtl,
     );
   }
 
@@ -946,68 +1022,79 @@ class GeniusPdfInfoBox {
     String? position,
     String title = 'Contact',
     String titleAr = 'جهة الاتصال',
+    required GeniusPdfConfig config,
     GeniusPdfInfoBoxStyle? style,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
   }) {
+    final resolvedBase = _resolveBaseFont(baseFont, config);
+    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
+    final resolvedIsRtl = isRTL ?? config.isRTL;
+
     final items = <GeniusPdfLabeledValue>[];
 
     items.add(GeniusPdfLabeledValue(
+      config: config,
       label: 'Name',
       labelAr: 'الاسم',
       value: name,
-      baseFont: baseFont,
-      boldFont: boldFont,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
     ));
 
     if (position != null && position.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Position',
         labelAr: 'المنصب',
         value: position,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (department != null && department.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Department',
         labelAr: 'القسم',
         value: department,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (phone != null && phone.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Phone',
         labelAr: 'الهاتف',
         value: phone,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (mobile != null && mobile.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Mobile',
         labelAr: 'الجوال',
         value: mobile,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
     if (email != null && email.isNotEmpty) {
       items.add(GeniusPdfLabeledValue(
+        config: config,
         label: 'Email',
         labelAr: 'البريد',
         value: email,
-        baseFont: baseFont,
-        boldFont: boldFont,
+        baseFont: resolvedBase,
+        boldFont: resolvedBold,
       ));
     }
 
@@ -1015,10 +1102,11 @@ class GeniusPdfInfoBox {
       title: title,
       titleAr: titleAr,
       items: items,
+      config: config,
       style: style ?? const GeniusPdfInfoBoxStyle.card(),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
+      baseFont: resolvedBase,
+      boldFont: resolvedBold,
+      isRTL: resolvedIsRtl,
     );
   }
 
@@ -1039,6 +1127,9 @@ class GeniusPdfInfoBox {
 
   /// Box style configuration.
   final GeniusPdfInfoBoxStyle style;
+
+  /// PDF configuration.
+  final GeniusPdfConfig config;
 
   /// Base font for text.
   final PdfFont baseFont;
@@ -1122,6 +1213,7 @@ class GeniusPdfInfoBox {
     String? tag,
   }) {
     return GeniusPdfInfoBox(
+      config: config,
       title: title ?? this.title,
       titleAr: titleAr ?? this.titleAr,
       subtitle: subtitle ?? this.subtitle,
@@ -1226,9 +1318,8 @@ class GeniusPdfInfoBox {
       // Draw icon if present
       if (icon != null) {
         final iconY = currentY + (_getTitleHeight() - style.iconSize) / 2;
-        final iconX = isRTL
-            ? (titleLeft + titleWidth - style.iconSize)
-            : titleLeft;
+        final iconX =
+            isRTL ? (titleLeft + titleWidth - style.iconSize) : titleLeft;
 
         graphics.drawImage(
           PdfBitmap(icon!.data),
@@ -1268,8 +1359,7 @@ class GeniusPdfInfoBox {
       final displaySubtitle = getSubtitle();
       if (displaySubtitle != null && displaySubtitle.isNotEmpty) {
         currentY += 2;
-        final subtitleColor =
-            style.titleStyle.color.withValues(alpha: 0.7);
+        final subtitleColor = style.titleStyle.color.withValues(alpha: 0.7);
         graphics.drawString(
           displaySubtitle,
           baseFont,
@@ -1362,7 +1452,7 @@ class GeniusPdfInfoBox {
     if (displayFooter != null && displayFooter.isNotEmpty) {
       currentY += style.itemSpacing;
       final defaultFooterColor =
-        style.contentStyle.color.withValues(alpha: 0.7);
+          style.contentStyle.color.withValues(alpha: 0.7);
       final effectiveFooterStyle = footerStyle ??
           GeniusPdfTextStyle(
             fontSize: style.contentStyle.fontSize * 0.9,
@@ -1393,6 +1483,7 @@ class GeniusPdfInfoBox {
 
   GeniusPdfLabeledValue _createLabeledValue(GeniusPdfLabeledValue item) {
     return GeniusPdfLabeledValue(
+      config: config,
       label: item.label,
       labelAr: item.labelAr,
       value: item.value.isEmpty ? emptyItemPlaceholder : item.value,
@@ -1454,6 +1545,26 @@ class GeniusPdfInfoBox {
       return style.contentStyle.fontSize * 2.4;
     }
     return style.contentStyle.fontSize * 1.4;
+  }
+
+  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+    return baseFont ?? config.baseFont;
+  }
+
+  static PdfFont _resolveBoldFont(
+    PdfFont? boldFont,
+    PdfFont? baseFont,
+    GeniusPdfConfig config,
+  ) {
+    return boldFont ?? config.boldFont;
+  }
+
+  static GeniusPdfInfoBoxStyle _resolveInfoBoxStyle(
+    GeniusPdfInfoBoxStyle? style,
+    GeniusPdfConfig config,
+  ) {
+    if (style != null) return style;
+    return GeniusPdfInfoBoxStyle.fromTheme(config.printTheme);
   }
 
   /// Draws border lines around a rectangle based on [GeniusPdfBorderStyle].
@@ -1656,7 +1767,8 @@ class GeniusPdfDualInfoBox {
     required PdfPage page,
     required Rect bounds,
   }) {
-    GeniusPdfLogger.debug('Drawing DualInfoBox: layout=${layout.name}', tag: 'InfoBox');
+    GeniusPdfLogger.debug('Drawing DualInfoBox: layout=${layout.name}',
+        tag: 'InfoBox');
     final graphics = page.graphics;
     final contentBounds = Rect.fromLTWH(
       bounds.left + padding.left,
@@ -2138,6 +2250,7 @@ class GeniusPdfSectionStyle {
 /// ```
 class GeniusPdfSection {
   GeniusPdfSection({
+    required this.config,
     this.title,
     this.titleAr,
     this.subtitle,
@@ -2150,9 +2263,9 @@ class GeniusPdfSection {
     @Deprecated('Use style.titleStyle instead') GeniusPdfTextStyle titleStyle =
         const GeniusPdfTextStyle.header(fontSize: 11),
     GeniusPdfSectionStyle? style,
-    required this.baseFont,
-    required this.boldFont,
-    this.isRTL = true,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
     this.icon,
     this.iconColor,
     this.tag,
@@ -2160,13 +2273,16 @@ class GeniusPdfSection {
     this.pageBreakBefore = false,
     this.minHeight,
     this.maxHeight,
-  }) : style = style ??
+  })  : style = style ??
             GeniusPdfSectionStyle(
               backgroundColor: backgroundColor,
               borderStyle: borderStyle,
               padding: padding,
               titleStyle: titleStyle,
-            );
+            ),
+        baseFont = _resolveBaseFont(baseFont, config),
+        boldFont = _resolveBoldFont(boldFont, baseFont, config),
+        isRTL = isRTL ?? config.isRTL;
 
   /// Creates a titled section with corporate styling.
   factory GeniusPdfSection.corporate({
@@ -2175,11 +2291,13 @@ class GeniusPdfSection {
     String? subtitle,
     String? subtitleAr,
     Color primaryColor = const Color(0xFF1565C0),
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
   }) {
     return GeniusPdfSection(
+      config: config,
       title: title,
       titleAr: titleAr,
       subtitle: subtitle,
@@ -2199,11 +2317,13 @@ class GeniusPdfSection {
     String? subtitleAr,
     Color borderColor = const Color(0xFFE0E0E0),
     Color? backgroundColor = const Color(0xFFFFFFFF),
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
   }) {
     return GeniusPdfSection(
+      config: config,
       title: title,
       titleAr: titleAr,
       subtitle: subtitle,
@@ -2233,6 +2353,9 @@ class GeniusPdfSection {
   /// Section style configuration.
   final GeniusPdfSectionStyle style;
 
+  /// PDF configuration.
+  final GeniusPdfConfig config;
+
   /// Base font for text.
   final PdfFont baseFont;
 
@@ -2241,6 +2364,18 @@ class GeniusPdfSection {
 
   /// Whether to use RTL layout.
   final bool isRTL;
+
+  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+    return baseFont ?? config.baseFont;
+  }
+
+  static PdfFont _resolveBoldFont(
+    PdfFont? boldFont,
+    PdfFont? baseFont,
+    GeniusPdfConfig config,
+  ) {
+    return boldFont ?? config.boldFont;
+  }
 
   /// Optional icon identifier.
   final String? icon;

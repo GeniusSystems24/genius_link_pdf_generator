@@ -73,6 +73,7 @@ class _DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
     );
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         GeniusPdfGridColumn(
           id: 'code',
@@ -157,10 +158,12 @@ class _DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
     );
 
     final noteBox = GeniusPdfInfoBox(
+      config: config,
       title: _isRTL ? 'ملاحظة' : 'Note',
       titleAr: 'ملاحظة',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: _isRTL ? 'المراجعة' : 'Validation',
           labelAr: 'المراجعة',
           value: _isRTL
@@ -207,6 +210,7 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
     double yOffset = 70;
 
     final heading = GeniusPdfRichTextBuilder(
+      config: config,
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
@@ -219,6 +223,7 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
     heading.draw(page: page, bounds: Rect.fromLTWH(20, yOffset, w, 25));
 
     final invoiceLine = GeniusPdfRichTextBuilder(
+      config: config,
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
@@ -231,6 +236,7 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
         page: page, bounds: Rect.fromLTWH(20, yOffset + 30, w, 25));
 
     final totalLine = GeniusPdfRichTextBuilder(
+      config: config,
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
@@ -244,6 +250,7 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
     totalLine.draw(page: page, bounds: Rect.fromLTWH(20, yOffset + 55, w, 25));
 
     final priceLine = GeniusPdfRichTextBuilder(
+      config: config,
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
@@ -257,6 +264,7 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
     priceLine.draw(page: page, bounds: Rect.fromLTWH(20, yOffset + 80, w, 25));
 
     final noteLine = GeniusPdfRichTextBuilder(
+      config: config,
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
@@ -284,6 +292,7 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
           ],
         ),
       ],
+      config: config,
       style: GeniusPdfBulletStyle.disc,
       baseFont: baseFont,
       boldFont: bFont,
@@ -302,11 +311,13 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
+      config: config,
     );
     mdRichText.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 265, w, 25));
 
     final linkLine = GeniusPdfRichTextBuilder(
+      config: config,
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
@@ -342,6 +353,7 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
+      config: config,
     );
     autoRichText.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 325, w, 25));
@@ -356,6 +368,7 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
+      config: config,
     );
     colorRichText.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 355, w, 25));
@@ -386,10 +399,12 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
     double yOffset = 70;
 
     final customerBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Customer Info',
       titleAr: 'بيانات العميل',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Name',
           labelAr: 'الاسم',
           value: _isRTL ? 'أحمد محمد' : 'Ahmed Mohammed',
@@ -398,6 +413,7 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
           isRTL: _isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Phone',
           labelAr: 'الهاتف',
           value: '+966 50 123 4567',
@@ -406,6 +422,7 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
           isRTL: _isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Email',
           labelAr: 'البريد',
           value: 'ahmed@example.com',
@@ -414,6 +431,7 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
           isRTL: _isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Address',
           labelAr: 'العنوان',
           value: _isRTL ? 'الرياض، السعودية' : 'Riyadh, Saudi Arabia',
@@ -436,6 +454,7 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
           _isRTL ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia',
       phone: '+966 11 123 4567',
       email: 'info@alamal.com',
+      config: config,
       baseFont: baseFont,
       boldFont: bFont,
       isRTL: _isRTL,
@@ -457,10 +476,12 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
     final statusWidth = (pageSize.width - 70) / 2;
 
     final infoBox = GeniusPdfInfoBox(
+      config: config,
       title: _isRTL ? 'معلومة' : 'Info',
       titleAr: 'معلومة',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: _isRTL ? 'ملاحظة' : 'Note',
           labelAr: 'ملاحظة',
           value: _isRTL
@@ -482,10 +503,12 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
     );
 
     final warningBox = GeniusPdfInfoBox(
+      config: config,
       title: _isRTL ? 'تحذير' : 'Warning',
       titleAr: 'تحذير',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: _isRTL ? 'تنبيه' : 'Alert',
           labelAr: 'تنبيه',
           value: _isRTL ? 'مستند للمعاينة فقط' : 'Preview only document',
@@ -506,10 +529,12 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
     yOffset += 85;
 
     final successBox = GeniusPdfInfoBox(
+      config: config,
       title: _isRTL ? 'نجاح' : 'Success',
       titleAr: 'نجاح',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: _isRTL ? 'الحالة' : 'Status',
           labelAr: 'الحالة',
           value: _isRTL ? 'تم إتمام العملية بنجاح' : 'Operation completed',
@@ -529,10 +554,12 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
     );
 
     final errorBox = GeniusPdfInfoBox(
+      config: config,
       title: _isRTL ? 'خطأ' : 'Error',
       titleAr: 'خطأ',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: _isRTL ? 'المشكلة' : 'Issue',
           labelAr: 'المشكلة',
           value: _isRTL ? 'فشل في معالجة الطلب' : 'Failed to process',
@@ -592,6 +619,7 @@ class _HeadersDemoBuilder extends GeniusPdfDocumentBuilder {
     );
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Tax Invoice',
       titleAr: 'فاتورة ضريبية',
       subtitle: 'Invoice #INV-2024-001',
@@ -611,6 +639,7 @@ class _HeadersDemoBuilder extends GeniusPdfDocumentBuilder {
     yOffset = result + 15;
 
     final bilingualHeader = GeniusPdfReportHeader.bilingualSplit(
+      config: config,
       title: 'Trial Balance',
       titleAr: 'ميزان المراجعة',
       subtitle: 'As of December 31, 2025',
@@ -650,6 +679,7 @@ class _SummaryDemoBuilder extends GeniusPdfDocumentBuilder {
     );
 
     final summary = GeniusPdfSummarySection(
+      config: config,
       items: [
         GeniusPdfSummaryItem(
           label: 'Subtotal',
@@ -696,10 +726,12 @@ class _SummaryDemoBuilder extends GeniusPdfDocumentBuilder {
     );
 
     final note = GeniusPdfInfoBox(
+      config: config,
       title: _isRTL ? 'توضيح' : 'Note',
       titleAr: 'توضيح',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: _isRTL ? 'الحساب' : 'Calculation',
           labelAr: 'الحساب',
           value: _isRTL

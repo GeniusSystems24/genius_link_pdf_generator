@@ -166,6 +166,7 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
       onGenerate: () => _generatePdf('data_grid'),
       codeExample: '''
 final grid = GeniusPdfDataGrid(
+  config: config,
   columns: [
     GeniusPdfGridColumn.numeric(id: 'code', title: 'الكود', width: 60),
     GeniusPdfGridColumn(id: 'desc', title: 'الوصف', flex: 2),
@@ -285,6 +286,7 @@ final grid = GeniusPdfDataGrid(
       codeExample: '''
 // ─── Fluent Builder API ────────────────────────
 final richText = GeniusPdfRichTextBuilder(
+  config: config,
   baseFont: config.baseFont,
   boldFont: config.boldFont,
   isRTL: true,
@@ -339,6 +341,7 @@ final list = GeniusPdfBulletList(
     GeniusPdfBulletItem.simple('البند الأول'),
     GeniusPdfBulletItem.simple('البند الثاني'),
   ],
+  config: config,
   style: GeniusPdfBulletStyle.disc,
   baseFont: config.baseFont,
   boldFont: config.boldFont,
@@ -529,10 +532,12 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
       codeExample: '''
 // Status-themed info boxes
 final infoBox = GeniusPdfInfoBox(
+  config: config,
   title: 'ملاحظة هامة',
   style: GeniusPdfInfoBoxStyle.info(),
   items: [
     GeniusPdfLabeledValue(
+      config: config,
       label: 'التفاصيل',
       value: 'يرجى الاحتفاظ بهذه الفاتورة...',
     ),
@@ -543,6 +548,7 @@ final infoBox = GeniusPdfInfoBox(
 
 // Pre-configured company factory
 final companyBox = GeniusPdfInfoBox.company(
+  config: config,
   companyName: 'شركة الأمل للتجارة',
   taxNumber: '300123456789003',
   commercialReg: '1010123456',
@@ -638,6 +644,7 @@ final dualBox = GeniusPdfDualInfoBox(
       codeExample: '''
 // Standard invoice header
 final header = GeniusPdfReportHeader(
+  config: config,
   title: 'Tax Invoice',
   titleAr: 'فاتورة ضريبية',
   company: companyInfo,
@@ -649,6 +656,7 @@ final header = GeniusPdfReportHeader(
 
 // Bilingual split: English left, logo center, Arabic right
 final bilingualHeader = GeniusPdfReportHeader.bilingualSplit(
+  config: config,
   title: 'Trial Balance',
   titleAr: 'ميزان المراجعة',
   company: companyInfo,
@@ -802,6 +810,7 @@ final bilingualHeader = GeniusPdfReportHeader.bilingualSplit(
       onGenerate: () => _generatePdf('summary'),
       codeExample: '''
 final summary = GeniusPdfSummarySection(
+  config: config,
   items: [
     GeniusPdfSummaryItem(
       label: 'Subtotal',

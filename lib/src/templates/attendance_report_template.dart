@@ -204,6 +204,7 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
         '${_formatDate(data.periodStart)} - ${_formatDate(data.periodEnd)}';
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: title,
       subtitle: 'Period: $periodText',
       subtitleAr: 'الفترة: $periodText',
@@ -390,6 +391,7 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
     }).toList();
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.modern(),
@@ -439,6 +441,7 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
 
       // Daily attendance grid
       final grid = GeniusPdfDataGrid(
+        config: config,
         columns: [
           const GeniusPdfGridColumn(
             id: 'date',

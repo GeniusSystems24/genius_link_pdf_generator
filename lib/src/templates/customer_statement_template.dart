@@ -174,6 +174,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Customer Statement of Account',
       titleAr: 'كشف حساب عميل',
       subtitle:
@@ -199,10 +200,12 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawInfoSection() {
     final customerBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Customer Details',
       titleAr: 'تفاصيل العميل',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Customer Name',
           labelAr: 'اسم العميل',
           value: customer.getName(isArabic: config.isRTL),
@@ -212,6 +215,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (customer.address != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Address',
             labelAr: 'العنوان',
             value: config.isRTL
@@ -223,6 +227,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (customer.accountNumber != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Account No',
             labelAr: 'رقم الحساب',
             value: customer.accountNumber!,
@@ -232,6 +237,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (customer.phone != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Phone',
             labelAr: 'رقم الهاتف',
             value: customer.phone!,
@@ -247,10 +253,12 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
     );
 
     final periodBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Statement Details',
       titleAr: 'تفاصيل الكشف',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Period From',
           labelAr: 'من تاريخ',
           value: _formatDate(data.periodFrom),
@@ -259,6 +267,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
           isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Period To',
           labelAr: 'إلى تاريخ',
           value: _formatDate(data.periodTo),
@@ -267,6 +276,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
           isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Opening Balance',
           labelAr: 'الرصيد الافتتاحي',
           value: _formatNumber(data.openingBalance),
@@ -275,6 +285,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
           isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Currency',
           labelAr: 'العملة',
           value: data.currency,
@@ -401,6 +412,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
     ));
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.classic(),
@@ -435,6 +447,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
 
     // Aging table
     final agingGrid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'period',

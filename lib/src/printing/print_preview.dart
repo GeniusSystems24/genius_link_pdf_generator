@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 
+import '../core/pdf_config.dart';
 import '../core/pdf_logger.dart';
 import 'printer_models.dart';
 import 'printer_service.dart';
@@ -21,6 +22,7 @@ class GeniusPrintPreview extends StatefulWidget {
     super.key,
     required this.pdfBytes,
     required this.documentName,
+    required this.config,
     this.initialSettings,
     this.showSettings = true,
     this.showThumbnails = true,
@@ -34,6 +36,9 @@ class GeniusPrintPreview extends StatefulWidget {
 
   /// Document name for printing
   final String documentName;
+
+  /// Optional PDF configuration for defaults
+  final GeniusPdfConfig config;
 
   /// Initial print settings
   final GeniusPrintSettings? initialSettings;
@@ -71,7 +76,8 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
   @override
   void initState() {
     super.initState();
-    _settings = widget.initialSettings ?? GeniusPrintSettings.defaults();
+    _settings = widget.initialSettings ??
+        GeniusPrintSettings.fromPdfConfig(widget.config);
     _countPages();
   }
 
@@ -324,6 +330,7 @@ class _GeniusPrintPreviewState extends State<GeniusPrintPreview> {
         pdfBytes: widget.pdfBytes,
         documentName: widget.documentName,
         settings: _settings,
+        config: widget.config,
       );
 
       if (mounted) {
@@ -761,6 +768,7 @@ class GeniusPrintPreviewDialog {
     required BuildContext context,
     required Uint8List pdfBytes,
     required String documentName,
+    required GeniusPdfConfig config,
     GeniusPrintSettings? initialSettings,
     bool showSettings = true,
   }) {
@@ -771,6 +779,7 @@ class GeniusPrintPreviewDialog {
         child: GeniusPrintPreview(
           pdfBytes: pdfBytes,
           documentName: documentName,
+          config: config,
           initialSettings: initialSettings,
           showSettings: showSettings,
           onCancel: () => Navigator.of(context).pop(false),
@@ -787,6 +796,7 @@ class GeniusPrintPreviewEnhanced extends StatefulWidget {
     super.key,
     required this.pdfBytes,
     required this.documentName,
+    required this.pdfConfig,
     this.initialSettings,
     this.showSettings = true,
     this.showShareButton = true,
@@ -804,6 +814,9 @@ class GeniusPrintPreviewEnhanced extends StatefulWidget {
 
   /// Document name
   final String documentName;
+
+  /// Optional PDF configuration for defaults
+  final GeniusPdfConfig pdfConfig;
 
   /// Initial print settings
   final GeniusPrintSettings? initialSettings;
@@ -849,7 +862,8 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
   @override
   void initState() {
     super.initState();
-    _settings = widget.initialSettings ?? GeniusPrintSettings.defaults();
+    _settings = widget.initialSettings ??
+        GeniusPrintSettings.fromPdfConfig(widget.pdfConfig);
   }
 
   @override
@@ -1104,6 +1118,7 @@ class _GeniusPrintPreviewEnhancedState extends State<GeniusPrintPreviewEnhanced>
         pdfBytes: widget.pdfBytes,
         documentName: widget.documentName,
         settings: _settings,
+        config: widget.pdfConfig,
       );
 
       if (mounted) {
@@ -1288,6 +1303,7 @@ class GeniusPrintPreviewEnhancedDialog {
     required BuildContext context,
     required Uint8List pdfBytes,
     required String documentName,
+    required GeniusPdfConfig pdfConfig,
     GeniusPrintSettings? initialSettings,
     bool showSettings = true,
     bool showShareButton = true,
@@ -1300,6 +1316,7 @@ class GeniusPrintPreviewEnhancedDialog {
         child: GeniusPrintPreviewEnhanced(
           pdfBytes: pdfBytes,
           documentName: documentName,
+          pdfConfig: pdfConfig,
           initialSettings: initialSettings,
           showSettings: showSettings,
           showShareButton: showShareButton,

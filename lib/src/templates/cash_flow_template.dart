@@ -170,6 +170,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
         '${_formatDate(data.periodStart)} - ${_formatDate(data.periodEnd)}';
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Statement of Cash Flows',
       titleAr: 'قائمة التدفقات النقدية',
       subtitle: 'For the period $periodText',

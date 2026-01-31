@@ -295,24 +295,28 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
       switch (type) {
         case 'confidential':
           document.addWatermark(GeniusPdfWatermark.confidential(
+            config: geniusPdfConfig,
             baseFont: geniusPdfConfig.baseFont,
             boldFont: geniusPdfConfig.boldFont,
           ));
           break;
         case 'draft':
           document.addWatermark(GeniusPdfWatermark.draft(
+            config: geniusPdfConfig,
             baseFont: geniusPdfConfig.baseFont,
             boldFont: geniusPdfConfig.boldFont,
           ));
           break;
         case 'copy':
           document.addWatermark(GeniusPdfWatermark.copy(
+            config: geniusPdfConfig,
             baseFont: geniusPdfConfig.baseFont,
             boldFont: geniusPdfConfig.boldFont,
           ));
           break;
         case 'tiled':
           GeniusPdfWatermark.tiled(
+            config: geniusPdfConfig,
             GeniusTiledWatermarkSettings(
               text: 'SAMPLE',
               fontSize: 20,
@@ -327,6 +331,7 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
           break;
         case 'custom':
           GeniusPdfWatermark.text(
+            config: geniusPdfConfig,
             GeniusTextWatermarkSettings(
               text: 'GENIUS LINK',
               fontSize: 50,
@@ -447,6 +452,7 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
       switch (type) {
         case 'visual':
           final signature = GeniusPdfDigitalSignature(
+            config: geniusPdfConfig,
             baseFont: geniusPdfConfig.baseFont,
             boldFont: geniusPdfConfig.boldFont,
             settings: GeniusDigitalSignatureSettings(
@@ -458,6 +464,7 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
           break;
         case 'detailed':
           final signature = GeniusPdfDigitalSignature(
+            config: geniusPdfConfig,
             baseFont: geniusPdfConfig.baseFont,
             boldFont: geniusPdfConfig.boldFont,
             settings: GeniusDigitalSignatureSettings(
@@ -478,6 +485,7 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
           break;
         case 'multiple':
           final sig1 = GeniusPdfDigitalSignature(
+            config: geniusPdfConfig,
             baseFont: geniusPdfConfig.baseFont,
             boldFont: geniusPdfConfig.boldFont,
             settings: GeniusDigitalSignatureSettings(
@@ -491,6 +499,7 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
               page, Rect.fromLTWH(50, pageSize.height - 130, 180, 90));
 
           final sig2 = GeniusPdfDigitalSignature(
+            config: geniusPdfConfig,
             baseFont: geniusPdfConfig.baseFont,
             boldFont: geniusPdfConfig.boldFont,
             settings: GeniusDigitalSignatureSettings(
@@ -508,6 +517,7 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
           break;
         case 'custom':
           final signature = GeniusPdfDigitalSignature(
+            config: geniusPdfConfig,
             settings: GeniusDigitalSignatureSettings(
               signerName: 'CEO Signature',
               reason: 'Final Approval',
@@ -557,12 +567,14 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
       final page3 = document.pages.add();
 
       GeniusPdfWatermark.text(
+        config: geniusPdfConfig,
         GeniusTextWatermarkSettings.confidential(opacity: 0.15),
         baseFont: geniusPdfConfig.baseFont,
         boldFont: geniusPdfConfig.boldFont,
       ).applyToPage(page1);
 
       GeniusPdfWatermark.tiled(
+        config: geniusPdfConfig,
         GeniusTiledWatermarkSettings(
           text: 'SAMPLE',
           fontSize: 18,
@@ -572,7 +584,7 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
         boldFont: geniusPdfConfig.boldFont,
       ).applyToPage(page2);
 
-      final signature = GeniusPdfDigitalSignature(
+      final signature = GeniusPdfDigitalSignature(config: geniusPdfConfig,
         settings: GeniusDigitalSignatureSettings(
           signerName: 'Document Admin',
           reason: 'Comprehensive Demo',

@@ -7,7 +7,20 @@ import 'package:image/image.dart' as img;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../models/barcode_models.dart';
+import '../../core/pdf_config.dart';
 import '../../core/pdf_logger.dart';
+
+PdfFont _resolveBarcodeBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+  return baseFont ?? config.baseFont;
+}
+
+PdfFont? _resolveBarcodeBoldFont(
+  PdfFont? boldFont,
+  PdfFont? baseFont,
+  GeniusPdfConfig config,
+) {
+  return boldFont ?? config.boldFont;
+}
 
 // ============================================================================
 // GeniusPdfBarcode - 1D and 2D Barcode Component
@@ -39,31 +52,38 @@ class GeniusPdfBarcode {
     required this.type,
     this.caption,
     this.captionAr,
-    this.style = const GeniusPdfBarcodeStyle(),
-    required this.baseFont,
-    this.boldFont,
-    this.captionFont,
-    this.isRTL = true,
+    required this.config,
+    GeniusPdfBarcodeStyle? style,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    PdfFont? captionFont,
+    bool? isRTL,
     this.width,
     this.height,
-  });
+  })  : style = style ?? const GeniusPdfBarcodeStyle(),
+        baseFont = _resolveBarcodeBaseFont(baseFont, config),
+        boldFont = _resolveBarcodeBoldFont(boldFont, baseFont, config),
+        captionFont = captionFont,
+        isRTL = isRTL ?? config.isRTL;
 
   /// Creates an EAN-13 barcode.
   factory GeniusPdfBarcode.ean13({
     required String data,
     String? caption,
     String? captionAr,
+    required GeniusPdfConfig config,
     GeniusPdfBarcodeStyle style = const GeniusPdfBarcodeStyle.retail(),
-    required PdfFont baseFont,
+    PdfFont? baseFont,
     PdfFont? boldFont,
     PdfFont? captionFont,
-    bool isRTL = true,
+    bool? isRTL,
   }) {
     return GeniusPdfBarcode(
       data: data,
       type: GeniusBarcodeType.ean13,
       caption: caption,
       captionAr: captionAr,
+      config: config,
       style: style,
       baseFont: baseFont,
       boldFont: boldFont,
@@ -77,17 +97,19 @@ class GeniusPdfBarcode {
     required String data,
     String? caption,
     String? captionAr,
+    required GeniusPdfConfig config,
     GeniusPdfBarcodeStyle style = const GeniusPdfBarcodeStyle(),
-    required PdfFont baseFont,
+    PdfFont? baseFont,
     PdfFont? boldFont,
     PdfFont? captionFont,
-    bool isRTL = true,
+    bool? isRTL,
   }) {
     return GeniusPdfBarcode(
       data: data,
       type: GeniusBarcodeType.code128,
       caption: caption,
       captionAr: captionAr,
+      config: config,
       style: style,
       baseFont: baseFont,
       boldFont: boldFont,
@@ -101,10 +123,11 @@ class GeniusPdfBarcode {
     required String data,
     String trackingLabel = 'Tracking Number',
     String trackingLabelAr = 'رقم التتبع',
-    required PdfFont baseFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
     PdfFont? boldFont,
     PdfFont? captionFont,
-    bool isRTL = true,
+    bool? isRTL,
   }) {
     return GeniusPdfBarcode(
       data: data,
@@ -112,6 +135,7 @@ class GeniusPdfBarcode {
       caption: trackingLabel,
       captionAr: trackingLabelAr,
       style: const GeniusPdfBarcodeStyle.shipping(),
+      config: config,
       baseFont: baseFont,
       boldFont: boldFont,
       captionFont: captionFont,
@@ -124,6 +148,7 @@ class GeniusPdfBarcode {
   final String? caption;
   final String? captionAr;
   final GeniusPdfBarcodeStyle style;
+  final GeniusPdfConfig config;
   final PdfFont baseFont;
   final PdfFont? boldFont;
   final PdfFont? captionFont;
@@ -142,7 +167,9 @@ class GeniusPdfBarcode {
     required PdfPage page,
     required Rect bounds,
   }) {
-    GeniusPdfLogger.debug('Drawing barcode: ${type.name} data="${data.length > 20 ? '${data.substring(0, 20)}...' : data}"', tag: 'Barcode');
+    GeniusPdfLogger.debug(
+        'Drawing barcode: ${type.name} data="${data.length > 20 ? '${data.substring(0, 20)}...' : data}"',
+        tag: 'Barcode');
     final graphics = page.graphics;
     final pad = style.padding;
 
@@ -223,7 +250,8 @@ class GeniusPdfBarcode {
       currentY += barcodeHeight;
     } catch (e) {
       // Draw error text if barcode generation fails
-      GeniusPdfLogger.error('Barcode generation failed: ${type.name}', tag: 'Barcode', error: e);
+      GeniusPdfLogger.error('Barcode generation failed: ${type.name}',
+          tag: 'Barcode', error: e);
       graphics.drawString(
         'Error: $e',
         baseFont,
@@ -405,31 +433,39 @@ class GeniusPdfQRCodeGenerator {
     required this.data,
     this.caption,
     this.captionAr,
-    this.style = const GeniusPdfQRCodeStyle(),
-    required this.baseFont,
-    this.boldFont,
-    this.captionFont,
-    this.isRTL = true,
-  });
+    required this.config,
+    GeniusPdfQRCodeStyle? style,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    PdfFont? captionFont,
+    bool? isRTL,
+  })  : style = style ?? const GeniusPdfQRCodeStyle(),
+        baseFont = _resolveBarcodeBaseFont(baseFont, config),
+        boldFont = _resolveBarcodeBoldFont(boldFont, baseFont, config),
+        captionFont = captionFont,
+        isRTL = isRTL ?? config.isRTL;
 
   /// Creates a QR code for a URL.
   factory GeniusPdfQRCodeGenerator.url({
     required String url,
     String? caption,
     String? captionAr,
+    required GeniusPdfConfig config,
     GeniusPdfQRCodeStyle style = const GeniusPdfQRCodeStyle(),
-    required PdfFont baseFont,
+    PdfFont? baseFont,
     PdfFont? boldFont,
     PdfFont? captionFont,
-    bool isRTL = true,
+    bool? isRTL,
   }) {
     return GeniusPdfQRCodeGenerator(
       data: url,
       caption: caption ?? 'Scan to open',
       captionAr: captionAr ?? 'امسح للفتح',
+      config: config,
       style: style,
       baseFont: baseFont,
       boldFont: boldFont,
+      captionFont: captionFont,
       isRTL: isRTL,
     );
   }
@@ -444,11 +480,12 @@ class GeniusPdfQRCodeGenerator {
     required DateTime timestamp,
     required double total,
     required double vatAmount,
+    required GeniusPdfConfig config,
     GeniusPdfQRCodeStyle style = const GeniusPdfQRCodeStyle.invoice(),
-    required PdfFont baseFont,
+    PdfFont? baseFont,
     PdfFont? boldFont,
     PdfFont? captionFont,
-    bool isRTL = true,
+    bool? isRTL,
   }) {
     final tlvData = _encodeZatcaTlv(
       sellerName: sellerName,
@@ -462,6 +499,7 @@ class GeniusPdfQRCodeGenerator {
       data: tlvData,
       caption: 'ZATCA QR Code',
       captionAr: 'رمز هيئة الزكاة والضريبة',
+      config: config,
       style: style,
       baseFont: baseFont,
       boldFont: boldFont,
@@ -475,11 +513,12 @@ class GeniusPdfQRCodeGenerator {
     required String ssid,
     required String password,
     String encryption = 'WPA',
+    required GeniusPdfConfig config,
     GeniusPdfQRCodeStyle style = const GeniusPdfQRCodeStyle(),
-    required PdfFont baseFont,
+    PdfFont? baseFont,
     PdfFont? boldFont,
     PdfFont? captionFont,
-    bool isRTL = true,
+    bool? isRTL,
   }) {
     final wifiData = 'WIFI:T:$encryption;S:$ssid;P:$password;;';
 
@@ -487,6 +526,7 @@ class GeniusPdfQRCodeGenerator {
       data: wifiData,
       caption: 'WiFi: $ssid',
       captionAr: 'واي فاي: $ssid',
+      config: config,
       style: style,
       baseFont: baseFont,
       boldFont: boldFont,
@@ -503,10 +543,11 @@ class GeniusPdfQRCodeGenerator {
     String? company,
     String? address,
     GeniusPdfQRCodeStyle style = const GeniusPdfQRCodeStyle(),
-    required PdfFont baseFont,
+    required GeniusPdfConfig config,
+    PdfFont? baseFont,
     PdfFont? boldFont,
     PdfFont? captionFont,
-    bool isRTL = true,
+    bool? isRTL,
   }) {
     final vCardData = StringBuffer();
     vCardData.writeln('BEGIN:VCARD');
@@ -523,6 +564,7 @@ class GeniusPdfQRCodeGenerator {
       caption: name,
       captionAr: name,
       style: style,
+      config: config,
       baseFont: baseFont,
       boldFont: boldFont,
       captionFont: captionFont,
@@ -534,6 +576,7 @@ class GeniusPdfQRCodeGenerator {
   final String? caption;
   final String? captionAr;
   final GeniusPdfQRCodeStyle style;
+  final GeniusPdfConfig config;
   final PdfFont baseFont;
   final PdfFont? boldFont;
   final PdfFont? captionFont;
@@ -550,7 +593,9 @@ class GeniusPdfQRCodeGenerator {
     required PdfPage page,
     required Rect bounds,
   }) {
-    GeniusPdfLogger.debug('Drawing QR code: data="${data.length > 30 ? '${data.substring(0, 30)}...' : data}"', tag: 'QRCode');
+    GeniusPdfLogger.debug(
+        'Drawing QR code: data="${data.length > 30 ? '${data.substring(0, 30)}...' : data}"',
+        tag: 'QRCode');
     final graphics = page.graphics;
     final qrSize = style.size;
     final pad = style.padding;
@@ -599,7 +644,8 @@ class GeniusPdfQRCodeGenerator {
       currentY += qrSize;
     } catch (e) {
       // Draw error placeholder
-      GeniusPdfLogger.error('QR code generation failed', tag: 'QRCode', error: e);
+      GeniusPdfLogger.error('QR code generation failed',
+          tag: 'QRCode', error: e);
       graphics.drawString(
         'QR Error: $e',
         baseFont,
@@ -965,7 +1011,7 @@ class GeniusBarcodeValidationResult {
     this.errorMessageAr,
   });
 
-  /// Creates a valid result.
+  /// Creates an valid result with error message.
   factory GeniusBarcodeValidationResult.valid() {
     return const GeniusBarcodeValidationResult._(isValid: true);
   }
@@ -1077,8 +1123,9 @@ class GeniusBarcodeGroup {
         bounds: Rect.fromLTWH(bounds.left, currentY, bounds.width, 20),
         format: PdfStringFormat(
           alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-          textDirection:
-              isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+          textDirection: isRTL
+              ? PdfTextDirection.rightToLeft
+              : PdfTextDirection.leftToRight,
         ),
       );
       currentY += 24;
@@ -1086,16 +1133,26 @@ class GeniusBarcodeGroup {
 
     switch (layout) {
       case GeniusBarcodeGroupLayout.horizontal:
-        return _drawHorizontal(page, Rect.fromLTWH(bounds.left, currentY, bounds.width, bounds.height - (currentY - bounds.top)));
+        return _drawHorizontal(
+            page,
+            Rect.fromLTWH(bounds.left, currentY, bounds.width,
+                bounds.height - (currentY - bounds.top)));
       case GeniusBarcodeGroupLayout.vertical:
-        return _drawVertical(page, Rect.fromLTWH(bounds.left, currentY, bounds.width, bounds.height - (currentY - bounds.top)));
+        return _drawVertical(
+            page,
+            Rect.fromLTWH(bounds.left, currentY, bounds.width,
+                bounds.height - (currentY - bounds.top)));
       case GeniusBarcodeGroupLayout.grid:
-        return _drawGrid(page, Rect.fromLTWH(bounds.left, currentY, bounds.width, bounds.height - (currentY - bounds.top)));
+        return _drawGrid(
+            page,
+            Rect.fromLTWH(bounds.left, currentY, bounds.width,
+                bounds.height - (currentY - bounds.top)));
     }
   }
 
   Rect _drawHorizontal(PdfPage page, Rect bounds) {
-    final itemWidth = (bounds.width - (spacing * (barcodes.length - 1))) / barcodes.length;
+    final itemWidth =
+        (bounds.width - (spacing * (barcodes.length - 1))) / barcodes.length;
     double maxHeight = 0;
 
     for (int i = 0; i < barcodes.length; i++) {
@@ -1118,12 +1175,14 @@ class GeniusBarcodeGroup {
     for (int i = 0; i < barcodes.length; i++) {
       final result = barcodes[i].draw(
         page: page,
-        bounds: Rect.fromLTWH(bounds.left, currentY, bounds.width, bounds.height - (currentY - bounds.top)),
+        bounds: Rect.fromLTWH(bounds.left, currentY, bounds.width,
+            bounds.height - (currentY - bounds.top)),
       );
       currentY += result.height + spacing;
     }
 
-    return Rect.fromLTWH(bounds.left, bounds.top, bounds.width, currentY - bounds.top - spacing);
+    return Rect.fromLTWH(
+        bounds.left, bounds.top, bounds.width, currentY - bounds.top - spacing);
   }
 
   Rect _drawGrid(PdfPage page, Rect bounds) {
@@ -1149,7 +1208,8 @@ class GeniusBarcodeGroup {
       }
     }
 
-    return Rect.fromLTWH(bounds.left, bounds.top, bounds.width, maxY - bounds.top);
+    return Rect.fromLTWH(
+        bounds.left, bounds.top, bounds.width, maxY - bounds.top);
   }
 }
 
@@ -1165,6 +1225,7 @@ class GeniusBarcodeGenerator {
     required int start,
     required int count,
     required GeniusBarcodeType type,
+    required GeniusPdfConfig config,
     int padLength = 6,
     GeniusPdfBarcodeStyle style = const GeniusPdfBarcodeStyle(),
     required PdfFont baseFont,
@@ -1177,6 +1238,7 @@ class GeniusBarcodeGenerator {
       return GeniusPdfBarcode(
         data: data,
         type: type,
+        config: config,
         style: style,
         baseFont: baseFont,
         boldFont: boldFont,
@@ -1189,6 +1251,7 @@ class GeniusBarcodeGenerator {
   static List<GeniusPdfBarcode> fromDataList({
     required List<String> dataList,
     required GeniusBarcodeType type,
+    required GeniusPdfConfig config,
     GeniusPdfBarcodeStyle style = const GeniusPdfBarcodeStyle(),
     required PdfFont baseFont,
     PdfFont? boldFont,
@@ -1198,6 +1261,7 @@ class GeniusBarcodeGenerator {
         .map((data) => GeniusPdfBarcode(
               data: data,
               type: type,
+              config: config,
               style: style,
               baseFont: baseFont,
               boldFont: boldFont,

@@ -193,6 +193,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
     );
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: note.noteTypeTitle,
       titleAr: note.noteTypeTitleAr,
       company: company,
@@ -221,9 +222,11 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
         : (config.isRTL ? 'من (المورد)' : 'From (Vendor)');
 
     final partyBox = GeniusPdfInfoBox(
+      config: config,
       title: partyTitle,
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Name',
           labelAr: 'الاسم',
           value: config.isRTL ? (party.nameAr ?? party.name) : party.name,
@@ -233,6 +236,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (party.address != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Address',
             labelAr: 'العنوان',
             value: config.isRTL
@@ -244,6 +248,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (party.vatNumber != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'VAT No',
             labelAr: 'الرقم الضريبي',
             value: party.vatNumber!,
@@ -253,6 +258,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (party.accountNumber != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Account No',
             labelAr: 'رقم الحساب',
             value: party.accountNumber!,
@@ -268,10 +274,12 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
     );
 
     final noteBox = GeniusPdfInfoBox(
+      config: config,
       title: 'Note Details',
       titleAr: 'تفاصيل الإشعار',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Note No',
           labelAr: 'رقم الإشعار',
           value: note.noteNumber,
@@ -280,6 +288,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
           isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(note.noteDate),
@@ -289,6 +298,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
         ),
         if (note.originalInvoiceNumber != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Original Invoice',
             labelAr: 'الفاتورة الأصلية',
             value: note.originalInvoiceNumber!,
@@ -298,6 +308,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
           ),
         if (note.originalInvoiceDate != null)
           GeniusPdfLabeledValue(
+            config: config,
             label: 'Invoice Date',
             labelAr: 'تاريخ الفاتورة',
             value: _formatDate(note.originalInvoiceDate!),
@@ -352,6 +363,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawItemsTable() {
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'no',
@@ -453,6 +465,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
     ));
 
     final summary = GeniusPdfSummarySection(
+      config: config,
       items: items,
       style: const GeniusPdfSummaryStyle.bordered(),
       baseFont: baseFont,

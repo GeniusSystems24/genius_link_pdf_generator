@@ -685,6 +685,7 @@ class _ChartsDemoScreenState extends State<ChartsDemoScreen>
     final typeStr = _barType.toString().split('.')[1];
     return '''
 final barChart = GeniusPdfBarChart(
+  config: config,
   title: 'Monthly Performance',
   titleAr: 'الأداء الشهري',
   series: [
@@ -708,6 +709,7 @@ final barChart = GeniusPdfBarChart(
     final typeStr = _lineType.toString().split('.')[1];
     return '''
 final lineChart = GeniusPdfLineChart(
+  config: config,
   title: 'Revenue Trend',
   series: [
     GeniusChartSeries(
@@ -754,6 +756,7 @@ final lineChart = GeniusPdfLineChart(
 
     return '''
 final pieChart = GeniusPdfPieChart(
+  config: config,
   title: 'Expense Distribution',
   dataPoints: [
     GeniusChartDataPoint(label: 'Rent', value: 5000),
@@ -773,6 +776,7 @@ final pieChart = GeniusPdfPieChart(
 
     return '''
 final areaChart = GeniusPdfAreaChart(
+  config: config,
   title: 'Website Traffic',
   series: [
     GeniusChartSeries(name: 'Desktop', dataPoints: desktopData),

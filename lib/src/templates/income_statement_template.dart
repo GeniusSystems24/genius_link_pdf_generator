@@ -232,6 +232,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
         '${_formatDate(data.periodStart)} - ${_formatDate(data.periodEnd)}';
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Income Statement',
       titleAr: 'قائمة الدخل',
       subtitle: 'For the period $periodText',
@@ -306,6 +307,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
     ));
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'code',

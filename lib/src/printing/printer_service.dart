@@ -24,6 +24,7 @@ import 'package:path_provider/path_provider.dart';
 import 'printer_models.dart';
 import 'printer_discovery.dart';
 
+import '../core/pdf_config.dart';
 import '../core/pdf_logger.dart';
 
 /// Callback for print job progress
@@ -216,11 +217,13 @@ class GeniusPrinterService {
     required Uint8List pdfBytes,
     required String documentName,
     GeniusPrintSettings? settings,
+    required GeniusPdfConfig config,
     GeniusPrintProgressCallback? onProgress,
     GeniusPrintCompleteCallback? onComplete,
     GeniusPrintErrorCallback? onError,
   }) async {
-    final effectiveSettings = settings ?? GeniusPrintSettings.defaults();
+    final effectiveSettings =
+        settings ?? GeniusPrintSettings.fromPdfConfig(config);
     final job = _createJob(
       documentName: documentName,
       printerId: 'system_dialog',
@@ -298,11 +301,13 @@ class GeniusPrinterService {
     required String documentName,
     String? printerId,
     GeniusPrintSettings? settings,
+    required GeniusPdfConfig pdfConfig,
     GeniusPrintProgressCallback? onProgress,
     GeniusPrintCompleteCallback? onComplete,
     GeniusPrintErrorCallback? onError,
   }) async {
-    final effectiveSettings = settings ?? GeniusPrintSettings.defaults();
+    final effectiveSettings =
+        settings ?? GeniusPrintSettings.fromPdfConfig(pdfConfig);
     final effectivePrinterId = printerId ?? 'system_default';
 
     final job = _createJob(
@@ -372,6 +377,7 @@ class GeniusPrinterService {
           pdfBytes: pdfBytes,
           documentName: documentName,
           settings: settings,
+          config: pdfConfig,
           onProgress: onProgress,
           onComplete: onComplete,
           onError: onError,
@@ -398,17 +404,20 @@ class GeniusPrinterService {
     required int copies,
     String? printerId,
     GeniusPrintSettings? settings,
+    required GeniusPdfConfig pdfConfig,
     GeniusPrintProgressCallback? onProgress,
     GeniusPrintCompleteCallback? onComplete,
     GeniusPrintErrorCallback? onError,
   }) async {
-    final effectiveSettings =
-        (settings ?? GeniusPrintSettings.defaults()).copyWith(copies: copies);
+    final baseSettings =
+        settings ?? GeniusPrintSettings.fromPdfConfig(pdfConfig);
+    final effectiveSettings = baseSettings.copyWith(copies: copies);
 
     return printWithDialog(
       pdfBytes: pdfBytes,
       documentName: documentName,
       settings: effectiveSettings,
+      config: pdfConfig,
       onProgress: onProgress,
       onComplete: onComplete,
       onError: onError,
@@ -765,11 +774,13 @@ extension GeniusPrintBytesExtension on Uint8List {
   Future<GeniusPrintResult> print({
     required String documentName,
     GeniusPrintSettings? settings,
+    required GeniusPdfConfig pdfConfig,
   }) {
     return GeniusPrinterService.instance.printWithDialog(
       pdfBytes: this,
       documentName: documentName,
       settings: settings,
+      config: pdfConfig,
     );
   }
 

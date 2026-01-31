@@ -150,6 +150,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Balance Sheet',
       titleAr: 'الميزانية العمومية',
       subtitle: 'As of ${_formatDate(data.reportDate)}',
@@ -208,6 +209,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
       isGroupHeader: true,
     ));
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: [
         const GeniusPdfGridColumn(
           id: 'code',
@@ -281,6 +283,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
     ];
 
     final summary = GeniusPdfSummarySection(
+      config: config,
       items: summaryItems,
       style: const GeniusPdfSummaryStyle.bordered(),
       baseFont: baseFont,

@@ -4,9 +4,13 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 import 'package:pdf/pdf.dart' hide PdfFont;
 import 'package:pdf/widgets.dart' as pw;
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 Future<Uint8List> buildSimpleDocumentBytes() async {
-  return GeniusPdfBuilder(id: 'simple-doc')
+  return GeniusPdfBuilder(
+        id: 'simple-doc',
+        config: GeniusPdfConfig(baseFont: PdfStandardFont(PdfFontFamily.helvetica, 10)),
+      )
       .metadata(title: 'Simple Document', author: 'Demo')
       .pageFormat(PdfPageFormat.a4)
       .addPage((page) => page

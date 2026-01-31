@@ -154,6 +154,7 @@ class PayslipTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Payslip',
       titleAr: 'كشف راتب',
       company: company,

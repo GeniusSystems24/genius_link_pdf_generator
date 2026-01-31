@@ -168,6 +168,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
         : data.reportTitle;
 
     final header = GeniusPdfReportHeader(
+      config: config,
       title: title,
       subtitle: 'Period: $periodText',
       subtitleAr: 'الفترة: $periodText',

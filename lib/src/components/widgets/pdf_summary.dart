@@ -4,6 +4,8 @@ import 'package:flutter/material.dart' show FontWeight;
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfTextStyle, PdfBorderStyle;
 
+import '../../core/pdf_config.dart';
+import '../../core/pdf_print_theme.dart';
 import '../../extensions/color_extensions.dart';
 import '../../models/pdf_image.dart';
 import '../models/pdf_styles.dart';
@@ -298,6 +300,56 @@ class GeniusPdfSummaryStyle {
     this.titleSpacing = 8,
   });
 
+  /// Creates a summary style from [GeniusPdfPrintTheme].
+  factory GeniusPdfSummaryStyle.fromTheme(GeniusPdfPrintTheme theme) {
+    final summaryTheme = theme.summaryTheme ?? const GeniusPdfSummaryTheme.defaults();
+    final typography = theme.typography;
+
+    return GeniusPdfSummaryStyle(
+      backgroundColor: summaryTheme.backgroundColor,
+      borderStyle: summaryTheme.showBorder
+          ? GeniusPdfBorderStyle.all(
+              width: summaryTheme.borderWidth,
+              color: summaryTheme.borderColor,
+            )
+          : const GeniusPdfBorderStyle.none(),
+      padding: summaryTheme.padding,
+      labelStyle: GeniusPdfTextStyle(
+        fontSize: typography.bodySize,
+        color: summaryTheme.labelColor,
+        alignment: GeniusPdfTextAlign.left,
+      ),
+      valueStyle: GeniusPdfTextStyle(
+        fontSize: typography.bodySize,
+        color: summaryTheme.valueColor,
+        alignment: GeniusPdfTextAlign.right,
+      ),
+      totalLabelStyle: GeniusPdfTextStyle(
+        fontSize: typography.bodySize,
+        fontWeight: FontWeight.bold,
+        color: summaryTheme.labelColor,
+        alignment: GeniusPdfTextAlign.left,
+      ),
+      totalValueStyle: GeniusPdfTextStyle(
+        fontSize: typography.bodySize,
+        fontWeight: FontWeight.bold,
+        color: summaryTheme.valueColor,
+        alignment: GeniusPdfTextAlign.right,
+      ),
+      highlightBackgroundColor: summaryTheme.highlightBackgroundColor,
+      itemSpacing: summaryTheme.itemSpacing,
+      labelWidth: summaryTheme.labelWidthRatio,
+      showSeparatorLine: summaryTheme.showBorder,
+      separatorLineColor: summaryTheme.borderColor,
+      separatorLineWidth: summaryTheme.borderWidth,
+      titleStyle: GeniusPdfTextStyle.header(
+        fontSize: typography.headingSize,
+        color: summaryTheme.labelColor,
+      ),
+      titleSpacing: theme.spacing.sm,
+    );
+  }
+
   /// Creates a card-style summary.
   const GeniusPdfSummaryStyle.card()
       : backgroundColor = const Color(0xFFFAFAFA),
@@ -572,13 +624,17 @@ class GeniusPdfSummarySection {
     required this.items,
     this.title,
     this.titleAr,
-    this.style = const GeniusPdfSummaryStyle(),
-    required this.baseFont,
-    required this.boldFont,
-    this.isRTL = true,
+    required this.config,
+    GeniusPdfSummaryStyle? style,
+    PdfFont? baseFont,
+    PdfFont? boldFont,
+    bool? isRTL,
     this.alignment = GeniusPdfSummaryAlignment.right,
     this.width,
-  });
+  })  : style = _resolveSummaryStyle(style, config),
+        baseFont = _resolveBaseFont(baseFont, config),
+        boldFont = _resolveBoldFont(boldFont, baseFont, config),
+        isRTL = isRTL ?? config.isRTL;
 
   /// Summary items to display.
   final List<GeniusPdfSummaryItem> items;
@@ -591,6 +647,9 @@ class GeniusPdfSummarySection {
 
   /// Style configuration.
   final GeniusPdfSummaryStyle style;
+
+  /// PDF configuration.
+  final GeniusPdfConfig config;
 
   /// Base font for text.
   final PdfFont baseFont;
@@ -606,6 +665,26 @@ class GeniusPdfSummarySection {
 
   /// Fixed width (optional, uses default proportion if null).
   final double? width;
+
+  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
+    return baseFont ?? config.baseFont;
+  }
+
+  static PdfFont _resolveBoldFont(
+    PdfFont? boldFont,
+    PdfFont? baseFont,
+    GeniusPdfConfig config,
+  ) {
+    return boldFont ?? config.boldFont;
+  }
+
+  static GeniusPdfSummaryStyle _resolveSummaryStyle(
+    GeniusPdfSummaryStyle? style,
+    GeniusPdfConfig config,
+  ) {
+    if (style != null) return style;
+    return GeniusPdfSummaryStyle.fromTheme(config.printTheme);
+  }
 
   /// Draws the summary section on a PDF page.
   Rect draw({

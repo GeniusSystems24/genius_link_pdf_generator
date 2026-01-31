@@ -135,6 +135,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
+      config: config,
       title: 'Trial Balance',
       titleAr: 'ميزان المراجعة',
       subtitle: 'As of ${_formatDateLong(data.asOfDate)}',
@@ -231,6 +232,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     }
 
     final grid = GeniusPdfDataGrid(
+      config: config,
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.classic(),
