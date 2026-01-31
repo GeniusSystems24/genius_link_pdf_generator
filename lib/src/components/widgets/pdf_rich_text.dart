@@ -2042,6 +2042,67 @@ class GeniusPdfTextMeasurer {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Markdown Parser Configuration
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Configuration for [GeniusPdfSimpleMarkdownParser].
+///
+/// Controls link styling and auto-detection of URLs, emails, and phone numbers
+/// in parsed text.
+///
+/// ## Example
+/// ```dart
+/// final config = GeniusPdfMarkdownConfig(
+///   linkColor: Color(0xFF0D47A1),
+///   autoDetectUrls: true,
+///   autoDetectEmails: true,
+/// );
+/// final spans = GeniusPdfSimpleMarkdownParser.parse(
+///   'Visit https://example.com or email info@example.com',
+///   config: config,
+/// );
+/// ```
+class GeniusPdfMarkdownConfig {
+  /// Color applied to explicit markdown links `[text](url)`.
+  final Color linkColor;
+
+  /// Whether to auto-detect bare URLs (`https://...`, `http://...`, `www.…`).
+  final bool autoDetectUrls;
+
+  /// Whether to auto-detect email addresses (`user@domain.com`).
+  final bool autoDetectEmails;
+
+  /// Whether to auto-detect phone numbers (`+123-456-7890`).
+  final bool autoDetectPhones;
+
+  /// Color for auto-detected links (URLs, emails, phones).
+  /// Falls back to [linkColor] if null.
+  final Color? autoLinkColor;
+
+  /// Creates a markdown configuration.
+  const GeniusPdfMarkdownConfig({
+    this.linkColor = const Color(0xFF1565C0),
+    this.autoDetectUrls = true,
+    this.autoDetectEmails = true,
+    this.autoDetectPhones = false,
+    this.autoLinkColor,
+  });
+
+  /// The effective color for auto-detected links.
+  Color get effectiveAutoLinkColor => autoLinkColor ?? linkColor;
+
+  /// Default configuration with standard blue links and auto-detection enabled.
+  static const defaultConfig = GeniusPdfMarkdownConfig();
+
+  /// Configuration with no auto-detection (only explicit markdown links).
+  static const noAutoDetect = GeniusPdfMarkdownConfig(
+    autoDetectUrls: false,
+    autoDetectEmails: false,
+    autoDetectPhones: false,
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Simple Markdown Parser
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -2055,7 +2116,11 @@ class GeniusPdfTextMeasurer {
 /// - `==highlight==` → highlighted span
 /// - `^superscript^` → superscript span
 /// - `` `code` `` → code span
-/// - `[text](url)` → link span
+/// - `[text](url)` → link span (uses [GeniusPdfMarkdownConfig.linkColor])
+/// - `[text](url){#RRGGBB}` → link span with inline hex color
+/// - Bare URLs (`https://...`) → auto-detected link (when enabled)
+/// - Emails (`user@domain.com`) → auto-detected mailto link (when enabled)
+/// - Phone numbers (`+123-456-7890`) → auto-detected tel link (when enabled)
 ///
 /// ## Example
 /// ```dart
@@ -2063,30 +2128,83 @@ class GeniusPdfTextMeasurer {
 ///   'This is **bold** and *italic* with a [link](https://example.com)',
 /// );
 /// ```
+///
+/// ## Example with config
+/// ```dart
+/// final spans = GeniusPdfSimpleMarkdownParser.parse(
+///   'Visit https://example.com for details',
+///   config: GeniusPdfMarkdownConfig(
+///     linkColor: Color(0xFF0D47A1),
+///     autoDetectUrls: true,
+///   ),
+/// );
+/// ```
 class GeniusPdfSimpleMarkdownParser {
   GeniusPdfSimpleMarkdownParser._();
 
+  // ── Auto-detection patterns ──────────────────────────────────────────────
+
+  /// Matches bare URLs: https://..., http://..., www.…
+  static final _urlPattern =
+      RegExp(r'https?://[^\s<>\]\)]+|www\.[^\s<>\]\)]+');
+
+  /// Matches email addresses: user@domain.com
+  static final _emailPattern =
+      RegExp(r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}');
+
+  /// Matches phone numbers: +1-234-567-8901, (123) 456-7890, etc.
+  static final _phonePattern = RegExp(
+      r'(?:\+?\d{1,3}[-.\s]?)?(?:\(?\d{2,4}\)?[-.\s]?)?\d{3,4}[-.\s]?\d{3,4}');
+
+  /// Matches link with inline hex color: [text](url){#RRGGBB}
+  static final _linkWithColorPattern =
+      RegExp(r'\[([^\]]+)\]\(([^)]+)\)\{#([0-9a-fA-F]{6})\}');
+
+  /// Matches standard link: [text](url)
+  static final _linkPattern = RegExp(r'\[([^\]]+)\]\(([^)]+)\)');
+
+  // ── Public API ───────────────────────────────────────────────────────────
+
   /// Parses a markdown-like string into a list of spans.
-  static List<GeniusPdfTextSpan> parse(String input) {
+  ///
+  /// If [config] is null, uses [GeniusPdfMarkdownConfig.noAutoDetect] for
+  /// backward compatibility (explicit links only, default blue color).
+  static List<GeniusPdfTextSpan> parse(
+    String input, {
+    GeniusPdfMarkdownConfig? config,
+  }) {
     if (input.isEmpty) return [];
 
+    final effectiveConfig = config ?? GeniusPdfMarkdownConfig.noAutoDetect;
     final spans = <GeniusPdfTextSpan>[];
     final buffer = StringBuffer();
     int i = 0;
 
     while (i < input.length) {
-      // ── Link [text](url) ────────────────────────────────────────
+      // ── Link with inline color [text](url){#RRGGBB} ──────────
       if (input[i] == '[') {
-        final linkMatch = RegExp(r'\[([^\]]+)\]\(([^)]+)\)').matchAsPrefix(input, i);
+        final colorMatch = _linkWithColorPattern.matchAsPrefix(input, i);
+        if (colorMatch != null) {
+          _flushBuffer(buffer, spans);
+          final hexColor = colorMatch.group(3)!;
+          final color = Color(0xFF000000 | int.parse(hexColor, radix: 16));
+          spans.add(GeniusPdfTextSpan.link(
+            colorMatch.group(1)!,
+            link: colorMatch.group(2)!,
+            color: color,
+          ));
+          i += colorMatch.end - colorMatch.start;
+          continue;
+        }
+
+        // ── Standard link [text](url) ──────────────────────────
+        final linkMatch = _linkPattern.matchAsPrefix(input, i);
         if (linkMatch != null) {
-          // Flush buffer
-          if (buffer.isNotEmpty) {
-            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
-            buffer.clear();
-          }
+          _flushBuffer(buffer, spans);
           spans.add(GeniusPdfTextSpan.link(
             linkMatch.group(1)!,
             link: linkMatch.group(2)!,
+            color: effectiveConfig.linkColor,
           ));
           i += linkMatch.end - linkMatch.start;
           continue;
@@ -2097,10 +2215,7 @@ class GeniusPdfSimpleMarkdownParser {
       if (_matchAt(input, i, '***')) {
         final end = input.indexOf('***', i + 3);
         if (end != -1) {
-          if (buffer.isNotEmpty) {
-            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
-            buffer.clear();
-          }
+          _flushBuffer(buffer, spans);
           spans.add(GeniusPdfTextSpan.boldItalic(input.substring(i + 3, end)));
           i = end + 3;
           continue;
@@ -2111,10 +2226,7 @@ class GeniusPdfSimpleMarkdownParser {
       if (_matchAt(input, i, '**')) {
         final end = input.indexOf('**', i + 2);
         if (end != -1) {
-          if (buffer.isNotEmpty) {
-            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
-            buffer.clear();
-          }
+          _flushBuffer(buffer, spans);
           spans.add(GeniusPdfTextSpan.bold(input.substring(i + 2, end)));
           i = end + 2;
           continue;
@@ -2125,10 +2237,7 @@ class GeniusPdfSimpleMarkdownParser {
       if (_matchAt(input, i, '~~')) {
         final end = input.indexOf('~~', i + 2);
         if (end != -1) {
-          if (buffer.isNotEmpty) {
-            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
-            buffer.clear();
-          }
+          _flushBuffer(buffer, spans);
           spans.add(GeniusPdfTextSpan.strikethrough(input.substring(i + 2, end)));
           i = end + 2;
           continue;
@@ -2139,10 +2248,7 @@ class GeniusPdfSimpleMarkdownParser {
       if (_matchAt(input, i, '==')) {
         final end = input.indexOf('==', i + 2);
         if (end != -1) {
-          if (buffer.isNotEmpty) {
-            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
-            buffer.clear();
-          }
+          _flushBuffer(buffer, spans);
           spans.add(GeniusPdfTextSpan.highlight(input.substring(i + 2, end)));
           i = end + 2;
           continue;
@@ -2153,10 +2259,7 @@ class GeniusPdfSimpleMarkdownParser {
       if (input[i] == '*' && !_matchAt(input, i, '**')) {
         final end = _findSingleChar(input, '*', i + 1);
         if (end != -1) {
-          if (buffer.isNotEmpty) {
-            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
-            buffer.clear();
-          }
+          _flushBuffer(buffer, spans);
           spans.add(GeniusPdfTextSpan.italic(input.substring(i + 1, end)));
           i = end + 1;
           continue;
@@ -2167,10 +2270,7 @@ class GeniusPdfSimpleMarkdownParser {
       if (input[i] == '^') {
         final end = input.indexOf('^', i + 1);
         if (end != -1) {
-          if (buffer.isNotEmpty) {
-            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
-            buffer.clear();
-          }
+          _flushBuffer(buffer, spans);
           spans.add(GeniusPdfTextSpan.superscript(input.substring(i + 1, end)));
           i = end + 1;
           continue;
@@ -2181,10 +2281,7 @@ class GeniusPdfSimpleMarkdownParser {
       if (input[i] == '`') {
         final end = input.indexOf('`', i + 1);
         if (end != -1) {
-          if (buffer.isNotEmpty) {
-            spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
-            buffer.clear();
-          }
+          _flushBuffer(buffer, spans);
           spans.add(GeniusPdfTextSpan.code(input.substring(i + 1, end)));
           i = end + 1;
           continue;
@@ -2201,7 +2298,142 @@ class GeniusPdfSimpleMarkdownParser {
       spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
     }
 
+    // ── Second pass: auto-detect URLs, emails, phones in plain spans ──
+    if (effectiveConfig.autoDetectUrls ||
+        effectiveConfig.autoDetectEmails ||
+        effectiveConfig.autoDetectPhones) {
+      return _autoDetectLinks(spans, effectiveConfig);
+    }
+
     return spans;
+  }
+
+  // ── Auto-detection (second pass) ─────────────────────────────────────────
+
+  /// Scans plain text spans for bare URLs, emails, and phone numbers,
+  /// splitting them into link spans and remaining plain text.
+  static List<GeniusPdfTextSpan> _autoDetectLinks(
+    List<GeniusPdfTextSpan> spans,
+    GeniusPdfMarkdownConfig config,
+  ) {
+    final result = <GeniusPdfTextSpan>[];
+
+    for (final span in spans) {
+      // Only process plain text spans (no existing links, no styled spans)
+      if (span.hasLink ||
+          span.isBold ||
+          span.isItalic ||
+          span.isStrikethrough ||
+          span.isSuperscript ||
+          span.isSubscript ||
+          span.backgroundColor != null) {
+        result.add(span);
+        continue;
+      }
+
+      final text = span.text;
+      final matches = <_AutoMatch>[];
+
+      // Collect all auto-detection matches
+      if (config.autoDetectUrls) {
+        for (final m in _urlPattern.allMatches(text)) {
+          matches.add(_AutoMatch(m.start, m.end, m.group(0)!, _AutoType.url));
+        }
+      }
+      if (config.autoDetectEmails) {
+        for (final m in _emailPattern.allMatches(text)) {
+          // Avoid matching emails that overlap with URLs
+          final email = m.group(0)!;
+          matches
+              .add(_AutoMatch(m.start, m.end, email, _AutoType.email));
+        }
+      }
+      if (config.autoDetectPhones) {
+        for (final m in _phonePattern.allMatches(text)) {
+          final phone = m.group(0)!;
+          // Only match if the phone has at least 7 digits
+          final digits = phone.replaceAll(RegExp(r'\D'), '');
+          if (digits.length >= 7) {
+            matches
+                .add(_AutoMatch(m.start, m.end, phone, _AutoType.phone));
+          }
+        }
+      }
+
+      if (matches.isEmpty) {
+        result.add(span);
+        continue;
+      }
+
+      // Sort by start position and remove overlaps
+      matches.sort((a, b) => a.start.compareTo(b.start));
+      final filtered = _removeOverlaps(matches);
+
+      // Split the plain text span into segments
+      int pos = 0;
+      final linkColor = config.effectiveAutoLinkColor;
+
+      for (final match in filtered) {
+        // Add plain text before this match
+        if (match.start > pos) {
+          result.add(GeniusPdfTextSpan.plain(text.substring(pos, match.start)));
+        }
+
+        // Add the auto-detected link
+        String url;
+        switch (match.type) {
+          case _AutoType.url:
+            url = match.text.startsWith('www.')
+                ? 'https://${match.text}'
+                : match.text;
+            break;
+          case _AutoType.email:
+            url = 'mailto:${match.text}';
+            break;
+          case _AutoType.phone:
+            url =
+                'tel:${match.text.replaceAll(RegExp(r'[\s\-\(\)]'), '')}';
+            break;
+        }
+
+        result.add(GeniusPdfTextSpan.link(
+          match.text,
+          link: url,
+          color: linkColor,
+        ));
+
+        pos = match.end;
+      }
+
+      // Add remaining plain text
+      if (pos < text.length) {
+        result.add(GeniusPdfTextSpan.plain(text.substring(pos)));
+      }
+    }
+
+    return result;
+  }
+
+  /// Removes overlapping matches, keeping earlier/longer ones.
+  static List<_AutoMatch> _removeOverlaps(List<_AutoMatch> sorted) {
+    if (sorted.isEmpty) return sorted;
+    final result = <_AutoMatch>[sorted.first];
+    for (int i = 1; i < sorted.length; i++) {
+      if (sorted[i].start >= result.last.end) {
+        result.add(sorted[i]);
+      }
+    }
+    return result;
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  /// Flushes the [buffer] into a plain text span.
+  static void _flushBuffer(StringBuffer buffer, List<GeniusPdfTextSpan> spans) {
+    if (buffer.isNotEmpty) {
+      spans.add(GeniusPdfTextSpan.plain(buffer.toString()));
+      buffer.clear();
+    }
   }
 
   /// Checks if [pattern] appears at position [i] in [input].
@@ -2221,6 +2453,18 @@ class GeniusPdfSimpleMarkdownParser {
     }
     return -1;
   }
+}
+
+/// Type of auto-detected content.
+enum _AutoType { url, email, phone }
+
+/// A match from auto-detection.
+class _AutoMatch {
+  final int start;
+  final int end;
+  final String text;
+  final _AutoType type;
+  const _AutoMatch(this.start, this.end, this.text, this.type);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2249,8 +2493,8 @@ extension GeniusPdfStringSpanExtension on String {
       GeniusPdfTextSpan.highlight(this, backgroundColor: backgroundColor);
 
   /// Converts to a link text span.
-  GeniusPdfTextSpan toLinkSpan(String url) =>
-      GeniusPdfTextSpan.link(this, link: url);
+  GeniusPdfTextSpan toLinkSpan(String url, {Color? color}) =>
+      GeniusPdfTextSpan.link(this, link: url, color: color ?? const Color(0xFF1565C0));
 
   /// Converts to a badge text span.
   GeniusPdfTextSpan toBadgeSpan({Color? backgroundColor, Color? color}) =>
@@ -2270,6 +2514,9 @@ extension GeniusPdfStringSpanExtension on String {
       GeniusPdfTextSpan.small(this, color: color);
 
   /// Parses this string as simple markdown into spans.
-  List<GeniusPdfTextSpan> parseMarkdownSpans() =>
-      GeniusPdfSimpleMarkdownParser.parse(this);
+  ///
+  /// If [config] is provided, enables auto-detection of URLs, emails, and
+  /// phone numbers, and customizes link colors.
+  List<GeniusPdfTextSpan> parseMarkdownSpans({GeniusPdfMarkdownConfig? config}) =>
+      GeniusPdfSimpleMarkdownParser.parse(this, config: config);
 }

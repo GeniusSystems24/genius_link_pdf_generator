@@ -310,6 +310,29 @@ final richText = GeniusPdfRichTextBuilder(
 // ─── Markdown Parser ───────────────────────────
 final spans = 'This is **bold** and *italic*'.parseMarkdownSpans();
 
+// ─── Links with Custom Colors ──────────────────
+final link = GeniusPdfRichTextBuilder(...)
+  .text('Visit: ')
+  .link('our site', 'https://example.com',
+        color: Color(0xFF0D47A1))
+  .build();
+
+// ─── Auto-detect URLs & Emails ─────────────────
+final auto = GeniusPdfSimpleMarkdownParser.parse(
+  'Email info@test.com or visit https://test.com',
+  config: GeniusPdfMarkdownConfig(
+    autoDetectUrls: true,
+    autoDetectEmails: true,
+    autoLinkColor: Color(0xFF00796B),
+  ),
+);
+
+// ─── Inline Hex Color in Markdown Links ────────
+final colored = GeniusPdfSimpleMarkdownParser.parse(
+  '[Red](https://r.com){#E53935} '
+  '[Green](https://g.com){#43A047}',
+);
+
 // ─── Bullet List ───────────────────────────────
 final list = GeniusPdfBulletList(
   items: [
@@ -323,6 +346,8 @@ final list = GeniusPdfBulletList(
 
 // ─── String Extensions ─────────────────────────
 final span = 'مهم'.toBoldSpan(color: Colors.red);
+final linkSpan = 'click'.toLinkSpan('https://x.com',
+    color: Color(0xFFE65100));
 ''',
       preview: _buildRichTextPreview(isDark),
     );
@@ -1148,6 +1173,64 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
     );
     mdRichText.draw(
         page: page, bounds: Rect.fromLTWH(20, yOffset + 265, w, 25));
+
+    // 8. Link with custom color via builder
+    final linkLine = GeniusPdfRichTextBuilder(
+      baseFont: baseFont,
+      boldFont: bFont,
+      isRTL: _isRTL,
+    )
+        .text(_isRTL ? 'زر الموقع: ' : 'Visit site: ')
+        .link(
+          _isRTL ? 'موقعنا' : 'our website',
+          'https://example.com',
+          color: const Color(0xFF0D47A1),
+        )
+        .text(_isRTL ? ' أو ' : ' or ')
+        .link(
+          _isRTL ? 'الدعم' : 'support',
+          'https://support.example.com',
+          color: const Color(0xFFE65100),
+        )
+        .build();
+    linkLine.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset + 295, w, 25));
+
+    // 9. Markdown with auto-detection of URLs and emails
+    final autoSpans = GeniusPdfSimpleMarkdownParser.parse(
+      _isRTL
+          ? 'تواصل عبر info@example.com أو https://example.com'
+          : 'Contact info@example.com or visit https://example.com',
+      config: const GeniusPdfMarkdownConfig(
+        linkColor: Color(0xFF1565C0),
+        autoDetectUrls: true,
+        autoDetectEmails: true,
+        autoLinkColor: Color(0xFF00796B),
+      ),
+    );
+    final autoRichText = GeniusPdfRichText(
+      spans: autoSpans,
+      baseFont: baseFont,
+      boldFont: bFont,
+      isRTL: _isRTL,
+    );
+    autoRichText.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset + 325, w, 25));
+
+    // 10. Inline hex color syntax in markdown link
+    final colorSpans = GeniusPdfSimpleMarkdownParser.parse(
+      _isRTL
+          ? '**رابط ملون:** [الأحمر](https://red.example.com){#E53935} و [الأخضر](https://green.example.com){#43A047}'
+          : '**Colored link:** [red link](https://red.example.com){#E53935} and [green link](https://green.example.com){#43A047}',
+    );
+    final colorRichText = GeniusPdfRichText(
+      spans: colorSpans,
+      baseFont: baseFont,
+      boldFont: bFont,
+      isRTL: _isRTL,
+    );
+    colorRichText.draw(
+        page: page, bounds: Rect.fromLTWH(20, yOffset + 355, w, 25));
   }
 }
 

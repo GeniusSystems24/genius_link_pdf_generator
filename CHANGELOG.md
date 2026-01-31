@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.3+10] - 2026-01-31
+
+### Added
+
+#### GeniusPdfRichText — Enhanced Links & Auto-Detection
+- **`GeniusPdfMarkdownConfig`** — New configuration class for parser with `linkColor`, `autoDetectUrls`, `autoDetectEmails`, `autoDetectPhones`, `autoLinkColor`
+- **Auto-detect bare URLs** — `https://...`, `http://...`, `www.…` auto-converted to clickable link spans (opt-in via config)
+- **Auto-detect emails** — `user@domain.com` auto-converted to `mailto:` link spans (opt-in via config)
+- **Auto-detect phone numbers** — `+123-456-7890` auto-converted to `tel:` link spans (opt-in via config)
+- **Inline hex color syntax** — `[text](url){#RRGGBB}` for per-link color in markdown
+- **Configurable link color** — `GeniusPdfSimpleMarkdownParser.parse()` now accepts `config` parameter for link styling
+- **`autoLinkColor`** — Separate color for auto-detected links vs explicit markdown links
+- **Preset configs** — `GeniusPdfMarkdownConfig.defaultConfig` (auto-detect on) and `.noAutoDetect` (backward-compatible)
+
+### Changed
+- **`GeniusPdfSimpleMarkdownParser.parse()`** — Added optional `config` parameter (backward-compatible, defaults to no auto-detect)
+- **`toLinkSpan()` extension** — Now accepts optional `color` parameter
+- **`parseMarkdownSpans()` extension** — Now accepts optional `config` parameter
+- **Two-pass parsing** — First pass handles markdown syntax, second pass auto-detects URLs/emails/phones in plain text only
+- **Overlap resolution** — Auto-detected links properly de-duplicated (earlier/longer match wins)
+
+---
+
 ## [2.3.3+9] - 2026-01-29
 
 ### Added
