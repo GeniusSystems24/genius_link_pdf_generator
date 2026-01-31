@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets;
-import 'package:logger/logger.dart';
-import 'screens/dashboard_layout.dart';
+import 'dashboard_layout.dart';
 import 'theme/app_theme.dart';
 
 /// Global PDF configuration for the example app.
@@ -15,11 +14,6 @@ late final GeniusPdfConfig geniusPdfConfig;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  FlutterError.onError = (details) {
-    Logger().e(details.exception, stackTrace: details.stack);
-    Logger().e(geniusPdfConfig);
-  };
 
   // Load font data first for baseFont
   final fontData = await rootBundle.load('assets/fonts/din/din.ttf');
@@ -60,18 +54,6 @@ void main() async {
       keepHistory: true,
     ),
   );
-
-  // Access assets through the config instance (v2.3.3+1)
-  try {
-    // Access assets via instance (no more static getters)
-    Logger().d(
-        'Primary font loaded: ${geniusPdfConfig.assets.primaryFont.length} bytes');
-    Logger().d('Config has assets: ${geniusPdfConfig.hasAssets}');
-
-    GeniusPdfConfig.logger.info('PDF Generator initialized successfully');
-  } catch (e) {
-    Logger().e('Error accessing assets: $e');
-  }
 
   runApp(const GeniusPdfExampleApp());
 }

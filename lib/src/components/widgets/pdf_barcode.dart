@@ -1065,7 +1065,6 @@ class GeniusBarcodeGroup {
   }) {
     final graphics = page.graphics;
     double currentY = bounds.top;
-    double currentX = bounds.left;
 
     // Draw title if present
     final title = getTitle();
@@ -1129,7 +1128,6 @@ class GeniusBarcodeGroup {
 
   Rect _drawGrid(PdfPage page, Rect bounds) {
     final cols = gridColumns.clamp(1, barcodes.length);
-    final rows = (barcodes.length / cols).ceil();
     final itemWidth = (bounds.width - (spacing * (cols - 1))) / cols;
     final itemHeight = 100.0; // Estimated height per barcode
 

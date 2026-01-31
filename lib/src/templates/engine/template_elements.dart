@@ -260,7 +260,6 @@ class TextElement extends TemplateElement {
     if (!shouldRender(context)) return 0;
 
     final displayText = getText(context.isRtl);
-    final effectiveFontSize = fontSize ?? 12;
 
     final brush = PdfSolidBrush(fontColor ?? PdfColor(0, 0, 0));
     final alignment =

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
-import '../widgets/dashboard_widgets.dart';
+import 'theme/app_theme.dart';
+import 'widgets/dashboard_widgets.dart';
 
 /// Dashboard Home Screen
 class DashboardHome extends StatelessWidget {

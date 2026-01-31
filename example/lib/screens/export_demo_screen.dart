@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../documents/export_demo_document.dart';
+import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 
 /// Demo screen for multi-format export features.
@@ -38,46 +39,7 @@ class _ExportDemoScreenState extends State<ExportDemoScreen> {
     });
 
     try {
-      final fontData = await rootBundle.load('assets/fonts/din/din.ttf');
-      final fontBytes = fontData.buffer.asUint8List();
-      final font = PdfTrueTypeFont(fontBytes, 14);
-      final titleFont = PdfTrueTypeFont(fontBytes, 24);
-
-      final document = PdfDocument();
-
-      // Page 1
-      final page1 = document.pages.add();
-      page1.graphics.drawString(
-        'Sample PDF Document',
-        titleFont,
-        bounds: const Rect.fromLTWH(50, 50, 500, 40),
-      );
-      page1.graphics.drawString(
-        'This is a sample document created for demonstrating '
-        'the multi-format export capabilities of the PDF Generator library.\n\n'
-        'Features demonstrated:\n'
-        '• Export to PNG and JPEG images\n'
-        '• Export to HTML format\n'
-        '• Export to plain text\n'
-        '• Export to PDF/A for archival\n'
-        '• Batch export functionality',
-        font,
-        bounds: const Rect.fromLTWH(50, 160, 500, 300),
-      );
-
-      // Page 2
-      final page2 = document.pages.add();
-      page2.graphics.drawString(
-        'Page 2 - Additional Content',
-        titleFont,
-        bounds: const Rect.fromLTWH(50, 50, 500, 40),
-      );
-      page2.graphics.drawString(
-        'This page demonstrates multi-page export functionality.\n'
-        'Each page can be exported separately or together.',
-        font,
-        bounds: const Rect.fromLTWH(50, 160, 500, 200),
-      );
+      final document = await buildExportSampleDocument(geniusPdfConfig);
 
       setState(() {
         _sampleDocument = document;

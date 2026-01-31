@@ -284,7 +284,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       );
     }
 
-    final font = baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 9);
+    final font = baseFont;
 
     // Category
     currentPage.graphics.drawString(
@@ -535,7 +535,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
     for (final item in summaryItems) {
       currentPage.graphics.drawString(
         '• ${item.$1}: ${item.$2}',
-        baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 10),
+        baseFont,
         bounds: Rect.fromLTWH(10, currentY, pageWidth - 10, 18),
         format: PdfStringFormat(
           alignment:
@@ -555,7 +555,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       '$notesLabel\n$notesText',
-      baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 9),
+      baseFont,
       bounds: Rect.fromLTWH(0, currentY, pageWidth, 60),
       format: PdfStringFormat(
         alignment:

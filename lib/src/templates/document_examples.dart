@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../core/pdf_config.dart';
 import '../models/pdf_image.dart';

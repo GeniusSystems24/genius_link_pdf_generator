@@ -350,8 +350,7 @@ class GeniusPdfLogger {
   // ─── Handlers ───────────────────────────────────────────────────────
 
   /// Add a custom log handler.
-  static void addHandler(GeniusLogHandler handler) =>
-      _handlers.add(handler);
+  static void addHandler(GeniusLogHandler handler) => _handlers.add(handler);
 
   /// Remove a custom log handler.
   static void removeHandler(GeniusLogHandler handler) =>
@@ -363,8 +362,8 @@ class GeniusPdfLogger {
   /// Add the built-in console handler.
   static void useConsoleHandler({bool colored = true}) {
     addHandler((entry) {
-      final formatted =
-          entry.format(showLocation: _showLocation, showTimestamp: _showTimestamp);
+      final formatted = entry.format(
+          showLocation: _showLocation, showTimestamp: _showTimestamp);
       if (colored) {
         final color = _ansi(entry.level);
         const reset = '\x1B[0m';
@@ -430,7 +429,8 @@ class GeniusPdfLogger {
   }
 
   /// Log a warning message.
-  static void warning(String message, {String? tag, Map<String, dynamic>? data}) {
+  static void warning(String message,
+      {String? tag, Map<String, dynamic>? data}) {
     if (!_enabled) return;
     _log(GeniusLogLevel.warning, message, tag: tag, data: data);
   }
@@ -471,13 +471,13 @@ class GeniusPdfLogger {
   }
 
   /// Stop a named timer and log its duration.
-  static void stopTimer(String name, {String? tag, GeniusLogLevel level = GeniusLogLevel.info}) {
+  static void stopTimer(String name,
+      {String? tag, GeniusLogLevel level = GeniusLogLevel.info}) {
     if (!_enabled) return;
     final sw = _timers.remove(name);
     if (sw == null) return;
     sw.stop();
-    _log(level, '$name completed',
-        tag: tag, duration: sw.elapsed);
+    _log(level, '$name completed', tag: tag, duration: sw.elapsed);
   }
 
   // ─── Internal ───────────────────────────────────────────────────────
@@ -718,7 +718,9 @@ mixin GeniusLoggable {
       GeniusPdfLogger.warning(message, tag: logTag, data: data);
 
   void logError(String message,
-          {Object? error, StackTrace? stackTrace, Map<String, dynamic>? data}) =>
+          {Object? error,
+          StackTrace? stackTrace,
+          Map<String, dynamic>? data}) =>
       GeniusPdfLogger.error(message,
           tag: logTag, error: error, stackTrace: stackTrace, data: data);
 

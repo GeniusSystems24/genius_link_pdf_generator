@@ -296,10 +296,6 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawGrandTotal() {
     // Grand total bar
-    final totalText = config.isRTL
-        ? 'إجمالي قيمة المخزون: ${_formatCurrency(data.totalValue)}'
-        : 'Total Inventory Value: ${_formatCurrency(data.totalValue)}';
-
     final totalBar = GeniusPdfTotalBar(
       label: config.isRTL ? 'إجمالي قيمة المخزون' : 'Total Inventory Value',
       labelAr: 'إجمالي قيمة المخزون',

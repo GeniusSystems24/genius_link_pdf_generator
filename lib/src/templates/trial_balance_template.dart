@@ -7,7 +7,6 @@ import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
 import '../core/pdf_config.dart';
 import '../extensions/color_extensions.dart';
-import '../models/pdf_image.dart';
 
 /// Account entry for trial balance.
 class TrialBalanceEntry {

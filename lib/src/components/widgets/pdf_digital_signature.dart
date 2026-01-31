@@ -117,8 +117,6 @@ class GeniusPdfDigitalSignature {
 
   /// تكوين مظهر التوقيع
   void _configureAppearance(PdfSignatureField signatureField, Rect bounds) {
-    final appearance = settings.appearance;
-
     // Create graphics appearance
     final template = PdfTemplate(bounds.width, bounds.height);
     final graphics = template.graphics!;

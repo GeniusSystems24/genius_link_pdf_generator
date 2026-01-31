@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -179,7 +178,6 @@ class GeniusPdfWatermark {
   void _drawTextWatermark(PdfGraphics graphics, PdfPage page,
       GeniusTextWatermarkSettings settings) {
     final pageSize = page.getClientSize();
-    final center = Offset(pageSize.width / 2, pageSize.height / 2);
 
     // Font
     final font = baseFont;
@@ -291,9 +289,6 @@ class GeniusPdfWatermark {
     final textSize = font.measureString(settings.text);
 
     // Calculate diagonal length
-    final diagonalLength = math.sqrt(
-        pageSize.width * pageSize.width + pageSize.height * pageSize.height);
-
     // Center position
     final centerX = pageSize.width / 2;
     final centerY = pageSize.height / 2;

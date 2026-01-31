@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
-import '../data/sample_data.dart';
-import '../main.dart' show geniusPdfConfig;
+import '../documents/templates_demo_documents.dart';
 import '../theme/app_theme.dart';
 
 class TemplatesDemoScreen extends StatefulWidget {
@@ -745,14 +744,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
     setState(() => _isGenerating = true);
 
     try {
-      final config = _createConfig();
-      final invoice = TaxInvoiceTemplate(
-        config: config,
-        company: SampleData.companyInfo,
-        customer: SampleData.invoiceCustomer,
-        invoice: SampleData.invoiceData,
-        showQRCode: false,
-      );
+      final invoice = buildTaxInvoiceTemplate(isRtl: _isRTL);
 
       final service = GeniusPdfService();
       final result = await service.generateAndOpen(
@@ -773,12 +765,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
     setState(() => _isGenerating = true);
 
     try {
-      final config = _createConfig();
-      final report = TrialBalanceTemplate(
-        config: config,
-        company: SampleData.companyInfo,
-        data: SampleData.trialBalanceData,
-      );
+      final report = buildTrialBalanceTemplate(isRtl: _isRTL);
 
       final service = GeniusPdfService();
       final result = await service.generateAndOpen(
@@ -799,13 +786,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
     setState(() => _isGenerating = true);
 
     try {
-      final config = _createConfig();
-      final statement = CustomerStatementTemplate(
-        config: config,
-        company: SampleData.companyInfo,
-        customer: SampleData.statementCustomer,
-        data: SampleData.statementData,
-      );
+      final statement = buildCustomerStatementTemplate(isRtl: _isRTL);
 
       final service = GeniusPdfService();
       final result = await service.generateAndOpen(
@@ -826,12 +807,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
     setState(() => _isGenerating = true);
 
     try {
-      final config = _createConfig();
-      final report = InventoryReportTemplate(
-        config: config,
-        company: SampleData.companyInfo,
-        data: SampleData.inventoryData,
-      );
+      final report = buildInventoryReportTemplate(isRtl: _isRTL);
 
       final service = GeniusPdfService();
       final result = await service.generateAndOpen(
@@ -846,14 +822,6 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
     } finally {
       setState(() => _isGenerating = false);
     }
-  }
-
-  GeniusPdfConfig _createConfig() {
-    return GeniusPdfConfig(
-      baseFont:
-          PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 10),
-      textDirection: _isRTL ? TextDirection.rtl : TextDirection.ltr,
-    );
   }
 
   void _showSuccess(String message) {

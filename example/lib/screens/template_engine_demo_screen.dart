@@ -1,8 +1,24 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
+import 'package:genius_pdf_example/main.dart';
 
+import '../documents/templates/template_builtin_invoice.dart';
+import '../documents/templates/template_builtin_letter.dart';
+import '../documents/templates/template_builtin_report.dart';
+import '../documents/templates/template_contract.dart';
+import '../documents/templates/template_export_json.dart';
+import '../documents/templates/template_invoice.dart';
+import '../documents/templates/template_json_letter.dart';
+import '../documents/templates/template_json_memo.dart';
+import '../documents/templates/template_purchase_order.dart';
+import '../documents/templates/template_quotation.dart';
+import '../documents/templates/template_receipt.dart';
+import '../documents/templates/template_report.dart';
+import '../documents/templates/template_timesheet.dart';
 import '../theme/app_theme.dart';
 
 /// Model class for template engine tabs.
@@ -34,7 +50,6 @@ class TemplateEngineDemoScreen extends StatefulWidget {
 class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  PdfFont? _font;
   bool _isLoading = false;
   String _status = '';
   Uint8List? _pdfBytes;
@@ -68,14 +83,6 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
     _tabController.addListener(() => setState(() {}));
-    _loadFont();
-  }
-
-  Future<void> _loadFont() async {
-    final fontData = await rootBundle.load('assets/fonts/din/din.ttf');
-    setState(() {
-      _font = PdfTrueTypeFont(fontData.buffer.asUint8List(), 12);
-    });
   }
 
   @override
@@ -134,7 +141,8 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
                 padding:
                     const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
-                  gradient: isSelected ? LinearGradient(colors: tab.gradient) : null,
+                  gradient:
+                      isSelected ? LinearGradient(colors: tab.gradient) : null,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -145,17 +153,22 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
                       size: 20,
                       color: isSelected
                           ? Colors.white
-                          : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                          : (isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.lightTextSecondary),
                     ),
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(
                         tab.title,
                         style: TextStyle(
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w500,
                           color: isSelected
                               ? Colors.white
-                              : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                              : (isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.lightTextSecondary),
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -181,7 +194,8 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             icon: Icons.build_rounded,
             title: 'Template Builder',
             titleAr: 'منشئ القوالب',
-            description: 'Create templates programmatically using TemplateBuilder',
+            description:
+                'Create templates programmatically using TemplateBuilder',
             gradient: AppColors.primaryGradient,
           ),
           const SizedBox(height: 20),
@@ -204,6 +218,51 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
                 icon: Icons.article_rounded,
                 gradient: AppColors.orangeGradient,
                 onPressed: _generateReportTemplate,
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                isDark: isDark,
+                label: 'Generate Purchase Order',
+                labelAr: 'إنشاء أمر شراء',
+                icon: Icons.shopping_cart_rounded,
+                gradient: AppColors.cyanGradient,
+                onPressed: _generatePurchaseOrderTemplate,
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                isDark: isDark,
+                label: 'Generate Receipt Template',
+                labelAr: 'إنشاء قالب إيصال',
+                icon: Icons.receipt_long_rounded,
+                gradient: AppColors.successGradient,
+                onPressed: _generateReceiptTemplate,
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                isDark: isDark,
+                label: 'Generate Quotation',
+                labelAr: 'إنشاء عرض سعر',
+                icon: Icons.request_quote_rounded,
+                gradient: AppColors.orangeGradient,
+                onPressed: _generateQuotationTemplate,
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                isDark: isDark,
+                label: 'Generate Contract',
+                labelAr: 'إنشاء عقد خدمة',
+                icon: Icons.assignment_rounded,
+                gradient: AppColors.purpleGradient,
+                onPressed: _generateContractTemplate,
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                isDark: isDark,
+                label: 'Generate Timesheet',
+                labelAr: 'إنشاء سجل دوام',
+                icon: Icons.schedule_rounded,
+                gradient: AppColors.cyanGradient,
+                onPressed: _generateTimesheetTemplate,
               ),
             ],
           ),
@@ -239,6 +298,15 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
                 icon: Icons.upload_file_rounded,
                 gradient: AppColors.primaryGradient,
                 onPressed: _generateFromJson,
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                isDark: isDark,
+                label: 'Load Memo JSON',
+                labelAr: 'تحميل مذكرة JSON',
+                icon: Icons.note_alt_rounded,
+                gradient: AppColors.orangeGradient,
+                onPressed: _generateFromJsonMemo,
               ),
               const SizedBox(height: 12),
               _buildActionButton(
@@ -301,6 +369,24 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
                 icon: Icons.picture_as_pdf_rounded,
                 gradient: AppColors.orangeGradient,
                 onPressed: _renderBuiltInInvoice,
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                isDark: isDark,
+                label: 'Render Built-in Report',
+                labelAr: 'عرض التقرير المدمج',
+                icon: Icons.assessment_rounded,
+                gradient: AppColors.cyanGradient,
+                onPressed: _renderBuiltInReport,
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                isDark: isDark,
+                label: 'Render Built-in Letter',
+                labelAr: 'عرض الخطاب المدمج',
+                icon: Icons.mail_outline_rounded,
+                gradient: AppColors.primaryGradient,
+                onPressed: _renderBuiltInLetter,
               ),
             ],
           ),
@@ -420,7 +506,9 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             children: [
               Icon(
                 Icons.play_circle_rounded,
-                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -449,7 +537,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     required List<Color> gradient,
     required VoidCallback onPressed,
   }) {
-    final isEnabled = _font != null && !_isLoading;
+    final isEnabled = !_isLoading;
 
     return Material(
       color: Colors.transparent,
@@ -460,7 +548,9 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: isEnabled ? LinearGradient(colors: gradient) : null,
-            color: isEnabled ? null : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+            color: isEnabled
+                ? null
+                : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
             borderRadius: BorderRadius.circular(12),
             boxShadow: isEnabled
                 ? [
@@ -476,7 +566,11 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             children: [
               Icon(
                 icon,
-                color: isEnabled ? Colors.white : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                color: isEnabled
+                    ? Colors.white
+                    : (isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary),
                 size: 24,
               ),
               const SizedBox(width: 16),
@@ -489,7 +583,11 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: isEnabled ? Colors.white : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                        color: isEnabled
+                            ? Colors.white
+                            : (isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary),
                       ),
                     ),
                     Text(
@@ -498,7 +596,9 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
                         fontSize: 12,
                         color: isEnabled
                             ? Colors.white.withValues(alpha: 0.8)
-                            : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                            : (isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary),
                       ),
                       textDirection: TextDirection.rtl,
                     ),
@@ -512,14 +612,22 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      isEnabled ? Colors.white : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                      isEnabled
+                          ? Colors.white
+                          : (isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.lightTextSecondary),
                     ),
                   ),
                 )
               else
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: isEnabled ? Colors.white.withValues(alpha: 0.8) : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                  color: isEnabled
+                      ? Colors.white.withValues(alpha: 0.8)
+                      : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary),
                   size: 16,
                 ),
             ],
@@ -561,7 +669,9 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: isSuccess ? AppColors.successGradient : AppColors.primaryGradient,
+                    colors: isSuccess
+                        ? AppColors.successGradient
+                        : AppColors.primaryGradient,
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -583,9 +693,11 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
               if (_pdfBytes != null) ...[
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.successGradient.first.withValues(alpha: 0.15),
+                    color:
+                        AppColors.successGradient.first.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -615,7 +727,9 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
               style: TextStyle(
                 fontSize: 13,
                 fontFamily: 'monospace',
-                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
                 height: 1.5,
               ),
             ),
@@ -626,8 +740,6 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
   }
 
   Future<void> _generateInvoiceTemplate() async {
-    if (_font == null) return;
-
     setState(() {
       _isLoading = true;
       _status = 'Building invoice template...';
@@ -635,79 +747,14 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
 
     try {
       // Build template
-      final template = TemplateBuilder(
-        id: 'demo-invoice',
-        name: 'Demo Invoice',
-        nameAr: 'فاتورة تجريبية',
-      )
-          .addVariable(TemplateVariable.string('invoiceNumber', required: true))
-          .addVariable(TemplateVariable.string('customerName', required: true))
-          .addVariable(TemplateVariable.date('invoiceDate'))
-          .addVariable(TemplateVariable.list('items'))
-          .addVariable(TemplateVariable.currency('total'))
-          .addText('INVOICE', textAr: 'فاتورة', fontSize: 24)
-          .addSpacer(20)
-          .addRow([
-            const VariableElement(
-              variableName: 'invoiceNumber',
-              prefix: 'Invoice #: ',
-              prefixAr: 'رقم الفاتورة: ',
-            ),
-            const VariableElement(
-              variableName: 'invoiceDate',
-              prefix: 'Date: ',
-              prefixAr: 'التاريخ: ',
-            ),
-          ], flexValues: [
-            1,
-            1
-          ])
-          .addSpacer(10)
-          .addVariableElement('customerName', prefix: 'Customer: ')
-          .addSpacer(20)
-          .addDivider()
-          .addSpacer(10)
-          .addTable(
-            columns: [
-              const TableColumn(
-                  field: 'name', title: 'Item', titleAr: 'البند', flex: 2),
-              const TableColumn(
-                  field: 'qty', title: 'Qty', titleAr: 'الكمية', flex: 1),
-              const TableColumn(
-                  field: 'price', title: 'Price', titleAr: 'السعر', flex: 1),
-            ],
-            dataVariable: 'items',
-          )
-          .addSpacer(10)
-          .addDivider()
-          .addSpacer(10)
-          .addVariableElement('total', prefix: 'Total: ', suffix: ' SAR')
-          .build();
-
-      // Render with sample data
-      final engine = PdfTemplateEngine(baseFont: _font!);
-      final bytes = await engine.render(
-        template: template,
-        data: {
-          'invoiceNumber': 'INV-2026-001',
-          'customerName': 'Ahmed Mohamed',
-          'invoiceDate': DateTime.now().toString().split(' ')[0],
-          'items': [
-            {'name': 'Product A', 'qty': 2, 'price': 150},
-            {'name': 'Product B', 'qty': 1, 'price': 300},
-            {'name': 'Product C', 'qty': 3, 'price': 75},
-          ],
-          'total': 825,
-        },
-        isRtl: false,
-      );
+      final result = await buildTemplateInvoiceBytes(geniusPdfConfig);
 
       setState(() {
-        _pdfBytes = bytes;
+        _pdfBytes = result.bytes;
         _status = 'Invoice template generated successfully!\n'
-            'Template ID: ${template.id}\n'
-            'Variables: ${template.variables.length}\n'
-            'Elements: ${template.content.length}';
+            'Template ID: ${result.template.id}\n'
+            'Variables: ${result.template.variables.length}\n'
+            'Elements: ${result.template.content.length}';
       });
     } catch (e) {
       setState(() {
@@ -720,80 +767,151 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
   }
 
   Future<void> _generateReportTemplate() async {
-    if (_font == null) return;
-
     setState(() {
       _isLoading = true;
       _status = 'Building report template...';
     });
 
     try {
-      final template = TemplateBuilder(
-        id: 'demo-report',
-        name: 'Monthly Report',
-        nameAr: 'التقرير الشهري',
-      )
-          .addVariable(TemplateVariable.string('title', required: true))
-          .addVariable(TemplateVariable.string('department'))
-          .addVariable(TemplateVariable.date('reportDate'))
-          .addVariable(TemplateVariable.list('sections'))
-          .addText('MONTHLY REPORT', textAr: 'التقرير الشهري', fontSize: 24)
-          .addSpacer(15)
-          .addVariableElement('title', prefix: 'Title: ')
-          .addVariableElement('department', prefix: 'Department: ')
-          .addVariableElement('reportDate', prefix: 'Date: ')
-          .addSpacer(20)
-          .addDivider(thickness: 2)
-          .addSpacer(15)
-          .addLoop(
-        variable: 'sections',
-        itemName: 'section',
-        children: [
-          const VariableElement(
-            variableName: 'section.title',
-            fontSize: 16,
-            isBold: true,
-          ),
-          const SpacerElement(height: 5),
-          const VariableElement(variableName: 'section.content'),
-          const SpacerElement(height: 15),
-        ],
-      ).build();
-
-      final engine = PdfTemplateEngine(baseFont: _font!);
-      final bytes = await engine.render(
-        template: template,
-        data: {
-          'title': 'Q1 Performance Review',
-          'department': 'Engineering',
-          'reportDate': DateTime.now().toString().split(' ')[0],
-          'sections': [
-            {
-              'title': 'Summary',
-              'content':
-                  'Overall performance exceeded expectations with 120% target achievement.',
-            },
-            {
-              'title': 'Key Achievements',
-              'content':
-                  'Launched 3 new products, reduced costs by 15%, improved efficiency by 25%.',
-            },
-            {
-              'title': 'Challenges',
-              'content':
-                  'Supply chain disruptions caused delays in Q1. Mitigation measures implemented.',
-            },
-          ],
-        },
-        isRtl: false,
-      );
+      final result = await buildTemplateReportBytes(geniusPdfConfig);
 
       setState(() {
-        _pdfBytes = bytes;
+        _pdfBytes = result.bytes;
         _status = 'Report template generated successfully!\n'
-            'Template ID: ${template.id}\n'
-            'Variables: ${template.variables.length}\n'
-            'Elements: ${template.content.length}';
+            'Template ID: ${result.template.id}\n'
+            'Variables: ${result.template.variables.length}\n'
+            'Elements: ${result.template.content.length}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Error: $e';
+        _pdfBytes = null;
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _generatePurchaseOrderTemplate() async {
+    setState(() {
+      _isLoading = true;
+      _status = 'Building purchase order template...';
+    });
+
+    try {
+        final result = await buildTemplatePurchaseOrderBytes(geniusPdfConfig);
+
+      setState(() {
+        _pdfBytes = result.bytes;
+        _status = 'Purchase order generated successfully!\n'
+            'Template ID: ${result.template.id}\n'
+            'Variables: ${result.template.variables.length}\n'
+            'Elements: ${result.template.content.length}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Error: $e';
+        _pdfBytes = null;
+        _isLoading = false;
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _generateReceiptTemplate() async {
+    setState(() {
+      _isLoading = true;
+      _status = 'Building receipt template...';
+    });
+
+    try {
+      final result = await buildTemplateReceiptBytes(geniusPdfConfig);
+
+      setState(() {
+        _pdfBytes = result.bytes;
+        _status = 'Receipt template generated successfully!\n'
+            'Template ID: ${result.template.id}\n'
+            'Variables: ${result.template.variables.length}\n'
+            'Elements: ${result.template.content.length}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Error: $e';
+        _pdfBytes = null;
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _generateQuotationTemplate() async {
+    setState(() {
+      _isLoading = true;
+      _status = 'Building quotation template...';
+    });
+
+    try {
+        final result = await buildTemplateQuotationBytes(geniusPdfConfig);
+
+      setState(() {
+        _pdfBytes = result.bytes;
+        _status = 'Quotation template generated successfully!\n'
+            'Template ID: ${result.template.id}\n'
+            'Variables: ${result.template.variables.length}\n'
+            'Elements: ${result.template.content.length}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Error: $e';
+        _pdfBytes = null;
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _generateContractTemplate() async {
+    setState(() {
+      _isLoading = true;
+      _status = 'Building contract template...';
+    });
+
+    try {
+        final result = await buildTemplateContractBytes(geniusPdfConfig);
+
+      setState(() {
+        _pdfBytes = result.bytes;
+        _status = 'Contract template generated successfully!\n'
+            'Template ID: ${result.template.id}\n'
+            'Variables: ${result.template.variables.length}\n'
+            'Elements: ${result.template.content.length}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Error: $e';
+        _pdfBytes = null;
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _generateTimesheetTemplate() async {
+    setState(() {
+      _isLoading = true;
+      _status = 'Building timesheet template...';
+    });
+
+    try {
+        final result = await buildTemplateTimesheetBytes(geniusPdfConfig);
+
+      setState(() {
+        _pdfBytes = result.bytes;
+        _status = 'Timesheet template generated successfully!\n'
+            'Template ID: ${result.template.id}\n'
+            'Variables: ${result.template.variables.length}\n'
+            'Elements: ${result.template.content.length}';
       });
     } catch (e) {
       setState(() {
@@ -806,68 +924,46 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
   }
 
   Future<void> _generateFromJson() async {
-    if (_font == null) return;
-
     setState(() {
       _isLoading = true;
       _status = 'Loading template from JSON...';
     });
 
     try {
-      // Define template in JSON
-      const jsonTemplate = '''
-{
-  "id": "json-letter",
-  "name": "Business Letter",
-  "nameAr": "خطاب رسمي",
-  "version": "1.0.0",
-  "category": "general",
-  "variables": [
-    {"name": "recipient", "type": "string", "required": true, "label": "Recipient"},
-    {"name": "subject", "type": "string", "required": true, "label": "Subject"},
-    {"name": "body", "type": "string", "required": true, "label": "Body"},
-    {"name": "sender", "type": "string", "required": true, "label": "Sender"},
-    {"name": "date", "type": "date", "label": "Date"}
-  ],
-  "content": [
-    {"type": "variable", "variableName": "date"},
-    {"type": "spacer", "height": 20},
-    {"type": "variable", "variableName": "recipient", "prefix": "To: ", "prefixAr": "إلى: "},
-    {"type": "spacer", "height": 15},
-    {"type": "variable", "variableName": "subject", "prefix": "Subject: ", "prefixAr": "الموضوع: ", "isBold": true},
-    {"type": "spacer", "height": 20},
-    {"type": "variable", "variableName": "body"},
-    {"type": "spacer", "height": 30},
-    {"type": "text", "text": "Best regards,", "textAr": "مع أطيب التحيات،"},
-    {"type": "spacer", "height": 10},
-    {"type": "variable", "variableName": "sender", "isBold": true}
-  ]
-}
-''';
-
-      final template = TemplateDefinition.fromJsonString(jsonTemplate);
-
-      final engine = PdfTemplateEngine(baseFont: _font!);
-      final bytes = await engine.render(
-        template: template,
-        data: {
-          'recipient': 'Mr. John Smith\nABC Corporation',
-          'subject': 'Partnership Proposal',
-          'body': 'Dear Mr. Smith,\n\nI am writing to propose a strategic partnership between our organizations. '
-              'Our companies share similar values and complementary strengths that could benefit both parties.\n\n'
-              'I would welcome the opportunity to discuss this proposal in detail at your convenience.',
-          'sender': 'Sarah Johnson\nCEO, XYZ Inc.',
-          'date': DateTime.now().toString().split(' ')[0],
-        },
-        isRtl: false,
-      );
+        final result = await buildTemplateFromJsonLetterBytes(geniusPdfConfig);
 
       setState(() {
-        _pdfBytes = bytes;
+        _pdfBytes = result.bytes;
         _status = 'Template loaded from JSON successfully!\n'
-            'Template: ${template.name}\n'
-            'Version: ${template.version}\n'
-            'Variables: ${template.variables.length}';
+            'Template: ${result.template.name}\n'
+            'Version: ${result.template.version}\n'
+            'Variables: ${result.template.variables.length}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Error: $e';
+        _pdfBytes = null;
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _generateFromJsonMemo() async {
+    setState(() {
+      _isLoading = true;
+      _status = 'Loading memo template from JSON...';
+    });
+
+    try {
+        final result = await buildTemplateFromJsonMemoBytes(geniusPdfConfig);
+
+      setState(() {
+        _pdfBytes = result.bytes;
+        _status = 'Memo template loaded from JSON!\n'
+            'Template: ${result.template.name}\n'
+            'Version: ${result.template.version}\n'
+            'Variables: ${result.template.variables.length}';
       });
     } catch (e) {
       setState(() {
@@ -886,27 +982,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     });
 
     try {
-      final template = TemplateDefinition(
-        id: 'export-demo',
-        name: 'Export Demo',
-        nameAr: 'عرض التصدير',
-        description: 'A template for demonstrating JSON export',
-        version: '1.0.0',
-        author: 'Genius Systems',
-        category: TemplateCategory.general,
-        tags: ['demo', 'export', 'example'],
-        variables: [
-          TemplateVariable.string('title', required: true, label: 'Title'),
-          TemplateVariable.list('items', label: 'Items'),
-        ],
-        content: const [
-          TextElement(text: 'Demo Template', fontSize: 20),
-          SpacerElement(height: 10),
-          VariableElement(variableName: 'title'),
-        ],
-      );
-
-      final json = template.toJsonString(pretty: true);
+      final json = buildExportTemplateJson();
 
       setState(() {
         _status = 'Template exported to JSON:\n\n$json';
@@ -986,42 +1062,66 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
   }
 
   Future<void> _renderBuiltInInvoice() async {
-    if (_font == null) return;
-
     setState(() {
       _isLoading = true;
       _status = 'Rendering built-in invoice template...';
     });
 
     try {
-      final registry = TemplateRegistry.instance;
-
-      if (!registry.has('builtin-simple-invoice')) {
-        TemplateLibrary.registerBuiltInTemplates(registry);
-      }
-
-      final template = registry.getOrThrow('builtin-simple-invoice');
-
-      final engine = PdfTemplateEngine(baseFont: _font!);
-      final bytes = await engine.render(
-        template: template,
-        data: {
-          'invoiceNumber': 'INV-2026-999',
-          'invoiceDate': DateTime.now().toIso8601String(),
-          'customerName': 'Test Customer',
-          'items': [
-            {'name': 'Service A', 'quantity': 1, 'price': 500, 'total': 500},
-            {'name': 'Service B', 'quantity': 2, 'price': 250, 'total': 500},
-          ],
-          'total': 1000,
-        },
-        isRtl: false,
-      );
+      final result = await buildBuiltInInvoiceBytes(geniusPdfConfig);
 
       setState(() {
-        _pdfBytes = bytes;
+        _pdfBytes = result.bytes;
         _status = 'Built-in invoice rendered successfully!\n'
-            'Template: ${template.name}';
+            'Template: ${result.template.name}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Error: $e';
+        _pdfBytes = null;
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _renderBuiltInReport() async {
+    setState(() {
+      _isLoading = true;
+      _status = 'Rendering built-in report template...';
+    });
+
+    try {
+      final result = await buildBuiltInReportBytes(geniusPdfConfig);
+
+      setState(() {
+        _pdfBytes = result.bytes;
+        _status = 'Built-in report rendered successfully!\n'
+            'Template: ${result.template.name}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Error: $e';
+        _pdfBytes = null;
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _renderBuiltInLetter() async {
+    setState(() {
+      _isLoading = true;
+      _status = 'Rendering built-in letter template...';
+    });
+
+    try {
+      final result = await buildBuiltInLetterBytes(geniusPdfConfig);
+
+      setState(() {
+        _pdfBytes = result.bytes;
+        _status = 'Built-in letter rendered successfully!\n'
+            'Template: ${result.template.name}';
       });
     } catch (e) {
       setState(() {

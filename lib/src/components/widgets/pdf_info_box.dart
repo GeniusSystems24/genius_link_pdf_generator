@@ -1269,8 +1269,7 @@ class GeniusPdfInfoBox {
       if (displaySubtitle != null && displaySubtitle.isNotEmpty) {
         currentY += 2;
         final subtitleColor =
-            (style.titleStyle.color ?? const Color(0xFF424242))
-                .withValues(alpha: 0.7);
+            style.titleStyle.color.withValues(alpha: 0.7);
         graphics.drawString(
           displaySubtitle,
           baseFont,
@@ -1363,8 +1362,7 @@ class GeniusPdfInfoBox {
     if (displayFooter != null && displayFooter.isNotEmpty) {
       currentY += style.itemSpacing;
       final defaultFooterColor =
-          (style.contentStyle.color ?? const Color(0xFF424242))
-              .withValues(alpha: 0.7);
+        style.contentStyle.color.withValues(alpha: 0.7);
       final effectiveFooterStyle = footerStyle ??
           GeniusPdfTextStyle(
             fontSize: style.contentStyle.fontSize * 0.9,
@@ -2336,8 +2334,7 @@ class GeniusPdfSection {
           final subtitleTextStyle = style.subtitleStyle ??
               GeniusPdfTextStyle(
                 fontSize: style.titleStyle.fontSize * 0.85,
-                color: (style.titleStyle.color ?? const Color(0xFF424242))
-                    .withValues(alpha: 0.7),
+                color: style.titleStyle.color.withValues(alpha: 0.7),
               );
           graphics.drawString(
             displaySubtitle,
@@ -2354,9 +2351,7 @@ class GeniusPdfSection {
           currentY += 2;
           graphics.drawLine(
             PdfPen(
-              (style.titleUnderlineColor ??
-                      style.titleStyle.color ??
-                      const Color(0xFF424242))
+              (style.titleUnderlineColor ?? style.titleStyle.color)
                   .toPdfColor(),
               width: style.titleUnderlineWidth,
             ),
@@ -2464,7 +2459,7 @@ class GeniusPdfSection {
 
       var titleY = boxBounds.top + style.padding.top;
       graphics.drawString(
-        displayTitle!,
+        displayTitle,
         boldFont,
         brush: style.titleStyle.toBrush(),
         bounds: Rect.fromLTWH(
@@ -2483,8 +2478,7 @@ class GeniusPdfSection {
         final subtitleTextStyle = style.subtitleStyle ??
             GeniusPdfTextStyle(
               fontSize: style.titleStyle.fontSize * 0.85,
-              color: (style.titleStyle.color ?? const Color(0xFF424242))
-                  .withValues(alpha: 0.7),
+              color: style.titleStyle.color.withValues(alpha: 0.7),
             );
         graphics.drawString(
           displaySubtitle,

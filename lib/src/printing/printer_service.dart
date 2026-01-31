@@ -14,7 +14,7 @@ library;
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:io';
-import 'dart:ui' show Rect, ImageByteFormat;
+import 'dart:ui' show Rect;
 
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';

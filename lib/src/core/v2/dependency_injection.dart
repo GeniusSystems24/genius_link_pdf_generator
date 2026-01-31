@@ -16,7 +16,7 @@ import 'dart:async';
 ///
 /// // Register lazy singleton
 /// container.registerLazySingleton<PdfTemplateEngine>(() {
-///   return PdfTemplateEngine(baseFont: container.get<PdfFont>());
+///   return PdfTemplateEngine(config: container.get<GeniusPdfConfig>());
 /// });
 ///
 /// // Resolve dependencies

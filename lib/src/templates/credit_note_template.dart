@@ -477,7 +477,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       '$notesLabel\n$notesText',
-      baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 9),
+      baseFont,
       bounds: Rect.fromLTWH(0, currentY, pageWidth, 50),
       format: PdfStringFormat(
         alignment:

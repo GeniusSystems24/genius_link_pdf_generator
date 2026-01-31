@@ -489,8 +489,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
             onSelectionChanged: (v) => setState(() => _isRTL = v.first),
             style: ButtonStyle(
               visualDensity: VisualDensity.compact,
-              textStyle:
-                  WidgetStateProperty.all(const TextStyle(fontSize: 12)),
+              textStyle: WidgetStateProperty.all(const TextStyle(fontSize: 12)),
             ),
           ),
         ],
@@ -504,8 +503,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       width: double.infinity,
       height: 56,
       decoration: BoxDecoration(
-        gradient:
-            _isGenerating ? null : LinearGradient(colors: gradient),
+        gradient: _isGenerating ? null : LinearGradient(colors: gradient),
         borderRadius: BorderRadius.circular(14),
         boxShadow: _isGenerating
             ? null
@@ -564,8 +562,9 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         bounds: Rect.fromLTWH(20, 20, pageSize.width - 40, 30),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection:
-              _isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+          textDirection: _isRTL
+              ? PdfTextDirection.rightToLeft
+              : PdfTextDirection.leftToRight,
         ),
       );
 
@@ -641,8 +640,9 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         bounds: Rect.fromLTWH(20, 20, pageSize.width - 40, 30),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection:
-              _isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+          textDirection: _isRTL
+              ? PdfTextDirection.rightToLeft
+              : PdfTextDirection.leftToRight,
         ),
       );
 
@@ -742,8 +742,9 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         bounds: Rect.fromLTWH(20, 15, pageSize.width - 40, 25),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection:
-              _isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+          textDirection: _isRTL
+              ? PdfTextDirection.rightToLeft
+              : PdfTextDirection.leftToRight,
         ),
       );
 
@@ -757,8 +758,9 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 20),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection:
-              _isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+          textDirection: _isRTL
+              ? PdfTextDirection.rightToLeft
+              : PdfTextDirection.leftToRight,
         ),
       );
       yOffset += 25;
@@ -799,8 +801,9 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 20),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection:
-              _isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+          textDirection: _isRTL
+              ? PdfTextDirection.rightToLeft
+              : PdfTextDirection.leftToRight,
         ),
       );
       yOffset += 25;

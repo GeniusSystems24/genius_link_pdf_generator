@@ -943,7 +943,6 @@ class GeniusPdfRichText {
       case GeniusPdfParagraphAlignment.end:
         return isRTL ? bounds.left + lineWidth : bounds.right - lineWidth;
       case GeniusPdfParagraphAlignment.start:
-      default:
         return isRTL ? bounds.right : bounds.left;
     }
   }

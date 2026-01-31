@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
-import '../widgets/dashboard_sidebar.dart';
+import 'theme/app_theme.dart';
+import 'widgets/dashboard_sidebar.dart';
 import 'dashboard_home.dart';
-import 'components_demo_screen.dart';
-import 'charts_demo_screen.dart';
-import 'templates_demo_screen.dart';
-import 'new_templates_demo_screen.dart';
-import 'security_demo_screen.dart';
-import 'export_demo_screen.dart';
-import 'printing_demo_screen.dart';
-import 'sharing_demo_screen.dart';
-import 'ai_features_demo_screen.dart';
-import 'v2_architecture_demo_screen.dart';
-import 'template_engine_demo_screen.dart';
-import 'job_manager_demo_screen.dart';
-import 'custom_report_screen.dart';
-import 'barcode_demo_screen.dart';
+import 'screens/components_demo_screen.dart';
+import 'screens/charts_demo_screen.dart';
+import 'screens/templates_demo_screen.dart';
+import 'screens/new_templates_demo_screen.dart';
+import 'screens/template_engine_demo_screen.dart';
+import 'screens/security_demo_screen.dart';
+import 'screens/export_demo_screen.dart';
+import 'screens/printing_demo_screen.dart';
+import 'screens/sharing_demo_screen.dart';
+import 'screens/ai_features_demo_screen.dart';
+import 'screens/v2_architecture_demo_screen.dart';
+import 'screens/barcode_demo_screen.dart';
 
 /// Main Dashboard Layout with Sidebar Navigation
 class DashboardLayout extends StatefulWidget {
@@ -135,6 +133,9 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       _DrawerItem('components', 'Components', Icons.widgets_rounded),
       _DrawerItem('charts', 'Charts', Icons.bar_chart_rounded),
       _DrawerItem('templates', 'Templates', Icons.description_rounded),
+      _DrawerItem('templates_demo', 'Templates Demo', Icons.view_quilt_rounded),
+      _DrawerItem('new_templates', 'Business Templates', Icons.auto_awesome_rounded),
+      _DrawerItem('template_engine', 'Template Engine', Icons.tune_rounded),
       _DrawerItem('barcodes', 'Barcodes & QR', Icons.qr_code_rounded),
       _DrawerItem('security', 'Security', Icons.security_rounded),
       _DrawerItem('export', 'Export', Icons.file_download_rounded),
@@ -142,6 +143,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       _DrawerItem('sharing', 'Sharing', Icons.share_rounded),
       _DrawerItem('ai_features', 'AI Features', Icons.smart_toy_rounded),
       _DrawerItem('advanced', 'Advanced', Icons.auto_awesome_rounded),
+      _DrawerItem('v2_architecture', 'V2 Architecture', Icons.account_tree_rounded),
     ];
 
     return SafeArea(
@@ -428,8 +430,13 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       case 'area_chart':
         return 'Charts';
       case 'templates':
+      case 'templates_demo':
       case 'invoices':
         return 'Templates';
+      case 'new_templates':
+        return 'Business Templates';
+      case 'template_engine':
+        return 'Template Engine';
       case 'financial':
       case 'sales':
       case 'hr':
@@ -447,6 +454,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       case 'ai_features':
         return 'AI Features';
       case 'advanced':
+      case 'v2_architecture':
         return 'Advanced Features';
       default:
         return 'Genius PDF';
@@ -484,8 +492,13 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
       // Templates
       case 'templates':
+      case 'templates_demo':
       case 'invoices':
         return const TemplatesDemoScreen(initialTab: 0);
+      case 'new_templates':
+        return const NewTemplatesDemoScreen(initialTab: 0);
+      case 'template_engine':
+        return const TemplateEngineDemoScreen();
       case 'financial':
         return const NewTemplatesDemoScreen(initialTab: 0);
       case 'sales':
@@ -509,6 +522,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       case 'ai_features':
         return const AiFeaturesDemoScreen();
       case 'advanced':
+      case 'v2_architecture':
         return const V2ArchitectureDemoScreen();
 
       default:

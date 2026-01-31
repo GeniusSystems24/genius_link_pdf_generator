@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../core/pdf_config.dart';
 import 'template_definition.dart';
 import 'template_elements.dart';
 import 'template_models.dart';
@@ -16,7 +17,7 @@ import 'template_models.dart';
 /// ## Example
 /// ```dart
 /// final engine = PdfTemplateEngine(
-///   baseFont: PdfTrueTypeFont(fontBytes, 12),
+///   config: pdfConfig,
 /// );
 ///
 /// // Render a template with data
@@ -36,12 +37,21 @@ import 'template_models.dart';
 class PdfTemplateEngine {
   /// Creates a template engine.
   PdfTemplateEngine({
-    required this.baseFont,
-    this.defaultMargins = const TemplateMargins.all(40),
-  });
+    required this.config,
+    TemplateMargins? defaultMargins,
+  }) : defaultMargins = defaultMargins ??
+            TemplateMargins(
+              left: config.margins.left,
+              top: config.margins.top,
+              right: config.margins.right,
+              bottom: config.margins.bottom,
+            );
+
+  /// Configuration for the document.
+  final GeniusPdfConfig config;
 
   /// The base font for the document.
-  final PdfFont baseFont;
+  PdfFont get baseFont => config.baseFont;
 
   /// Default margins if not specified in template.
   final TemplateMargins defaultMargins;
@@ -50,15 +60,16 @@ class PdfTemplateEngine {
   Future<Uint8List> render({
     required TemplateDefinition template,
     required Map<String, dynamic> data,
-    bool isRtl = false,
+    bool? isRtl,
     void Function(RenderProgress)? onProgress,
   }) async {
+    final resolvedRtl = isRtl ?? config.textDirection == TextDirection.rtl;
     // Validate data
     final validationErrors = template.validate(data);
     if (validationErrors.any((e) => !e.isValid)) {
       final errors = validationErrors
           .where((e) => !e.isValid)
-          .map((e) => e.getError(isRtl))
+          .map((e) => e.getError(resolvedRtl))
           .join(', ');
       throw TemplateRenderException('Validation failed: $errors');
     }
@@ -69,7 +80,7 @@ class PdfTemplateEngine {
     // Create context
     final context = TemplateContext(
       data: mergedData,
-      isRtl: isRtl,
+      isRtl: resolvedRtl,
     );
 
     // Create document
@@ -214,7 +225,7 @@ class PdfTemplateEngine {
   Future<PdfDocument> renderToDocument({
     required TemplateDefinition template,
     required Map<String, dynamic> data,
-    bool isRtl = false,
+    bool? isRtl,
   }) async {
     final bytes = await render(
       template: template,
@@ -227,26 +238,23 @@ class PdfTemplateEngine {
   /// Previews a template with sample data.
   Future<Uint8List> preview({
     required TemplateDefinition template,
-    bool isRtl = false,
+    bool? isRtl,
   }) {
     // Generate sample data from variable definitions
     final sampleData = _generateSampleData(template);
     return render(template: template, data: sampleData, isRtl: isRtl);
   }
 
-  void _applyPageSettings(
-      PdfDocument document, TemplatePageSettings? settings) {
-    if (settings == null) return;
+  void _applyPageSettings(PdfDocument document, TemplatePageSettings? settings) {
+    document.pageSettings.size = settings?.pageSize ?? config.pageSize;
+    document.pageSettings.orientation =
+        settings?.orientation ?? config.orientation;
 
-    document.pageSettings.size = settings.pageSize;
-    document.pageSettings.orientation = settings.orientation;
-
-    if (settings.margins != null) {
-      document.pageSettings.margins.left = settings.margins!.left;
-      document.pageSettings.margins.top = settings.margins!.top;
-      document.pageSettings.margins.right = settings.margins!.right;
-      document.pageSettings.margins.bottom = settings.margins!.bottom;
-    }
+    final margins = settings?.margins ?? defaultMargins;
+    document.pageSettings.margins.left = margins.left;
+    document.pageSettings.margins.top = margins.top;
+    document.pageSettings.margins.right = margins.right;
+    document.pageSettings.margins.bottom = margins.bottom;
   }
 
   double _renderElements(

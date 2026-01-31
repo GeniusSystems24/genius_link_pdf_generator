@@ -1925,7 +1925,7 @@ class GeniusPdfReportHeader {
       final logoX =
           _resolveLogoX(logoPos, contentLeft, contentRight, logoWidth);
       graphics.drawImage(
-        PdfBitmap(scaledLogo!.data),
+        PdfBitmap(scaledLogo.data),
         Rect.fromLTWH(logoX, currentY, logoWidth, logoHeight),
       );
       logoSectionHeight = logoHeight;

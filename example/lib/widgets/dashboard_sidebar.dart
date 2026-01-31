@@ -130,6 +130,21 @@ class _DashboardSidebarState extends State<DashboardSidebar>
       gradient: AppColors.purpleGradient,
       children: [
         const NavItem(
+          id: 'templates_demo',
+          title: 'Templates Demo',
+          icon: Icons.view_quilt_rounded,
+        ),
+        const NavItem(
+          id: 'new_templates',
+          title: 'Business Templates',
+          icon: Icons.auto_awesome_rounded,
+        ),
+        const NavItem(
+          id: 'template_engine',
+          title: 'Template Engine',
+          icon: Icons.tune_rounded,
+        ),
+        const NavItem(
           id: 'invoices',
           title: 'Invoices',
           icon: Icons.receipt_long_rounded,
@@ -187,11 +202,18 @@ class _DashboardSidebarState extends State<DashboardSidebar>
       icon: Icons.smart_toy_rounded,
       gradient: AppColors.warningGradient,
     ),
-    const NavItem(
+    NavItem(
       id: 'advanced',
       title: 'Advanced',
       icon: Icons.auto_awesome_rounded,
       gradient: AppColors.pinkGradient,
+      children: [
+        const NavItem(
+          id: 'v2_architecture',
+          title: 'V2 Architecture',
+          icon: Icons.account_tree_rounded,
+        ),
+      ],
     ),
   ];
 

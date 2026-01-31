@@ -2,14 +2,13 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide PdfTextStyle, PdfGridStyle, PdfBorderStyle, PdfGridColumn, PdfGridRow;
 
+import '../documents/custom_report_document.dart';
+import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 
 class CustomReportScreen extends StatefulWidget {
@@ -122,7 +121,8 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                 ),
               ],
             ),
-            child: const Icon(Icons.design_services_rounded, color: Colors.white, size: 28),
+            child: const Icon(Icons.design_services_rounded,
+                color: Colors.white, size: 28),
           ),
           const SizedBox(width: 20),
           Expanded(
@@ -141,7 +141,9 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                   'Design and generate custom PDF reports with configurable components',
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
                   ),
                 ),
               ],
@@ -159,7 +161,9 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
           _buildHeaderButton(
             isDark: isDark,
             label: _isGenerating ? 'Generating...' : 'Generate PDF',
-            icon: _isGenerating ? Icons.hourglass_empty_rounded : Icons.picture_as_pdf_rounded,
+            icon: _isGenerating
+                ? Icons.hourglass_empty_rounded
+                : Icons.picture_as_pdf_rounded,
             gradient: AppColors.successGradient,
             onPressed: _isGenerating ? null : _generatePdf,
             isLoading: _isGenerating,
@@ -188,7 +192,9 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
             gradient: isEnabled ? LinearGradient(colors: gradient) : null,
-            color: isEnabled ? null : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+            color: isEnabled
+                ? null
+                : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
             borderRadius: BorderRadius.circular(12),
             boxShadow: isEnabled
                 ? [
@@ -219,7 +225,11 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: isEnabled ? Colors.white : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                  color: isEnabled
+                      ? Colors.white
+                      : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary),
                 ),
               ),
             ],
@@ -255,7 +265,9 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
               children: [
                 Icon(
                   Icons.settings_rounded,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -284,14 +296,16 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                   icon: Icons.article_rounded,
                   gradient: AppColors.primaryGradient,
                   children: [
-                    _buildTextField(isDark, 'Report Title (English)', _reportTitle,
-                        (v) => _reportTitle = v),
-                    _buildTextField(isDark, 'Report Title (Arabic)', _reportTitleAr,
-                        (v) => _reportTitleAr = v, isRtl: true),
-                    _buildTextField(isDark, 'Company Name (English)', _companyName,
-                        (v) => _companyName = v),
-                    _buildTextField(isDark, 'Company Name (Arabic)', _companyNameAr,
-                        (v) => _companyNameAr = v, isRtl: true),
+                    _buildTextField(isDark, 'Report Title (English)',
+                        _reportTitle, (v) => _reportTitle = v),
+                    _buildTextField(isDark, 'Report Title (Arabic)',
+                        _reportTitleAr, (v) => _reportTitleAr = v,
+                        isRtl: true),
+                    _buildTextField(isDark, 'Company Name (English)',
+                        _companyName, (v) => _companyName = v),
+                    _buildTextField(isDark, 'Company Name (Arabic)',
+                        _companyNameAr, (v) => _companyNameAr = v,
+                        isRtl: true),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -301,14 +315,26 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                   icon: Icons.view_quilt_rounded,
                   gradient: AppColors.cyanGradient,
                   children: [
-                    _buildSwitchTile(isDark, 'Right-to-Left (RTL)', 'Use Arabic as primary language',
-                        _isRtl, (v) => setState(() => _isRtl = v)),
-                    _buildSwitchTile(isDark, 'Include Header', null, _includeHeader,
+                    _buildSwitchTile(
+                        isDark,
+                        'Right-to-Left (RTL)',
+                        'Use Arabic as primary language',
+                        _isRtl,
+                        (v) => setState(() => _isRtl = v)),
+                    _buildSwitchTile(
+                        isDark,
+                        'Include Header',
+                        null,
+                        _includeHeader,
                         (v) => setState(() => _includeHeader = v)),
-                    _buildSwitchTile(isDark, 'Include Footer', null, _includeFooter,
+                    _buildSwitchTile(
+                        isDark,
+                        'Include Footer',
+                        null,
+                        _includeFooter,
                         (v) => setState(() => _includeFooter = v)),
-                    _buildSwitchTile(isDark, 'Include Logo Placeholder', null, _includeLogo,
-                        (v) => setState(() => _includeLogo = v)),
+                    _buildSwitchTile(isDark, 'Include Logo Placeholder', null,
+                        _includeLogo, (v) => setState(() => _includeLogo = v)),
                   ],
                 ),
                 if (_includeInfoBox) ...[
@@ -321,11 +347,16 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                     children: [
                       _buildTextField(isDark, 'Info Box Title', _infoBoxTitle,
                           (v) => _infoBoxTitle = v),
-                      _buildTextField(isDark, 'Info Box Content', _infoBoxContent,
-                          (v) => _infoBoxContent = v, maxLines: 3),
-                      _buildDropdown(isDark, 'Info Box Style', _infoBoxStyleType,
+                      _buildTextField(isDark, 'Info Box Content',
+                          _infoBoxContent, (v) => _infoBoxContent = v,
+                          maxLines: 3),
+                      _buildDropdown(
+                          isDark,
+                          'Info Box Style',
+                          _infoBoxStyleType,
                           ['Card', 'Highlighted', 'Header Content'],
-                          (v) => setState(() => _infoBoxStyleType = v ?? 'Card')),
+                          (v) =>
+                              setState(() => _infoBoxStyleType = v ?? 'Card')),
                     ],
                   ),
                 ],
@@ -340,17 +371,23 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildNumberField(isDark, 'Rows', _gridRows,
-                                (v) => _gridRows = v, min: 1, max: 20),
+                            child: _buildNumberField(
+                                isDark, 'Rows', _gridRows, (v) => _gridRows = v,
+                                min: 1, max: 20),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: _buildNumberField(isDark, 'Columns', _gridColumns,
-                                (v) => _gridColumns = v, min: 1, max: 6),
+                            child: _buildNumberField(isDark, 'Columns',
+                                _gridColumns, (v) => _gridColumns = v,
+                                min: 1, max: 6),
                           ),
                         ],
                       ),
-                      _buildSwitchTile(isDark, 'Show Totals Row', null, _gridShowTotals,
+                      _buildSwitchTile(
+                          isDark,
+                          'Show Totals Row',
+                          null,
+                          _gridShowTotals,
                           (v) => setState(() => _gridShowTotals = v)),
                     ],
                   ),
@@ -363,12 +400,12 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                     icon: Icons.calculate_rounded,
                     gradient: AppColors.successGradient,
                     children: [
-                      _buildCurrencyField(isDark, 'Subtotal', _subtotal,
-                          (v) => _subtotal = v),
-                      _buildCurrencyField(isDark, 'Tax Amount', _tax,
-                          (v) => _tax = v),
-                      _buildCurrencyField(isDark, 'Discount', _discount,
-                          (v) => _discount = v),
+                      _buildCurrencyField(
+                          isDark, 'Subtotal', _subtotal, (v) => _subtotal = v),
+                      _buildCurrencyField(
+                          isDark, 'Tax Amount', _tax, (v) => _tax = v),
+                      _buildCurrencyField(
+                          isDark, 'Discount', _discount, (v) => _discount = v),
                     ],
                   ),
                 ],
@@ -406,7 +443,9 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
               children: [
                 Icon(
                   Icons.widgets_rounded,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -681,7 +720,9 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                     subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                     ),
                   ),
               ],
@@ -729,12 +770,18 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 gradient: value ? LinearGradient(colors: gradient) : null,
-                color: value ? null : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                color: value
+                    ? null
+                    : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 icon,
-                color: value ? Colors.white : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                color: value
+                    ? Colors.white
+                    : (isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary),
                 size: 20,
               ),
             ),
@@ -755,15 +802,23 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
                     description,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                     ),
                   ),
                 ],
               ),
             ),
             Icon(
-              value ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-              color: value ? gradient.first : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+              value
+                  ? Icons.check_circle_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              color: value
+                  ? gradient.first
+                  : (isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary),
               size: 24,
             ),
           ],
@@ -811,7 +866,8 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
           const SizedBox(height: 16),
           _buildPreviewRow('Title', _isRtl ? _reportTitleAr : _reportTitle),
           _buildPreviewRow('Company', _isRtl ? _companyNameAr : _companyName),
-          _buildPreviewRow('Direction', _isRtl ? 'RTL (Arabic)' : 'LTR (English)'),
+          _buildPreviewRow(
+              'Direction', _isRtl ? 'RTL (Arabic)' : 'LTR (English)'),
           _buildPreviewRow('Components', activeComponents.join(', ')),
           if (_includeSummary)
             _buildPreviewRow('Total', 'SAR ${total.toStringAsFixed(2)}'),
@@ -881,7 +937,35 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
     setState(() => _isGenerating = true);
 
     try {
-      final Uint8List pdfBytes = await _buildCustomPdf();
+      final Uint8List pdfBytes = await buildCustomReportPdf(
+        CustomReportData(
+          reportTitle: _reportTitle,
+          reportTitleAr: _reportTitleAr,
+          companyName: _companyName,
+          companyNameAr: _companyNameAr,
+          config: geniusPdfConfig.copyWith(
+            baseFont: PdfTrueTypeFont(
+                geniusPdfConfig.assets.primaryFont.toList(), 10),
+            textDirection: _isRtl ? TextDirection.rtl : TextDirection.ltr,
+          ),
+          includeHeader: _includeHeader,
+          includeFooter: _includeFooter,
+          includeLogo: _includeLogo,
+          includeInfoBox: _includeInfoBox,
+          includeDataGrid: _includeDataGrid,
+          includeRichText: _includeRichText,
+          includeSummary: _includeSummary,
+          infoBoxTitle: _infoBoxTitle,
+          infoBoxContent: _infoBoxContent,
+          infoBoxStyleType: _infoBoxStyleType,
+          gridRows: _gridRows,
+          gridColumns: _gridColumns,
+          gridShowTotals: _gridShowTotals,
+          subtotal: _subtotal,
+          tax: _tax,
+          discount: _discount,
+        ),
+      );
 
       // Save to file
       final directory = await getApplicationDocumentsDirectory();
@@ -915,326 +999,5 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
         setState(() => _isGenerating = false);
       }
     }
-  }
-
-  Future<Uint8List> _buildCustomPdf() async {
-    final document = PdfDocument();
-    final page = document.pages.add();
-    final graphics = page.graphics;
-    final pageSize = page.getClientSize();
-
-    double yOffset = 0;
-    const double margin = 20;
-    final contentWidth = pageSize.width - (margin * 2);
-
-    // Load TrueType fonts - always use TrueType fonts for components (v2.0.5+ requirement)
-    // Use Arabic-capable font for RTL, DIN font for LTR
-    PdfFont regularFont;
-    PdfFont boldFont;
-    PdfFont titleFont;
-    PdfFont subtitleFont;
-    if (_isRtl) {
-      final fontData =
-          await rootBundle.load('assets/fonts/hacen/hacenTunisia.ttf');
-      final fontBytes = fontData.buffer.asUint8List();
-      regularFont = PdfTrueTypeFont(fontBytes, 10);
-      boldFont = PdfTrueTypeFont(fontBytes, 10);
-      titleFont = PdfTrueTypeFont(fontBytes, 18);
-      subtitleFont = PdfTrueTypeFont(fontBytes, 12);
-    } else {
-      // Use DIN font for LTR (TrueType required for components since v2.0.5)
-      final fontData = await rootBundle.load('assets/fonts/din/din.ttf');
-      final fontBytes = fontData.buffer.asUint8List();
-      regularFont = PdfTrueTypeFont(fontBytes, 10);
-      boldFont = PdfTrueTypeFont(fontBytes, 10);
-      titleFont = PdfTrueTypeFont(fontBytes, 18);
-      subtitleFont = PdfTrueTypeFont(fontBytes, 12);
-    }
-
-    // Draw Header
-    if (_includeHeader) {
-      final headerBounds = Rect.fromLTWH(margin, yOffset, contentWidth, 80);
-
-      // Company name and title
-      final displayTitle = _isRtl ? _reportTitleAr : _reportTitle;
-      final displayCompany = _isRtl ? _companyNameAr : _companyName;
-
-      // Draw header background
-      graphics.drawRectangle(
-        brush: PdfSolidBrush(PdfColor(41, 128, 185)),
-        bounds: headerBounds,
-      );
-
-      // Draw title
-      graphics.drawString(
-        displayCompany,
-        titleFont,
-        brush: PdfBrushes.white,
-        bounds: Rect.fromLTWH(margin + 10, yOffset + 15, contentWidth - 20, 30),
-        format: PdfStringFormat(
-          alignment: _isRtl ? PdfTextAlignment.right : PdfTextAlignment.left,
-          textDirection: _isRtl
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
-        ),
-      );
-
-      graphics.drawString(
-        displayTitle,
-        subtitleFont,
-        brush: PdfBrushes.white,
-        bounds: Rect.fromLTWH(margin + 10, yOffset + 45, contentWidth - 20, 20),
-        format: PdfStringFormat(
-          alignment: _isRtl ? PdfTextAlignment.right : PdfTextAlignment.left,
-          textDirection: _isRtl
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
-        ),
-      );
-
-      // Draw date
-      final dateStr = DateTime.now().toString().substring(0, 10);
-      graphics.drawString(
-        dateStr,
-        regularFont,
-        brush: PdfBrushes.white,
-        bounds: Rect.fromLTWH(margin + 10, yOffset + 45, contentWidth - 20, 20),
-        format: PdfStringFormat(
-          alignment: _isRtl ? PdfTextAlignment.left : PdfTextAlignment.right,
-        ),
-      );
-
-      yOffset += 100;
-    }
-
-    // Draw Info Box
-    if (_includeInfoBox) {
-      final infoBoxStyle = _getInfoBoxStyle();
-      final infoBox = GeniusPdfInfoBox(
-        title: _infoBoxTitle,
-        items: [
-          GeniusPdfLabeledValue(
-            label: _infoBoxTitle,
-            value: _infoBoxContent,
-            baseFont: regularFont,
-            boldFont: boldFont,
-          ),
-        ],
-        style: infoBoxStyle,
-        baseFont: regularFont,
-        boldFont: boldFont,
-        isRTL: _isRtl,
-      );
-
-      final result = infoBox.draw(
-        page: page,
-        bounds: Rect.fromLTWH(margin, yOffset, contentWidth, 0),
-      );
-      yOffset = result.bottom + 20;
-    }
-
-    // Draw Rich Text Section
-    if (_includeRichText) {
-      final richText = GeniusPdfRichTextBuilder(
-              baseFont: regularFont, boldFont: boldFont, isRTL: _isRtl)
-          .text('This is a ')
-          .bold('custom report ')
-          .text('generated using the ')
-          .bold('Genius Link PDF Generator', color: const Color(0xFF2980B9))
-          .text(' library. ')
-          .text('It supports ')
-          .colored('colored text', Colors.green)
-          .text(', ')
-          .bold('bold')
-          .text(', ')
-          .italic('italic')
-          .text(', ')
-          .highlight('highlighted')
-          .text(', ')
-          .strikethrough('deleted text')
-          .text(', ')
-          .code('inline code')
-          .text(', ')
-          .superscript('superscript')
-          .text(', and ')
-          .link('clickable links', 'https://example.com')
-          .text('.')
-          .build();
-
-      final textResult = richText.draw(
-        page: page,
-        bounds: Rect.fromLTWH(margin, yOffset, contentWidth, 60),
-      );
-      yOffset = (textResult?.bounds.bottom ?? 0) + 20;
-    }
-
-    // Draw Data Grid
-    if (_includeDataGrid) {
-      final columns = _generateColumns();
-      final rows = _generateRows();
-
-      final dataGrid = GeniusPdfDataGrid(
-        columns: columns,
-        rows: rows,
-        style: GeniusPdfGridStyle(
-          headerStyle:
-              GeniusPdfCellStyle(backgroundColor: const Color(0xFF2980B9)),
-          alternateRowStyle:
-              GeniusPdfCellStyle(backgroundColor: const Color(0xFFF8F9FA)),
-          borderStyle: GeniusPdfBorderStyle.all(color: const Color(0xFFDEE2E6)),
-        ),
-        baseFont: regularFont,
-        boldFont: boldFont,
-        isRTL: _isRtl,
-      );
-
-      final gridResult = dataGrid.draw(
-        page: page,
-        bounds: Rect.fromLTWH(margin, yOffset, contentWidth, 0),
-      );
-      yOffset = (gridResult?.bounds.bottom ?? 0) + 20;
-    }
-
-    // Draw Summary Section
-    if (_includeSummary) {
-      final summary = GeniusPdfSummarySection(
-        items: [
-          GeniusPdfSummaryItem(
-            label: 'Subtotal',
-            labelAr: 'المجموع الفرعي',
-            value: 'SAR ${_subtotal.toStringAsFixed(2)}',
-          ),
-          GeniusPdfSummaryItem(
-            label: 'Tax (15%)',
-            labelAr: 'الضريبة (15%)',
-            value: 'SAR ${_tax.toStringAsFixed(2)}',
-          ),
-          GeniusPdfSummaryItem(
-            label: 'Discount',
-            labelAr: 'الخصم',
-            value: '- SAR ${_discount.toStringAsFixed(2)}',
-            valueColor: Colors.red,
-          ),
-        ],
-        title: 'Total',
-        titleAr: 'الإجمالي',
-        isRTL: _isRtl,
-        alignment: GeniusPdfSummaryAlignment.right,
-        width: contentWidth / 2,
-        baseFont: regularFont,
-        boldFont: boldFont,
-      );
-
-      final summaryBounds = Rect.fromLTWH(
-        _isRtl ? margin : margin + contentWidth / 2,
-        yOffset,
-        contentWidth / 2,
-        0,
-      );
-
-      final summaryResult = summary.draw(page: page, bounds: summaryBounds);
-      yOffset = (summaryResult.bottom) + 20;
-    }
-
-    // Draw Footer
-    if (_includeFooter) {
-      final footerY = pageSize.height - 30;
-
-      graphics.drawLine(
-        PdfPen(PdfColor(200, 200, 200)),
-        Offset(margin, footerY - 10),
-        Offset(pageSize.width - margin, footerY - 10),
-      );
-
-      graphics.drawString(
-        'Generated by Genius Link PDF Generator',
-        regularFont,
-        brush: PdfBrushes.gray,
-        bounds: Rect.fromLTWH(margin, footerY, contentWidth / 2, 20),
-      );
-
-      graphics.drawString(
-        'Page 1 of 1',
-        regularFont,
-        brush: PdfBrushes.gray,
-        bounds: Rect.fromLTWH(
-            margin + contentWidth / 2, footerY, contentWidth / 2, 20),
-        format: PdfStringFormat(alignment: PdfTextAlignment.right),
-      );
-    }
-
-    final bytes = await document.save();
-    document.dispose();
-    return Uint8List.fromList(bytes);
-  }
-
-  GeniusPdfInfoBoxStyle _getInfoBoxStyle() {
-    switch (_infoBoxStyleType) {
-      case 'Highlighted':
-        return const GeniusPdfInfoBoxStyle.highlighted();
-      case 'Header Content':
-        return const GeniusPdfInfoBoxStyle.headerContent();
-      case 'Card':
-      default:
-        return const GeniusPdfInfoBoxStyle.card();
-    }
-  }
-
-  List<GeniusPdfGridColumn> _generateColumns() {
-    final columnNames = [
-      ('Item', 'البند'),
-      ('Description', 'الوصف'),
-      ('Quantity', 'الكمية'),
-      ('Unit Price', 'سعر الوحدة'),
-      ('Total', 'الإجمالي'),
-      ('Notes', 'ملاحظات'),
-    ];
-
-    return List.generate(
-      _gridColumns.clamp(1, 6),
-      (index) => GeniusPdfGridColumn(
-        id: columnNames[index].$1.toLowerCase().replaceAll(' ', '_'),
-        title: columnNames[index].$1,
-        titleAr: columnNames[index].$2,
-        width: index == 0 ? 80 : (index == 1 ? 120 : 80),
-        alignment:
-            index >= 2 ? GeniusPdfTextAlign.center : GeniusPdfTextAlign.left,
-      ),
-    );
-  }
-
-  List<GeniusPdfGridRow> _generateRows() {
-    final sampleItems = [
-      'Product A',
-      'Product B',
-      'Product C',
-      'Service X',
-      'Service Y',
-      'Item 1',
-      'Item 2',
-      'Item 3',
-      'Item 4',
-      'Item 5',
-    ];
-
-    return List.generate(
-      _gridRows.clamp(1, 20),
-      (rowIndex) {
-        final qty = (rowIndex + 1) * 2;
-        final price = 100.0 + (rowIndex * 25);
-        final total = qty * price;
-
-        final values = <String, dynamic>{
-          'item': sampleItems[rowIndex % sampleItems.length],
-          'description': 'Sample description for row ${rowIndex + 1}',
-          'quantity': qty.toString(),
-          'unit_price': 'SAR ${price.toStringAsFixed(2)}',
-          'total': 'SAR ${total.toStringAsFixed(2)}',
-          'notes': rowIndex % 2 == 0 ? 'In stock' : 'On order',
-        };
-
-        return GeniusPdfGridRow(cells: values);
-      },
-    );
   }
 }

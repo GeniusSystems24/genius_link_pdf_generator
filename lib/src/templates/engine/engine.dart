@@ -9,7 +9,7 @@
 /// import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 ///
 /// // Create engine
-/// final engine = PdfTemplateEngine(baseFont: font);
+/// final engine = PdfTemplateEngine(config: config);
 ///
 /// // Define a template
 /// final template = TemplateDefinition(

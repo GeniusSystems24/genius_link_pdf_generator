@@ -488,7 +488,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
     for (final item in summaryItems) {
       currentPage.graphics.drawString(
         '• $item',
-        baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 9),
+        baseFont,
         bounds: Rect.fromLTWH(15, yOffset, pageWidth - 30, 16),
         format: PdfStringFormat(
           alignment:
@@ -508,7 +508,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       '$notesLabel\n$notesText',
-      baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 9),
+      baseFont,
       bounds: Rect.fromLTWH(0, currentY, pageWidth, 50),
       format: PdfStringFormat(
         alignment:
@@ -553,7 +553,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
       config.isRTL
           ? 'تاريخ ووقت الاستلام: _______________'
           : 'Date/Time Received: _______________',
-      baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 9),
+      baseFont,
       bounds: Rect.fromLTWH((pageWidth - 200) / 2, bottomY + 50, 200, 18),
       format: PdfStringFormat(alignment: PdfTextAlignment.center),
     );

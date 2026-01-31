@@ -236,7 +236,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
 
     final font = item.isSubtotal
         ? _boldFont
-        : (baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 10));
+        : baseFont;
 
     if (item.isSubtotal) {
       currentPage.graphics.drawRectangle(
@@ -443,7 +443,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
   void _drawReconciliationLine(String label, double amount) {
     currentPage.graphics.drawString(
       label,
-      baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 10),
+      baseFont,
       bounds: Rect.fromLTWH(10, currentY, pageWidth * 0.65, 18),
       format: PdfStringFormat(
         alignment:
@@ -457,7 +457,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       amountText,
-      baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 10),
+      baseFont,
       bounds:
           Rect.fromLTWH(pageWidth * 0.65, currentY, pageWidth * 0.35 - 5, 18),
       format: PdfStringFormat(
@@ -476,7 +476,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       '$notesLabel\n$notesText',
-      baseFont ?? PdfStandardFont(PdfFontFamily.helvetica, 9),
+      baseFont,
       bounds: Rect.fromLTWH(0, currentY, pageWidth, 60),
       format: PdfStringFormat(
         alignment:

@@ -343,9 +343,6 @@ class GeniusBluetoothShareService {
   /// Singleton instance.
   static GeniusBluetoothShareService get instance => _instance;
 
-  /// Platform channel for native Bluetooth operations.
-  static const _channel = MethodChannel('genius_pdf_bluetooth');
-
   /// Discovered devices.
   final List<GeniusBluetoothDevice> _discoveredDevices = [];
 

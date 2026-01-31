@@ -6,8 +6,6 @@ import 'package:syncfusion_flutter_pdf/pdf.dart'
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
 import '../core/pdf_config.dart';
-import '../extensions/color_extensions.dart';
-import '../models/pdf_image.dart';
 
 /// Transaction entry for customer statement.
 class StatementTransaction {

@@ -1,11 +1,17 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
-import 'package:pdf/pdf.dart' hide PdfFont;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
+import '../documents/invoice_document.dart';
+import '../documents/report_document.dart';
+import '../documents/simple_document.dart';
 import '../theme/app_theme.dart';
 
 /// Demo screen for V2 Architecture features (v2.0.0).
@@ -20,7 +26,6 @@ class V2ArchitectureDemoScreen extends StatefulWidget {
 class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  PdfFont? _font;
   bool _isLoading = false;
   String _status = '';
   final List<String> _eventLog = [];
@@ -57,15 +62,7 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
-    _loadFont();
     _setupEventListener();
-  }
-
-  Future<void> _loadFont() async {
-    final fontData = await rootBundle.load('assets/fonts/din/din.ttf');
-    setState(() {
-      _font = PdfTrueTypeFont(fontData.buffer.asUint8List(), 12);
-    });
   }
 
   void _setupEventListener() {
@@ -694,6 +691,17 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
     );
   }
 
+  Future<String> _savePdfBytes(Uint8List bytes, String fileName) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/$fileName.pdf';
+    await const GeniusPdfService().saveToPath(bytes: bytes, path: filePath);
+    return filePath;
+  }
+
+  Future<void> _openPdf(String filePath) async {
+    await OpenFile.open(filePath);
+  }
+
   // ============ Fluent API Demos ============
 
   Future<void> _buildSimpleDocument() async {
@@ -703,36 +711,16 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
     });
 
     try {
-      final pdf = GeniusPdfBuilder(id: 'simple-doc')
-          .metadata(title: 'Simple Document', author: 'Demo')
-          .pageFormat(PdfPageFormat.a4)
-          .addPage((page) => page
-              .header('Welcome to V2 Architecture')
-              .spacer(20)
-              .paragraph(
-                  'This document was created using the new enhanced Fluent API '
-                  'introduced in version 2.0.0 of the PDF Generator library.')
-              .spacer(10)
-              .bulletList([
-                'Plugin System for extensibility',
-                'Dependency Injection container',
-                'Event-driven architecture',
-                'Smart caching system',
-                'Platform compatibility',
-              ])
-              .spacer(20)
-              .divider()
-              .spacer(10)
-              .paragraph(
-                  'The Fluent API makes it easy to create complex documents '
-                  'with a chainable, expressive syntax.')
-              .build())
-          .build();
+      final bytes = await buildSimpleDocumentBytes();
+
+      final filePath = await _savePdfBytes(bytes, 'simple-doc');
+      await _openPdf(filePath);
 
       setState(() {
         _status = 'Document built successfully!\n'
-            'Document ID: simple-doc\n'
-            'Pages: ${pdf.document.pdfPageList.pages.length}';
+        'Document ID: simple-doc\n'
+        'Saved to: $filePath\n'
+        'Opened in default viewer.';
       });
     } catch (e) {
       setState(() {
@@ -750,39 +738,16 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
     });
 
     try {
-      final pdf = GeniusPdfBuilder(id: 'invoice-001')
-          .configure((c) {
-            c.title('Invoice INV-2026-001');
-            c.author('Genius Systems');
-            return c.config;
-          })
-          .addPage((page) => page
-              .header('INVOICE', fontSize: 28)
-              .spacer(20)
-              .paragraph('Invoice Number: INV-2026-001')
-              .paragraph('Date: ${DateTime.now().toString().split(' ')[0]}')
-              .spacer(20)
-              .subheader('Bill To:')
-              .paragraph('Ahmed Mohamed\nABC Company\nRiyadh, Saudi Arabia')
-              .spacer(20)
-              .table([
-                ['Item', 'Qty', 'Price', 'Total'],
-                ['Product A', '2', '150 SAR', '300 SAR'],
-                ['Product B', '1', '250 SAR', '250 SAR'],
-                ['Service C', '3', '100 SAR', '300 SAR'],
-              ])
-              .spacer(20)
-              .paragraph('Subtotal: 850 SAR')
-              .paragraph('VAT (15%): 127.50 SAR')
-              .divider()
-              .paragraph('Total: 977.50 SAR')
-              .build())
-          .build();
+      final bytes = await buildInvoiceDocumentBytes();
+
+      final filePath = await _savePdfBytes(bytes, 'invoice-001');
+      await _openPdf(filePath);
 
       setState(() {
         _status = 'Invoice built successfully!\n'
             'Document ID: invoice-001\n'
-            'Pages: ${pdf.document.pdfPageList.pages.length}';
+        'Saved to: $filePath\n'
+        'Opened in default viewer.';
       });
     } catch (e) {
       setState(() {
@@ -800,36 +765,16 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
     });
 
     try {
-      final pdf = GeniusPdfBuilder(id: 'monthly-report')
-          .metadata(title: 'Monthly Report', author: 'System')
-          .addMultiPage((mp) => mp
-              .textHeader('Monthly Performance Report - January 2026')
-              .pageNumberFooter()
-              .heading('Executive Summary')
-              .paragraph('This report provides a comprehensive overview of our '
-                  'performance metrics for January 2026. Key highlights include '
-                  'revenue growth of 15% and customer satisfaction scores above 90%.')
-              .heading('Revenue Analysis', level: 1)
-              .paragraph('Total revenue for the month reached 1.5 million SAR, '
-                  'representing a 15% increase compared to the same period last year.')
-              .heading('Customer Metrics', level: 1)
-              .paragraph(
-                  'Customer satisfaction scores averaged 92%, with particular '
-                  'strength in product quality (95%) and customer service (91%).')
-              .heading('Operational Efficiency', level: 1)
-              .paragraph('Operational costs were reduced by 8% through process '
-                  'improvements and automation initiatives.')
-              .heading('Recommendations')
-              .paragraph(
-                  'Based on the analysis, we recommend continuing investment '
-                  'in customer service training and expanding automation efforts.')
-              .build())
-          .build();
+      final bytes = await buildMultiPageReportBytes();
+
+      final filePath = await _savePdfBytes(bytes, 'monthly-report');
+      await _openPdf(filePath);
 
       setState(() {
         _status = 'Multi-page report built successfully!\n'
             'Document ID: monthly-report\n'
-            'Content sections added';
+        'Saved to: $filePath\n'
+        'Opened in default viewer.';
       });
     } catch (e) {
       setState(() {
