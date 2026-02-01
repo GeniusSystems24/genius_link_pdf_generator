@@ -336,6 +336,11 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
     final isPositive = netChange >= 0;
     final color = isPositive ? PdfColor(0, 100, 0) : PdfColor(180, 0, 0);
 
+    final netChangeFont = config.configAssets == null
+        ? config.baseFont
+        : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
+            style: PdfFontStyle.bold);
+
     currentPage.graphics.drawRectangle(
       brush: PdfSolidBrush(PdfColor(200, 200, 255)),
       pen: PdfPen(PdfColor(100, 100, 150)),
@@ -344,10 +349,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       label,
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-              style: PdfFontStyle.bold),
+      netChangeFont,
       bounds: Rect.fromLTWH(5, currentY + 5, pageWidth * 0.65, 20),
       format: PdfStringFormat(
         alignment:
@@ -361,10 +363,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       amountText,
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-              style: PdfFontStyle.bold),
+      netChangeFont,
       brush: PdfSolidBrush(color),
       bounds: Rect.fromLTWH(
           pageWidth * 0.65, currentY + 5, pageWidth * 0.35 - 5, 20),

@@ -52,7 +52,7 @@ class IncomeStatementSection {
   double? get previousTotal {
     if (items.every((item) => item.previousAmount == null)) return null;
     return items.fold(
-        0.0, (sum, item) => (sum ?? 0) + (item.previousAmount ?? 0));
+        0.0, (sum, item) => sum + (item.previousAmount ?? 0));
   }
 }
 
@@ -328,7 +328,6 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       ],
       rows: rows,
       style: const GeniusPdfGridStyle(showHeader: false),
-
     );
 
     final result = grid.drawAt(
@@ -365,10 +364,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       _formatCurrency(amount),
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold),
+      _boldFont,
       brush: PdfSolidBrush(color),
       bounds: Rect.fromLTWH(
           pageWidth * 0.6, currentY + 4, pageWidth * 0.4 - 10, 18),
@@ -415,6 +411,11 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
         isProfit ? PdfColor(200, 255, 200) : PdfColor(255, 200, 200);
     final textColor = isProfit ? PdfColor(0, 100, 0) : PdfColor(180, 0, 0);
 
+    final netFont = config.configAssets == null
+        ? config.baseFont
+        : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 12,
+            style: PdfFontStyle.bold);
+
     currentPage.graphics.drawRectangle(
       brush: PdfSolidBrush(bgColor),
       pen: PdfPen(PdfColor(100, 100, 100)),
@@ -423,10 +424,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       label,
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 12,
-              style: PdfFontStyle.bold),
+      netFont,
       bounds: Rect.fromLTWH(10, currentY + 7, pageWidth * 0.6, 20),
       format: PdfStringFormat(
         alignment:
@@ -436,10 +434,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
 
     currentPage.graphics.drawString(
       _formatCurrency(data.netIncome),
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 12,
-              style: PdfFontStyle.bold),
+      netFont,
       brush: PdfSolidBrush(textColor),
       bounds: Rect.fromLTWH(
           pageWidth * 0.6, currentY + 7, pageWidth * 0.4 - 10, 20),

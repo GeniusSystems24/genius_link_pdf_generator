@@ -1,8 +1,5 @@
 import 'dart:ui';
 
-
-
-
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
@@ -423,11 +420,15 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
     }
 
     final totalLabel = note.noteType == NoteType.credit
-        ? (config.isRTL ? 'إجمالي المبلغ الدائن' : 'Total Credit Amount')
-        : (config.isRTL ? 'إجمالي المبلغ المدين' : 'Total Debit Amount');
+        ? 'Total Credit Amount'
+        : 'Total Debit Amount';
+    final totalLabelAr = note.noteType == NoteType.credit
+        ? 'إجمالي المبلغ الدائن'
+        : 'إجمالي المبلغ المدين';
 
     items.add(GeniusPdfSummaryItem.total(
       label: totalLabel,
+      labelAr: totalLabelAr,
       value: _formatCurrency(note.grandTotal),
     ));
 

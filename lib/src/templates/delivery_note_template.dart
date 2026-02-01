@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
@@ -410,7 +409,11 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
 
       return GeniusPdfGridRow(
         cells: cells,
-        isGroupHeader: item.isPartialDelivery,
+        style: item.isPartialDelivery
+            ? const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFFFF8E1),
+              )
+            : null,
       );
     }).toList();
 
@@ -436,9 +439,18 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
   void _drawDeliverySummary() {
     final title = config.isRTL ? 'ملخص التسليم' : 'Delivery Summary';
 
+    final summaryItems = [
+      '${config.isRTL ? 'عدد الأصناف' : 'Total Items'}: ${delivery.totalItems}',
+      '${config.isRTL ? 'إجمالي الكمية المسلمة' : 'Total Qty Delivered'}: ${delivery.totalDeliveredQty}',
+      '${config.isRTL ? 'حالة التسليم' : 'Delivery Status'}: ${delivery.isFullDelivery ? (config.isRTL ? 'كامل' : 'Complete') : (config.isRTL ? 'جزئي' : 'Partial')}',
+    ];
+
+    // حساب ارتفاع المربع: عنوان (25) + عناصر (14 لكل عنصر) + هامش (10)
+    final boxHeight = 25.0 + summaryItems.length * 14.0 + 10.0;
+
     currentPage.graphics.drawRectangle(
       brush: PdfSolidBrush(PdfColor(240, 240, 240)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 60),
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, boxHeight),
     );
 
     currentPage.graphics.drawString(
@@ -450,12 +462,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
       ),
     );
-
-    final summaryItems = [
-      '${config.isRTL ? 'عدد الأصناف' : 'Total Items'}: ${delivery.totalItems}',
-      '${config.isRTL ? 'إجمالي الكمية المسلمة' : 'Total Qty Delivered'}: ${delivery.totalDeliveredQty}',
-      '${config.isRTL ? 'حالة التسليم' : 'Delivery Status'}: ${delivery.isFullDelivery ? (config.isRTL ? 'كامل' : 'Complete') : (config.isRTL ? 'جزئي' : 'Partial')}',
-    ];
 
     var yOffset = currentY + 25;
     for (final item in summaryItems) {
@@ -471,7 +477,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
       yOffset += 14;
     }
 
-    addSpace(70);
+    addSpace(boxHeight + 10);
   }
 
   void _drawNotes() {

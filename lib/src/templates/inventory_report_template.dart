@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridRow, PdfTextStyle, PdfBorderStyle, PdfGridColumn, PdfGridStyle;
 
@@ -268,7 +267,6 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.classic(),
-   
     );
 
     final result = grid.drawAt(
@@ -287,7 +285,7 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
     // Grand total bar
     final totalBar = GeniusPdfTotalBar(
       config: config,
-      label: config.isRTL ? 'إجمالي قيمة المخزون' : 'Total Inventory Value',
+      label: 'Total Inventory Value',
       labelAr: 'إجمالي قيمة المخزون',
       value: _formatCurrency(data.totalValue),
       backgroundColor: const Color(0xFF1565C0),
@@ -311,10 +309,7 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
       pageText,
       x: pageWidth - 100,
       y: pageHeight - 20,
-      font: config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 8,
-              style: PdfFontStyle.regular),
+      font: config.smallFont,
       brush: PdfSolidBrush(const Color(0xFF757575).toPdfColor()),
     );
   }

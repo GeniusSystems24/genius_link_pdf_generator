@@ -1,10 +1,5 @@
 import 'dart:ui';
 
-
-
-
-
-
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
 import '../core/pdf_config.dart';
@@ -491,11 +486,13 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     final wholePart = amount.floor();
     final fractionalPart = ((amount - wholePart) * 100).round();
     final wholeWords = _convertWholeToArabic(wholePart);
+    final currencyName = _getArabicCurrencyName(currency);
+    final subName = _getArabicSubCurrencyName(currency);
     if (fractionalPart > 0) {
       final fracWords = _convertWholeToArabic(fractionalPart);
-      return '$wholeWords ريالاً و $fracWords هللة لا غير';
+      return '$wholeWords $currencyName و $fracWords $subName لا غير';
     }
-    return '$wholeWords ريالاً سعودياً لا غير';
+    return '$wholeWords $currencyName لا غير';
   }
 
   static String _getCurrencyName(String code) {
@@ -518,6 +515,28 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       'AED': 'Fils',
     };
     return names[code] ?? 'units';
+  }
+
+  static String _getArabicCurrencyName(String code) {
+    const names = {
+      'SAR': 'ريالاً سعودياً',
+      'USD': 'دولاراً أمريكياً',
+      'EUR': 'يورو',
+      'GBP': 'جنيهاً إسترلينياً',
+      'AED': 'درهماً إماراتياً',
+    };
+    return names[code] ?? code;
+  }
+
+  static String _getArabicSubCurrencyName(String code) {
+    const names = {
+      'SAR': 'هللة',
+      'USD': 'سنتاً',
+      'EUR': 'سنتاً',
+      'GBP': 'بنساً',
+      'AED': 'فلساً',
+    };
+    return names[code] ?? '';
   }
 
   static String _convertWholeToEnglish(int number) {

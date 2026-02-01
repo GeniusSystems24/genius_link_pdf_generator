@@ -1,7 +1,5 @@
 import 'dart:ui';
 
-
-
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridRow, PdfGridColumn, PdfGridStyle, PdfTextStyle;
 
@@ -232,7 +230,6 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
       ],
       rows: rows,
       style: const GeniusPdfGridStyle.modern(),
-
     );
 
     final result = grid.drawAt(
@@ -257,7 +254,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
       cells: {
         'code': item.accountCode,
         'account': '$indent$accountName',
-        'amount': item.amount,
+        'amount': item.totalAmount,
       },
       isTotal: item.isSubtotal,
     ));
