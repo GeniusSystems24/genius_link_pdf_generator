@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2026-02-01
+
+### Added
+
+#### GeniusPdfDocumentBuilder — Advanced Layout
+- **`addRichText(GeniusPdfRichText)`** — Draw rich text (bold, colors, links, styled spans) at the current Y position with auto advancement
+- **`addInfoBox(GeniusPdfInfoBox)`** — Draw an info box with labeled values at the current Y position; supports multi-column layouts
+- **`addReportHeader(GeniusPdfReportHeader)`** — Draw a professional report header with company info, bilingual titles, and document metadata
+- **`addTwoColumns()`** — Two-column layout with flexible width ratios; each column receives a callback with `(PdfPage, Rect)` and returns height
+- **`setPageTemplate(PdfPageTemplateElement)`** — Set page-level stamps, watermarks, or template elements at top/bottom/left/right/stamp positions
+- **Example** — `AdvancedLayoutDemoBuilder` in `example/lib/documents/` demonstrates all five advanced layout features
+
+---
+
 ## [2.7.0] - 2026-02-01
 
 ### Added

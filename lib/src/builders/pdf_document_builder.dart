@@ -6,8 +6,11 @@ import '../components/widgets/pdf_area_chart.dart';
 import '../components/widgets/pdf_bar_chart.dart';
 import '../components/widgets/pdf_barcode.dart';
 import '../components/widgets/pdf_data_grid.dart';
+import '../components/widgets/pdf_info_box.dart';
 import '../components/widgets/pdf_line_chart.dart';
 import '../components/widgets/pdf_pie_chart.dart';
+import '../components/widgets/pdf_report_header.dart';
+import '../components/widgets/pdf_rich_text.dart';
 import '../components/widgets/pdf_summary.dart';
 import '../core/pdf_config.dart';
 import '../core/pdf_logger.dart';
@@ -1156,6 +1159,240 @@ abstract class GeniusPdfDocumentBuilder {
         titleAr: titlesAr != null && i < titlesAr.length ? titlesAr[i] : null,
       );
     }
+  }
+
+  // ============================================================
+  // ADVANCED LAYOUT METHODS (v2.8.0)
+  // ============================================================
+
+  /// Draws a [GeniusPdfRichText] at the current Y position.
+  ///
+  /// After drawing, [currentY] advances to the bottom of the rendered text.
+  /// Returns the [PdfLayoutResult] from the rich text draw operation.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final richText = GeniusPdfRichTextBuilder(config: config)
+  ///     .bold('Total: ')
+  ///     .text('SAR 1,500.00')
+  ///     .build();
+  /// addRichText(richText, spacing: 10);
+  /// ```
+  PdfLayoutResult? addRichText(
+    GeniusPdfRichText richText, {
+    double spacing = 0,
+  }) {
+    final drawY = _currentY + spacing;
+    final page = currentPage;
+
+    GeniusPdfLogger.debug(
+      'Drawing rich text at Y=$drawY',
+      tag: 'Builder',
+    );
+
+    final result = richText.draw(
+      page: page,
+      bounds: Rect.fromLTWH(0, drawY, pageWidth, remainingHeight - spacing),
+    );
+
+    if (result != null) {
+      _currentY = result.bounds.bottom;
+    }
+
+    return result;
+  }
+
+  /// Draws a [GeniusPdfInfoBox] at the current Y position.
+  ///
+  /// After drawing, [currentY] advances to the bottom of the info box.
+  /// Returns the bounding [Rect] of the drawn info box.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final infoBox = GeniusPdfInfoBox(
+  ///   config: config,
+  ///   title: 'Company Info',
+  ///   titleAr: 'معلومات الشركة',
+  ///   items: [
+  ///     GeniusPdfLabeledValue(label: 'Name', labelAr: 'الاسم', value: 'Genius Systems'),
+  ///   ],
+  /// );
+  /// addInfoBox(infoBox, spacing: 10);
+  /// ```
+  Rect addInfoBox(
+    GeniusPdfInfoBox infoBox, {
+    double spacing = 0,
+    double? height,
+  }) {
+    final drawY = _currentY + spacing;
+    final page = currentPage;
+
+    GeniusPdfLogger.debug(
+      'Drawing info box at Y=$drawY',
+      tag: 'Builder',
+    );
+
+    final bounds = infoBox.draw(
+      page: page,
+      bounds: Rect.fromLTWH(
+        0,
+        drawY,
+        pageWidth,
+        height ?? (remainingHeight - spacing),
+      ),
+    );
+
+    _currentY = bounds.bottom;
+    GeniusPdfLogger.debug(
+      'Info box drawn → Y=${_currentY.toStringAsFixed(1)}',
+      tag: 'Builder',
+    );
+
+    return bounds;
+  }
+
+  /// Draws a [GeniusPdfReportHeader] at the current Y position.
+  ///
+  /// After drawing, [currentY] advances by the header height.
+  /// Returns the height of the drawn header.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final header = GeniusPdfReportHeader(
+  ///   config: config,
+  ///   title: 'Sales Report',
+  ///   titleAr: 'تقرير المبيعات',
+  ///   company: myCompanyInfo,
+  /// );
+  /// addReportHeader(header);
+  /// ```
+  double addReportHeader(
+    GeniusPdfReportHeader reportHeader, {
+    double spacing = 0,
+    double height = 100,
+  }) {
+    final drawY = _currentY + spacing;
+    final page = currentPage;
+
+    GeniusPdfLogger.debug(
+      'Drawing report header at Y=$drawY',
+      tag: 'Builder',
+    );
+
+    final headerHeight = reportHeader.draw(
+      page: page,
+      bounds: Rect.fromLTWH(0, drawY, pageWidth, height),
+    );
+
+    _currentY = drawY + headerHeight;
+    GeniusPdfLogger.debug(
+      'Report header drawn → Y=${_currentY.toStringAsFixed(1)} (height=$headerHeight)',
+      tag: 'Builder',
+    );
+
+    return headerHeight;
+  }
+
+  /// Draws two content blocks side by side.
+  ///
+  /// This creates a two-column layout by calling [leftContent] and
+  /// [rightContent] callbacks with the appropriate bounds. After both
+  /// columns are drawn, [currentY] advances to the bottom of the
+  /// tallest column.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addTwoColumns(
+  ///   leftContent: (page, bounds) {
+  ///     final box = GeniusPdfInfoBox(config: config, title: 'From', items: [...]);
+  ///     return box.draw(page: page, bounds: bounds).height;
+  ///   },
+  ///   rightContent: (page, bounds) {
+  ///     final box = GeniusPdfInfoBox(config: config, title: 'To', items: [...]);
+  ///     return box.draw(page: page, bounds: bounds).height;
+  ///   },
+  ///   spacing: 10,
+  ///   gap: 15,
+  /// );
+  /// ```
+  void addTwoColumns({
+    required double Function(PdfPage page, Rect bounds) leftContent,
+    required double Function(PdfPage page, Rect bounds) rightContent,
+    double spacing = 0,
+    double gap = 10,
+    double leftFlex = 1,
+    double rightFlex = 1,
+  }) {
+    final drawY = _currentY + spacing;
+    final page = currentPage;
+    final totalFlex = leftFlex + rightFlex;
+    final leftWidth = (pageWidth - gap) * (leftFlex / totalFlex);
+    final rightWidth = (pageWidth - gap) * (rightFlex / totalFlex);
+    final availHeight = remainingHeight - spacing;
+
+    GeniusPdfLogger.debug(
+      'Drawing two columns at Y=$drawY (left=${leftWidth.toStringAsFixed(0)}, right=${rightWidth.toStringAsFixed(0)})',
+      tag: 'Builder',
+    );
+
+    final leftBounds = Rect.fromLTWH(0, drawY, leftWidth, availHeight);
+    final rightBounds = Rect.fromLTWH(
+      leftWidth + gap,
+      drawY,
+      rightWidth,
+      availHeight,
+    );
+
+    final leftHeight = leftContent(page, leftBounds);
+    final rightHeight = rightContent(page, rightBounds);
+
+    final maxHeight = leftHeight > rightHeight ? leftHeight : rightHeight;
+    _currentY = drawY + maxHeight;
+
+    GeniusPdfLogger.debug(
+      'Two columns drawn → Y=${_currentY.toStringAsFixed(1)} (left=$leftHeight, right=$rightHeight)',
+      tag: 'Builder',
+    );
+  }
+
+  /// Sets a page template element at the specified position.
+  ///
+  /// The template is applied to all pages (current and future) in the document.
+  /// Supported positions: `top`, `bottom`, `left`, `right`, `background`,
+  /// `stamp`. Uses [PdfDocumentTemplate] for rendering.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final watermark = PdfPageTemplateElement(Rect.fromLTWH(0, 0, 500, 50));
+  /// watermark.graphics.drawString('CONFIDENTIAL', font, brush: greyBrush);
+  /// setPageTemplate(watermark, position: 'stamp');
+  /// ```
+  void setPageTemplate(
+    PdfPageTemplateElement element, {
+    String position = 'stamp',
+  }) {
+    switch (position) {
+      case 'top':
+        _document.template.top = element;
+        break;
+      case 'bottom':
+        _document.template.bottom = element;
+        break;
+      case 'left':
+        _document.template.left = element;
+        break;
+      case 'right':
+        _document.template.right = element;
+        break;
+      case 'stamp':
+        _document.template.stamps.add(element);
+        break;
+    }
+
+    GeniusPdfLogger.debug(
+      'Page template set at position=$position',
+      tag: 'Builder',
+    );
   }
 
   // ============================================================

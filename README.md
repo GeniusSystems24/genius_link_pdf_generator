@@ -109,6 +109,11 @@ A comprehensive PDF generation and preview library for Flutter applications with
 🖼️ **Image Attachment** (v2.7.0) - `addImageAttachment()` labeled inline image with auto-scaling
 📄 **Image Page** (v2.7.0) - `addImagePage()` full-page image attachment for scanned documents
 📎 **Batch Attachments** (v2.7.0) - `addAttachments()` batch-add multiple images each on its own page
+📝 **Builder Rich Text** (v2.8.0) - `addRichText()` draws styled text (bold, links, colors) with auto Y-advancement
+📦 **Builder Info Box** (v2.8.0) - `addInfoBox()` draws info boxes with labeled values at current position
+🏢 **Builder Report Header** (v2.8.0) - `addReportHeader()` professional headers with company info
+📐 **Two-Column Layout** (v2.8.0) - `addTwoColumns()` flexible two-column layout with callbacks
+🎭 **Page Templates** (v2.8.0) - `setPageTemplate()` stamps, watermarks, and template elements
 
 ---
 
