@@ -3,8 +3,6 @@ import 'dart:ui' show Color, Rect;
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide PdfTextStyle, PdfGridStyle, PdfBorderStyle, PdfGridColumn, PdfGridRow;
 
 Future<Uint8List> buildComponentDemoBytes({
   required String component,
@@ -38,7 +36,7 @@ Future<Uint8List> buildComponentDemoBytes({
 
 /// Builds a Data Grid demo PDF document with extended details.
 class _DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
-  _DataGridDemoBuilder(GeniusPdfConfig config) : super(config);
+  _DataGridDemoBuilder(super.config);
 
   bool get _isRTL => config.isRTL;
 
@@ -180,7 +178,7 @@ class _DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
 
 /// Builds a Rich Text demo PDF document with extended examples.
 class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
-  _RichTextDemoBuilder(GeniusPdfConfig config) : super(config);
+  _RichTextDemoBuilder(super.config);
 
   bool get _isRTL => config.isRTL;
 
@@ -368,7 +366,7 @@ class _RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
 
 /// Builds an Info Box demo PDF document with extended details.
 class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
-  _InfoBoxDemoBuilder(GeniusPdfConfig config) : super(config);
+  _InfoBoxDemoBuilder(super.config);
 
   bool get _isRTL => config.isRTL;
 
@@ -528,7 +526,7 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
 
 /// Builds a Headers demo PDF document with extended details.
 class _HeadersDemoBuilder extends GeniusPdfDocumentBuilder {
-  _HeadersDemoBuilder(GeniusPdfConfig config) : super(config);
+  _HeadersDemoBuilder(super.config);
 
   bool get _isRTL => config.isRTL;
 
@@ -600,7 +598,7 @@ class _HeadersDemoBuilder extends GeniusPdfDocumentBuilder {
 
 /// Builds a Summary demo PDF document with extended details.
 class _SummaryDemoBuilder extends GeniusPdfDocumentBuilder {
-  _SummaryDemoBuilder(GeniusPdfConfig config) : super(config);
+  _SummaryDemoBuilder(super.config);
 
   bool get _isRTL => config.isRTL;
 

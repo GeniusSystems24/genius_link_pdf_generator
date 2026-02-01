@@ -1,8 +1,6 @@
 // ignore_for_file: unused_element_parameter
 
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +11,6 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../data/sample_data.dart';
 import '../main.dart' show geniusPdfConfig;

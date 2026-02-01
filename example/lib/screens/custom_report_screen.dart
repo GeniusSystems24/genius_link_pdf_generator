@@ -667,7 +667,7 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
     Function(String?) onChanged,
   ) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -731,7 +731,7 @@ class _CustomReportScreenState extends State<CustomReportScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.primaryGradient.first,
+            activeThumbColor: AppColors.primaryGradient.first,
           ),
         ],
       ),

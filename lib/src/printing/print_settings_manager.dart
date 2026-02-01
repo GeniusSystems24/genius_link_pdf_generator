@@ -167,12 +167,12 @@ class GeniusPrintProfile {
 /// Manages saved print profiles and provides system presets.
 class GeniusPrintSettingsManager {
 
+  /// Creates a new instance (for testing)
+  factory GeniusPrintSettingsManager() => instance;
+
   GeniusPrintSettingsManager._() {
     _initializeSystemPresets();
   }
-
-  /// Creates a new instance (for testing)
-  factory GeniusPrintSettingsManager() => instance;
   /// Singleton instance
   static GeniusPrintSettingsManager? _instance;
 

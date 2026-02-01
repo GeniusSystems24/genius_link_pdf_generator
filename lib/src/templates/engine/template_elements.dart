@@ -85,6 +85,14 @@ abstract class TemplateElement {
 
 /// Style properties for template elements.
 class ElementStyle {
+  const ElementStyle({
+    this.padding,
+    this.margin,
+    this.backgroundColor,
+    this.borderColor,
+    this.borderWidth,
+    this.alignment,
+  });
 
   factory ElementStyle.fromJson(Map<String, dynamic> json) {
     return ElementStyle(
@@ -119,14 +127,6 @@ class ElementStyle {
           : null,
     );
   }
-  const ElementStyle({
-    this.padding,
-    this.margin,
-    this.backgroundColor,
-    this.borderColor,
-    this.borderWidth,
-    this.alignment,
-  });
 
   final EdgeInsets? padding;
   final EdgeInsets? margin;
@@ -208,6 +208,17 @@ class EdgeInsets {
 
 /// A static text element.
 class TextElement extends TemplateElement {
+  const TextElement({
+    required this.text,
+    this.textAr,
+    this.fontSize,
+    this.fontColor,
+    this.isBold = false,
+    this.isItalic = false,
+    super.id,
+    super.condition,
+    super.style,
+  });
 
   factory TextElement.fromJson(Map<String, dynamic> json) {
     return TextElement(
@@ -229,17 +240,6 @@ class TextElement extends TemplateElement {
           : null,
     );
   }
-  const TextElement({
-    required this.text,
-    this.textAr,
-    this.fontSize,
-    this.fontColor,
-    this.isBold = false,
-    this.isItalic = false,
-    super.id,
-    super.condition,
-    super.style,
-  });
 
   final String text;
   final String? textAr;
@@ -321,6 +321,20 @@ class TextElement extends TemplateElement {
 
 /// A variable placeholder element.
 class VariableElement extends TemplateElement {
+  const VariableElement({
+    required this.variableName,
+    this.prefix,
+    this.prefixAr,
+    this.suffix,
+    this.suffixAr,
+    this.defaultValue,
+    this.fontSize,
+    this.fontColor,
+    this.isBold = false,
+    super.id,
+    super.condition,
+    super.style,
+  });
 
   factory VariableElement.fromJson(Map<String, dynamic> json) {
     return VariableElement(
@@ -345,20 +359,6 @@ class VariableElement extends TemplateElement {
           : null,
     );
   }
-  const VariableElement({
-    required this.variableName,
-    this.prefix,
-    this.prefixAr,
-    this.suffix,
-    this.suffixAr,
-    this.defaultValue,
-    this.fontSize,
-    this.fontColor,
-    this.isBold = false,
-    super.id,
-    super.condition,
-    super.style,
-  });
 
   final String variableName;
   final String? prefix;
@@ -454,6 +454,11 @@ class VariableElement extends TemplateElement {
 
 /// A spacer element for adding vertical space.
 class SpacerElement extends TemplateElement {
+  const SpacerElement({
+    required this.height,
+    super.id,
+    super.condition,
+  });
 
   factory SpacerElement.fromJson(Map<String, dynamic> json) {
     return SpacerElement(
@@ -465,11 +470,6 @@ class SpacerElement extends TemplateElement {
           : null,
     );
   }
-  const SpacerElement({
-    required this.height,
-    super.id,
-    super.condition,
-  });
 
   final double height;
 
@@ -501,6 +501,13 @@ class SpacerElement extends TemplateElement {
 
 /// A divider/line element.
 class DividerElement extends TemplateElement {
+  const DividerElement({
+    this.thickness = 1,
+    this.color,
+    this.dashPattern,
+    super.id,
+    super.condition,
+  });
 
   factory DividerElement.fromJson(Map<String, dynamic> json) {
     return DividerElement(
@@ -518,13 +525,6 @@ class DividerElement extends TemplateElement {
           : null,
     );
   }
-  const DividerElement({
-    this.thickness = 1,
-    this.color,
-    this.dashPattern,
-    super.id,
-    super.condition,
-  });
 
   final double thickness;
   final PdfColor? color;
@@ -577,6 +577,12 @@ class DividerElement extends TemplateElement {
 
 /// A container element that wraps other elements.
 class ContainerElement extends TemplateElement {
+  const ContainerElement({
+    required this.children,
+    super.id,
+    super.condition,
+    super.style,
+  });
 
   factory ContainerElement.fromJson(Map<String, dynamic> json) {
     return ContainerElement(
@@ -593,12 +599,6 @@ class ContainerElement extends TemplateElement {
           : null,
     );
   }
-  const ContainerElement({
-    required this.children,
-    super.id,
-    super.condition,
-    super.style,
-  });
 
   final List<TemplateElement> children;
 
@@ -682,6 +682,14 @@ class ContainerElement extends TemplateElement {
 
 /// A row element that arranges children horizontally.
 class RowElement extends TemplateElement {
+  const RowElement({
+    required this.children,
+    this.spacing = 10,
+    this.flexValues,
+    super.id,
+    super.condition,
+    super.style,
+  });
 
   factory RowElement.fromJson(Map<String, dynamic> json) {
     return RowElement(
@@ -701,14 +709,6 @@ class RowElement extends TemplateElement {
           : null,
     );
   }
-  const RowElement({
-    required this.children,
-    this.spacing = 10,
-    this.flexValues,
-    super.id,
-    super.condition,
-    super.style,
-  });
 
   final List<TemplateElement> children;
   final double spacing;
@@ -797,6 +797,13 @@ class RowElement extends TemplateElement {
 
 /// A column element that arranges children vertically.
 class ColumnElement extends TemplateElement {
+  const ColumnElement({
+    required this.children,
+    this.spacing = 5,
+    super.id,
+    super.condition,
+    super.style,
+  });
 
   factory ColumnElement.fromJson(Map<String, dynamic> json) {
     return ColumnElement(
@@ -814,13 +821,6 @@ class ColumnElement extends TemplateElement {
           : null,
     );
   }
-  const ColumnElement({
-    required this.children,
-    this.spacing = 5,
-    super.id,
-    super.condition,
-    super.style,
-  });
 
   final List<TemplateElement> children;
   final double spacing;
@@ -884,6 +884,14 @@ class ColumnElement extends TemplateElement {
 
 /// A loop element that repeats children for each item in a list.
 class LoopElement extends TemplateElement {
+  const LoopElement({
+    required this.loop,
+    required this.children,
+    this.separator,
+    super.id,
+    super.condition,
+    super.style,
+  });
 
   factory LoopElement.fromJson(Map<String, dynamic> json) {
     return LoopElement(
@@ -904,14 +912,6 @@ class LoopElement extends TemplateElement {
           : null,
     );
   }
-  const LoopElement({
-    required this.loop,
-    required this.children,
-    this.separator,
-    super.id,
-    super.condition,
-    super.style,
-  });
 
   final TemplateLoop loop;
   final List<TemplateElement> children;
@@ -995,6 +995,13 @@ class LoopElement extends TemplateElement {
 
 /// A conditional element that renders different content based on a condition.
 class ConditionalElement extends TemplateElement {
+  const ConditionalElement({
+    required super.condition,
+    required this.thenElements,
+    this.elseElements,
+    super.id,
+    super.style,
+  });
 
   factory ConditionalElement.fromJson(Map<String, dynamic> json) {
     return ConditionalElement(
@@ -1013,13 +1020,6 @@ class ConditionalElement extends TemplateElement {
           : null,
     );
   }
-  const ConditionalElement({
-    required super.condition,
-    required this.thenElements,
-    this.elseElements,
-    super.id,
-    super.style,
-  });
 
   final List<TemplateElement> thenElements;
   final List<TemplateElement>? elseElements;
@@ -1080,6 +1080,17 @@ class ConditionalElement extends TemplateElement {
 
 /// A simple table element.
 class TableElement extends TemplateElement {
+  const TableElement({
+    required this.columns,
+    required this.dataVariable,
+    this.headerStyle,
+    this.cellStyle,
+    this.showHeader = true,
+    this.rowSpacing = 5,
+    super.id,
+    super.condition,
+    super.style,
+  });
 
   factory TableElement.fromJson(Map<String, dynamic> json) {
     return TableElement(
@@ -1105,17 +1116,6 @@ class TableElement extends TemplateElement {
           : null,
     );
   }
-  const TableElement({
-    required this.columns,
-    required this.dataVariable,
-    this.headerStyle,
-    this.cellStyle,
-    this.showHeader = true,
-    this.rowSpacing = 5,
-    super.id,
-    super.condition,
-    super.style,
-  });
 
   final List<TableColumn> columns;
   final String dataVariable;
@@ -1239,6 +1239,13 @@ class TableElement extends TemplateElement {
 
 /// Column definition for TableElement.
 class TableColumn {
+  const TableColumn({
+    required this.field,
+    required this.title,
+    this.titleAr,
+    this.flex,
+    this.format,
+  });
 
   factory TableColumn.fromJson(Map<String, dynamic> json) {
     return TableColumn(
@@ -1249,13 +1256,6 @@ class TableColumn {
       format: json['format'] as String?,
     );
   }
-  const TableColumn({
-    required this.field,
-    required this.title,
-    this.titleAr,
-    this.flex,
-    this.format,
-  });
 
   final String field;
   final String title;
@@ -1274,6 +1274,15 @@ class TableColumn {
 
 /// An image element.
 class ImageElement extends TemplateElement {
+  const ImageElement({
+    this.imageVariable,
+    this.width,
+    this.height,
+    this.alignment = PdfTextAlignment.center,
+    super.id,
+    super.condition,
+    super.style,
+  });
 
   factory ImageElement.fromJson(Map<String, dynamic> json) {
     return ImageElement(
@@ -1296,15 +1305,6 @@ class ImageElement extends TemplateElement {
           : null,
     );
   }
-  const ImageElement({
-    this.imageVariable,
-    this.width,
-    this.height,
-    this.alignment = PdfTextAlignment.center,
-    super.id,
-    super.condition,
-    super.style,
-  });
 
   final String? imageVariable;
   final double? width;

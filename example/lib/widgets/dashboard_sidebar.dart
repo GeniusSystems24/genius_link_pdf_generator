@@ -223,7 +223,7 @@ class _DashboardSidebarState extends State<DashboardSidebar>
     ),
   ];
 
-  Set<String> _expandedItems = {};
+  final Set<String> _expandedItems = {};
 
   @override
   void initState() {

@@ -52,7 +52,7 @@ class IncomeStatementSection {
   double? get previousTotal {
     if (items.every((item) => item.previousAmount == null)) return null;
     return items.fold(
-        0.0, (sum, item) => sum + (item.previousAmount ?? 0));
+        0.0, (sum, item) => (sum ?? 0) + (item.previousAmount ?? 0));
   }
 }
 

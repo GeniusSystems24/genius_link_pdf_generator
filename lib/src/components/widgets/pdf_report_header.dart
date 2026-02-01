@@ -358,7 +358,18 @@ enum GeniusPdfTitleAlignment {
   end,
 
   /// Centered.
-  center,
+  center;
+
+  PdfTextAlignment toPdfTextAlignment(bool isRTL) {
+    switch (this) {
+      case GeniusPdfTitleAlignment.start:
+        return isRTL ? PdfTextAlignment.right : PdfTextAlignment.left;
+      case GeniusPdfTitleAlignment.end:
+        return isRTL ? PdfTextAlignment.left : PdfTextAlignment.right;
+      case GeniusPdfTitleAlignment.center:
+        return PdfTextAlignment.center;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -738,9 +749,9 @@ class GeniusPdfReportHeaderStyle {
         color: Color(0xFF666666),
       ),
       showBorder: true,
-      borderStyle: GeniusPdfBorderStyle.all(
+      borderStyle: const GeniusPdfBorderStyle.all(
         width: 1,
-        color: const Color(0xFFCCCCCC),
+        color: Color(0xFFCCCCCC),
       ),
       padding: const GeniusPdfCellPadding.all(15),
       spacing: 12,
@@ -1335,18 +1346,6 @@ class GeniusPdfReportHeader {
   // Alignment helpers
   // -------------------------------------------------------------------------
 
-  /// Resolves [GeniusPdfTitleAlignment] to [PdfTextAlignment] based on RTL.
-  PdfTextAlignment _resolveTextAlignment(GeniusPdfTitleAlignment alignment) {
-    switch (alignment) {
-      case GeniusPdfTitleAlignment.start:
-        return isRTL ? PdfTextAlignment.right : PdfTextAlignment.left;
-      case GeniusPdfTitleAlignment.end:
-        return isRTL ? PdfTextAlignment.left : PdfTextAlignment.right;
-      case GeniusPdfTitleAlignment.center:
-        return PdfTextAlignment.center;
-    }
-  }
-
   /// Resolves logo X position based on [GeniusPdfLogoPosition] and RTL.
   double _resolveLogoX(
     GeniusPdfLogoPosition position,
@@ -1371,7 +1370,7 @@ class GeniusPdfReportHeader {
   /// Creates a [PdfStringFormat] for the given alignment and RTL direction.
   PdfStringFormat _textFormat(GeniusPdfTitleAlignment alignment) {
     return PdfStringFormat(
-      alignment: _resolveTextAlignment(alignment),
+      alignment: alignment.toPdfTextAlignment(isRTL),
       textDirection:
           isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
     );
@@ -1448,6 +1447,9 @@ class GeniusPdfReportHeader {
     }
   }
 
+  PdfTextDirection get textDirection =>
+      isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
+
   /// Draws date and page info, returns the height consumed.
   double _drawDateSection(
     PdfGraphics graphics,
@@ -1479,7 +1481,8 @@ class GeniusPdfReportHeader {
         dateFont,
         brush: dateBrush,
         bounds: Rect.fromLTWH(dateX, currentY, dateWidth, 0),
-        format: PdfStringFormat(alignment: dateAlignment),
+        format: PdfStringFormat(
+            alignment: dateAlignment, textDirection: textDirection),
       );
       dateHeight = dateFontSize + 2;
     }
@@ -1497,7 +1500,8 @@ class GeniusPdfReportHeader {
         brush: dateBrush,
         bounds:
             Rect.fromLTWH(contentLeft, currentY, contentRight - contentLeft, 0),
-        format: PdfStringFormat(alignment: pageAlignment),
+        format: PdfStringFormat(
+            alignment: pageAlignment, textDirection: textDirection),
       );
       if (dateHeight == 0) dateHeight = dateFontSize + 2;
     }
@@ -1528,7 +1532,7 @@ class GeniusPdfReportHeader {
     if (company == null) return 0;
 
     double infoY = y;
-    final nameAlignment = _resolveTextAlignment(alignment);
+    final nameAlignment = alignment.toPdfTextAlignment(isRTL);
     final dir =
         isArabic ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
 
@@ -1663,7 +1667,7 @@ class GeniusPdfReportHeader {
     GeniusPdfTitleAlignment alignment,
   ) {
     double titleY = y;
-    final pdfAlignment = _resolveTextAlignment(alignment);
+    final pdfAlignment = alignment.toPdfTextAlignment(isRTL);
 
     // Bilingual title
     if (showBilingualTitle && titleAr != null) {
@@ -1748,7 +1752,7 @@ class GeniusPdfReportHeader {
 
     if (subtitle == null && subtitleAr == null) return 0;
 
-    final pdfAlignment = _resolveTextAlignment(alignment);
+    final pdfAlignment = alignment.toPdfTextAlignment(isRTL);
 
     // Arabic subtitle
     if (subtitleAr != null) {

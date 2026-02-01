@@ -355,7 +355,7 @@ class GeniusDigitalSignatureService {
     try {
       final form = document.form;
       bool hasSignature = false;
-      final bool isValid = true;
+      const bool isValid = true;
       final List<GeniusSignatureInfo> signatures = [];
 
       for (int i = 0; i < form.fields.count; i++) {

@@ -156,7 +156,7 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
             child: Switch(
               value: _isRTL,
               onChanged: (value) => setState(() => _isRTL = value),
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),

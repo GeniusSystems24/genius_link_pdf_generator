@@ -337,7 +337,9 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     );
 
     if (result != null) {
-      addSpace(result.bounds.height + 15);
+      // Update current page and Y position from the grid result
+      // This handles multi-page grids correctly in both RTL and LTR modes
+      updateFromLayoutResult(result, spacing: 15);
     }
   }
 
@@ -422,7 +424,8 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
     // Signature area on the left
     if (showSignature) {
-      final signature = GeniusPdfSignatureArea(config: config,
+      final signature = GeniusPdfSignatureArea(
+        config: config,
         title: 'Authorized Signature',
         titleAr: 'التوقيع المعتمد',
       );
@@ -440,7 +443,8 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
     // QR Code on the right
     if (showQRCode && qrCode != null) {
-      final qr = GeniusPdfQRCode(config: config,
+      final qr = GeniusPdfQRCode(
+        config: config,
         image: qrCode!,
         size: 70,
       );

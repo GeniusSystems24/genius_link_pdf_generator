@@ -3,8 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide PdfTextStyle, PdfGridStyle, PdfBorderStyle, PdfGridColumn, PdfGridRow;
 
 Future<Uint8List> buildBarChartPdf({
   required GeniusPdfConfig config,

@@ -7,10 +7,22 @@ import '../../extensions/color_extensions.dart';
 
 /// Text alignment options for PDF components.
 enum GeniusPdfTextAlign {
-  left,
+  start,
   center,
-  right,
-  justify,
+  end,
+  justify;
+
+  PdfTextAlignment toPdfTextAlignment(bool isRTL) {
+    switch (this) {
+      case GeniusPdfTextAlign.start:
+      case GeniusPdfTextAlign.justify:
+        return isRTL ? PdfTextAlignment.right : PdfTextAlignment.left;
+      case GeniusPdfTextAlign.end:
+        return isRTL ? PdfTextAlignment.left : PdfTextAlignment.right;
+      case GeniusPdfTextAlign.center:
+        return PdfTextAlignment.center;
+    }
+  }
 }
 
 /// Vertical alignment options for PDF cells.
@@ -24,11 +36,11 @@ enum GeniusPdfVerticalAlign {
 extension GeniusPdfTextAlignExtension on GeniusPdfTextAlign {
   PdfTextAlignment toPdfTextAlignment() {
     switch (this) {
-      case GeniusPdfTextAlign.left:
+      case GeniusPdfTextAlign.start:
         return PdfTextAlignment.left;
       case GeniusPdfTextAlign.center:
         return PdfTextAlignment.center;
-      case GeniusPdfTextAlign.right:
+      case GeniusPdfTextAlign.end:
         return PdfTextAlignment.right;
       case GeniusPdfTextAlign.justify:
         return PdfTextAlignment.justify;
@@ -177,7 +189,7 @@ class GeniusPdfTextStyle {
     this.fontSize = 10,
     this.fontWeight = material.FontWeight.normal,
     this.color = const Color(0xFF000000),
-    this.alignment = GeniusPdfTextAlign.left,
+    this.alignment = GeniusPdfTextAlign.start,
     this.verticalAlignment = GeniusPdfVerticalAlign.middle,
     this.lineSpacing = 1.0,
   });
@@ -213,7 +225,7 @@ class GeniusPdfTextStyle {
   const GeniusPdfTextStyle.body({
     this.fontSize = 10,
     this.color = const Color(0xFF000000),
-    this.alignment = GeniusPdfTextAlign.left,
+    this.alignment = GeniusPdfTextAlign.start,
   })  : fontWeight = material.FontWeight.normal,
         verticalAlignment = GeniusPdfVerticalAlign.middle,
         lineSpacing = 1.0;
@@ -222,7 +234,7 @@ class GeniusPdfTextStyle {
   const GeniusPdfTextStyle.caption({
     this.fontSize = 8,
     this.color = const Color(0xFF666666),
-    this.alignment = GeniusPdfTextAlign.left,
+    this.alignment = GeniusPdfTextAlign.start,
   })  : fontWeight = material.FontWeight.normal,
         verticalAlignment = GeniusPdfVerticalAlign.middle,
         lineSpacing = 1.0;
@@ -246,7 +258,8 @@ class GeniusPdfTextStyle {
   /// Creates a [PdfStringFormat] from this style.
   PdfStringFormat toStringFormat({TextDirection? textDirection}) {
     return PdfStringFormat(
-      alignment: alignment.toPdfTextAlignment(),
+      alignment:
+          alignment.toPdfTextAlignment(textDirection == TextDirection.rtl),
       lineAlignment: verticalAlignment.toPdfVerticalAlignment(),
       textDirection: textDirection == TextDirection.rtl
           ? PdfTextDirection.rightToLeft

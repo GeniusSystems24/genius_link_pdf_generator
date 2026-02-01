@@ -1087,7 +1087,7 @@ class GeniusBarcodeGroup {
   Rect _drawGrid(PdfPage page, Rect bounds) {
     final cols = gridColumns.clamp(1, barcodes.length);
     final itemWidth = (bounds.width - (spacing * (cols - 1))) / cols;
-    final itemHeight = 100.0; // Estimated height per barcode
+    const itemHeight = 100.0; // Estimated height per barcode
 
     double maxY = bounds.top;
 

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'widgets/dashboard_widgets.dart';
@@ -211,7 +213,7 @@ class DashboardHome extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 110,
+          height: 120,
           child: ListView(
             scrollDirection: Axis.horizontal,
             clipBehavior: Clip.none,
@@ -643,7 +645,7 @@ class _QuickActionCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          width: 100,
+          width: 120,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isDark ? AppColors.darkCard : AppColors.lightCard,
@@ -672,6 +674,7 @@ class _QuickActionCard extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   color: isDark ? AppColors.darkText : AppColors.lightText,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

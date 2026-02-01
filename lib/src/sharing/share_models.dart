@@ -276,6 +276,17 @@ class GeniusShareResult {
 
 /// A history item for share operations.
 class GeniusShareHistoryItem {
+  /// Creates a new share history item.
+  const GeniusShareHistoryItem({
+    required this.id,
+    required this.fileName,
+    required this.target,
+    required this.status,
+    required this.timestamp,
+    this.fileSize,
+    this.error,
+    this.metadata = const {},
+  });
 
   /// Create from JSON map.
   factory GeniusShareHistoryItem.fromJson(Map<String, dynamic> json) {
@@ -298,17 +309,6 @@ class GeniusShareHistoryItem {
       metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
     );
   }
-  /// Creates a new share history item.
-  const GeniusShareHistoryItem({
-    required this.id,
-    required this.fileName,
-    required this.target,
-    required this.status,
-    required this.timestamp,
-    this.fileSize,
-    this.error,
-    this.metadata = const {},
-  });
 
   /// Creates from a share result.
   factory GeniusShareHistoryItem.fromResult(

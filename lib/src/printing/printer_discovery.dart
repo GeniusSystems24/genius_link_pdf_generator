@@ -23,10 +23,10 @@ typedef GeniusPrinterDiscoveryCallback = void Function(GeniusPrinterInfo printer
 /// Discovers and monitors available printers.
 class GeniusPrinterDiscovery {
 
-  GeniusPrinterDiscovery._();
-
   /// Creates a new instance (for testing)
   factory GeniusPrinterDiscovery() => instance;
+
+  GeniusPrinterDiscovery._();
   /// Singleton instance
   static GeniusPrinterDiscovery? _instance;
 

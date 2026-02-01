@@ -142,10 +142,10 @@ class GeniusPdfShareResult {
 
 /// Main printer service for printing PDFs
 class GeniusPrinterService {
-  GeniusPrinterService._();
 
   /// Creates a new instance (for testing)
   factory GeniusPrinterService() => instance;
+  GeniusPrinterService._();
 
   /// Singleton instance
   static GeniusPrinterService? _instance;
@@ -236,7 +236,7 @@ class GeniusPrinterService {
     GeniusPdfLogger.info('Print with dialog: "$documentName"', tag: 'PrinterService');
 
     if (pdfBytes.isEmpty) {
-      final message = 'Print failed: PDF data is empty.';
+      const message = 'Print failed: PDF data is empty.';
       job.status = GeniusPrintJobStatus.failed;
       job.errorMessage = message;
       job.completedAt = DateTime.now();
@@ -322,7 +322,7 @@ class GeniusPrinterService {
     GeniusPdfLogger.info('Direct print: "$documentName" to $effectivePrinterId', tag: 'PrinterService');
 
     if (pdfBytes.isEmpty) {
-      final message = 'Direct print failed: PDF data is empty.';
+      const message = 'Direct print failed: PDF data is empty.';
       job.status = GeniusPrintJobStatus.failed;
       job.errorMessage = message;
       job.completedAt = DateTime.now();

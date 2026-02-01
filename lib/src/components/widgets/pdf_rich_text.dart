@@ -25,7 +25,7 @@ GeniusPdfTextStyle _resolveRichTextDefaultStyle(
   return GeniusPdfTextStyle(
     fontSize: typography.bodySize,
     color: config.printTheme.colorScheme.onSurface,
-    alignment: GeniusPdfTextAlign.left,
+    alignment: GeniusPdfTextAlign.start,
   );
 }
 
@@ -800,7 +800,7 @@ class GeniusPdfRichText {
         if (isLastLine &&
             si == line.segments.length - 1 &&
             overflow == GeniusPdfTextOverflow.ellipsis) {
-          final ellipsis = '…';
+          const ellipsis = '…';
           final ellipsisSize = _measureText(ellipsis, font);
           if (drawWidth + ellipsisSize.width <= bounds.width) {
             drawText = '${seg.text}$ellipsis';
@@ -2108,6 +2108,15 @@ class GeniusPdfTextMeasurer {
 /// );
 /// ```
 class GeniusPdfMarkdownConfig {
+
+  /// Creates a markdown configuration.
+  const GeniusPdfMarkdownConfig({
+    this.linkColor = const Color(0xFF1565C0),
+    this.autoDetectUrls = true,
+    this.autoDetectEmails = true,
+    this.autoDetectPhones = false,
+    this.autoLinkColor,
+  });
   /// Color applied to explicit markdown links `[text](url)`.
   final Color linkColor;
 
@@ -2123,15 +2132,6 @@ class GeniusPdfMarkdownConfig {
   /// Color for auto-detected links (URLs, emails, phones).
   /// Falls back to [linkColor] if null.
   final Color? autoLinkColor;
-
-  /// Creates a markdown configuration.
-  const GeniusPdfMarkdownConfig({
-    this.linkColor = const Color(0xFF1565C0),
-    this.autoDetectUrls = true,
-    this.autoDetectEmails = true,
-    this.autoDetectPhones = false,
-    this.autoLinkColor,
-  });
 
   /// The effective color for auto-detected links.
   Color get effectiveAutoLinkColor => autoLinkColor ?? linkColor;
@@ -2502,11 +2502,11 @@ enum _AutoType { url, email, phone }
 
 /// A match from auto-detection.
 class _AutoMatch {
+  const _AutoMatch(this.start, this.end, this.text, this.type);
   final int start;
   final int end;
   final String text;
   final _AutoType type;
-  const _AutoMatch(this.start, this.end, this.text, this.type);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

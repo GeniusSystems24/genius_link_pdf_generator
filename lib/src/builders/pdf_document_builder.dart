@@ -1,5 +1,8 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:barcode/barcode.dart' as bc;
+import 'package:image/image.dart' as img;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../components/widgets/chart/pdf_area_chart.dart';
@@ -223,6 +226,39 @@ abstract class GeniusPdfDocumentBuilder {
   /// Resets the Y position to [y] (defaults to 0 — top of content area).
   void resetY([double y = 0]) {
     _currentY = y;
+  }
+
+  /// Sets the current page to [page] and optionally updates the Y position.
+  ///
+  /// This is useful when a component (like a grid) creates new pages during
+  /// rendering and you need to synchronize the builder's state with the
+  /// component's final page.
+  void setCurrentPage(PdfPage page, {double? y}) {
+    _currentPage = page;
+    // Find the index of this page in the document
+    for (int i = 0; i < _document.pages.count; i++) {
+      if (_document.pages[i] == page) {
+        _currentIndex = i;
+        break;
+      }
+    }
+    if (y != null) {
+      _currentY = y;
+    }
+    GeniusPdfLogger.debug(
+      'Page set to index=$_currentIndex, Y=$_currentY',
+      tag: 'Builder',
+    );
+  }
+
+  /// Updates the current page and Y position from a [PdfLayoutResult].
+  ///
+  /// This is essential for handling multi-page content like grids that may
+  /// span multiple pages. The result's [page] becomes the current page,
+  /// and [currentY] is set to the bottom of the result's bounds plus
+  /// optional [spacing].
+  void updateFromLayoutResult(PdfLayoutResult result, {double spacing = 0}) {
+    setCurrentPage(result.page, y: result.bounds.bottom + spacing);
   }
 
   /// Adds vertical spacing without drawing anything.
@@ -477,7 +513,7 @@ abstract class GeniusPdfDocumentBuilder {
     return header;
   }
 
-  /// Adds a footer to all pages with optional user name and page numbers.
+  /// Adds a footer to all pages with optional user name, QR code, and page numbers.
   ///
   /// ## Parameters
   /// - [userName]: Name of the user who generated the document.
@@ -486,6 +522,8 @@ abstract class GeniusPdfDocumentBuilder {
   /// - [showPageNumber]: Whether to show page numbers.
   /// - [font]: Footer font.
   /// - [pageNumberFormat]: Page number format (defaults to `'{0}/{1}'`).
+  /// - [qrCodeUrl]: URL for QR code to display in footer.
+  /// - [qrCodeSize]: Size of QR code (defaults to 50).
   PdfPageTemplateElement addFooter({
     String? userName,
     String? userLabel,
@@ -493,17 +531,66 @@ abstract class GeniusPdfDocumentBuilder {
     bool showPageNumber = false,
     PdfFont? font,
     String pageNumberFormat = '{0}/{1}',
+    String? qrCodeUrl,
+    double qrCodeSize = 50,
   }) {
     final footerFont = font ?? baseFont;
+    final hasQrCode = qrCodeUrl != null && qrCodeUrl.isNotEmpty;
+    final footerHeight = hasQrCode ? qrCodeSize + 15 : 25.0;
+
     final footer = PdfPageTemplateElement(
-      Rect.fromLTWH(0, 0, availableWidth, 25),
+      Rect.fromLTWH(0, 0, availableWidth, footerHeight),
     );
+
+    // QR Code - left side (RTL: right side)
+    if (hasQrCode) {
+      try {
+        final qrSize = (qrCodeSize - 10).toInt();
+        final qrCode = bc.Barcode.qrCode();
+        final qrData = qrCode.make(qrCodeUrl,
+            width: qrSize.toDouble(), height: qrSize.toDouble());
+
+        // Create QR image
+        final image = img.Image(width: qrSize, height: qrSize);
+        img.fill(image, color: img.ColorRgba8(255, 255, 255, 255));
+
+        final fgColor = img.ColorRgba8(0, 0, 0, 255);
+        for (final element in qrData) {
+          if ((element is bc.BarcodeBar) && element.black) {
+            final x1 = element.left.clamp(0, qrSize - 1).toInt();
+            final y1 = element.top.clamp(0, qrSize - 1).toInt();
+            final x2 = (element.left + element.width).clamp(0, qrSize).toInt();
+            final y2 = (element.top + element.height).clamp(0, qrSize).toInt();
+            for (int y = y1; y < y2; y++) {
+              for (int x = x1; x < x2; x++) {
+                image.setPixel(x, y, fgColor);
+              }
+            }
+          }
+        }
+
+        final qrImage = Uint8List.fromList(img.encodePng(image));
+        final qrX = isRTL ? availableWidth - qrCodeSize : 5.0;
+
+        footer.graphics.drawImage(
+          PdfBitmap(qrImage),
+          Rect.fromLTWH(qrX, 8, qrCodeSize - 10, qrCodeSize - 10),
+        );
+      } catch (e) {
+        GeniusPdfLogger.warning('Failed to draw QR code in footer: $e',
+            tag: 'Footer');
+      }
+    }
+
+    // Calculate text offset based on QR code presence
+    final textOffsetX = hasQrCode ? qrCodeSize + 5 : 0.0;
+    final textY = hasQrCode ? (footerHeight - footerFont.height) / 2 : 5.0;
 
     // User name — dynamic positioning.
     if (userName != null) {
       final label = userLabel ?? (isRTL ? 'المستخدم : ' : 'User: ');
       final userText = '$label$userName';
-      final userX = isRTL ? availableWidth - 10 : 5.0;
+      final userX = isRTL ? availableWidth - textOffsetX - 10 : textOffsetX + 5;
 
       PdfTextElement(
         text: userText,
@@ -512,7 +599,7 @@ abstract class GeniusPdfDocumentBuilder {
         format: _format,
       ).draw(
         graphics: footer.graphics,
-        bounds: Rect.fromLTWH(userX, 5, 0, 0),
+        bounds: Rect.fromLTWH(userX, textY, 0, 0),
       );
     }
 
@@ -530,7 +617,7 @@ abstract class GeniusPdfDocumentBuilder {
         ),
       ).draw(
         graphics: footer.graphics,
-        bounds: Rect.fromLTWH(timeX, 5, 0, 0),
+        bounds: Rect.fromLTWH(timeX, textY, 0, 0),
       );
     }
 
@@ -544,8 +631,12 @@ abstract class GeniusPdfDocumentBuilder {
         brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       )..numberStyle = PdfNumberStyle.numeric;
 
-      // Position: RTL → right side, LTR → left side.
-      final pnX = isRTL ? availableWidth * 0.05 : availableWidth * 0.85;
+      // Position: RTL → left side (after QR), LTR → right side (before QR)
+      final pnX = isRTL
+          ? (hasQrCode ? textOffsetX + 5 : availableWidth * 0.05)
+          : (hasQrCode
+              ? availableWidth - qrCodeSize - 60
+              : availableWidth * 0.85);
 
       PdfCompositeField(
         font: font ?? PdfTrueTypeFont(config.baseFontBytes, 12),
@@ -554,7 +645,7 @@ abstract class GeniusPdfDocumentBuilder {
         fields: [pageNumber, pageCount],
       ).draw(
         footer.graphics,
-        Offset(pnX, 5),
+        Offset(pnX, textY),
       );
     }
 
@@ -862,7 +953,7 @@ abstract class GeniusPdfDocumentBuilder {
       // Draw a line-title-line pattern.
       final page = currentPage;
       final textSize = dividerFont.measureString(title);
-      final gapWidth = 10.0;
+      const gapWidth = 10.0;
       final textX = (pageWidth - textSize.width) / 2;
       final lineY = _currentY + textSize.height / 2;
 
@@ -915,7 +1006,8 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     double height = 250,
   }) {
-    return _addChart(chart.draw, spacing: spacing, height: height, tag: 'BarChart');
+    return _addChart(chart.draw,
+        spacing: spacing, height: height, tag: 'BarChart');
   }
 
   /// Draws a [GeniusPdfLineChart] at the current Y position.
@@ -929,7 +1021,8 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     double height = 250,
   }) {
-    return _addChart(chart.draw, spacing: spacing, height: height, tag: 'LineChart');
+    return _addChart(chart.draw,
+        spacing: spacing, height: height, tag: 'LineChart');
   }
 
   /// Draws a [GeniusPdfPieChart] at the current Y position.
@@ -943,7 +1036,8 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     double height = 250,
   }) {
-    return _addChart(chart.draw, spacing: spacing, height: height, tag: 'PieChart');
+    return _addChart(chart.draw,
+        spacing: spacing, height: height, tag: 'PieChart');
   }
 
   /// Draws a [GeniusPdfAreaChart] at the current Y position.
@@ -957,7 +1051,8 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     double height = 250,
   }) {
-    return _addChart(chart.draw, spacing: spacing, height: height, tag: 'AreaChart');
+    return _addChart(chart.draw,
+        spacing: spacing, height: height, tag: 'AreaChart');
   }
 
   /// Internal helper that draws any chart using its draw function.
@@ -1080,9 +1175,8 @@ abstract class GeniusPdfDocumentBuilder {
         ? (image.width > pageWidth ? pageWidth : image.width)
         : (maxWidth > pageWidth ? pageWidth : maxWidth);
 
-    final scaled = image.width > targetWidth
-        ? image.scaledToWidth(targetWidth)
-        : image;
+    final scaled =
+        image.width > targetWidth ? image.scaledToWidth(targetWidth) : image;
 
     addImage(scaled, alignment: alignment, spacing: 0);
   }

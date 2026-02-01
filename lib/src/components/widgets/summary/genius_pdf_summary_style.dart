@@ -29,7 +29,7 @@ class GeniusPdfSummaryStyle {
     this.labelStyle = const GeniusPdfTextStyle.body(),
     this.valueStyle = const GeniusPdfTextStyle(
       fontSize: 10,
-      alignment: GeniusPdfTextAlign.right,
+      alignment: GeniusPdfTextAlign.end,
     ),
     this.totalLabelStyle,
     this.totalValueStyle,
@@ -48,7 +48,8 @@ class GeniusPdfSummaryStyle {
 
   /// Creates a summary style from [GeniusPdfPrintTheme].
   factory GeniusPdfSummaryStyle.fromTheme(GeniusPdfPrintTheme theme) {
-    final summaryTheme = theme.summaryTheme ?? const GeniusPdfSummaryTheme.defaults();
+    final summaryTheme =
+        theme.summaryTheme ?? const GeniusPdfSummaryTheme.defaults();
     final typography = theme.typography;
 
     return GeniusPdfSummaryStyle(
@@ -63,24 +64,24 @@ class GeniusPdfSummaryStyle {
       labelStyle: GeniusPdfTextStyle(
         fontSize: typography.bodySize,
         color: summaryTheme.labelColor,
-        alignment: GeniusPdfTextAlign.left,
+        alignment: GeniusPdfTextAlign.start,
       ),
       valueStyle: GeniusPdfTextStyle(
         fontSize: typography.bodySize,
         color: summaryTheme.valueColor,
-        alignment: GeniusPdfTextAlign.right,
+        alignment: GeniusPdfTextAlign.end,
       ),
       totalLabelStyle: GeniusPdfTextStyle(
         fontSize: typography.bodySize,
         fontWeight: FontWeight.bold,
         color: summaryTheme.labelColor,
-        alignment: GeniusPdfTextAlign.left,
+        alignment: GeniusPdfTextAlign.start,
       ),
       totalValueStyle: GeniusPdfTextStyle(
         fontSize: typography.bodySize,
         fontWeight: FontWeight.bold,
         color: summaryTheme.valueColor,
-        alignment: GeniusPdfTextAlign.right,
+        alignment: GeniusPdfTextAlign.end,
       ),
       highlightBackgroundColor: summaryTheme.highlightBackgroundColor,
       itemSpacing: summaryTheme.itemSpacing,
@@ -105,7 +106,7 @@ class GeniusPdfSummaryStyle {
         labelStyle = const GeniusPdfTextStyle.body(),
         valueStyle = const GeniusPdfTextStyle(
           fontSize: 10,
-          alignment: GeniusPdfTextAlign.right,
+          alignment: GeniusPdfTextAlign.end,
         ),
         totalLabelStyle = null,
         totalValueStyle = null,
@@ -130,7 +131,7 @@ class GeniusPdfSummaryStyle {
         labelStyle = const GeniusPdfTextStyle.body(),
         valueStyle = const GeniusPdfTextStyle(
           fontSize: 10,
-          alignment: GeniusPdfTextAlign.right,
+          alignment: GeniusPdfTextAlign.end,
         ),
         totalLabelStyle = null,
         totalValueStyle = null,
@@ -159,7 +160,7 @@ class GeniusPdfSummaryStyle {
         ),
         valueStyle = const GeniusPdfTextStyle(
           fontSize: 10,
-          alignment: GeniusPdfTextAlign.right,
+          alignment: GeniusPdfTextAlign.end,
         ),
         totalLabelStyle = const GeniusPdfTextStyle(
           fontSize: 11,
@@ -169,7 +170,7 @@ class GeniusPdfSummaryStyle {
         totalValueStyle = const GeniusPdfTextStyle(
           fontSize: 11,
           fontWeight: FontWeight.bold,
-          alignment: GeniusPdfTextAlign.right,
+          alignment: GeniusPdfTextAlign.end,
         ),
         highlightBackgroundColor = const Color(0xFFF5F5F5),
         highlightTextColor = null,
@@ -203,7 +204,7 @@ class GeniusPdfSummaryStyle {
         ),
         valueStyle = const GeniusPdfTextStyle(
           fontSize: 9,
-          alignment: GeniusPdfTextAlign.right,
+          alignment: GeniusPdfTextAlign.end,
         ),
         totalLabelStyle = const GeniusPdfTextStyle(
           fontSize: 10,
@@ -213,7 +214,7 @@ class GeniusPdfSummaryStyle {
         totalValueStyle = const GeniusPdfTextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
-          alignment: GeniusPdfTextAlign.right,
+          alignment: GeniusPdfTextAlign.end,
           color: Color(0xFF212529),
         ),
         highlightBackgroundColor = const Color(0xFFE9ECEF),

@@ -1004,7 +1004,7 @@ class _ComponentPage extends StatelessWidget {
           Switch(
               value: isRTL,
               onChanged: onRTLChanged,
-              activeColor: AppColors.primary),
+              activeThumbColor: AppColors.primary),
           Text('RTL',
               style: TextStyle(
                   fontSize: 12,

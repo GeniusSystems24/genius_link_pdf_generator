@@ -313,7 +313,7 @@ List<GeniusPdfGridColumn> _generateColumns(int gridColumns) {
       titleAr: columnNames[index].$2,
       width: index == 0 ? 80 : (index == 1 ? 120 : 80),
       alignment:
-          index >= 2 ? GeniusPdfTextAlign.center : GeniusPdfTextAlign.left,
+          index >= 2 ? GeniusPdfTextAlign.center : GeniusPdfTextAlign.start,
     ),
   );
 }

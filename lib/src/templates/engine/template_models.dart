@@ -15,6 +15,17 @@
 /// );
 /// ```
 class TemplateVariable {
+  /// Creates a template variable.
+  const TemplateVariable({
+    required this.name,
+    required this.type,
+    this.defaultValue,
+    this.label,
+    this.labelAr,
+    this.required = false,
+    this.format,
+    this.validation,
+  });
 
   /// Creates from JSON.
   factory TemplateVariable.fromJson(Map<String, dynamic> json) {
@@ -34,17 +45,6 @@ class TemplateVariable {
           : null,
     );
   }
-  /// Creates a template variable.
-  const TemplateVariable({
-    required this.name,
-    required this.type,
-    this.defaultValue,
-    this.label,
-    this.labelAr,
-    this.required = false,
-    this.format,
-    this.validation,
-  });
 
   /// Creates a string variable.
   factory TemplateVariable.string(
@@ -243,6 +243,14 @@ enum VariableType {
 
 /// Validation rules for template variables.
 class VariableValidation {
+  const VariableValidation({
+    this.minLength,
+    this.maxLength,
+    this.min,
+    this.max,
+    this.pattern,
+    this.allowedValues,
+  });
 
   factory VariableValidation.fromJson(Map<String, dynamic> json) {
     return VariableValidation(
@@ -254,14 +262,6 @@ class VariableValidation {
       allowedValues: json['allowedValues'] as List<dynamic>?,
     );
   }
-  const VariableValidation({
-    this.minLength,
-    this.maxLength,
-    this.min,
-    this.max,
-    this.pattern,
-    this.allowedValues,
-  });
 
   /// Minimum length for strings.
   final int? minLength;
@@ -388,6 +388,13 @@ class ValidationResult {
 /// );
 /// ```
 class TemplateCondition {
+  const TemplateCondition({
+    required this.variable,
+    required this.operator,
+    this.value,
+    this.and,
+    this.or,
+  });
 
   factory TemplateCondition.fromJson(Map<String, dynamic> json) {
     return TemplateCondition(
@@ -405,13 +412,6 @@ class TemplateCondition {
           .toList(),
     );
   }
-  const TemplateCondition({
-    required this.variable,
-    required this.operator,
-    this.value,
-    this.and,
-    this.or,
-  });
 
   /// Creates an equality condition.
   factory TemplateCondition.equals(String variable, dynamic value) {
@@ -647,6 +647,16 @@ enum ConditionOperator {
 /// );
 /// ```
 class TemplateLoop {
+  const TemplateLoop({
+    required this.variable,
+    this.itemName = 'item',
+    this.indexName = 'index',
+    this.filter,
+    this.sortBy,
+    this.sortDescending = false,
+    this.limit,
+    this.offset = 0,
+  });
 
   factory TemplateLoop.fromJson(Map<String, dynamic> json) {
     return TemplateLoop(
@@ -662,16 +672,6 @@ class TemplateLoop {
       offset: json['offset'] as int? ?? 0,
     );
   }
-  const TemplateLoop({
-    required this.variable,
-    this.itemName = 'item',
-    this.indexName = 'index',
-    this.filter,
-    this.sortBy,
-    this.sortDescending = false,
-    this.limit,
-    this.offset = 0,
-  });
 
   /// The list variable to iterate over.
   final String variable;

@@ -72,8 +72,8 @@ class GeniusPdfInfoBoxStyle {
     this.labelValueGap = 4,
     this.labelValueLayout = GeniusPdfLabelValueLayout.horizontal,
     this.labelWidth,
-    this.labelAlign = GeniusPdfTextAlign.left,
-    this.valueAlign = GeniusPdfTextAlign.right,
+    this.labelAlign = GeniusPdfTextAlign.start,
+    this.valueAlign = GeniusPdfTextAlign.end,
     this.contentAlignment = GeniusPdfInfoBoxAlignment.top,
     this.iconSize = 16,
     this.iconSpacing = 6,
@@ -149,8 +149,8 @@ class GeniusPdfInfoBoxStyle {
         labelValueGap = 4,
         labelValueLayout = GeniusPdfLabelValueLayout.horizontal,
         labelWidth = null,
-        labelAlign = GeniusPdfTextAlign.left,
-        valueAlign = GeniusPdfTextAlign.right,
+        labelAlign = GeniusPdfTextAlign.start,
+        valueAlign = GeniusPdfTextAlign.end,
         contentAlignment = GeniusPdfInfoBoxAlignment.top,
         iconSize = 16,
         iconSpacing = 6,
@@ -195,8 +195,8 @@ class GeniusPdfInfoBoxStyle {
         labelValueGap = 4,
         labelValueLayout = GeniusPdfLabelValueLayout.horizontal,
         labelWidth = null,
-        labelAlign = GeniusPdfTextAlign.left,
-        valueAlign = GeniusPdfTextAlign.right,
+        labelAlign = GeniusPdfTextAlign.start,
+        valueAlign = GeniusPdfTextAlign.end,
         contentAlignment = GeniusPdfInfoBoxAlignment.top,
         iconSize = 16,
         iconSpacing = 6,
@@ -232,8 +232,8 @@ class GeniusPdfInfoBoxStyle {
         labelValueGap = 4,
         labelValueLayout = GeniusPdfLabelValueLayout.horizontal,
         labelWidth = null,
-        labelAlign = GeniusPdfTextAlign.left,
-        valueAlign = GeniusPdfTextAlign.right,
+        labelAlign = GeniusPdfTextAlign.start,
+        valueAlign = GeniusPdfTextAlign.end,
         contentAlignment = GeniusPdfInfoBoxAlignment.top,
         iconSize = 16,
         iconSpacing = 6,
@@ -261,9 +261,9 @@ class GeniusPdfInfoBoxStyle {
       borderStyle: GeniusPdfBorderStyle.all(color: primaryColor, width: 1),
       borderRadius: 0,
       padding: const GeniusPdfCellPadding.all(0),
-      titleStyle: GeniusPdfTextStyle.header(
+      titleStyle: const GeniusPdfTextStyle.header(
         fontSize: 10,
-        color: const Color(0xFFFFFFFF),
+        color: Color(0xFFFFFFFF),
       ),
       contentStyle: const GeniusPdfTextStyle.body(fontSize: 9),
       labelStyle: const GeniusPdfTextStyle(
@@ -603,16 +603,16 @@ class GeniusPdfInfoBoxStyle {
   /// When [isRTL] is true, swaps left↔right for proper bidirectional layout.
   GeniusPdfTextAlign effectiveLabelAlign({bool isRTL = false}) {
     if (!isRTL) return labelAlign;
-    if (labelAlign == GeniusPdfTextAlign.left) return GeniusPdfTextAlign.right;
-    if (labelAlign == GeniusPdfTextAlign.right) return GeniusPdfTextAlign.left;
+    if (labelAlign == GeniusPdfTextAlign.start) return GeniusPdfTextAlign.end;
+    if (labelAlign == GeniusPdfTextAlign.end) return GeniusPdfTextAlign.start;
     return labelAlign;
   }
 
   /// Returns RTL-aware value alignment.
   GeniusPdfTextAlign effectiveValueAlign({bool isRTL = false}) {
     if (!isRTL) return valueAlign;
-    if (valueAlign == GeniusPdfTextAlign.left) return GeniusPdfTextAlign.right;
-    if (valueAlign == GeniusPdfTextAlign.right) return GeniusPdfTextAlign.left;
+    if (valueAlign == GeniusPdfTextAlign.start) return GeniusPdfTextAlign.end;
+    if (valueAlign == GeniusPdfTextAlign.end) return GeniusPdfTextAlign.start;
     return valueAlign;
   }
 
@@ -1135,8 +1135,8 @@ class GeniusPdfInfoBox {
     );
   }
 
- PdfFont  get baseFont => config.baseFont;
- PdfFont  get boldFont => config.boldFont;
+  PdfFont get baseFont => config.baseFont;
+  PdfFont get boldFont => config.boldFont;
 
   /// Draws the info box on a PDF page.
   ///
@@ -1239,7 +1239,7 @@ class GeniusPdfInfoBox {
       }
 
       final titleFormat = PdfStringFormat(
-        alignment: style.titleStyle.alignment.toPdfTextAlignment(),
+        alignment: style.titleStyle.alignment.toPdfTextAlignment(config.isRTL),
         textDirection: config.isRTL
             ? PdfTextDirection.rightToLeft
             : PdfTextDirection.leftToRight,
@@ -1365,7 +1365,8 @@ class GeniusPdfInfoBox {
           );
 
       final footerFormat = PdfStringFormat(
-        alignment: effectiveFooterStyle.alignment.toPdfTextAlignment(),
+        alignment:
+            effectiveFooterStyle.alignment.toPdfTextAlignment(config.isRTL),
         textDirection: config.isRTL
             ? PdfTextDirection.rightToLeft
             : PdfTextDirection.leftToRight,
@@ -2294,7 +2295,7 @@ class GeniusPdfSection {
 
     if (hasTitle) {
       final titleFormat = PdfStringFormat(
-        alignment: style.titleStyle.alignment.toPdfTextAlignment(),
+        alignment: style.titleStyle.alignment.toPdfTextAlignment(config.isRTL),
         textDirection:
             isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
       );
@@ -2438,7 +2439,7 @@ class GeniusPdfSection {
     if (hasTitle &&
         style.titlePosition == GeniusPdfSectionTitlePosition.inside) {
       final titleFormat = PdfStringFormat(
-        alignment: style.titleStyle.alignment.toPdfTextAlignment(),
+        alignment: style.titleStyle.alignment.toPdfTextAlignment(config.isRTL),
         textDirection:
             isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
       );

@@ -152,7 +152,9 @@ class GeniusPdfDataGrid {
     required Rect bounds,
     PdfLayoutFormat? layoutFormat,
   }) {
-    GeniusPdfLogger.debug('Drawing grid: ${columns.length} columns, ${rows.length} rows', tag: 'DataGrid');
+    GeniusPdfLogger.debug(
+        'Drawing grid: ${columns.length} columns, ${rows.length} rows',
+        tag: 'DataGrid');
     final grid = _buildGrid(page);
 
     return grid.draw(
@@ -404,10 +406,10 @@ class GeniusPdfDataGrid {
     // String format (alignment)
     final alignment = column.alignment;
     cell.style.stringFormat = PdfStringFormat(
-      alignment: alignment.toPdfTextAlignment(),
+      alignment: alignment.toPdfTextAlignment(config.isRTL),
       lineAlignment:
           cellStyle.textStyle.verticalAlignment.toPdfVerticalAlignment(),
-        textDirection: config.isRTL
+      textDirection: config.isRTL
           ? PdfTextDirection.rightToLeft
           : PdfTextDirection.leftToRight,
     );
@@ -423,7 +425,7 @@ class GeniusPdfDataGrid {
     int totalFlex = 0;
 
     // First pass: calculate fixed widths and count flex columns
-    for (final col in cols) {
+    for (final col in (config.isRTL ? cols.reversed : cols)) {
       if (col.width != null) {
         widths.add(col.width!);
         usedWidth += col.width!;
@@ -497,7 +499,7 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
           title: valueHeader,
           titleAr: valueHeaderAr,
           flexFactor: 1,
-          alignment: GeniusPdfTextAlign.right,
+          alignment: GeniusPdfTextAlign.end,
         ),
       ],
       rows: data.entries
@@ -753,7 +755,9 @@ class GeniusConditionalFormatRule {
 
   /// Creates a custom rule with a function.
   factory GeniusConditionalFormatRule.custom({
-    required bool Function(dynamic value, String columnId, Map<String, dynamic> rowData) condition,
+    required bool Function(
+            dynamic value, String columnId, Map<String, dynamic> rowData)
+        condition,
     List<String>? columnIds,
     Color? backgroundColor,
     Color? textColor,
@@ -783,7 +787,9 @@ class GeniusConditionalFormatRule {
   final dynamic value2;
 
   /// Custom condition function.
-  final bool Function(dynamic value, String columnId, Map<String, dynamic> rowData)? customCondition;
+  final bool Function(
+          dynamic value, String columnId, Map<String, dynamic> rowData)?
+      customCondition;
 
   /// Background color when condition is met.
   final Color? backgroundColor;
@@ -812,7 +818,8 @@ class GeniusConditionalFormatRule {
   }
 
   /// Evaluates if the condition is met.
-  bool evaluate(dynamic cellValue, String columnId, Map<String, dynamic> rowData) {
+  bool evaluate(
+      dynamic cellValue, String columnId, Map<String, dynamic> rowData) {
     if (!appliesToColumn(columnId)) return false;
 
     switch (conditionType) {
@@ -922,7 +929,11 @@ class GeniusConditionalFormatManager {
       }
     }
 
-    if (backgroundColor == null && textColor == null && fontWeight == null && prefix == null && suffix == null) {
+    if (backgroundColor == null &&
+        textColor == null &&
+        fontWeight == null &&
+        prefix == null &&
+        suffix == null) {
       return null;
     }
 

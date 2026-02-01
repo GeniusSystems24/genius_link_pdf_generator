@@ -1215,8 +1215,8 @@ class GeniusPdfJobChain {
   final bool stopOnError;
   final void Function(List<GeniusPdfResult> results)? onChainComplete;
   final void Function(int failedIndex, GeniusPdfFailure error)? onChainError;
-  int _currentIndex = 0;
-  bool _isRunning = false;
+  final int _currentIndex = 0;
+  final bool _isRunning = false;
   bool _isCancelled = false;
 
   bool get isRunning => _isRunning;

@@ -36,16 +36,16 @@ class GeniusPdfPrintTheme {
 
   /// Creates a default print theme.
   factory GeniusPdfPrintTheme.defaults() {
-    return GeniusPdfPrintTheme(
-      colorScheme: const GeniusPdfPrintColorScheme.defaults(),
-      typography: const GeniusPdfPrintTypography.defaults(),
-      spacing: const GeniusPdfPrintSpacing.defaults(),
-      borders: const GeniusPdfPrintBorders.defaults(),
-      gridTheme: const GeniusPdfGridTheme.defaults(),
-      summaryTheme: const GeniusPdfSummaryTheme.defaults(),
-      infoBoxTheme: const GeniusPdfInfoBoxTheme.defaults(),
-      headerTheme: const GeniusPdfHeaderTheme.defaults(),
-      sectionTheme: const GeniusPdfSectionTheme.defaults(),
+    return const GeniusPdfPrintTheme(
+      colorScheme: GeniusPdfPrintColorScheme.defaults(),
+      typography: GeniusPdfPrintTypography.defaults(),
+      spacing: GeniusPdfPrintSpacing.defaults(),
+      borders: GeniusPdfPrintBorders.defaults(),
+      gridTheme: GeniusPdfGridTheme.defaults(),
+      summaryTheme: GeniusPdfSummaryTheme.defaults(),
+      infoBoxTheme: GeniusPdfInfoBoxTheme.defaults(),
+      headerTheme: GeniusPdfHeaderTheme.defaults(),
+      sectionTheme: GeniusPdfSectionTheme.defaults(),
     );
   }
 

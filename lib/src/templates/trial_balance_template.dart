@@ -1,12 +1,10 @@
 import 'dart:ui';
 
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide PdfGridStyle, PdfBorderStyle, PdfTextStyle, PdfGridRow, PdfGridColumn;
+import 'package:intl/intl.dart';
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
 import '../core/pdf_config.dart';
-import '../extensions/color_extensions.dart';
 
 /// Account entry for trial balance.
 class TrialBalanceEntry {
@@ -103,6 +101,13 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     required this.data,
     this.showCategories = true,
     this.showCategorySubtotals = true,
+    this.reportId,
+    this.printedBy,
+    this.showQRCode = true,
+    this.showSignatures = true,
+    this.showNotes = true,
+    this.notes,
+    this.notesAr,
   }) : super(config);
 
   final GeniusPdfCompanyInfo company;
@@ -110,8 +115,40 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
   final bool showCategories;
   final bool showCategorySubtotals;
 
+  /// Report ID for QR code URL
+  final String? reportId;
+
+  /// User who printed the report
+  final String? printedBy;
+
+  /// Whether to show QR code with report link
+  final bool showQRCode;
+
+  /// Whether to show signature areas
+  final bool showSignatures;
+
+  /// Whether to show notes section
+  final bool showNotes;
+
+  /// Custom notes to display
+  final String? notes;
+  final String? notesAr;
+
   @override
   void build() {
+    // Add repeating footer with QR code and user info on all pages
+    if (showQRCode || printedBy != null) {
+      final qrUrl =
+          reportId != null ? 'https://localhost:443/report/$reportId' : null;
+      addFooter(
+        userName: printedBy,
+        printTime: _formatDate(DateTime.now()),
+        showPageNumber: true,
+        qrCodeUrl: qrUrl,
+        qrCodeSize: 55,
+      );
+    }
+
     newPage();
 
     // Header
@@ -122,19 +159,34 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
 
     // Footer totals
     _drawTotals();
+
+    // Summary section
+    _drawSummary();
+
+    // Notes section
+    if (showNotes) {
+      _drawNotes();
+    }
+
+    // Signatures section
+    if (showSignatures) {
+      _drawSignatures();
+    }
   }
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
       config: config,
-      title: 'Trial Balance',
-      titleAr: 'ميزان المراجعة',
-      subtitle: 'As of ${_formatDateLong(data.asOfDate)}',
-      subtitleAr: 'كما في ${_formatDateArabic(data.asOfDate)}',
+      title: config.isLTR
+          ? 'Trial Balance As of ${_formatDateLong(data.asOfDate)}'
+          : 'ميزان المراجعة كما في ${_formatDateArabic(data.asOfDate)}',
+      // subtitle: config.isLTR
+      //     ? 'As of ${_formatDateLong(data.asOfDate)}'
+      //     : 'كما في ${_formatDateArabic(data.asOfDate)}',
       company: company,
-      printDate: DateTime.now(),
+      // printDate: DateTime.now(),
       style: const GeniusPdfReportHeaderStyle.classic(),
-      layout: GeniusPdfReportHeaderLayout.centered,
+      layout: GeniusPdfReportHeaderLayout.standard,
     );
 
     final height = header.draw(
@@ -151,7 +203,6 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
         id: 'account',
         title: 'Account Name',
         titleAr: 'اسم الحساب',
-        flexFactor: 3,
       ),
       GeniusPdfGridColumn.currency(
         id: 'debit',
@@ -234,7 +285,9 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     );
 
     if (result != null) {
-      addSpace(result.bounds.height + 10);
+      // Update current page and Y position from the grid result
+      // This handles multi-page grids correctly in both RTL and LTR modes
+      updateFromLayoutResult(result, spacing: 10);
     }
   }
 
@@ -257,22 +310,6 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     );
 
     addSpace(50);
-
-    // Page indicator (if multi-page)
-    final pageText = config.isRTL
-        ? 'صفحة ${document.pages.count} من ${document.pages.count}'
-        : 'Page ${document.pages.count} of ${document.pages.count}';
-
-    addTextAt(
-      pageText,
-      x: pageWidth - 100,
-      y: pageHeight - 20,
-      font: config.configAssets == null
-          ? PdfTrueTypeFont(config.baseFontBytes, 8)
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 8,
-              style: PdfFontStyle.regular),
-      brush: PdfSolidBrush(const Color(0xFF757575).toPdfColor()),
-    );
   }
 
   String _formatDateLong(DateTime date) {
@@ -320,5 +357,154 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
         );
+  }
+
+  String _formatDate(DateTime date) {
+    return DateFormat('dd/MM/yyyy').format(date);
+  }
+
+  void _drawSummary() {
+    // Summary section with key metrics
+    final summaryItems = <GeniusPdfSummaryItem>[
+      GeniusPdfSummaryItem(
+        label: 'Total Accounts',
+        labelAr: 'إجمالي الحسابات',
+        value: '${data.allEntries.length}',
+      ),
+      GeniusPdfSummaryItem(
+        label: 'Categories',
+        labelAr: 'التصنيفات',
+        value: '${data.categories.length}',
+      ),
+      GeniusPdfSummaryItem.negative(
+        label: 'Total Debit',
+        labelAr: 'إجمالي المدين',
+        value: '${_formatNumber(data.totalDebit)} ${data.currency}',
+      ),
+      GeniusPdfSummaryItem.positive(
+        label: 'Total Credit',
+        labelAr: 'إجمالي الدائن',
+        value: '${_formatNumber(data.totalCredit)} ${data.currency}',
+      ),
+      if (data.totalDebit != data.totalCredit)
+        GeniusPdfSummaryItem.total(
+          label: 'Difference',
+          labelAr: 'الفرق',
+          value:
+              '${_formatNumber(data.totalDebit - data.totalCredit)} ${data.currency}',
+        ),
+    ];
+
+    final summary = GeniusPdfSummarySection(
+      config: config,
+      items: summaryItems,
+      style: const GeniusPdfSummaryStyle.bordered(),
+      alignment: GeniusPdfSummaryAlignment.right,
+      width: pageWidth * 0.45,
+    );
+
+    final result = summary.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 120),
+    );
+
+    addSpace(result.height + 15);
+  }
+
+  void _drawNotes() {
+    final displayNotes = notes ?? (config.isRTL ? notesAr : notes);
+    final defaultNotes = config.isRTL
+        ? '''ملاحظات:
+• ميزان المراجعة يعرض أرصدة جميع الحسابات كما في تاريخ التقرير
+• يجب أن يتساوى إجمالي الجانب المدين مع إجمالي الجانب الدائن
+• أي فرق يشير إلى وجود خطأ في القيود المحاسبية
+• للاستفسارات، يرجى التواصل مع قسم المحاسبة'''
+        : '''Notes:
+• Trial Balance shows all account balances as of the report date
+• Total Debit must equal Total Credit
+• Any difference indicates errors in accounting entries
+• For inquiries, contact the Accounting Department''';
+
+    final notesText = displayNotes ?? defaultNotes;
+
+    addLine(
+      notesText,
+      font: config.baseFont,
+      topMargin: 5,
+      padding: 10,
+    );
+
+    addSpace(20);
+  }
+
+  void _drawSignatures() {
+    // Ensure enough space for signatures
+    if (currentY > pageHeight - 100) {
+      newPage();
+    }
+
+    addSpace(20);
+
+    // Draw separator line
+    addHorizontalLine(spacing: 10);
+
+    // Signature areas side by side
+    final signatureY = currentY;
+
+    // Prepared by signature
+    final preparedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'Prepared By',
+      titleAr: 'أعده',
+      lineWidth: 100,
+    );
+
+    preparedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? pageWidth - 110 : 0,
+        signatureY,
+        110,
+        60,
+      ),
+    );
+
+    // Reviewed by signature
+    final reviewedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'Reviewed By',
+      titleAr: 'راجعه',
+      lineWidth: 100,
+    );
+
+    reviewedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        (pageWidth - 110) / 2,
+        signatureY,
+        110,
+        60,
+      ),
+    );
+
+    // Approved by signature
+    final approvedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'Approved By',
+      titleAr: 'اعتمده',
+      lineWidth: 100,
+    );
+
+    approvedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? 0 : pageWidth - 110,
+        signatureY,
+        110,
+        60,
+      ),
+    );
+
+    addSpace(70);
   }
 }

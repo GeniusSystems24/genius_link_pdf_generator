@@ -1,12 +1,10 @@
 import 'dart:ui';
 
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide PdfGridRow, PdfTextStyle, PdfBorderStyle, PdfGridColumn, PdfGridStyle;
+import 'package:intl/intl.dart';
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
 import '../core/pdf_config.dart';
-import '../extensions/color_extensions.dart';
 
 /// Inventory item data.
 class InventoryItem {
@@ -122,6 +120,13 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
     required this.data,
     this.showCategories = true,
     this.showCategorySubtotals = true,
+    this.reportId,
+    this.printedBy,
+    this.showQRCode = true,
+    this.showSignatures = true,
+    this.showNotes = true,
+    this.notes,
+    this.notesAr,
   }) : super(config);
 
   final GeniusPdfCompanyInfo company;
@@ -129,8 +134,40 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
   final bool showCategories;
   final bool showCategorySubtotals;
 
+  /// Report ID for QR code URL (e.g., "INV-2024-001")
+  final String? reportId;
+
+  /// User who printed the report
+  final String? printedBy;
+
+  /// Whether to show QR code with report link
+  final bool showQRCode;
+
+  /// Whether to show signature areas
+  final bool showSignatures;
+
+  /// Whether to show notes section
+  final bool showNotes;
+
+  /// Custom notes to display
+  final String? notes;
+  final String? notesAr;
+
   @override
   void build() {
+    // Add repeating footer with QR code and user info on all pages
+    if (showQRCode || printedBy != null) {
+      final qrUrl =
+          reportId != null ? 'https://localhost:443/report/$reportId' : null;
+      addFooter(
+        userName: printedBy,
+        printTime: _formatDate(DateTime.now()),
+        showPageNumber: true,
+        qrCodeUrl: qrUrl,
+        qrCodeSize: 55,
+      );
+    }
+
     newPage();
 
     // Header
@@ -141,17 +178,28 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
 
     // Grand total
     _drawGrandTotal();
+
+    // Summary section with report info
+    _drawSummary();
+
+    // Notes section
+    if (showNotes) {
+      _drawNotes();
+    }
+
+    // Signatures section (without QR code since it's in footer)
+    if (showSignatures) {
+      _drawSignatures();
+    }
   }
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
       config: config,
-      title: 'Inventory Valuation Report',
-      titleAr: 'تقرير تقييم المخزون',
-      subtitle: 'As of: ${_formatDate(data.asOfDate)}',
-      subtitleAr: 'كما في: ${_formatDate(data.asOfDate)}',
+      title: config.isLTR
+          ? 'Inventory Valuation Report As of ${_formatDateLong(data.asOfDate)}'
+          : 'تقرير تقييم المخزون كما في ${_formatDateArabic(data.asOfDate)}',
       company: company,
-      printDate: DateTime.now(),
       style: const GeniusPdfReportHeaderStyle.classic(),
       layout: GeniusPdfReportHeaderLayout.standard,
     );
@@ -176,7 +224,6 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
         id: 'name',
         title: 'Item Name',
         titleAr: 'اسم الصنف',
-        flexFactor: 2,
       ),
       const GeniusPdfGridColumn(
         id: 'warehouse',
@@ -189,6 +236,7 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
         title: 'Qty on Hand',
         titleAr: 'الكمية المتوفرة',
         width: 70,
+        alignment: GeniusPdfTextAlign.end,
       ),
       GeniusPdfGridColumn.currency(
         id: 'avgCost',
@@ -196,6 +244,7 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
         titleAr: 'متوسط التكلفة',
         width: 80,
         currencySymbol: '',
+        alignment: GeniusPdfTextAlign.end,
       ),
       GeniusPdfGridColumn.currency(
         id: 'totalValue',
@@ -203,6 +252,7 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
         titleAr: 'إجمالي القيمة',
         width: 90,
         currencySymbol: '',
+        alignment: GeniusPdfTextAlign.end,
       ),
     ];
 
@@ -277,7 +327,10 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
     );
 
     if (result != null) {
-      addSpace(result.bounds.height + 10);
+      // Update current page and Y position from the grid result
+      // This handles multi-page grids correctly by synchronizing the builder's
+      // state with where the grid actually ended
+      updateFromLayoutResult(result, spacing: 10);
     }
   }
 
@@ -299,23 +352,50 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
     );
 
     addSpace(50);
+  }
 
-    // Page indicator
-    final pageText = config.isRTL
-        ? 'صفحة ${document.pages.count} من ${document.pages.count}'
-        : 'Page ${document.pages.count} of ${document.pages.count}';
+  String _formatDateLong(DateTime date) {
+    final months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
 
-    addTextAt(
-      pageText,
-      x: pageWidth - 100,
-      y: pageHeight - 20,
-      font: config.smallFont,
-      brush: PdfSolidBrush(const Color(0xFF757575).toPdfColor()),
-    );
+  String _formatDateArabic(DateTime date) {
+    return '${date.day} ${_arabicMonth(date.month)} ${date.year}';
+  }
+
+  String _arabicMonth(int month) {
+    const months = [
+      'يناير',
+      'فبراير',
+      'مارس',
+      'أبريل',
+      'مايو',
+      'يونيو',
+      'يوليو',
+      'أغسطس',
+      'سبتمبر',
+      'أكتوبر',
+      'نوفمبر',
+      'ديسمبر'
+    ];
+    return months[month - 1];
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    return DateFormat('dd/MM/yyyy').format(date);
   }
 
   String _formatCurrency(double value) {
@@ -324,5 +404,133 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
           (Match m) => '${m[1]},',
         );
     return '$formatted ${data.currency}';
+  }
+
+  void _drawSummary() {
+    // Summary section with key metrics
+    final summaryItems = <GeniusPdfSummaryItem>[
+      GeniusPdfSummaryItem(
+        label: 'Total Items',
+        labelAr: 'إجمالي الأصناف',
+        value: '${data.allItems.length}',
+      ),
+      GeniusPdfSummaryItem(
+        label: 'Total Quantity',
+        labelAr: 'إجمالي الكميات',
+        value: _formatNumber(data.totalQuantity),
+      ),
+      GeniusPdfSummaryItem(
+        label: 'Categories',
+        labelAr: 'التصنيفات',
+        value: '${data.categories.length}',
+      ),
+      GeniusPdfSummaryItem.total(
+        label: 'Total Value',
+        labelAr: 'إجمالي القيمة',
+        value: _formatCurrency(data.totalValue),
+      ),
+    ];
+
+    final summary = GeniusPdfSummarySection(
+      config: config,
+      items: summaryItems,
+      style: const GeniusPdfSummaryStyle.bordered(),
+      alignment: GeniusPdfSummaryAlignment.right,
+      width: pageWidth * 0.45,
+    );
+
+    final result = summary.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 120),
+    );
+
+    addSpace(result.height + 15);
+  }
+
+  void _drawNotes() {
+    // Notes section with benefits
+    final displayNotes = notes ?? (config.isRTL ? notesAr : notes);
+    final defaultNotes = config.isRTL
+        ? '''ملاحظات:
+• هذا التقرير يعرض حالة المخزون الفعلية كما في تاريخ التقرير
+• القيم المعروضة تستند إلى متوسط التكلفة المرجحة
+• يرجى مراجعة الجرد الفعلي للتأكد من دقة البيانات
+• للاستفسارات، يرجى التواصل مع إدارة المخازن'''
+        : '''Notes:
+• This report reflects the actual inventory status as of the report date
+• Values are based on weighted average cost method
+• Please verify with physical count for data accuracy
+• For inquiries, contact the Warehouse Department''';
+
+    final notesText = displayNotes ?? defaultNotes;
+
+    addLine(
+      notesText,
+      font: config.baseFont,
+      topMargin: 5,
+      padding: 10,
+    );
+
+    addSpace(20);
+  }
+
+  void _drawSignatures() {
+    // Ensure enough space for signatures
+    if (currentY > pageHeight - 100) {
+      newPage();
+    }
+
+    addSpace(20);
+
+    // Draw separator line
+    addHorizontalLine(spacing: 10);
+
+    // Signature areas side by side
+    final signatureY = currentY;
+
+    // Prepared by signature
+    final preparedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'Prepared By',
+      titleAr: 'أعده',
+      lineWidth: 120,
+    );
+
+    preparedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? pageWidth - 150 : 0,
+        signatureY,
+        150,
+        60,
+      ),
+    );
+
+    // Approved by signature
+    final approvedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'Approved By',
+      titleAr: 'اعتمده',
+      lineWidth: 120,
+    );
+
+    approvedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? 0 : pageWidth - 150,
+        signatureY,
+        150,
+        60,
+      ),
+    );
+
+    addSpace(70);
+  }
+
+  String _formatNumber(double value) {
+    return value.toStringAsFixed(0).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
   }
 }

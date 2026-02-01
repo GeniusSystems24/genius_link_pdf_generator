@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-
 import 'pdf_styles.dart';
 
 /// Represents a column definition for [GeniusPdfDataGrid].
@@ -19,7 +18,7 @@ import 'pdf_styles.dart';
 ///   id: 'total',
 ///   title: 'Total',
 ///   titleAr: 'الإجمالي',
-///   alignment: GeniusPdfTextAlign.right,
+///   alignment: GeniusPdfTextAlign.end,
 ///   isNumeric: true,
 ///   valueFormatter: (v) => '\$${v.toStringAsFixed(2)}',
 /// )
@@ -35,8 +34,8 @@ class GeniusPdfGridColumn {
     this.minWidth,
     this.maxWidth,
     this.flexFactor,
-    this.alignment = GeniusPdfTextAlign.left,
-    this.verticalAlignment = GeniusPdfVerticalAlign.middle,
+    this.alignment = GeniusPdfTextAlign.start,
+    this.verticalAlignment = GeniusPdfVerticalAlign.top,
     this.headerAlignment,
     this.headerStyle,
     this.cellStyle,
@@ -53,37 +52,39 @@ class GeniusPdfGridColumn {
   });
 
   /// Creates a numeric column with right alignment.
-  factory GeniusPdfGridColumn.numeric({
-    required String id,
-    required String title,
-    String? titleAr,
-    double? width,
-    double? minWidth,
-    GeniusPdfCellStyle? headerStyle,
-    GeniusPdfCellStyle? cellStyle,
-    String Function(dynamic value)? valueFormatter,
-    int decimalPlaces = 2,
-    bool showThousandSeparator = true,
-  }) {
+  factory GeniusPdfGridColumn.numeric(
+      {required String id,
+      required String title,
+      String? titleAr,
+      double? width,
+      double? minWidth,
+      GeniusPdfCellStyle? headerStyle,
+      GeniusPdfCellStyle? cellStyle,
+      String Function(dynamic value)? valueFormatter,
+      int decimalPlaces = 2,
+      bool showThousandSeparator = true,
+      GeniusPdfTextAlign alignment = GeniusPdfTextAlign.start}) {
     return GeniusPdfGridColumn(
       id: id,
       title: title,
       titleAr: titleAr,
       width: width,
       minWidth: minWidth ?? 60,
-      alignment: GeniusPdfTextAlign.right,
+      alignment: alignment,
       headerStyle: headerStyle,
       cellStyle: cellStyle,
-      valueFormatter: valueFormatter ?? (value) {
-        if (value == null) return '';
-        final number = value is num ? value : double.tryParse(value.toString());
-        if (number == null) return value.toString();
-        final formatted = number.toStringAsFixed(decimalPlaces);
-        if (showThousandSeparator) {
-          return _formatWithThousandSeparator(formatted);
-        }
-        return formatted;
-      },
+      valueFormatter: valueFormatter ??
+          (value) {
+            if (value == null) return '';
+            final number =
+                value is num ? value : double.tryParse(value.toString());
+            if (number == null) return value.toString();
+            final formatted = number.toStringAsFixed(decimalPlaces);
+            if (showThousandSeparator) {
+              return _formatWithThousandSeparator(formatted);
+            }
+            return formatted;
+          },
       isNumeric: true,
     );
   }
@@ -101,6 +102,7 @@ class GeniusPdfGridColumn {
     bool showThousandSeparator = true,
     GeniusPdfCellStyle? headerStyle,
     GeniusPdfCellStyle? cellStyle,
+    GeniusPdfTextAlign alignment = GeniusPdfTextAlign.end,
   }) {
     return GeniusPdfGridColumn(
       id: id,
@@ -108,7 +110,7 @@ class GeniusPdfGridColumn {
       titleAr: titleAr,
       width: width,
       minWidth: minWidth ?? 80,
-      alignment: GeniusPdfTextAlign.right,
+      alignment: alignment,
       headerStyle: headerStyle,
       cellStyle: cellStyle,
       isNumeric: true,
@@ -120,7 +122,9 @@ class GeniusPdfGridColumn {
         if (showThousandSeparator) {
           formatted = _formatWithThousandSeparator(formatted);
         }
-        return currencyBefore ? '$currencySymbol $formatted' : '$formatted $currencySymbol';
+        return currencyBefore
+            ? '$currencySymbol $formatted'
+            : '$formatted $currencySymbol';
       },
     );
   }
@@ -163,13 +167,14 @@ class GeniusPdfGridColumn {
     String dateFormat = 'dd/MM/yyyy',
     GeniusPdfCellStyle? headerStyle,
     GeniusPdfCellStyle? cellStyle,
+    GeniusPdfTextAlign alignment = GeniusPdfTextAlign.start,
   }) {
     return GeniusPdfGridColumn(
       id: id,
       title: title,
       titleAr: titleAr,
       width: width ?? 80,
-      alignment: GeniusPdfTextAlign.center,
+      alignment: alignment,
       headerStyle: headerStyle,
       cellStyle: cellStyle,
       valueFormatter: (value) {
@@ -189,26 +194,26 @@ class GeniusPdfGridColumn {
   }
 
   /// Creates a status/badge column with conditional formatting.
-  factory GeniusPdfGridColumn.status({
-    required String id,
-    required String title,
-    String? titleAr,
-    double? width,
-    Map<String, Color>? statusColors,
-    GeniusPdfCellStyle? headerStyle,
-  }) {
+  factory GeniusPdfGridColumn.status(
+      {required String id,
+      required String title,
+      String? titleAr,
+      double? width,
+      Map<String, Color>? statusColors,
+      GeniusPdfCellStyle? headerStyle,
+      GeniusPdfTextAlign alignment = GeniusPdfTextAlign.center}) {
     return GeniusPdfGridColumn(
       id: id,
       title: title,
       titleAr: titleAr,
       width: width ?? 80,
-      alignment: GeniusPdfTextAlign.center,
+      alignment: alignment,
       headerStyle: headerStyle,
       cellStyle: statusColors != null
           ? GeniusPdfCellStyle(
-              textStyle: const GeniusPdfTextStyle(
+              textStyle: GeniusPdfTextStyle(
                 fontSize: 9,
-                alignment: GeniusPdfTextAlign.center,
+                alignment: alignment,
               ),
             )
           : null,
@@ -300,7 +305,8 @@ class GeniusPdfGridColumn {
   }
 
   /// Gets the effective header alignment.
-  GeniusPdfTextAlign get effectiveHeaderAlignment => headerAlignment ?? alignment;
+  GeniusPdfTextAlign get effectiveHeaderAlignment =>
+      headerAlignment ?? alignment;
 
   GeniusPdfGridColumn copyWith({
     String? id,
@@ -377,7 +383,8 @@ class GeniusPdfGridColumn {
   static String _formatDate(DateTime date, String format) {
     var result = format;
     result = result.replaceAll('yyyy', date.year.toString());
-    result = result.replaceAll('yy', (date.year % 100).toString().padLeft(2, '0'));
+    result =
+        result.replaceAll('yy', (date.year % 100).toString().padLeft(2, '0'));
     result = result.replaceAll('MM', date.month.toString().padLeft(2, '0'));
     result = result.replaceAll('M', date.month.toString());
     result = result.replaceAll('dd', date.day.toString().padLeft(2, '0'));
@@ -1054,7 +1061,8 @@ class GeniusPdfGridStyle {
               textStyle: GeniusPdfTextStyle(fontSize: 9),
               backgroundColor: Color(0xFFFAFAFA),
               border: GeniusPdfBorderStyle.horizontal(color: Color(0xFFE0E0E0)),
-              padding: GeniusPdfCellPadding.symmetric(horizontal: 6, vertical: 4),
+              padding:
+                  GeniusPdfCellPadding.symmetric(horizontal: 6, vertical: 4),
             )
           : null,
       totalRowStyle: const GeniusPdfCellStyle(

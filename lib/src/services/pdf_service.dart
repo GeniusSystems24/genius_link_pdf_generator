@@ -167,8 +167,9 @@ class GeniusPdfInfo {
 
   String get fileSizeFormatted {
     if (fileSizeBytes < 1024) return '$fileSizeBytes B';
-    if (fileSizeBytes < 1024 * 1024)
+    if (fileSizeBytes < 1024 * 1024) {
       return '${(fileSizeBytes / 1024).toStringAsFixed(1)} KB';
+    }
     return '${(fileSizeBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 }
@@ -713,7 +714,7 @@ class GeniusPdfService {
 
       if (validPages.isEmpty) {
         sourceDoc.dispose();
-        return GeniusPdfFailure(
+        return const GeniusPdfFailure(
             error: 'No valid pages to extract',
             message: 'No valid pages to extract');
       }
@@ -827,7 +828,7 @@ class GeniusPdfService {
     String outputFileName = 'rotated',
   }) async {
     if (rotation % 90 != 0) {
-      return GeniusPdfFailure(
+      return const GeniusPdfFailure(
           error: 'Rotation must be a multiple of 90',
           message: 'Rotation must be a multiple of 90');
     }

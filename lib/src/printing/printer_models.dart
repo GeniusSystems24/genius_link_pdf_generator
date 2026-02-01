@@ -101,7 +101,7 @@ class GeniusPrinterCapabilities {
 
   /// Default capabilities for unknown printers
   factory GeniusPrinterCapabilities.defaultCapabilities() {
-    return GeniusPrinterCapabilities(
+    return const GeniusPrinterCapabilities(
       supportsColor: true,
       supportsDuplex: false,
       supportedPaperSizes: [
@@ -115,7 +115,7 @@ class GeniusPrinterCapabilities {
 
   /// Full-featured printer capabilities
   factory GeniusPrinterCapabilities.fullFeatured() {
-    return GeniusPrinterCapabilities(
+    return const GeniusPrinterCapabilities(
       supportsColor: true,
       supportsDuplex: true,
       supportsCollation: true,

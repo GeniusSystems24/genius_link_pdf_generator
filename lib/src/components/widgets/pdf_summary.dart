@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart' show FontWeight;
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfTextStyle, PdfBorderStyle;
 

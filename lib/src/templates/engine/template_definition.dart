@@ -30,6 +30,25 @@ import 'template_models.dart';
 /// );
 /// ```
 class TemplateDefinition {
+  /// Creates a template definition.
+  const TemplateDefinition({
+    required this.id,
+    required this.name,
+    this.nameAr,
+    this.description,
+    this.descriptionAr,
+    this.version = '1.0.0',
+    this.author,
+    this.category,
+    this.tags = const [],
+    this.variables = const [],
+    required this.content,
+    this.pageSettings,
+    this.header,
+    this.footer,
+    this.styles = const {},
+    this.metadata = const {},
+  });
 
   /// Creates a template from JSON.
   factory TemplateDefinition.fromJson(Map<String, dynamic> json) {
@@ -74,25 +93,6 @@ class TemplateDefinition {
       jsonDecode(jsonString) as Map<String, dynamic>,
     );
   }
-  /// Creates a template definition.
-  const TemplateDefinition({
-    required this.id,
-    required this.name,
-    this.nameAr,
-    this.description,
-    this.descriptionAr,
-    this.version = '1.0.0',
-    this.author,
-    this.category,
-    this.tags = const [],
-    this.variables = const [],
-    required this.content,
-    this.pageSettings,
-    this.header,
-    this.footer,
-    this.styles = const {},
-    this.metadata = const {},
-  });
 
   /// Unique identifier for this template.
   final String id;
@@ -262,6 +262,11 @@ class TemplateDefinition {
 
 /// Page settings for a template.
 class TemplatePageSettings {
+  const TemplatePageSettings({
+    this.pageSize = PdfPageSize.a4,
+    this.orientation = PdfPageOrientation.portrait,
+    this.margins,
+  });
 
   factory TemplatePageSettings.fromJson(Map<String, dynamic> json) {
     return TemplatePageSettings(
@@ -277,11 +282,6 @@ class TemplatePageSettings {
           : null,
     );
   }
-  const TemplatePageSettings({
-    this.pageSize = PdfPageSize.a4,
-    this.orientation = PdfPageOrientation.portrait,
-    this.margins,
-  });
 
   /// Page size.
   final Size pageSize;
@@ -323,6 +323,12 @@ class TemplatePageSettings {
 
 /// Margins for a template page.
 class TemplateMargins {
+  const TemplateMargins({
+    this.left = 40,
+    this.top = 40,
+    this.right = 40,
+    this.bottom = 40,
+  });
 
   factory TemplateMargins.fromJson(Map<String, dynamic> json) {
     return TemplateMargins(
@@ -332,12 +338,6 @@ class TemplateMargins {
       bottom: (json['bottom'] as num?)?.toDouble() ?? 40,
     );
   }
-  const TemplateMargins({
-    this.left = 40,
-    this.top = 40,
-    this.right = 40,
-    this.bottom = 40,
-  });
 
   const TemplateMargins.all(double value)
       : left = value,

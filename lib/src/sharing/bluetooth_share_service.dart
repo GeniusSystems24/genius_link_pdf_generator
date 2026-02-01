@@ -62,6 +62,17 @@ enum GeniusBluetoothConnectionStatus {
 
 /// Represents a Bluetooth device.
 class GeniusBluetoothDevice {
+  /// Creates a Bluetooth device.
+  const GeniusBluetoothDevice({
+    required this.id,
+    required this.name,
+    this.address,
+    this.type = GeniusBluetoothDeviceType.unknown,
+    this.isPaired = false,
+    this.isFavorite = false,
+    this.lastConnected,
+    this.signalStrength,
+  });
 
   /// Create from JSON.
   factory GeniusBluetoothDevice.fromJson(Map<String, dynamic> json) {
@@ -80,17 +91,6 @@ class GeniusBluetoothDevice {
           : null,
     );
   }
-  /// Creates a Bluetooth device.
-  const GeniusBluetoothDevice({
-    required this.id,
-    required this.name,
-    this.address,
-    this.type = GeniusBluetoothDeviceType.unknown,
-    this.isPaired = false,
-    this.isFavorite = false,
-    this.lastConnected,
-    this.signalStrength,
-  });
 
   /// Device identifier.
   final String id;

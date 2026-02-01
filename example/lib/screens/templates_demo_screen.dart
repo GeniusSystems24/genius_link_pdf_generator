@@ -240,7 +240,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
                       child: Switch(
                         value: _isRTL,
                         onChanged: (value) => setState(() => _isRTL = value),
-                        activeColor: AppColors.primary,
+                        activeThumbColor: AppColors.primary,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ),
