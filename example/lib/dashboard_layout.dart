@@ -14,6 +14,7 @@ import 'screens/sharing_demo_screen.dart';
 import 'screens/ai_features_demo_screen.dart';
 import 'screens/v2_architecture_demo_screen.dart';
 import 'screens/barcode_demo_screen.dart';
+import 'screens/examples_showcase_screen.dart';
 
 /// Main Dashboard Layout with Sidebar Navigation
 class DashboardLayout extends StatefulWidget {
@@ -138,6 +139,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       _DrawerItem('template_engine', 'Template Engine', Icons.tune_rounded),
       _DrawerItem('barcodes', 'Barcodes & QR', Icons.qr_code_rounded),
       _DrawerItem('security', 'Security', Icons.security_rounded),
+      _DrawerItem('examples', 'Examples', Icons.auto_awesome_mosaic_rounded),
       _DrawerItem('export', 'Export', Icons.file_download_rounded),
       _DrawerItem('printing', 'Printing', Icons.print_rounded),
       _DrawerItem('sharing', 'Sharing', Icons.share_rounded),
@@ -456,6 +458,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       case 'advanced':
       case 'v2_architecture':
         return 'Advanced Features';
+      case 'examples':
+        return 'Examples';
       default:
         return 'Genius PDF';
     }
@@ -524,6 +528,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       case 'advanced':
       case 'v2_architecture':
         return const V2ArchitectureDemoScreen();
+      case 'examples':
+        return const ExamplesShowcaseScreen();
 
       default:
         return DashboardHome(onNavigate: _onItemSelected);

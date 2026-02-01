@@ -217,6 +217,13 @@ class DashboardHome extends StatelessWidget {
             gradient: AppColors.cyanGradient,
             onTap: () => onNavigate('sharing'),
           ),
+          const SizedBox(width: 12),
+          QuickActionButton(
+            label: 'Examples',
+            icon: Icons.auto_awesome_mosaic_rounded,
+            gradient: AppColors.infoGradient,
+            onTap: () => onNavigate('examples'),
+          ),
         ],
       ),
     );
@@ -350,6 +357,15 @@ class DashboardHome extends StatelessWidget {
                   gradient: AppColors.errorGradient,
                   tags: const ['Encrypted', 'Protected'],
                   onTap: () => onNavigate('security'),
+                ),
+                FeatureCard(
+                  title: 'Examples',
+                  description:
+                      'Selected demos covering advanced layout, charts, and QR',
+                  icon: Icons.auto_awesome_mosaic_rounded,
+                  gradient: AppColors.infoGradient,
+                  tags: const ['Gallery', 'Demos'],
+                  onTap: () => onNavigate('examples'),
                 ),
                 FeatureCard(
                   title: 'Printing',

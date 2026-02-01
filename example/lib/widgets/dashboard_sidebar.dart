@@ -179,6 +179,12 @@ class _DashboardSidebarState extends State<DashboardSidebar>
       gradient: AppColors.errorGradient,
     ),
     const NavItem(
+      id: 'examples',
+      title: 'Examples',
+      icon: Icons.auto_awesome_mosaic_rounded,
+      gradient: AppColors.infoGradient,
+    ),
+    const NavItem(
       id: 'export',
       title: 'Export',
       icon: Icons.file_download_rounded,
