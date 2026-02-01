@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:genius_pdf_example/main.dart';
 
 import '../documents/templates/template_builtin_invoice.dart';
@@ -756,6 +759,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             'Variables: ${result.template.variables.length}\n'
             'Elements: ${result.template.content.length}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_invoice');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -782,6 +786,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             'Variables: ${result.template.variables.length}\n'
             'Elements: ${result.template.content.length}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_report');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -799,7 +804,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     });
 
     try {
-        final result = await buildTemplatePurchaseOrderBytes(geniusPdfConfig);
+      final result = await buildTemplatePurchaseOrderBytes(geniusPdfConfig);
 
       setState(() {
         _pdfBytes = result.bytes;
@@ -808,6 +813,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             'Variables: ${result.template.variables.length}\n'
             'Elements: ${result.template.content.length}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_purchase_order');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -835,6 +841,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             'Variables: ${result.template.variables.length}\n'
             'Elements: ${result.template.content.length}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_receipt');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -852,7 +859,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     });
 
     try {
-        final result = await buildTemplateQuotationBytes(geniusPdfConfig);
+      final result = await buildTemplateQuotationBytes(geniusPdfConfig);
 
       setState(() {
         _pdfBytes = result.bytes;
@@ -861,6 +868,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             'Variables: ${result.template.variables.length}\n'
             'Elements: ${result.template.content.length}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_quotation');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -878,7 +886,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     });
 
     try {
-        final result = await buildTemplateContractBytes(geniusPdfConfig);
+      final result = await buildTemplateContractBytes(geniusPdfConfig);
 
       setState(() {
         _pdfBytes = result.bytes;
@@ -887,6 +895,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             'Variables: ${result.template.variables.length}\n'
             'Elements: ${result.template.content.length}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_contract');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -904,7 +913,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     });
 
     try {
-        final result = await buildTemplateTimesheetBytes(geniusPdfConfig);
+      final result = await buildTemplateTimesheetBytes(geniusPdfConfig);
 
       setState(() {
         _pdfBytes = result.bytes;
@@ -913,6 +922,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             'Variables: ${result.template.variables.length}\n'
             'Elements: ${result.template.content.length}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_timesheet');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -930,7 +940,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     });
 
     try {
-        final result = await buildTemplateFromJsonLetterBytes(geniusPdfConfig);
+      final result = await buildTemplateFromJsonLetterBytes(geniusPdfConfig);
 
       setState(() {
         _pdfBytes = result.bytes;
@@ -939,6 +949,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             'Version: ${result.template.version}\n'
             'Variables: ${result.template.variables.length}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_json_letter');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -956,7 +967,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
     });
 
     try {
-        final result = await buildTemplateFromJsonMemoBytes(geniusPdfConfig);
+      final result = await buildTemplateFromJsonMemoBytes(geniusPdfConfig);
 
       setState(() {
         _pdfBytes = result.bytes;
@@ -965,6 +976,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
             'Version: ${result.template.version}\n'
             'Variables: ${result.template.variables.length}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_json_memo');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -1075,6 +1087,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
         _status = 'Built-in invoice rendered successfully!\n'
             'Template: ${result.template.name}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_builtin_invoice');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -1099,6 +1112,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
         _status = 'Built-in report rendered successfully!\n'
             'Template: ${result.template.name}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_builtin_report');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -1123,6 +1137,7 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
         _status = 'Built-in letter rendered successfully!\n'
             'Template: ${result.template.name}';
       });
+      await _saveAndOpenPdf(result.bytes, 'template_builtin_letter');
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -1137,5 +1152,12 @@ class _TemplateEngineDemoScreenState extends State<TemplateEngineDemoScreen>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveAndOpenPdf(Uint8List bytes, String fileName) async {
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/$fileName.pdf');
+    await file.writeAsBytes(bytes);
+    await OpenFile.open(file.path);
   }
 }
