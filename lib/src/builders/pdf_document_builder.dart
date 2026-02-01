@@ -3,18 +3,42 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../core/pdf_config.dart';
+import '../core/pdf_logger.dart';
 import '../models/pdf_image.dart';
 import '../extensions/color_extensions.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Horizontal alignment for images and blocks within the builder.
+enum GeniusPdfImageAlignment {
+  /// Align to the start (left in LTR, right in RTL).
+  start,
+
+  /// Center horizontally.
+  center,
+
+  /// Align to the end (right in LTR, left in RTL).
+  end,
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GeniusPdfDocumentBuilder
+// ─────────────────────────────────────────────────────────────────────────────
+
 /// Abstract base class for building PDF documents.
 ///
-/// This class provides a fluent API for constructing PDF documents
-/// with support for RTL/LTR text, custom headers/footers, and
-/// automatic page management.
+/// Provides a fluent API for constructing PDF documents with:
+/// - **Precise Y-position tracking** via [currentY]
+/// - **Automatic page-breaking** when content exceeds the page
+/// - **RTL/LTR support** for text and alignment
+/// - **Custom headers/footers** applied to all pages
+/// - **Image drawing** with alignment and position advancement
 ///
 /// ## Example
 /// ```dart
-/// class InvoiceDocument extends PdfDocumentBuilder {
+/// class InvoiceDocument extends GeniusPdfDocumentBuilder {
 ///   InvoiceDocument(super.config);
 ///
 ///   @override
@@ -22,13 +46,15 @@ import '../extensions/color_extensions.dart';
 ///     addHeader(title: 'Invoice #123');
 ///     addLine('Customer: John Doe');
 ///     addLine('Amount: \$100.00');
+///     addHorizontalLine();
+///     addImage(logoImage, alignment: GeniusPdfImageAlignment.center);
 ///     addFooter(showPageNumber: true);
 ///   }
 /// }
 ///
-/// // Generate the PDF
 /// final builder = InvoiceDocument(config);
 /// final bytes = builder.generate();
+/// builder.dispose();
 /// ```
 abstract class GeniusPdfDocumentBuilder {
   /// Creates a new [GeniusPdfDocumentBuilder] with the given configuration.
@@ -47,17 +73,20 @@ abstract class GeniusPdfDocumentBuilder {
   /// The current page being written to.
   PdfPage? _currentPage;
 
-  /// The current layout result for positioning.
+  /// The current layout result for text positioning.
   PdfLayoutResult? _layoutResult;
 
-  /// The current page index (0-based).
+  /// The current page index (0-based, -1 = no pages yet).
   int _currentIndex = -1;
 
-  /// The string format based on text direction.
+  /// The string format based on text direction (RTL/LTR).
   late final PdfStringFormat _format;
 
-  // Track additional spacing
-  double _spaceOffset = 0;
+  /// Independent Y-position tracker.
+  ///
+  /// This is the **primary** position tracker. All draw methods update this
+  /// value after rendering. Use [currentY] to read the current position.
+  double _currentY = 0;
 
   void _applySettings() {
     _document.pageSettings.orientation = config.orientation;
@@ -86,31 +115,111 @@ abstract class GeniusPdfDocumentBuilder {
   /// The base font for this document.
   PdfFont get baseFont => config.baseFont;
 
-  /// The string format for this document.
+  /// The string format for this document (RTL/LTR).
   PdfStringFormat get format => _format;
 
-  /// The underlying PDF document.
+  /// The underlying [PdfDocument] instance.
   PdfDocument get document => _document;
 
-  /// The current page width (client area).
+  /// The current page width (client area, accounting for margins).
   double get pageWidth => _currentPage?.getClientSize().width ?? 0;
 
-  /// The current page height (client area).
+  /// The current page height (client area, accounting for margins).
   double get pageHeight => _currentPage?.getClientSize().height ?? 0;
 
-  /// The available page width accounting for margins.
-  double get availableWidth => config.orientation ==
-          PdfPageOrientation.landscape
-      ? config.pageSize.width - (config.margins.left + config.margins.right)
-      : config.pageSize.height - (config.margins.top + config.margins.bottom);
+  /// The available page width accounting for margins and orientation.
+  double get availableWidth {
+    // Use client size if a page exists (most accurate).
+    if (_currentPage != null) return pageWidth;
+    // Fallback: calculate from config.
+    final margins = config.margins;
+    if (config.orientation == PdfPageOrientation.landscape) {
+      return config.pageSize.width - (margins.left + margins.right);
+    }
+    return config.pageSize.width - (margins.left + margins.right);
+  }
 
   /// The current Y position on the page.
-  double get currentY => (_layoutResult?.bounds.bottom ?? 0) + _spaceOffset;
+  ///
+  /// This is the precise vertical position where the next content will be
+  /// drawn. All drawing methods (`addLine`, `addImage`, `addHorizontalLine`,
+  /// etc.) automatically advance this value after rendering.
+  double get currentY => _currentY;
+
+  /// The remaining vertical space on the current page.
+  ///
+  /// Returns `0` if no page exists yet.
+  double get remainingHeight {
+    if (_currentPage == null) return 0;
+    return pageHeight - _currentY;
+  }
+
+  /// Whether content of the given [height] can fit on the current page.
+  bool canFit(double height) => remainingHeight >= height;
+
+  /// The bounds of the available content area on the current page.
+  ///
+  /// Returns a [Rect] starting at `(0, currentY)` with the full page width
+  /// and the remaining height.
+  Rect get contentBounds =>
+      Rect.fromLTWH(0, _currentY, pageWidth, remainingHeight);
 
   /// The current page (creates one if none exists).
   PdfPage get currentPage {
     if (_currentIndex < 0) return newPage();
     return _currentPage ?? newPage();
+  }
+
+  /// Whether the text direction is left-to-right.
+  bool get isLTR => config.isLTR;
+
+  /// Whether the text direction is right-to-left.
+  bool get isRTL => config.isRTL;
+
+  /// The total number of pages created so far.
+  int get pageCount => _currentIndex + 1;
+
+  // ============================================================
+  // POSITION MANAGEMENT
+  // ============================================================
+
+  /// Advances the Y position by [height] pixels.
+  ///
+  /// If the new position exceeds the page height, the position is clamped
+  /// to the page bottom. Use [_ensureSpace] to auto-break pages.
+  void _advanceY(double height) {
+    _currentY += height;
+    GeniusPdfLogger.debug(
+      'Y advanced by $height → $_currentY (remaining: $remainingHeight)',
+      tag: 'Builder',
+    );
+  }
+
+  /// Ensures at least [needed] pixels of vertical space are available.
+  ///
+  /// If the remaining height is insufficient, creates a new page and
+  /// resets the Y position. Returns the page to draw on.
+  PdfPage _ensureSpace(double needed) {
+    if (_currentPage == null || remainingHeight < needed) {
+      GeniusPdfLogger.debug(
+        'Auto page-break: needed=$needed, remaining=$remainingHeight',
+        tag: 'Builder',
+      );
+      return newPage();
+    }
+    return currentPage;
+  }
+
+  /// Resets the Y position to [y] (defaults to 0 — top of content area).
+  void resetY([double y = 0]) {
+    _currentY = y;
+  }
+
+  /// Adds vertical spacing without drawing anything.
+  ///
+  /// This advances [currentY] by [height] pixels.
+  void addSpace(double height) {
+    _advanceY(height);
   }
 
   // ============================================================
@@ -119,13 +228,19 @@ abstract class GeniusPdfDocumentBuilder {
 
   /// Creates a new page and sets it as the current page.
   ///
-  /// Returns the newly created page.
+  /// Resets [currentY] to `0`. Optionally draws a border around the page.
+  /// Returns the newly created [PdfPage].
   PdfPage newPage({PdfPen? borderPen}) {
     final page = _document.pages.add();
     _currentIndex++;
     _currentPage = page;
     _layoutResult = null;
-    _spaceOffset = 0;
+    _currentY = 0;
+
+    GeniusPdfLogger.debug(
+      'New page created: index=$_currentIndex',
+      tag: 'Builder',
+    );
 
     if (borderPen != null) {
       page.graphics.drawRectangle(
@@ -148,13 +263,19 @@ abstract class GeniusPdfDocumentBuilder {
 
   /// Adds a line of text to the document.
   ///
+  /// The text is drawn at [currentY] plus [topMargin]. After drawing,
+  /// [currentY] advances to the bottom of the rendered text.
+  ///
+  /// If the text does not fit on the current page, a new page is created
+  /// automatically (unless [inNewPage] is true, which forces a new page).
+  ///
   /// ## Parameters
   /// - [text]: The text to add (required).
-  /// - [font]: Custom font (defaults to baseFont).
+  /// - [font]: Custom font (defaults to [baseFont]).
   /// - [brush]: Text color brush.
   /// - [pen]: Text outline pen.
   /// - [space]: Horizontal spacing/indentation.
-  /// - [padding]: Padding around text.
+  /// - [padding]: Horizontal padding around text.
   /// - [topMargin]: Space above the text.
   /// - [inNewPage]: Force text to start on a new page.
   void addLine(
@@ -167,30 +288,43 @@ abstract class GeniusPdfDocumentBuilder {
     double topMargin = 10,
     bool inNewPage = false,
   }) {
-    final page = inNewPage ? newPage() : currentPage;
+    final effectiveFont = font ?? baseFont;
+    // Estimate minimum height needed (one line of text + margin).
+    final minHeight = effectiveFont.height + topMargin;
+    final page = inNewPage ? newPage() : _ensureSpace(minHeight);
+
     final textElement = PdfTextElement(
       text: text,
-      font: font ?? baseFont,
+      font: effectiveFont,
       brush: brush ?? PdfBrushes.black,
       pen: pen,
-      format: config.isLTR ? null : _format,
+      format: isLTR ? null : _format,
     );
 
-    final adjustedSpace = space * (config.isLTR ? 1 : -1);
+    final adjustedSpace = space * (isLTR ? 1 : -1);
+    final drawY = _currentY + topMargin;
+
     _layoutResult = textElement.draw(
       page: page,
       bounds: Rect.fromLTWH(
         padding + adjustedSpace,
-        currentY + topMargin,
+        drawY,
         page.getClientSize().width - (padding * 2),
-        page.getClientSize().height,
+        page.getClientSize().height - drawY,
       ),
       format: config.layoutFormat,
     );
-    _spaceOffset = 0; // Reset after drawing
+
+    // Update _currentY from the layout result.
+    if (_layoutResult != null) {
+      _currentY = _layoutResult!.bounds.bottom;
+    }
   }
 
   /// Adds text at a specific position on the current page.
+  ///
+  /// This does **not** affect [currentY] — it is used for absolute
+  /// positioning only.
   void addTextAt(
     String text, {
     required double x,
@@ -209,6 +343,9 @@ abstract class GeniusPdfDocumentBuilder {
   }
 
   /// Adds text that flows after the previous content on the same line.
+  ///
+  /// Positions text at the same Y as the previous layout result, offset
+  /// horizontally by [horizontalOffset].
   void addInlineText(
     String text, {
     required double horizontalOffset,
@@ -224,20 +361,27 @@ abstract class GeniusPdfDocumentBuilder {
       font: font ?? baseFont,
       brush: brush ?? PdfBrushes.black,
       pen: pen,
-      format: config.isLTR ? null : _format,
+      format: isLTR ? null : _format,
     );
 
-    final adjustedOffset = horizontalOffset * (config.isLTR ? 1 : -1);
+    final adjustedOffset = horizontalOffset * (isLTR ? 1 : -1);
+    final drawY = (_layoutResult?.bounds.top ?? _currentY) + topMargin;
+
     _layoutResult = textElement.draw(
       page: page,
       bounds: Rect.fromLTWH(
         adjustedOffset,
-        (_layoutResult?.bounds.top ?? 0) + topMargin,
+        drawY,
         page.getClientSize().width - (padding * 2),
-        page.getClientSize().height,
+        page.getClientSize().height - drawY,
       ),
       format: config.layoutFormat,
     );
+
+    // Update _currentY to the bottom of the inline text.
+    if (_layoutResult != null) {
+      _currentY = _layoutResult!.bounds.bottom;
+    }
   }
 
   // ============================================================
@@ -246,9 +390,12 @@ abstract class GeniusPdfDocumentBuilder {
 
   /// Adds a header to all pages with optional image and title.
   ///
+  /// The header is rendered as a [PdfPageTemplateElement] applied to every
+  /// page in the document.
+  ///
   /// ## Parameters
-  /// - [image]: Header image.
-  /// - [title]: Document title.
+  /// - [image]: Header image (logo).
+  /// - [title]: Document title text.
   /// - [font]: Title font.
   /// - [backgroundColor]: Header background color.
   PdfPageTemplateElement addHeader({
@@ -324,23 +471,30 @@ abstract class GeniusPdfDocumentBuilder {
   ///
   /// ## Parameters
   /// - [userName]: Name of the user who generated the document.
+  /// - [userLabel]: Label text before the username (defaults to `'User: '`).
   /// - [printTime]: Timestamp text.
   /// - [showPageNumber]: Whether to show page numbers.
   /// - [font]: Footer font.
+  /// - [pageNumberFormat]: Page number format (defaults to `'{0}/{1}'`).
   PdfPageTemplateElement addFooter({
     String? userName,
+    String? userLabel,
     String? printTime,
     bool showPageNumber = false,
     PdfFont? font,
+    String pageNumberFormat = '{0}/{1}',
   }) {
     final footerFont = font ?? baseFont;
     final footer = PdfPageTemplateElement(
       Rect.fromLTWH(0, 0, availableWidth, 25),
     );
 
-    // User name
+    // User name — dynamic positioning.
     if (userName != null) {
-      final userText = 'المستخدم : $userName';
+      final label = userLabel ?? (isRTL ? 'المستخدم : ' : 'User: ');
+      final userText = '$label$userName';
+      final userX = isRTL ? availableWidth - 10 : 5;
+
       PdfTextElement(
         text: userText,
         font: footerFont,
@@ -348,20 +502,25 @@ abstract class GeniusPdfDocumentBuilder {
         format: _format,
       ).draw(
         graphics: footer.graphics,
-        bounds: Rect.fromLTWH(availableWidth - 10, 5, 0, 0),
+        bounds: Rect.fromLTWH(userX, 5, 0, 0),
       );
     }
 
-    // Print time
+    // Print time — dynamic positioning.
     if (printTime != null) {
+      final timeX = availableWidth * 0.35;
+
       PdfTextElement(
         text: printTime,
         font: footerFont,
         brush: PdfBrushes.black,
-        format: _format,
+        format: PdfStringFormat(
+          alignment: PdfTextAlignment.center,
+          textDirection: _format.textDirection,
+        ),
       ).draw(
         graphics: footer.graphics,
-        bounds: const Rect.fromLTWH(200, 5, 0, 0),
+        bounds: Rect.fromLTWH(timeX, 5, 0, 0),
       );
     }
 
@@ -375,18 +534,21 @@ abstract class GeniusPdfDocumentBuilder {
         brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       )..numberStyle = PdfNumberStyle.numeric;
 
+      // Position: RTL → right side, LTR → left side.
+      final pnX = isRTL ? availableWidth * 0.05 : availableWidth * 0.85;
+
       PdfCompositeField(
         font: font ?? PdfTrueTypeFont(config.baseFontBytes, 12),
         brush: PdfBrushes.black,
-        text: '{0}/{1}',
+        text: pageNumberFormat,
         fields: [pageNumber, pageCount],
       ).draw(
         footer.graphics,
-        Offset(footer.width * 0.35, 5),
+        Offset(pnX, 5),
       );
     }
 
-    // Top line
+    // Top line (dashed).
     final linePen = PdfPen(PdfColor(0, 0, 0), dashStyle: PdfDashStyle.custom)
       ..dashPattern = [2, 2];
     footer.graphics.drawLine(
@@ -403,43 +565,99 @@ abstract class GeniusPdfDocumentBuilder {
   // DRAWING METHODS
   // ============================================================
 
-  /// Draws a horizontal line at the current Y position.
+  /// Draws a horizontal line.
+  ///
+  /// If [y] is not specified, the line is drawn at the current Y position
+  /// plus [spacing]. After drawing, [currentY] is advanced by the line
+  /// thickness plus [spacing] (unless [advancePosition] is `false`).
+  ///
+  /// ## Parameters
+  /// - [y]: Explicit Y position (overrides automatic positioning).
+  /// - [pen]: Line style (defaults to 1px black solid).
+  /// - [padding]: Horizontal padding on both sides.
+  /// - [spacing]: Vertical space before and after the line.
+  /// - [advancePosition]: Whether to advance [currentY] after drawing.
   void addHorizontalLine({
     double? y,
     PdfPen? pen,
     double padding = 0,
+    double spacing = 5,
+    bool advancePosition = true,
   }) {
-    final yPos = y ?? currentY + 5;
     final linePen = pen ?? PdfPen(PdfColor(0, 0, 0));
+    final yPos = y ?? (_currentY + spacing);
+
+    if (advancePosition && y == null) {
+      _ensureSpace(spacing * 2 + 1);
+    }
+
     currentPage.graphics.drawLine(
       linePen,
       Offset(padding, yPos),
       Offset(pageWidth - padding, yPos),
     );
+
+    if (advancePosition) {
+      _currentY = yPos + spacing;
+    }
   }
 
   /// Draws an image at the specified position.
+  ///
+  /// By default, the image is drawn at [currentY] and [currentY] is advanced
+  /// by the image height. Use [advancePosition] = `false` to draw without
+  /// affecting the Y position.
+  ///
+  /// ## Parameters
+  /// - [image]: The image to draw.
+  /// - [x]: Explicit X position (overrides [alignment]).
+  /// - [y]: Explicit Y position (overrides [currentY]).
+  /// - [width]: Override image width.
+  /// - [height]: Override image height.
+  /// - [alignment]: Horizontal alignment (start/center/end).
+  /// - [spacing]: Vertical space before the image.
+  /// - [advancePosition]: Whether to advance [currentY] after drawing.
   void addImage(
     GeniusPdfImage image, {
     double? x,
     double? y,
     double? width,
     double? height,
+    GeniusPdfImageAlignment alignment = GeniusPdfImageAlignment.start,
+    double spacing = 0,
+    bool advancePosition = true,
   }) {
+    final drawWidth = width ?? image.width;
+    final drawHeight = height ?? image.height;
+    final drawY = y ?? (_currentY + spacing);
+
+    if (advancePosition && y == null) {
+      _ensureSpace(drawHeight + spacing);
+    }
+
+    // Calculate X position based on alignment.
+    final drawX = x ?? _resolveAlignment(alignment, drawWidth);
+
     currentPage.graphics.drawImage(
       PdfBitmap(image.data),
-      Rect.fromLTWH(
-        x ?? 0,
-        y ?? currentY,
-        width ?? image.width,
-        height ?? image.height,
-      ),
+      Rect.fromLTWH(drawX, drawY, drawWidth, drawHeight),
     );
+
+    if (advancePosition) {
+      _currentY = drawY + drawHeight;
+    }
   }
 
-  /// Adds vertical spacing.
-  void addSpace(double height) {
-    _spaceOffset += height;
+  /// Resolves horizontal alignment to an X coordinate.
+  double _resolveAlignment(GeniusPdfImageAlignment alignment, double width) {
+    switch (alignment) {
+      case GeniusPdfImageAlignment.start:
+        return isRTL ? (pageWidth - width) : 0;
+      case GeniusPdfImageAlignment.center:
+        return (pageWidth - width) / 2;
+      case GeniusPdfImageAlignment.end:
+        return isRTL ? 0 : (pageWidth - width);
+    }
   }
 
   // ============================================================
@@ -457,9 +675,9 @@ abstract class GeniusPdfDocumentBuilder {
 
   /// Builds and returns the PDF document bytes.
   ///
-  /// This calls [build] to populate the document, then saves it.
+  /// Calls [build] to populate the document, then serializes to bytes.
   List<int> generate() {
-    _spaceOffset = 0;
+    _currentY = 0;
     build();
     final bytes = _document.saveSync();
     return bytes;

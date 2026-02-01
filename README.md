@@ -91,6 +91,11 @@ A comprehensive PDF generation and preview library for Flutter applications with
 🏢 **Company/Contact Factories** (v2.3.3+8) - Pre-configured info box factories for common use cases
 ⚖️ **Equal Height** (v2.3.3+8) - DualInfoBox equalHeight synchronization between paired boxes
 📐 **Section Styles** (v2.3.3+8) - New GeniusPdfSectionStyle class with corporate, minimal, card, saudi presets
+📍 **Position Engine** (v2.4.0) - Precise Y-position tracking with independent `_currentY` tracker
+📄 **Auto Page-Break** (v2.4.0) - Automatic page creation when content exceeds available space
+🖼️ **Image Alignment** (v2.4.0) - Direction-aware image alignment (start/center/end) with position advancement
+📏 **Builder Utilities** (v2.4.0) - `remainingHeight`, `canFit()`, `contentBounds`, `resetY()`, `pageCount`
+🔧 **Enhanced Footer** (v2.4.0) - Configurable `userLabel`, `pageNumberFormat`, dynamic positioning
 
 ---
 
@@ -223,6 +228,57 @@ class InvoiceDocument extends GeniusPdfDocumentBuilder {
   }
 }
 ```
+
+### Position Tracking & Auto Page-Break (v2.4.0)
+
+The builder now tracks the vertical position (`currentY`) automatically. Every draw method advances the position, and content that exceeds the page triggers an automatic page-break.
+
+```dart
+class MyReport extends GeniusPdfDocumentBuilder {
+  MyReport({required GeniusPdfConfig config}) : super(config);
+
+  @override
+  void build() {
+    addHeader(title: 'Position Demo');
+    addLine('Position after header: ${currentY.toStringAsFixed(1)}');
+
+    // Check remaining space before drawing
+    if (canFit(200)) {
+      addLine('Enough room for a large block');
+    }
+
+    // Auto page-break: if 50 lines overflow, new pages are created
+    for (var i = 0; i < 50; i++) {
+      addLine('Line $i', topMargin: 4);
+    }
+
+    // Image with alignment (direction-aware: start/center/end)
+    addImage(myImage, alignment: GeniusPdfImageAlignment.center, spacing: 10);
+
+    // Horizontal line now advances position
+    addHorizontalLine(spacing: 8);
+
+    // Enhanced footer with configurable label
+    addFooter(
+      userName: 'Admin',
+      userLabel: 'Printed by: ',
+      showPageNumber: true,
+      pageNumberFormat: 'Page {0} of {1}',
+    );
+  }
+}
+```
+
+**Key APIs:**
+| API | Description |
+|-----|-------------|
+| `currentY` | Current vertical position on the page |
+| `remainingHeight` | Space left before page bottom |
+| `canFit(height)` | Check if content fits on current page |
+| `contentBounds` | Rect from current position to page bottom |
+| `pageCount` | Total pages created so far |
+| `resetY([y])` | Reset position (e.g., after absolute drawing) |
+| `isRTL` / `isLTR` | Text direction convenience getters |
 
 ### 3. Generate and Display
 

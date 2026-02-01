@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-02-01
+
+### Added
+
+#### GeniusPdfDocumentBuilder — Position Engine & Page Management
+- **`_currentY` position tracker** — Independent Y-position tracking replaces the old `_spaceOffset` + `_layoutResult` combo; all draw methods now update `_currentY` automatically
+- **`_ensureSpace(double needed)`** — Auto page-break: if the remaining vertical space is insufficient, a new page is created transparently
+- **`_advanceY(double height)`** — Internal helper to move the Y position with debug logging
+- **`remainingHeight` getter** — Returns the available vertical space on the current page
+- **`canFit(double height)`** — Check whether content of a given height fits on the current page
+- **`contentBounds` getter** — Returns a `Rect` from `(0, currentY)` to the bottom of the page
+- **`resetY([double y = 0])`** — Reset the Y position (e.g., after custom absolute drawing)
+- **`isLTR` / `isRTL` getters** — Convenience accessors for text direction from config
+- **`pageCount` getter** — Returns the total number of pages created so far
+- **`GeniusPdfImageAlignment` enum** — Direction-aware alignment: `start`, `center`, `end` (respects RTL/LTR)
+- **`addImage()` alignment** — New `alignment` parameter for horizontal image positioning
+- **`addImage()` spacing** — New `spacing` parameter for vertical space before the image
+- **`addImage()` advancePosition** — Control whether `addImage()` advances `currentY` (default: `true`)
+- **`addHorizontalLine()` spacing** — New `spacing` parameter (default: 5px) for vertical space before and after the line
+- **`addHorizontalLine()` advancePosition** — Control whether the line advances `currentY` (default: `true`)
+- **`addFooter()` userLabel** — Configurable label before the username (defaults to `'المستخدم : '` in RTL, `'User: '` in LTR)
+- **`addFooter()` pageNumberFormat** — Configurable page number format string (default: `'{0}/{1}'`)
+- **Logger integration** — All position changes and page-break events are logged via `GeniusPdfLogger.debug()`
+- **Example** — `PositionTrackingDemoBuilder` in `example/lib/documents/` demonstrates all v2.4.0 features
+
+### Fixed
+- **`availableWidth` bug** — In portrait orientation, `availableWidth` incorrectly used `pageSize.height` instead of `pageSize.width`; now correctly calculates `pageSize.width - (margins.left + margins.right)`
+- **`addImage()` not advancing position** — Images no longer leave `currentY` unchanged; subsequent content renders correctly below
+- **`addHorizontalLine()` not advancing position** — Horizontal lines now advance `currentY` so following content doesn't overlap
+- **`addFooter()` hardcoded Arabic** — Removed hardcoded `'المستخدم : '` string; now uses configurable `userLabel` parameter
+- **`addFooter()` hardcoded time position** — Replaced `const Rect.fromLTWH(200, ...)` with dynamic `availableWidth * 0.35`
+
+### Changed
+- **`addLine()` uses `_ensureSpace`** — Text that overflows the page triggers an automatic page-break instead of drawing off-page
+- **`newPage()` resets `_currentY`** — Consistent position tracking across page transitions
+- **`addSpace()` uses `_advanceY`** — Spacing is tracked precisely in the position system
+- **`addInlineText()` updates `_currentY`** — Inline text no longer leaves the position tracker stale
+
+---
+
 ## [2.3.3+10] - 2026-01-31
 
 ### Added
