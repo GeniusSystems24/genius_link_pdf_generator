@@ -9,19 +9,19 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:genius_pdf_example/main.dart';
 
-import '../documents/templates/template_builtin_invoice.dart';
-import '../documents/templates/template_builtin_letter.dart';
-import '../documents/templates/template_builtin_report.dart';
-import '../documents/templates/template_contract.dart';
-import '../documents/templates/template_export_json.dart';
-import '../documents/templates/template_invoice.dart';
-import '../documents/templates/template_json_letter.dart';
-import '../documents/templates/template_json_memo.dart';
-import '../documents/templates/template_purchase_order.dart';
-import '../documents/templates/template_quotation.dart';
-import '../documents/templates/template_receipt.dart';
-import '../documents/templates/template_report.dart';
-import '../documents/templates/template_timesheet.dart';
+import '../documents/template_builtin_invoice.dart';
+import '../documents/template_builtin_letter.dart';
+import '../documents/template_builtin_report.dart';
+import '../documents/template_contract.dart';
+import '../documents/template_export_json.dart';
+import '../documents/template_invoice.dart';
+import '../documents/template_json_letter.dart';
+import '../documents/template_json_memo.dart';
+import '../documents/template_purchase_order.dart';
+import '../documents/template_quotation.dart';
+import '../documents/template_receipt.dart';
+import '../documents/template_report.dart';
+import '../documents/template_timesheet.dart';
 import '../theme/app_theme.dart';
 
 /// Model class for template engine tabs.

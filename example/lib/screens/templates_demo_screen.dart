@@ -4,6 +4,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 
 import '../documents/templates_demo_documents.dart';
 import '../theme/app_theme.dart';
+import '../widgets/custom_tab_bar.dart';
 
 class TemplatesDemoScreen extends StatefulWidget {
   const TemplatesDemoScreen({super.key, this.initialTab = 0});
@@ -20,11 +21,38 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
   bool _isGenerating = false;
   bool _isRTL = true;
 
+  final List<CustomTabItem> _tabs = [
+    CustomTabItem(
+      id: 'invoice',
+      title: 'Tax Invoice',
+      icon: Icons.receipt_long_rounded,
+      gradient: AppColors.primaryGradient,
+    ),
+    CustomTabItem(
+      id: 'trial_balance',
+      title: 'Trial Balance',
+      icon: Icons.balance_rounded,
+      gradient: AppColors.successGradient,
+    ),
+    CustomTabItem(
+      id: 'statement',
+      title: 'Statement',
+      icon: Icons.description_rounded,
+      gradient: AppColors.purpleGradient,
+    ),
+    CustomTabItem(
+      id: 'inventory',
+      title: 'Inventory',
+      icon: Icons.inventory_2_rounded,
+      gradient: AppColors.orangeGradient,
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 4,
+      length: _tabs.length,
       vsync: this,
       initialIndex: widget.initialTab,
     );
@@ -157,7 +185,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
 
   Widget _buildHeader(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
         border: Border(
@@ -189,7 +217,8 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
                   color: isDark ? AppColors.darkCard : AppColors.lightBg,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                   ),
                 ),
                 child: Row(
@@ -220,53 +249,12 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           // Custom Tab Bar
-          Container(
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkCard : AppColors.lightBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-              ),
-            ),
-            padding: const EdgeInsets.all(4),
-            child: TabBar(
-              controller: _tabController,
-              indicator: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: AppColors.primaryGradient,
-                ),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              indicatorSize: TabBarIndicatorSize.tab,
-              dividerColor: Colors.transparent,
-              labelColor: Colors.white,
-              unselectedLabelColor: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
-              labelStyle: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-              tabs: const [
-                Tab(text: 'Tax Invoice'),
-                Tab(text: 'Trial Balance'),
-                Tab(text: 'Statement'),
-                Tab(text: 'Inventory'),
-              ],
-            ),
+          CustomTabBar(
+            controller: _tabController,
+            tabs: _tabs,
+            isDark: isDark,
           ),
         ],
       ),
@@ -391,7 +379,8 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? AppColors.darkText : AppColors.lightText,
+                        color:
+                            isDark ? AppColors.darkText : AppColors.lightText,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -526,7 +515,8 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
                     height: 1,
                     indent: 16,
                     endIndent: 16,
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                   ),
               ],
             );
@@ -679,9 +669,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
       height: 56,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        gradient: _isGenerating
-            ? null
-            : LinearGradient(colors: gradient),
+        gradient: _isGenerating ? null : LinearGradient(colors: gradient),
         color: _isGenerating
             ? (isDark ? AppColors.darkCard : AppColors.lightBorder)
             : null,

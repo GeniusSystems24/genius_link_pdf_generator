@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
-import '../documents/new_templates_demo/financial_templates.dart';
-import '../documents/new_templates_demo/hr_templates.dart';
-import '../documents/new_templates_demo/sales_templates.dart';
-import '../documents/new_templates_demo/shared_build.dart';
+import '../documents/financial_templates.dart';
+import '../documents/hr_templates.dart';
+import '../documents/sales_templates.dart';
+import '../documents/shared_build.dart';
 import '../theme/app_theme.dart';
+import '../widgets/custom_tab_bar.dart';
 
 /// Demo screen showcasing the new report templates added in v1.3.0.
 /// Redesigned with professional dashboard styling.
@@ -26,11 +27,32 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
   bool _isRTL = true;
   String? _generatingTemplate;
 
+  final List<CustomTabItem> _tabs = [
+    CustomTabItem(
+      id: 'financial',
+      title: 'Financial',
+      icon: Icons.account_balance_rounded,
+      gradient: AppColors.primaryGradient,
+    ),
+    CustomTabItem(
+      id: 'sales',
+      title: 'Sales',
+      icon: Icons.shopping_cart_rounded,
+      gradient: AppColors.successGradient,
+    ),
+    CustomTabItem(
+      id: 'hr',
+      title: 'HR',
+      icon: Icons.people_rounded,
+      gradient: AppColors.purpleGradient,
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 3,
+      length: _tabs.length,
       vsync: this,
       initialIndex: widget.initialTab,
     );
@@ -51,7 +73,11 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
       child: Column(
         children: [
           _buildHeader(),
-          _buildTabBar(),
+          CustomTabBar(
+            controller: _tabController,
+            tabs: _tabs,
+            isDark: _isDark,
+          ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -134,63 +160,6 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabBar() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: _isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        labelColor: AppColors.primary,
-        unselectedLabelColor: _isDark
-            ? AppColors.darkTextSecondary
-            : AppColors.lightTextSecondary,
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          gradient: const LinearGradient(
-            colors: AppColors.primaryGradient,
-          ),
-        ),
-        labelStyle: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-        ),
-        dividerColor: Colors.transparent,
-        splashBorderRadius: BorderRadius.circular(10),
-        padding: const EdgeInsets.all(4),
-        tabs: [
-          _buildTab(Icons.account_balance, 'Financial'),
-          _buildTab(Icons.shopping_cart, 'Sales'),
-          _buildTab(Icons.people, 'HR'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTab(IconData icon, String label) {
-    return Tab(
-      height: 48,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 18),
-          const SizedBox(width: 8),
-          Text(label),
         ],
       ),
     );

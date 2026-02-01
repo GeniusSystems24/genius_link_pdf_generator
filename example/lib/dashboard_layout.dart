@@ -15,8 +15,9 @@ import 'screens/ai_features_demo_screen.dart';
 import 'screens/v2_architecture_demo_screen.dart';
 import 'screens/barcode_demo_screen.dart';
 import 'screens/examples_showcase_screen.dart';
+import 'dart:ui'; // For ImageFilter
 
-/// Main Dashboard Layout with Sidebar Navigation
+/// Modern Dashboard Layout with Glassmorphism and Smooth Navigation
 class DashboardLayout extends StatefulWidget {
   const DashboardLayout({super.key});
 
@@ -40,7 +41,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 768;
+    final isMobile =
+        screenWidth < 1024; // Increased breakpoint for tablet support
 
     if (isMobile) {
       return _buildMobileLayout(isDark);
@@ -52,23 +54,96 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   Widget _buildDesktopLayout(bool isDark) {
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
-      body: Row(
+      body: Stack(
         children: [
-          DashboardSidebar(
-            selectedId: _selectedId,
-            onItemSelected: _onItemSelected,
-            isCollapsed: _sidebarCollapsed,
-            onToggleCollapse: _toggleSidebar,
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                _buildTopBar(isDark),
-                Expanded(
-                  child: _buildContent(),
+          // Background Gradient Orbs (Optional for extra flair)
+          if (isDark) ...[
+            Positioned(
+              top: -100,
+              right: -100,
+              child: Container(
+                width: 400,
+                height: 400,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.05),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.1),
+                      blurRadius: 100,
+                      spreadRadius: 20,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
+            Positioned(
+              bottom: -100,
+              left: -100,
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withOpacity(0.05),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.secondary.withOpacity(0.1),
+                      blurRadius: 80,
+                      spreadRadius: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+
+          Row(
+            children: [
+              DashboardSidebar(
+                selectedId: _selectedId,
+                onItemSelected: _onItemSelected,
+                isCollapsed: _sidebarCollapsed,
+                onToggleCollapse: _toggleSidebar,
+              ),
+              Expanded(
+                child: Column(
+                  children: [
+                    _buildTopBar(isDark),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isDark ? AppColors.darkBg : AppColors.lightBg,
+                        ),
+                        child: ClipRect(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            switchInCurve: Curves.easeOut,
+                            switchOutCurve: Curves.easeIn,
+                            transitionBuilder: (child, animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: const Offset(0.02, 0),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: KeyedSubtree(
+                              key: ValueKey(_selectedId),
+                              child: _buildContent(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -79,7 +154,23 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        titleSpacing: 0,
+        backgroundColor: isDark
+            ? AppColors.darkSurface.withOpacity(0.8)
+            : AppColors.lightSurface.withOpacity(0.8),
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(color: Colors.transparent),
+          ),
+        ),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu_rounded,
+                color: isDark ? AppColors.darkText : AppColors.lightText),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         title: Row(
           children: [
             Container(
@@ -97,7 +188,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                 size: 18,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             Text(
               _getTitle(),
               style: TextStyle(
@@ -118,10 +209,12 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             ),
             onPressed: () => themeController.toggleTheme(),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       drawer: Drawer(
-        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        backgroundColor:
+            isDark ? AppColors.darkSurface : AppColors.lightSurface,
         child: _buildMobileDrawer(isDark),
       ),
       body: _buildContent(),
@@ -135,7 +228,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       _DrawerItem('charts', 'Charts', Icons.bar_chart_rounded),
       _DrawerItem('templates', 'Templates', Icons.description_rounded),
       _DrawerItem('templates_demo', 'Templates Demo', Icons.view_quilt_rounded),
-      _DrawerItem('new_templates', 'Business Templates', Icons.auto_awesome_rounded),
+      _DrawerItem(
+          'new_templates', 'Business Templates', Icons.auto_awesome_rounded),
       _DrawerItem('template_engine', 'Template Engine', Icons.tune_rounded),
       _DrawerItem('barcodes', 'Barcodes & QR', Icons.qr_code_rounded),
       _DrawerItem('security', 'Security', Icons.security_rounded),
@@ -145,14 +239,15 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       _DrawerItem('sharing', 'Sharing', Icons.share_rounded),
       _DrawerItem('ai_features', 'AI Features', Icons.smart_toy_rounded),
       _DrawerItem('advanced', 'Advanced', Icons.auto_awesome_rounded),
-      _DrawerItem('v2_architecture', 'V2 Architecture', Icons.account_tree_rounded),
+      _DrawerItem(
+          'v2_architecture', 'V2 Architecture', Icons.account_tree_rounded),
     ];
 
     return SafeArea(
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -163,32 +258,41 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             child: Row(
               children: [
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: AppColors.primaryGradient,
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: const Icon(
                     Icons.picture_as_pdf_rounded,
                     color: Colors.white,
-                    size: 24,
+                    size: 26,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Genius PDF',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? AppColors.darkText : AppColors.lightText,
+                        color:
+                            isDark ? AppColors.darkText : AppColors.lightText,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       'v2.3.3+1',
                       style: TextStyle(
@@ -205,7 +309,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
           ),
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               itemCount: items.length,
               itemBuilder: (context, index) {
                 final item = items[index];
@@ -213,36 +317,39 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                     (_selectedId.startsWith(item.id.split('_').first) &&
                         item.id != 'dashboard');
 
-                return ListTile(
-                  leading: Icon(
-                    item.icon,
-                    color: isSelected
-                        ? AppColors.primary
-                        : (isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.lightTextSecondary),
-                  ),
-                  title: Text(
-                    item.title,
-                    style: TextStyle(
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.w500,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: ListTile(
+                    leading: Icon(
+                      item.icon,
                       color: isSelected
                           ? AppColors.primary
                           : (isDark
-                              ? AppColors.darkText
-                              : AppColors.lightText),
+                              ? AppColors.darkTextSecondary
+                              : AppColors.lightTextSecondary),
                     ),
+                    title: Text(
+                      item.title,
+                      style: TextStyle(
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        color: isSelected
+                            ? AppColors.primary
+                            : (isDark
+                                ? AppColors.darkText
+                                : AppColors.lightText),
+                      ),
+                    ),
+                    selected: isSelected,
+                    selectedTileColor: AppColors.primary.withOpacity(0.1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _onItemSelected(item.id);
+                    },
                   ),
-                  selected: isSelected,
-                  selectedTileColor: AppColors.primary.withOpacity(0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _onItemSelected(item.id);
-                  },
                 );
               },
             ),
@@ -254,10 +361,12 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
   Widget _buildTopBar(bool isDark) {
     return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      height: 72,
+      padding: const EdgeInsets.symmetric(horizontal: 32),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        color: isDark
+            ? AppColors.darkSurface.withOpacity(0.5)
+            : AppColors.lightSurface.withOpacity(0.8),
         border: Border(
           bottom: BorderSide(
             color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
@@ -267,29 +376,41 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       child: Row(
         children: [
           if (_selectedId != 'dashboard')
-            IconButton(
-              icon: Icon(
-                Icons.arrow_back_rounded,
-                color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary,
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_rounded,
+                  color: isDark ? AppColors.darkText : AppColors.lightText,
+                ),
+                style: IconButton.styleFrom(
+                  backgroundColor:
+                      isDark ? AppColors.darkCard : AppColors.lightCard,
+                  padding: const EdgeInsets.all(8),
+                ),
+                onPressed: () => _onItemSelected('dashboard'),
+                tooltip: 'Back to Dashboard',
               ),
-              onPressed: () => _onItemSelected('dashboard'),
-              tooltip: 'Back to Dashboard',
             ),
-          Text(
-            _getTitle(),
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.darkText : AppColors.lightText,
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _getTitle(),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.darkText : AppColors.lightText,
+                ),
+              ),
+            ],
           ),
           const Spacer(),
           _buildSearchBar(isDark),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           _buildNotificationButton(isDark),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           _buildProfileButton(isDark),
         ],
       ),
@@ -298,18 +419,25 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
   Widget _buildSearchBar(bool isDark) {
     return Container(
-      width: 280,
-      height: 40,
+      width: 320,
+      height: 44,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightBg,
-        borderRadius: BorderRadius.circular(10),
+        color: isDark ? AppColors.darkCard : AppColors.lightSurface,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Icon(
             Icons.search_rounded,
             size: 20,
@@ -317,11 +445,11 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                 ? AppColors.darkTextSecondary
                 : AppColors.lightTextSecondary,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search features...',
+                hintText: 'Search features, templates...',
                 hintStyle: TextStyle(
                   fontSize: 14,
                   color: isDark
@@ -329,6 +457,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                       : AppColors.lightTextSecondary,
                 ),
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
                 isDense: true,
               ),
@@ -342,16 +472,17 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.darkBorder
-                  : AppColors.lightBorder,
+              color: isDark ? AppColors.darkBg : AppColors.lightBg,
               borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+              ),
             ),
             child: Text(
               '⌘K',
               style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
                 color: isDark
                     ? AppColors.darkTextSecondary
                     : AppColors.lightTextSecondary,
@@ -364,48 +495,65 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   }
 
   Widget _buildNotificationButton(bool isDark) {
-    return Stack(
-      children: [
-        IconButton(
-          icon: Icon(
-            Icons.notifications_none_rounded,
-            color: isDark
-                ? AppColors.darkTextSecondary
-                : AppColors.lightTextSecondary,
-          ),
-          onPressed: () {},
+    return IconButton(
+      style: IconButton.styleFrom(
+        backgroundColor: isDark ? AppColors.darkCard : AppColors.lightSurface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        side: BorderSide(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
-        Positioned(
-          right: 8,
-          top: 8,
-          child: Container(
-            width: 8,
-            height: 8,
-            decoration: const BoxDecoration(
-              color: AppColors.error,
-              shape: BoxShape.circle,
+      ),
+      icon: Stack(
+        children: [
+          Icon(
+            Icons.notifications_outlined,
+            color: isDark ? AppColors.darkText : AppColors.lightText,
+            size: 22,
+          ),
+          Positioned(
+            right: 2,
+            top: 2,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isDark ? AppColors.darkCard : AppColors.lightSurface,
+                  width: 1.5,
+                ),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
+      onPressed: () {},
     );
   }
 
   Widget _buildProfileButton(bool isDark) {
     return Container(
-      width: 36,
-      height: 36,
+      width: 40,
+      height: 40,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: AppColors.primaryGradient,
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: const Center(
         child: Text(
           'GP',
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),

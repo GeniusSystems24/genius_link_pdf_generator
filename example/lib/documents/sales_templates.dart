@@ -1,7 +1,7 @@
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
-import '../../data/sample_data.dart';
+import '../data/sample_data.dart';
 import 'shared_build.dart';
 
 NewTemplatesDemoBuild buildQuotationDemo({required bool isRtl}) {

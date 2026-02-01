@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'widgets/dashboard_widgets.dart';
 
-/// Dashboard Home Screen
+/// Modern Dashboard Home Screen
 class DashboardHome extends StatelessWidget {
   final Function(String) onNavigate;
 
@@ -10,282 +10,379 @@ class DashboardHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Get theme from context for responsiveness
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isWide = screenWidth > 1200;
     final isMedium = screenWidth > 800;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildWelcomeHeader(isDark),
-          const SizedBox(height: 24),
-          _buildQuickActions(),
+          _buildHeroSection(context, isDark, theme),
           const SizedBox(height: 32),
-          _buildStatsSection(isDark, isWide, isMedium),
-          const SizedBox(height: 32),
-          _buildFeaturesSection(isDark, isWide, isMedium),
-          const SizedBox(height: 32),
-          _buildBottomSections(isDark, isWide),
+          _buildQuickActions(isDark),
+          const SizedBox(height: 48),
+          _buildStatsGrid(isDark, isWide, isMedium),
+          const SizedBox(height: 48),
+          _buildFeatureSpotlight(isDark, isWide),
+          const SizedBox(height: 48),
+          _buildBottomGrid(isDark, isWide),
         ],
       ),
     );
   }
 
-  Widget _buildWelcomeHeader(bool isDark) {
+  Widget _buildHeroSection(BuildContext context, bool isDark, ThemeData theme) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary.withOpacity(isDark ? 0.2 : 0.1),
-            AppColors.secondary.withOpacity(isDark ? 0.1 : 0.05),
-          ],
+          colors: isDark
+              ? [
+                  AppColors.primaryDark,
+                  AppColors.darkSurface,
+                ]
+              : [
+                  AppColors.primary,
+                  AppColors.primaryLight,
+                ],
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.2),
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
       ),
-      child: Row(
+      child: Stack(
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          // Decorative background circles
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            left: -40,
+            bottom: -40,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Genius PDF Generator',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? AppColors.darkText : AppColors.lightText,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: AppColors.successGradient,
-                        ),
+                        color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
-                        'v2.3.3+1',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star_rounded,
+                              color: Colors.amber, size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            'v2.3.3+1 Now Available',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Welcome to Genius PDF',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'The most powerful Flutter PDF generation library. Create invoices, reports, and charts with RTL support.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white.withOpacity(0.9),
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () => onNavigate('examples'),
+                          icon: const Icon(Icons.play_arrow_rounded),
+                          label: const Text('View Examples'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () => onNavigate('new_templates'),
+                          icon: const Icon(Icons.dashboard_customize_rounded),
+                          label: const Text('Browse Templates'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.white),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Professional PDF generation library with RTL support, charts, templates, and advanced features',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary,
-                    height: 1.5,
+              ),
+              if (MediaQuery.of(context).size.width > 800) ...[
+                const SizedBox(width: 48),
+                Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(32),
+                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.picture_as_pdf_rounded,
+                      size: 64,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _buildFeatureChip(
-                        Icons.format_textdirection_r_to_l, 'RTL/LTR'),
-                    _buildFeatureChip(Icons.translate, 'Bilingual'),
-                    _buildFeatureChip(Icons.insert_chart_rounded, 'Charts'),
-                    _buildFeatureChip(Icons.security_rounded, 'Security'),
-                    _buildFeatureChip(Icons.print_rounded, 'Printing'),
-                    _buildFeatureChip(Icons.share_rounded, 'Sharing'),
-                    _buildFeatureChip(Icons.smart_toy_rounded, 'AI Features'),
-                  ],
-                ),
               ],
-            ),
+            ],
           ),
-          const SizedBox(width: 24),
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: AppColors.primaryGradient,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Quick Actions',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDark ? AppColors.darkText : AppColors.lightText,
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 110,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            children: [
+              _QuickActionCard(
+                label: 'New Invoice',
+                icon: Icons.receipt_long_rounded,
+                color: AppColors.primary,
+                onTap: () => onNavigate('invoices'),
+                isDark: isDark,
               ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.picture_as_pdf_rounded,
-              size: 56,
-              color: Colors.white,
-            ),
+              const SizedBox(width: 16),
+              _QuickActionCard(
+                label: 'Financial Report',
+                icon: Icons.analytics_rounded,
+                color: AppColors.success,
+                onTap: () => onNavigate('financial'),
+                isDark: isDark,
+              ),
+              const SizedBox(width: 16),
+              _QuickActionCard(
+                label: 'Export Data',
+                icon: Icons.upload_file_rounded,
+                color: AppColors.warning,
+                onTap: () => onNavigate('export'),
+                isDark: isDark,
+              ),
+              const SizedBox(width: 16),
+              _QuickActionCard(
+                label: 'Print',
+                icon: Icons.print_rounded,
+                color: AppColors.info,
+                onTap: () => onNavigate('printing'),
+                isDark: isDark,
+              ),
+              const SizedBox(width: 16),
+              _QuickActionCard(
+                label: 'Scan QR',
+                icon: Icons.qr_code_scanner_rounded,
+                color: AppColors.secondary,
+                onTap: () => onNavigate('barcodes'),
+                isDark: isDark,
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeatureChip(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.2),
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: AppColors.primary),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.primary,
+      ],
+    );
+  }
+
+  Widget _buildStatsGrid(bool isDark, bool isWide, bool isMedium) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = isWide ? 4 : (isMedium ? 2 : 1);
+        final childAspectRatio = isWide ? 1.4 : (isMedium ? 1.6 : 2.5);
+
+        return GridView.count(
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: 24,
+          crossAxisSpacing: 24,
+          childAspectRatio: childAspectRatio,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            StatCard(
+              title: 'Components',
+              value: '15+',
+              subtitle: 'Core Widgets',
+              icon: Icons.widgets_rounded,
+              gradient: AppColors.primaryGradient,
+              change: 'Updated',
+              onTap: () => onNavigate('components'),
             ),
-          ),
-        ],
-      ),
+            StatCard(
+              title: 'Templates',
+              value: '24',
+              subtitle: 'Ready to use',
+              icon: Icons.description_rounded,
+              gradient: AppColors.successGradient,
+              change: '+4 New',
+              onTap: () => onNavigate('templates'),
+            ),
+            StatCard(
+              title: 'Charts',
+              value: '4 Types',
+              subtitle: 'Data Viz',
+              icon: Icons.bar_chart_rounded,
+              gradient: AppColors.warningGradient,
+              change: 'Animated',
+              onTap: () => onNavigate('charts'),
+            ),
+            StatCard(
+              title: 'Formats',
+              value: '5',
+              subtitle: 'Export Options',
+              icon: Icons.file_download_rounded,
+              gradient: AppColors.infoGradient,
+              change: 'Multi',
+              onTap: () => onNavigate('export'),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildQuickActions() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          QuickActionButton(
-            label: 'Generate Invoice',
-            icon: Icons.receipt_long_rounded,
-            gradient: AppColors.primaryGradient,
-            onTap: () => onNavigate('invoices'),
-          ),
-          const SizedBox(width: 12),
-          QuickActionButton(
-            label: 'Create Report',
-            icon: Icons.assessment_rounded,
-            gradient: AppColors.successGradient,
-            onTap: () => onNavigate('financial'),
-          ),
-          const SizedBox(width: 12),
-          QuickActionButton(
-            label: 'Export PDF',
-            icon: Icons.file_download_rounded,
-            gradient: AppColors.infoGradient,
-            onTap: () => onNavigate('export'),
-          ),
-          const SizedBox(width: 12),
-          QuickActionButton(
-            label: 'Print Document',
-            icon: Icons.print_rounded,
-            gradient: AppColors.purpleGradient,
-            onTap: () => onNavigate('printing'),
-          ),
-          const SizedBox(width: 12),
-          QuickActionButton(
-            label: 'Share',
-            icon: Icons.share_rounded,
-            gradient: AppColors.cyanGradient,
-            onTap: () => onNavigate('sharing'),
-          ),
-          const SizedBox(width: 12),
-          QuickActionButton(
-            label: 'Examples',
-            icon: Icons.auto_awesome_mosaic_rounded,
-            gradient: AppColors.infoGradient,
-            onTap: () => onNavigate('examples'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatsSection(bool isDark, bool isWide, bool isMedium) {
+  Widget _buildFeatureSpotlight(bool isDark, bool isWide) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(
-          title: 'Library Statistics',
-          subtitle: 'Overview of available features',
-          icon: Icons.analytics_rounded,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Feature Spotlight',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppColors.darkText : AppColors.lightText,
+              ),
+            ),
+            TextButton(
+              onPressed: () => onNavigate('advanced'),
+              child: const Text('View All'),
+            ),
+          ],
         ),
+        const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, constraints) {
-            final crossAxisCount = isWide ? 4 : (isMedium ? 2 : 1);
-            final childAspectRatio = isWide ? 1.4 : (isMedium ? 1.6 : 2.5);
+            final cardWidth = isWide
+                ? (constraints.maxWidth - 48) / 3
+                : (constraints.maxWidth);
 
-            return GridView.count(
-              crossAxisCount: crossAxisCount,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: childAspectRatio,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+            return Wrap(
+              spacing: 24,
+              runSpacing: 24,
               children: [
-                StatCard(
-                  title: 'Components',
-                  value: '15+',
-                  subtitle: 'Reusable PDF widgets',
-                  icon: Icons.widgets_rounded,
-                  gradient: AppColors.primaryGradient,
-                  change: 'Core',
-                  onTap: () => onNavigate('components'),
+                SizedBox(
+                  width: cardWidth,
+                  child: FeatureCard(
+                    title: 'Smart Tables',
+                    description: 'RTL support, pagination, custom styling',
+                    icon: Icons.table_chart_rounded,
+                    gradient: AppColors.primaryGradient,
+                    tags: const ['RTL', 'Paginated'],
+                    onTap: () => onNavigate('data_grid'),
+                  ),
                 ),
-                StatCard(
-                  title: 'Templates',
-                  value: '20+',
-                  subtitle: 'Business documents',
-                  icon: Icons.description_rounded,
-                  gradient: AppColors.successGradient,
-                  change: 'Ready',
-                  onTap: () => onNavigate('templates'),
+                SizedBox(
+                  width: cardWidth,
+                  child: FeatureCard(
+                    title: 'Rich Text',
+                    description: 'Styled mixed content with inline formatting',
+                    icon: Icons.text_fields_rounded,
+                    gradient: AppColors.purpleGradient,
+                    tags: const ['Markdown', 'HTML'],
+                    onTap: () => onNavigate('rich_text'),
+                  ),
                 ),
-                StatCard(
-                  title: 'Chart Types',
-                  value: '4',
-                  subtitle: 'Bar, Line, Pie, Area',
-                  icon: Icons.bar_chart_rounded,
-                  gradient: AppColors.warningGradient,
-                  change: 'Visual',
-                  onTap: () => onNavigate('charts'),
-                ),
-                StatCard(
-                  title: 'Export Formats',
-                  value: '5',
-                  subtitle: 'PDF, PNG, JPEG, HTML, Text',
-                  icon: Icons.file_download_rounded,
-                  gradient: AppColors.infoGradient,
-                  change: 'Multi',
-                  onTap: () => onNavigate('export'),
+                SizedBox(
+                  width: cardWidth,
+                  child: FeatureCard(
+                    title: 'AI Assistant',
+                    description: 'Content generation and layout optimization',
+                    icon: Icons.smart_toy_rounded,
+                    gradient: AppColors.tealGradient,
+                    tags: const ['Smart', 'Beta'],
+                    isPro: true,
+                    onTap: () => onNavigate('ai_features'),
+                  ),
                 ),
               ],
             );
@@ -295,315 +392,290 @@ class DashboardHome extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturesSection(bool isDark, bool isWide, bool isMedium) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(
-          title: 'Features',
-          subtitle: 'Explore all capabilities',
-          icon: Icons.auto_awesome_rounded,
-          action: TextButton.icon(
-            onPressed: () => onNavigate('advanced'),
-            icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-            label: const Text('View All'),
-          ),
-        ),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final crossAxisCount = isWide ? 4 : (isMedium ? 2 : 1);
-            final childAspectRatio = isWide ? 1.1 : (isMedium ? 1.2 : 2.0);
-
-            return GridView.count(
-              crossAxisCount: crossAxisCount,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: childAspectRatio,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                FeatureCard(
-                  title: 'Data Grid',
-                  description:
-                      'Advanced tables with RTL support, styling, and pagination',
-                  icon: Icons.table_chart_rounded,
-                  gradient: AppColors.primaryGradient,
-                  tags: const ['RTL', 'Styling'],
-                  onTap: () => onNavigate('data_grid'),
-                ),
-                FeatureCard(
-                  title: 'Rich Text',
-                  description:
-                      'Styled text with colors, fonts, and inline formatting',
-                  icon: Icons.text_fields_rounded,
-                  gradient: AppColors.purpleGradient,
-                  tags: const ['Styled', 'Colors'],
-                  onTap: () => onNavigate('rich_text'),
-                ),
-                FeatureCard(
-                  title: 'Charts',
-                  description:
-                      'Bar, line, pie, and area charts with customization',
-                  icon: Icons.insert_chart_rounded,
-                  gradient: AppColors.successGradient,
-                  tags: const ['4 Types', 'Animated'],
-                  onTap: () => onNavigate('charts'),
-                ),
-                FeatureCard(
-                  title: 'Security',
-                  description:
-                      'Watermarks, encryption, passwords, and digital signatures',
-                  icon: Icons.security_rounded,
-                  gradient: AppColors.errorGradient,
-                  tags: const ['Encrypted', 'Protected'],
-                  onTap: () => onNavigate('security'),
-                ),
-                FeatureCard(
-                  title: 'Examples',
-                  description:
-                      'Selected demos covering advanced layout, charts, and QR',
-                  icon: Icons.auto_awesome_mosaic_rounded,
-                  gradient: AppColors.infoGradient,
-                  tags: const ['Gallery', 'Demos'],
-                  onTap: () => onNavigate('examples'),
-                ),
-                FeatureCard(
-                  title: 'Printing',
-                  description:
-                      'Advanced print settings, preview, and printer discovery',
-                  icon: Icons.print_rounded,
-                  gradient: AppColors.orangeGradient,
-                  tags: const ['Preview', 'Profiles'],
-                  onTap: () => onNavigate('printing'),
-                ),
-                FeatureCard(
-                  title: 'Sharing',
-                  description:
-                      'Email, Bluetooth, WhatsApp, and cloud app sharing',
-                  icon: Icons.share_rounded,
-                  gradient: AppColors.cyanGradient,
-                  tags: const ['Email', 'Apps'],
-                  isNew: true,
-                  onTap: () => onNavigate('sharing'),
-                ),
-                FeatureCard(
-                  title: 'AI Features',
-                  description:
-                      'Content analysis, smart layout, and text summarization',
-                  icon: Icons.smart_toy_rounded,
-                  gradient: AppColors.warningGradient,
-                  tags: const ['Smart', 'Analysis'],
-                  isPro: true,
-                  onTap: () => onNavigate('ai_features'),
-                ),
-                FeatureCard(
-                  title: 'Template Engine',
-                  description:
-                      'Dynamic templates with variables, conditions, and loops',
-                  icon: Icons.build_rounded,
-                  gradient: AppColors.tealGradient,
-                  tags: const ['Dynamic', 'Variables'],
-                  onTap: () => onNavigate('advanced'),
-                ),
-              ],
-            );
-          },
-        ),
-      ],
-    );
+  Widget _buildBottomGrid(bool isDark, bool isWide) {
+    return isWide
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(flex: 3, child: _buildTemplatesList(isDark)),
+              const SizedBox(width: 32),
+              Expanded(flex: 2, child: _buildActivityFeed(isDark)),
+            ],
+          )
+        : Column(
+            children: [
+              _buildTemplatesList(isDark),
+              const SizedBox(height: 32),
+              _buildActivityFeed(isDark),
+            ],
+          );
   }
 
-  Widget _buildBottomSections(bool isDark, bool isWide) {
-    if (isWide) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: _buildTemplatesSection(isDark)),
-          const SizedBox(width: 24),
-          Expanded(child: _buildActivitySection(isDark)),
-        ],
-      );
-    }
-
-    return Column(
-      children: [
-        _buildTemplatesSection(isDark),
-        const SizedBox(height: 24),
-        _buildActivitySection(isDark),
-      ],
-    );
-  }
-
-  Widget _buildTemplatesSection(bool isDark) {
+  Widget _buildTemplatesList(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionHeader(
-            title: 'Document Templates',
-            subtitle: 'Pre-built professional templates',
-            icon: Icons.folder_rounded,
-            action: TextButton(
-              onPressed: () => onNavigate('templates'),
-              child: const Text('View All'),
-            ),
+          const SectionHeader(
+            title: 'Popular Templates',
+            subtitle: 'Start with a pre-built design',
+            icon: Icons.folder_special_rounded,
           ),
-          const SizedBox(height: 8),
-          _buildTemplateItem(
+          const SizedBox(height: 16),
+          _buildTemplateRow(
             'Tax Invoice',
-            'ZATCA compliant invoices',
-            Icons.receipt_long_rounded,
+            'ZATCA compliant, QR code',
+            Icons.receipt,
             AppColors.primaryGradient,
             () => onNavigate('invoices'),
+            isDark,
           ),
-          _buildTemplateItem(
-            'Financial Reports',
-            'Balance sheet, P&L, Cash flow',
-            Icons.account_balance_rounded,
+          _buildTemplateRow(
+            'Payslip',
+            'Earnings, deductions, net',
+            Icons.payments_rounded,
             AppColors.successGradient,
-            () => onNavigate('financial'),
-          ),
-          _buildTemplateItem(
-            'HR Documents',
-            'Payslips, attendance, leave reports',
-            Icons.people_rounded,
-            AppColors.purpleGradient,
             () => onNavigate('hr'),
+            isDark,
           ),
-          _buildTemplateItem(
-            'Sales Documents',
-            'Quotations, PO, delivery notes',
-            Icons.shopping_cart_rounded,
+          _buildTemplateRow(
+            'Sales Offer',
+            'Quotation with terms',
+            Icons.local_offer_rounded,
             AppColors.orangeGradient,
             () => onNavigate('sales'),
+            isDark,
+          ),
+          _buildTemplateRow(
+            'Certificate',
+            'Award and completion',
+            Icons.workspace_premium_rounded,
+            AppColors.purpleGradient,
+            () => onNavigate('templates'),
+            isDark,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTemplateItem(
+  Widget _buildTemplateRow(
     String title,
     String subtitle,
     IconData icon,
     List<Color> gradient,
     VoidCallback onTap,
+    bool isDark,
   ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: gradient),
-                  borderRadius: BorderRadius.circular(10),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: gradient),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 20),
                 ),
-                child: Icon(icon, size: 18, color: Colors.white),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isDark ? AppColors.darkText : AppColors.lightText,
+                        ),
                       ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.lightTextSecondary,
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.lightTextSecondary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 14,
-                color: AppColors.lightTextSecondary,
-              ),
-            ],
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildActivitySection(bool isDark) {
+  Widget _buildActivityFeed(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SectionHeader(
             title: 'Recent Updates',
-            subtitle: 'Latest library changes',
-            icon: Icons.update_rounded,
+            subtitle: 'New features & fixes',
+            icon: Icons.history_rounded,
           ),
-          const SizedBox(height: 8),
-          const ActivityItem(
-            title: 'Config Instance Pattern',
-            description: 'Removed singleton, per-builder config',
-            time: 'v2.3.3+1',
-            icon: Icons.architecture_rounded,
-            color: AppColors.error,
-          ),
-          const ActivityItem(
-            title: 'App Sharing',
-            description: 'WhatsApp, Telegram, cloud apps',
-            time: 'v2.3.3',
-            icon: Icons.share_rounded,
-            color: AppColors.success,
-          ),
-          const ActivityItem(
-            title: 'Bluetooth Sharing',
-            description: 'Nearby Share, AirDrop support',
-            time: 'v2.3.2',
-            icon: Icons.bluetooth_rounded,
-            color: AppColors.info,
-          ),
-          const ActivityItem(
-            title: 'Email Sharing',
-            description: 'Gmail, Outlook integration',
-            time: 'v2.3.1',
-            icon: Icons.email_rounded,
-            color: AppColors.warning,
-          ),
-          const ActivityItem(
-            title: 'Unified Sharing',
-            description: 'Single API for all sharing',
-            time: 'v2.3.0',
-            icon: Icons.hub_rounded,
-            color: AppColors.accent,
+          const SizedBox(height: 24),
+          // Timeline Style
+          Stack(
+            children: [
+              Positioned(
+                left: 19,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: 2,
+                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                ),
+              ),
+              Column(
+                children: const [
+                  ActivityItem(
+                    title: 'Config Instance Pattern',
+                    description: 'Removed singleton, added builder config',
+                    time: 'Just now',
+                    icon: Icons.architecture_rounded,
+                    color: AppColors.primary,
+                  ),
+                  ActivityItem(
+                    title: 'App Sharing',
+                    description: 'WhatsApp & Telegram integration',
+                    time: '1 day ago',
+                    icon: Icons.share_rounded,
+                    color: AppColors.success,
+                  ),
+                  ActivityItem(
+                    title: 'New Charts',
+                    description: 'Added Area and Pie charts',
+                    time: '3 days ago',
+                    icon: Icons.pie_chart_rounded,
+                    color: AppColors.warning,
+                  ),
+                  ActivityItem(
+                    title: 'Dark Mode',
+                    description: 'Full dark theme support',
+                    time: '1 week ago',
+                    icon: Icons.dark_mode_rounded,
+                    color: AppColors.secondary,
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _QuickActionCard extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  final bool isDark;
+
+  const _QuickActionCard({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: 100,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkCard : AppColors.lightCard,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? AppColors.darkText : AppColors.lightText,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

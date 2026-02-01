@@ -11,6 +11,7 @@ import '../documents/charts_demo_documents.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 import '../widgets/code_viewer.dart';
+import '../widgets/custom_tab_bar.dart';
 
 class ChartsDemoScreen extends StatefulWidget {
   final int initialTab;
@@ -33,26 +34,26 @@ class _ChartsDemoScreenState extends State<ChartsDemoScreen>
   _PieChartType _pieType = _PieChartType.standard;
   _AreaChartType _areaType = _AreaChartType.overlapping;
 
-  final List<_ChartTab> _tabs = [
-    _ChartTab(
+  final List<CustomTabItem> _tabs = [
+    CustomTabItem(
       id: 'bar',
       title: 'Bar Chart',
       icon: Icons.bar_chart_rounded,
       gradient: AppColors.primaryGradient,
     ),
-    _ChartTab(
+    CustomTabItem(
       id: 'line',
       title: 'Line Chart',
       icon: Icons.show_chart_rounded,
       gradient: AppColors.purpleGradient,
     ),
-    _ChartTab(
+    CustomTabItem(
       id: 'pie',
       title: 'Pie Chart',
       icon: Icons.pie_chart_rounded,
       gradient: AppColors.cyanGradient,
     ),
-    _ChartTab(
+    CustomTabItem(
       id: 'area',
       title: 'Area Chart',
       icon: Icons.area_chart_rounded,
@@ -84,7 +85,11 @@ class _ChartsDemoScreenState extends State<ChartsDemoScreen>
       color: isDark ? AppColors.darkBg : AppColors.lightBg,
       child: Column(
         children: [
-          _buildTabBar(isDark),
+          CustomTabBar(
+            controller: _tabController,
+            tabs: _tabs,
+            isDark: isDark,
+          ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -97,59 +102,6 @@ class _ChartsDemoScreenState extends State<ChartsDemoScreen>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTabBar(bool isDark) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        labelColor: AppColors.primary,
-        unselectedLabelColor:
-            isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicator: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        dividerColor: Colors.transparent,
-        padding: const EdgeInsets.all(6),
-        labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-        tabs: _tabs.map((tab) => _buildTab(tab, isDark)).toList(),
-      ),
-    );
-  }
-
-  Widget _buildTab(_ChartTab tab, bool isDark) {
-    return Tab(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: tab.gradient),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(tab.icon, size: 14, color: Colors.white),
-            ),
-            const SizedBox(width: 8),
-            Text(tab.title,
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-          ],
-        ),
       ),
     );
   }
@@ -885,7 +837,6 @@ final areaChart = GeniusPdfAreaChart(
 
   // --- Helper Methods ---
   Future<void> _saveAndOpenPdf(Uint8List bytes, String fileName) async {
-
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/$fileName.pdf');
     await file.writeAsBytes(bytes);
@@ -914,7 +865,6 @@ final areaChart = GeniusPdfAreaChart(
       );
     }
   }
-
 }
 
 // --- Enums ---
@@ -923,19 +873,6 @@ enum _PieChartType { standard, donut, percentages, legend }
 enum _AreaChartType { overlapping, stacked, curved, points }
 
 // --- Data Classes ---
-class _ChartTab {
-  final String id;
-  final String title;
-  final IconData icon;
-  final List<Color> gradient;
-
-  const _ChartTab({
-    required this.id,
-    required this.title,
-    required this.icon,
-    required this.gradient,
-  });
-}
 
 class _PieSlice {
   final String label;

@@ -2,8 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
-    hide EdgeInsets, Colors;
-
+    hide EdgeInsets, Colors, PdfColor;
 
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfTextStyle, PdfGridStyle, PdfBorderStyle, PdfGridColumn, PdfGridRow;
@@ -83,7 +82,7 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
 
     // Draw header background
     graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(41, 128, 185)),
+      brush: PdfSolidBrush(PdfColor(99, 102, 241)), // Indigo primary
       bounds: headerBounds,
     );
 
@@ -160,7 +159,7 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
         .text('This is a ')
         .bold('custom report ')
         .text('generated using the ')
-        .bold('Genius Link PDF Generator', color: const Color(0xFF2980B9))
+        .bold('Genius Link PDF Generator', color: const Color(0xFF6366F1))
         .text(' library. ')
         .text('It supports ')
         .colored('colored text', Colors.green)
@@ -199,10 +198,10 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
       rows: rows,
       style: GeniusPdfGridStyle(
         headerStyle:
-            GeniusPdfCellStyle(backgroundColor: const Color(0xFF2980B9)),
+            GeniusPdfCellStyle(backgroundColor: const Color(0xFF6366F1)),
         alternateRowStyle:
-            GeniusPdfCellStyle(backgroundColor: const Color(0xFFF8F9FA)),
-        borderStyle: GeniusPdfBorderStyle.all(color: const Color(0xFFDEE2E6)),
+            GeniusPdfCellStyle(backgroundColor: const Color(0xFFF8FAFC)),
+        borderStyle: GeniusPdfBorderStyle.all(color: const Color(0xFFE2E8F0)),
       ),
     );
 

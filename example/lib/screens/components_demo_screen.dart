@@ -8,6 +8,7 @@ import '../documents/components_demo_documents.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 import '../widgets/code_viewer.dart';
+import '../widgets/custom_tab_bar.dart';
 
 class ComponentsDemoScreen extends StatefulWidget {
   const ComponentsDemoScreen({super.key, this.initialTab = 0});
@@ -24,32 +25,32 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
   bool _isGenerating = false;
   bool _isRTL = true;
 
-  final List<_ComponentTab> _tabs = [
-    _ComponentTab(
+  final List<CustomTabItem> _tabs = [
+    CustomTabItem(
       id: 'data_grid',
       title: 'Data Grid',
       icon: Icons.table_chart_rounded,
       gradient: AppColors.primaryGradient,
     ),
-    _ComponentTab(
+    CustomTabItem(
       id: 'rich_text',
       title: 'Rich Text',
       icon: Icons.text_fields_rounded,
       gradient: AppColors.purpleGradient,
     ),
-    _ComponentTab(
+    CustomTabItem(
       id: 'info_box',
       title: 'Info Box',
       icon: Icons.info_rounded,
       gradient: AppColors.cyanGradient,
     ),
-    _ComponentTab(
+    CustomTabItem(
       id: 'headers',
       title: 'Headers',
       icon: Icons.article_rounded,
       gradient: AppColors.successGradient,
     ),
-    _ComponentTab(
+    CustomTabItem(
       id: 'summary',
       title: 'Summary',
       icon: Icons.calculate_rounded,
@@ -81,7 +82,11 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
       color: isDark ? AppColors.darkBg : AppColors.lightBg,
       child: Column(
         children: [
-          _buildTabBar(isDark),
+          CustomTabBar(
+            controller: _tabController,
+            tabs: _tabs,
+            isDark: isDark,
+          ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -95,59 +100,6 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTabBar(bool isDark) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        labelColor: AppColors.primary,
-        unselectedLabelColor:
-            isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicator: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        dividerColor: Colors.transparent,
-        padding: const EdgeInsets.all(6),
-        labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-        tabs: _tabs.map((tab) => _buildTab(tab, isDark)).toList(),
-      ),
-    );
-  }
-
-  Widget _buildTab(_ComponentTab tab, bool isDark) {
-    return Tab(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: tab.gradient),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(tab.icon, size: 14, color: Colors.white),
-            ),
-            const SizedBox(width: 8),
-            Text(tab.title,
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-          ],
-        ),
       ),
     );
   }
@@ -375,8 +327,7 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.success,
                   borderRadius: BorderRadius.circular(4),
@@ -405,13 +356,11 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
                 TextSpan(
                     text: 'رقم الفاتورة: ',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF424242))),
+                        fontWeight: FontWeight.bold, color: Color(0xFF424242))),
                 TextSpan(
                     text: '#INV-2024-001',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary)),
+                        fontWeight: FontWeight.bold, color: AppColors.primary)),
               ],
             ),
           ),
@@ -451,8 +400,7 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
                 TextSpan(
                     text: '34,615.00',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.success)),
+                        fontWeight: FontWeight.bold, color: AppColors.success)),
               ],
             ),
           ),
@@ -461,15 +409,9 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
           Text('عناصر البند:',
               textDirection: TextDirection.rtl,
               style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: textColor)),
+                  fontSize: 13, fontWeight: FontWeight.bold, color: textColor)),
           const SizedBox(height: 6),
-          for (final item in [
-            'خدمات استشارية',
-            'تطوير برمجيات',
-            'صيانة شهرية'
-          ])
+          for (final item in ['خدمات استشارية', 'تطوير برمجيات', 'صيانة شهرية'])
             Padding(
               padding: const EdgeInsets.only(right: 12, bottom: 4),
               child: Row(
@@ -928,19 +870,6 @@ final summary = GeniusPdfSummarySection(
 // ---------------------------------------------------------------------------
 // UI Support Classes
 // ---------------------------------------------------------------------------
-
-class _ComponentTab {
-  final String id;
-  final String title;
-  final IconData icon;
-  final List<Color> gradient;
-
-  const _ComponentTab(
-      {required this.id,
-      required this.title,
-      required this.icon,
-      required this.gradient});
-}
 
 class _ComponentPage extends StatelessWidget {
   final String title;

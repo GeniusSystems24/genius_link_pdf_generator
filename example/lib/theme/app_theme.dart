@@ -1,96 +1,111 @@
 import 'package:flutter/material.dart';
 
-/// Professional Dashboard Color Scheme
+/// Modern Professional Dashboard Color Scheme
 class AppColors {
-  // Primary Colors
-  static const Color primary = Color(0xFF6366F1);
-  static const Color primaryLight = Color(0xFF818CF8);
-  static const Color primaryDark = Color(0xFF4F46E5);
+  // Primary Brand Colors - Deep Indigo & Violet
+  static const Color primary = Color(0xFF6366F1); // Indigo 500
+  static const Color primaryLight = Color(0xFFA5B4FC); // Indigo 200
+  static const Color primaryDark = Color(0xFF4338CA); // Indigo 700
 
-  // Secondary Colors
-  static const Color secondary = Color(0xFF8B5CF6);
-  static const Color secondaryLight = Color(0xFFA78BFA);
-  static const Color secondaryDark = Color(0xFF7C3AED);
+  // Secondary Brand Colors - Electric Purple
+  static const Color secondary = Color(0xFF8B5CF6); // Violet 500
+  static const Color secondaryLight = Color(0xFFDDD6FE); // Violet 200
+  static const Color secondaryDark = Color(0xFF6D28D9); // Violet 700
 
-  // Accent Colors
-  static const Color accent = Color(0xFF06B6D4);
-  static const Color accentLight = Color(0xFF22D3EE);
-  static const Color accentDark = Color(0xFF0891B2);
+  // Accent Colors - Cyan & Teal
+  static const Color accent = Color(0xFF06B6D4); // Cyan 500
+  static const Color accentLight = Color(0xFF67E8F9); // Cyan 200
+  static const Color accentDark = Color(0xFF0E7490); // Cyan 700
 
-  // Status Colors
-  static const Color success = Color(0xFF10B981);
-  static const Color successLight = Color(0xFF34D399);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color warningLight = Color(0xFFFBBF24);
-  static const Color error = Color(0xFFEF4444);
-  static const Color errorLight = Color(0xFFF87171);
-  static const Color info = Color(0xFF3B82F6);
-  static const Color infoLight = Color(0xFF60A5FA);
+  // Functional Colors
+  static const Color success = Color(0xFF10B981); // Emerald 500
+  static const Color warning = Color(0xFFF59E0B); // Amber 500
+  static const Color error = Color(0xFFEF4444); // Red 500
+  static const Color info = Color(0xFF3B82F6); // Blue 500
 
-  // Dark Theme Colors
-  static const Color darkBg = Color(0xFF0F172A);
-  static const Color darkSurface = Color(0xFF1E293B);
-  static const Color darkCard = Color(0xFF334155);
-  static const Color darkBorder = Color(0xFF475569);
-  static const Color darkText = Color(0xFFF8FAFC);
-  static const Color darkTextSecondary = Color(0xFF94A3B8);
+  // Dark Theme Base (Slate)
+  static const Color darkBg = Color(0xFF0F172A); // Slate 900
+  static const Color darkSurface = Color(0xFF1E293B); // Slate 800
+  static const Color darkCard = Color(0xFF334155); // Slate 700
+  static const Color darkBorder = Color(0xFF475569); // Slate 600
+  static const Color darkText = Color(0xFFF8FAFC); // Slate 50
+  static const Color darkTextSecondary = Color(0xFF94A3B8); // Slate 400
 
-  // Light Theme Colors
-  static const Color lightBg = Color(0xFFF8FAFC);
-  static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightCard = Color(0xFFFFFFFF);
-  static const Color lightBorder = Color(0xFFE2E8F0);
-  static const Color lightText = Color(0xFF0F172A);
-  static const Color lightTextSecondary = Color(0xFF64748B);
+  // Light Theme Base (Cool Gray)
+  static const Color lightBg = Color(0xFFF8FAFC); // Slate 50
+  static const Color lightSurface = Color(0xFFFFFFFF); // White
+  static const Color lightCard = Color(0xFFFFFFFF); // White
+  static const Color lightBorder = Color(0xFFE2E8F0); // Slate 200
+  static const Color lightText = Color(0xFF0F172A); // Slate 900
+  static const Color lightTextSecondary = Color(0xFF64748B); // Slate 500
 
-  // Gradient Presets
-  static const List<Color> primaryGradient = [primary, secondary];
+  // Modern Gradients
+  static const List<Color> primaryGradient = [
+    Color(0xFF6366F1), // Indigo 500
+    Color(0xFF8B5CF6), // Violet 500
+  ];
+
   static const List<Color> successGradient = [
-    Color(0xFF10B981),
-    Color(0xFF059669)
+    Color(0xFF34D399), // Emerald 400
+    Color(0xFF10B981), // Emerald 500
   ];
+
   static const List<Color> warningGradient = [
-    Color(0xFFF59E0B),
-    Color(0xFFD97706)
+    Color(0xFFFBBF24), // Amber 400
+    Color(0xFFF59E0B), // Amber 500
   ];
+
   static const List<Color> errorGradient = [
-    Color(0xFFEF4444),
-    Color(0xFFDC2626)
+    Color(0xFFF87171), // Red 400
+    Color(0xFFEF4444), // Red 500
   ];
+
   static const List<Color> infoGradient = [
-    Color(0xFF3B82F6),
-    Color(0xFF2563EB)
+    Color(0xFF60A5FA), // Blue 400
+    Color(0xFF3B82F6), // Blue 500
   ];
+
   static const List<Color> purpleGradient = [
-    Color(0xFF8B5CF6),
-    Color(0xFF7C3AED)
+    Color(0xFFA78BFA), // Violet 400
+    Color(0xFF8B5CF6), // Violet 500
   ];
+
   static const List<Color> cyanGradient = [
+    Color(0xFF22D3EE),
     Color(0xFF06B6D4),
-    Color(0xFF0891B2)
   ];
+
   static const List<Color> pinkGradient = [
-    Color(0xFFEC4899),
-    Color(0xFFDB2777)
+    Color(0xFFF472B6), // Pink 400
+    Color(0xFFEC4899), // Pink 500
   ];
-  static const List<Color> orangeGradient = [
-    Color(0xFFF97316),
-    Color(0xFFEA580C)
-  ];
+
   static const List<Color> tealGradient = [
+    Color(0xFF2DD4BF),
     Color(0xFF14B8A6),
-    Color(0xFF0D9488)
+  ];
+
+  static const List<Color> orangeGradient = [
+    Color(0xFFFB923C),
+    Color(0xFFF97316),
+  ];
+
+  static const List<Color> glassDark = [
+    Color(0xCC1E293B), // Slate 800 with 80% opacity
+    Color(0xCC0F172A), // Slate 900 with 80% opacity
   ];
 }
 
-/// Professional App Theme Configuration
+/// Modern App Theme Configuration
 class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      fontFamily: 'Inter', // Assumed font, fallback to system default
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.darkBg,
+      canvasColor: AppColors.darkBg,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
@@ -100,22 +115,31 @@ class AppTheme {
         onSecondary: Colors.white,
         onSurface: AppColors.darkText,
         onError: Colors.white,
+        surfaceContainerHighest: AppColors.darkCard,
+        outline: AppColors.darkBorder,
       ),
       cardTheme: CardThemeData(
         color: AppColors.darkCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: AppColors.darkBorder, width: 1),
         ),
+        margin: EdgeInsets.zero,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.darkSurface,
+        backgroundColor: Colors.transparent, // Glass effect intended later
         foregroundColor: AppColors.darkText,
         elevation: 0,
         centerTitle: false,
+        scrolledUnderElevation: 0,
       ),
       dividerColor: AppColors.darkBorder,
+      dividerTheme: const DividerThemeData(
+        color: AppColors.darkBorder,
+        thickness: 1,
+        space: 1,
+      ),
       textTheme: _textTheme(AppColors.darkText, AppColors.darkTextSecondary),
       iconTheme: const IconThemeData(color: AppColors.darkTextSecondary),
       inputDecorationTheme: _inputDecorationTheme(true),
@@ -128,24 +152,33 @@ class AppTheme {
         backgroundColor: AppColors.darkSurface,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.darkTextSecondary,
+        type: BottomNavigationBarType.fixed,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16))),
       ),
       snackBarTheme: const SnackBarThemeData(
         backgroundColor: AppColors.darkCard,
         contentTextStyle: TextStyle(color: AppColors.darkText),
         behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12))),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.darkSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.darkSurface,
+        showDragHandle: true,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
     );
@@ -155,8 +188,10 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      fontFamily: 'Inter',
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.lightBg,
+      canvasColor: AppColors.lightBg,
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
@@ -166,22 +201,31 @@ class AppTheme {
         onSecondary: Colors.white,
         onSurface: AppColors.lightText,
         onError: Colors.white,
+        surfaceContainerHighest: AppColors.lightCard,
+        outline: AppColors.lightBorder,
       ),
       cardTheme: CardThemeData(
         color: AppColors.lightCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: AppColors.lightBorder, width: 1),
         ),
+        margin: EdgeInsets.zero,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.lightSurface,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.lightText,
         elevation: 0,
         centerTitle: false,
+        scrolledUnderElevation: 0,
       ),
       dividerColor: AppColors.lightBorder,
+      dividerTheme: const DividerThemeData(
+        color: AppColors.lightBorder,
+        thickness: 1,
+        space: 1,
+      ),
       textTheme: _textTheme(AppColors.lightText, AppColors.lightTextSecondary),
       iconTheme: const IconThemeData(color: AppColors.lightTextSecondary),
       inputDecorationTheme: _inputDecorationTheme(false),
@@ -194,24 +238,33 @@ class AppTheme {
         backgroundColor: AppColors.lightSurface,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.lightTextSecondary,
+        type: BottomNavigationBarType.fixed,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16))),
       ),
       snackBarTheme: const SnackBarThemeData(
         backgroundColor: AppColors.lightCard,
         contentTextStyle: TextStyle(color: AppColors.lightText),
         behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12))),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.lightSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.lightSurface,
+        showDragHandle: true,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
     );
@@ -221,9 +274,9 @@ class AppTheme {
     return TextTheme(
       displayLarge: TextStyle(
         fontSize: 32,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w800, // Extra Bold
         color: primary,
-        letterSpacing: -1,
+        letterSpacing: -1.0,
       ),
       displayMedium: TextStyle(
         fontSize: 28,
@@ -233,12 +286,13 @@ class AppTheme {
       ),
       displaySmall: TextStyle(
         fontSize: 24,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.bold,
         color: primary,
+        letterSpacing: 0,
       ),
       headlineLarge: TextStyle(
         fontSize: 22,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.bold,
         color: primary,
       ),
       headlineMedium: TextStyle(
@@ -253,7 +307,7 @@ class AppTheme {
       ),
       titleLarge: TextStyle(
         fontSize: 16,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700, // Bold
         color: primary,
       ),
       titleMedium: TextStyle(
@@ -269,21 +323,24 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
-        color: primary,
+        color: primary, // Good contrast for reading
+        height: 1.5,
       ),
       bodyMedium: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.normal,
-        color: secondary,
+        color: secondary, // Softer for secondary lists/descriptions
+        height: 1.5,
       ),
       bodySmall: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.normal,
         color: secondary,
+        height: 1.4,
       ),
       labelLarge: TextStyle(
         fontSize: 14,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         color: primary,
       ),
       labelMedium: TextStyle(
@@ -295,6 +352,7 @@ class AppTheme {
         fontSize: 10,
         fontWeight: FontWeight.w500,
         color: secondary,
+        letterSpacing: 0.5,
       ),
     );
   }
@@ -306,23 +364,30 @@ class AppTheme {
     return InputDecorationTheme(
       filled: true,
       fillColor: fillColor,
+      hoverColor: isDark
+          ? Colors.white.withOpacity(0.05)
+          : Colors.black.withOpacity(0.05),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide(color: borderColor),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide(color: borderColor),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: AppColors.primary, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: AppColors.error),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.error, width: 2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
     );
   }
 
@@ -332,12 +397,12 @@ class AppTheme {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
         textStyle: const TextStyle(
-          fontSize: 14,
+          fontSize: 15,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -350,13 +415,13 @@ class AppTheme {
     return OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primary,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         side: BorderSide(color: borderColor),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
         textStyle: const TextStyle(
-          fontSize: 14,
+          fontSize: 15,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -369,7 +434,7 @@ class AppTheme {
         foregroundColor: AppColors.primary,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
         textStyle: const TextStyle(
           fontSize: 14,
@@ -384,12 +449,12 @@ class AppTheme {
       backgroundColor: isDark ? AppColors.darkCard : AppColors.lightBg,
       labelStyle: TextStyle(
         color: isDark ? AppColors.darkText : AppColors.lightText,
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: FontWeight.w500,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         side: BorderSide(
           color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
@@ -402,6 +467,7 @@ class AppTheme {
       labelColor: AppColors.primary,
       unselectedLabelColor:
           isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+      indicatorSize: TabBarIndicatorSize.tab,
       indicatorColor: AppColors.primary,
       labelStyle: const TextStyle(
         fontSize: 14,
@@ -411,6 +477,7 @@ class AppTheme {
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
+      dividerColor: Colors.transparent, // Clean look
     );
   }
 }

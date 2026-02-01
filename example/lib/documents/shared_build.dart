@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
-import '../../main.dart' show geniusPdfConfig;
+import '../main.dart' show geniusPdfConfig;
 
 class NewTemplatesDemoBuild {
   final GeniusPdfDocumentBuilder builder;

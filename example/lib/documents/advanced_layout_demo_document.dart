@@ -3,12 +3,7 @@ import 'dart:ui';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide
-        PdfTextStyle,
-        PdfGridStyle,
-        PdfBorderStyle,
-        PdfGridColumn,
-        PdfGridRow;
+    hide PdfTextStyle, PdfGridStyle, PdfBorderStyle, PdfGridColumn, PdfGridRow;
 
 /// Demonstrates v2.8.0 advanced layout features in the document builder.
 ///
@@ -82,16 +77,19 @@ class AdvancedLayoutDemoBuilder extends GeniusPdfDocumentBuilder {
           titleAr: 'من',
           items: [
             GeniusPdfLabeledValue(
+              config: config,
               label: 'Company',
               labelAr: 'الشركة',
               value: 'Genius Systems LLC',
             ),
             GeniusPdfLabeledValue(
+              config: config,
               label: 'Address',
               labelAr: 'العنوان',
               value: 'Riyadh, Saudi Arabia',
             ),
             GeniusPdfLabeledValue(
+              config: config,
               label: 'VAT No.',
               labelAr: 'الرقم الضريبي',
               value: '310123456789003',
@@ -109,16 +107,19 @@ class AdvancedLayoutDemoBuilder extends GeniusPdfDocumentBuilder {
           titleAr: 'إلى',
           items: [
             GeniusPdfLabeledValue(
+              config: config,
               label: 'Customer',
               labelAr: 'العميل',
               value: 'ABC Trading Co.',
             ),
             GeniusPdfLabeledValue(
+              config: config,
               label: 'Address',
               labelAr: 'العنوان',
               value: 'Jeddah, Saudi Arabia',
             ),
             GeniusPdfLabeledValue(
+              config: config,
               label: 'VAT No.',
               labelAr: 'الرقم الضريبي',
               value: '310987654321003',
@@ -188,21 +189,25 @@ class AdvancedLayoutDemoBuilder extends GeniusPdfDocumentBuilder {
       titleAr: 'تفاصيل الدفع',
       items: [
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Payment Method',
           labelAr: 'طريقة الدفع',
           value: 'Bank Transfer',
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Bank Name',
           labelAr: 'اسم البنك',
           value: 'Al Rajhi Bank',
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'Account No.',
           labelAr: 'رقم الحساب',
           value: 'SA00 1234 5678 9012 3456',
         ),
         GeniusPdfLabeledValue(
+          config: config,
           label: 'IBAN',
           labelAr: 'آيبان',
           value: 'SA0012345678901234567890',
