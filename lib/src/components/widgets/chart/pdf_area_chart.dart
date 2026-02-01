@@ -1,12 +1,13 @@
+// ignore_for_file: deprecated_member_use, implementation_imports, unnecessary_import
+
 import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../core/pdf_config.dart';
-import '../../core/pdf_print_theme.dart';
-import '../models/chart_models.dart';
-import 'package:syncfusion_flutter_pdf/src/pdf/implementation/graphics/figures/base/text_layouter.dart';
+import '../../../core/pdf_config.dart';
+import '../../../core/pdf_print_theme.dart';
+import '../../models/chart_models.dart';
 
 /// مخطط المساحة للـ PDF
 /// Area chart component for PDF documents
@@ -114,7 +115,7 @@ class GeniusPdfAreaChart {
       );
     }
 
-    return PdfLayoutResultHelper.load(page, chartBounds);
+    return _createLayoutResult(page, chartBounds)!;
   }
 
   void _drawBackground(PdfGraphics graphics, Rect bounds) {
@@ -569,6 +570,18 @@ class GeniusPdfAreaChart {
 
   PdfColor _colorToPdfColor(Color color) {
     return PdfColor(color.red, color.green, color.blue);
+  }
+
+  /// Creates a PdfLayoutResult for the given bounds using PdfTextElement.
+  PdfLayoutResult? _createLayoutResult(PdfPage page, Rect bounds) {
+    final dummyElement = PdfTextElement(
+      text: ' ',
+      font: config.baseFont,
+    );
+    return dummyElement.draw(
+      page: page,
+      bounds: Rect.fromLTWH(bounds.left, bounds.bottom, 1, 1),
+    );
   }
 }
 

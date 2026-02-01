@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide
-        PdfTextStyle,
-        PdfGridStyle,
-        PdfBorderStyle,
-        PdfGridColumn,
-        PdfGridRow;
 
 /// Demonstrates v2.4.0 position tracking, auto page-break, and image alignment.
 ///

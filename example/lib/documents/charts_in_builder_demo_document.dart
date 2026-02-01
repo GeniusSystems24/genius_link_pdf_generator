@@ -2,13 +2,6 @@ import 'dart:ui';
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide
-        PdfTextStyle,
-        PdfGridStyle,
-        PdfBorderStyle,
-        PdfGridColumn,
-        PdfGridRow;
 
 /// Demonstrates v2.6.0 chart integration in the document builder.
 ///

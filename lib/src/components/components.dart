@@ -35,10 +35,10 @@ export 'widgets/pdf_report_header.dart';
 export 'widgets/pdf_summary.dart';
 
 // Charts
-export 'widgets/pdf_bar_chart.dart';
-export 'widgets/pdf_line_chart.dart';
-export 'widgets/pdf_pie_chart.dart';
-export 'widgets/pdf_area_chart.dart';
+export 'widgets/chart/pdf_bar_chart.dart';
+export 'widgets/chart/pdf_line_chart.dart';
+export 'widgets/chart/pdf_pie_chart.dart';
+export 'widgets/chart/pdf_area_chart.dart';
 
 // Barcodes & QR Codes
 export 'widgets/pdf_barcode.dart';

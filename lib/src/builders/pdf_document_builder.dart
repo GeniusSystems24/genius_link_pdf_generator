@@ -2,13 +2,13 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../components/widgets/pdf_area_chart.dart';
-import '../components/widgets/pdf_bar_chart.dart';
+import '../components/widgets/chart/pdf_area_chart.dart';
+import '../components/widgets/chart/pdf_bar_chart.dart';
 import '../components/widgets/pdf_barcode.dart';
 import '../components/widgets/pdf_data_grid.dart';
 import '../components/widgets/pdf_info_box.dart';
-import '../components/widgets/pdf_line_chart.dart';
-import '../components/widgets/pdf_pie_chart.dart';
+import '../components/widgets/chart/pdf_line_chart.dart';
+import '../components/widgets/chart/pdf_pie_chart.dart';
 import '../components/widgets/pdf_report_header.dart';
 import '../components/widgets/pdf_rich_text.dart';
 import '../components/widgets/pdf_summary.dart';
