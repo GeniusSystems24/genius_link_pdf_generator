@@ -4,6 +4,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../components/widgets/pdf_area_chart.dart';
 import '../components/widgets/pdf_bar_chart.dart';
+import '../components/widgets/pdf_barcode.dart';
 import '../components/widgets/pdf_data_grid.dart';
 import '../components/widgets/pdf_line_chart.dart';
 import '../components/widgets/pdf_pie_chart.dart';
@@ -985,6 +986,176 @@ abstract class GeniusPdfDocumentBuilder {
     );
 
     return result;
+  }
+
+  // ============================================================
+  // QR CODE & IMAGE ATTACHMENTS (v2.7.0)
+  // ============================================================
+
+  /// Draws a [GeniusPdfQRCodeGenerator] at the current Y position.
+  ///
+  /// The QR code is rendered at [currentY] + [spacing]. After drawing,
+  /// [currentY] advances to the bottom of the QR code area.
+  ///
+  /// The [size] parameter controls the QR code dimensions (default: 120px).
+  /// Use [alignment] to position the QR code horizontally.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final qr = GeniusPdfQRCodeGenerator.url(
+  ///   url: 'https://example.com',
+  ///   config: config,
+  /// );
+  /// addQRCode(qr, alignment: GeniusPdfImageAlignment.center, spacing: 10);
+  /// ```
+  Rect addQRCode(
+    GeniusPdfQRCodeGenerator qrCode, {
+    double size = 120,
+    GeniusPdfImageAlignment alignment = GeniusPdfImageAlignment.start,
+    double spacing = 0,
+  }) {
+    final drawY = _currentY + spacing;
+    _ensureSpace(size + spacing + 30); // +30 for caption
+
+    final x = _resolveAlignment(alignment, size);
+
+    GeniusPdfLogger.debug(
+      'Drawing QR code at Y=$drawY, X=$x (size=$size)',
+      tag: 'Builder',
+    );
+
+    final bounds = qrCode.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(x, drawY, size, size),
+    );
+
+    _currentY = bounds.bottom;
+    GeniusPdfLogger.debug(
+      'QR code drawn → Y=${_currentY.toStringAsFixed(1)}',
+      tag: 'Builder',
+    );
+
+    return bounds;
+  }
+
+  /// Draws an image as a labeled attachment at the current Y position.
+  ///
+  /// This renders a title label above the image, then the image itself.
+  /// The image is scaled to fit within the page width while preserving
+  /// the aspect ratio. After drawing, [currentY] advances past the image.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addImageAttachment(
+  ///   invoiceImage,
+  ///   title: 'Supplier Invoice',
+  ///   titleAr: 'فاتورة المورد',
+  ///   spacing: 15,
+  /// );
+  /// ```
+  void addImageAttachment(
+    GeniusPdfImage image, {
+    String? title,
+    String? titleAr,
+    double spacing = 10,
+    double maxWidth = double.infinity,
+    GeniusPdfImageAlignment alignment = GeniusPdfImageAlignment.center,
+  }) {
+    addSpace(spacing);
+
+    // Draw title if provided.
+    if (title != null || titleAr != null) {
+      final displayTitle = (isRTL && titleAr != null) ? titleAr : title;
+      if (displayTitle != null) {
+        addLine(displayTitle, font: config.boldFont, topMargin: 0);
+        addSpace(5);
+      }
+    }
+
+    // Scale image to fit available width.
+    final targetWidth = maxWidth == double.infinity
+        ? (image.width > pageWidth ? pageWidth : image.width)
+        : (maxWidth > pageWidth ? pageWidth : maxWidth);
+
+    final scaled = image.width > targetWidth
+        ? image.scaledToWidth(targetWidth)
+        : image;
+
+    addImage(scaled, alignment: alignment, spacing: 0);
+  }
+
+  /// Adds an image on a dedicated new page.
+  ///
+  /// Creates a new page, optionally draws a title, then renders the image
+  /// scaled to fit the full page content area. This is ideal for scanned
+  /// documents, supplier invoices, receipts, etc.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addImagePage(
+  ///   scannedInvoice,
+  ///   title: 'Attachment: Supplier Invoice',
+  ///   titleAr: 'مرفق: فاتورة المورد',
+  /// );
+  /// ```
+  void addImagePage(
+    GeniusPdfImage image, {
+    String? title,
+    String? titleAr,
+  }) {
+    newPage();
+
+    GeniusPdfLogger.debug(
+      'Adding image page (${image.width}x${image.height})',
+      tag: 'Builder',
+    );
+
+    // Draw title if provided.
+    if (title != null || titleAr != null) {
+      final displayTitle = (isRTL && titleAr != null) ? titleAr : title;
+      if (displayTitle != null) {
+        addLine(displayTitle, font: config.boldFont, topMargin: 5);
+        addSpace(10);
+      }
+    }
+
+    // Scale image to fit page content area.
+    final maxWidth = pageWidth;
+    final maxHeight = remainingHeight - 10;
+    final scaled = image.scaledToFit(maxWidth: maxWidth, maxHeight: maxHeight);
+
+    addImage(
+      scaled,
+      alignment: GeniusPdfImageAlignment.center,
+      spacing: 0,
+    );
+  }
+
+  /// Adds multiple images, each on its own page.
+  ///
+  /// Iterates through [images] and calls [addImagePage] for each one.
+  /// Optional [titles] and [titlesAr] lists provide per-image headings.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addAttachments(
+  ///   [receipt1, receipt2, receipt3],
+  ///   titles: ['Receipt #1', 'Receipt #2', 'Receipt #3'],
+  ///   titlesAr: ['إيصال #1', 'إيصال #2', 'إيصال #3'],
+  /// );
+  /// ```
+  void addAttachments(
+    List<GeniusPdfImage> images, {
+    List<String>? titles,
+    List<String>? titlesAr,
+  }) {
+    for (var i = 0; i < images.length; i++) {
+      addImagePage(
+        images[i],
+        title: titles != null && i < titles.length ? titles[i] : null,
+        titleAr: titlesAr != null && i < titlesAr.length ? titlesAr[i] : null,
+      );
+    }
   }
 
   // ============================================================

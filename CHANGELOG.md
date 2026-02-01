@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-02-01
+
+### Added
+
+#### GeniusPdfDocumentBuilder — QR Code & Image Attachments
+- **`addQRCode(GeniusPdfQRCodeGenerator)`** — Draw a QR code at the current Y position with configurable size and alignment (start/center/end)
+- **`addImageAttachment(GeniusPdfImage)`** — Draw a labeled image attachment inline with optional title, auto-scaling to page width
+- **`addImagePage(GeniusPdfImage)`** — Add an image on a dedicated new page, scaled to fit the full content area (ideal for scanned documents)
+- **`addAttachments(List<GeniusPdfImage>)`** — Batch-add multiple images, each on its own page, with optional per-image titles
+- **Example** — `QRAttachmentsDemoBuilder` in `example/lib/documents/` demonstrates QR codes (URL, WiFi, vCard) and image attachments
+
+---
+
 ## [2.6.0] - 2026-02-01
 
 ### Added

@@ -105,6 +105,10 @@ A comprehensive PDF generation and preview library for Flutter applications with
 📈 **Builder Line Chart** (v2.6.0) - `addLineChart()` draws line charts with auto Y-advancement
 🥧 **Builder Pie Chart** (v2.6.0) - `addPieChart()` draws pie charts at current position
 📉 **Builder Area Chart** (v2.6.0) - `addAreaChart()` draws area charts with auto page-break
+📱 **Builder QR Code** (v2.7.0) - `addQRCode()` draws QR codes with alignment at current position
+🖼️ **Image Attachment** (v2.7.0) - `addImageAttachment()` labeled inline image with auto-scaling
+📄 **Image Page** (v2.7.0) - `addImagePage()` full-page image attachment for scanned documents
+📎 **Batch Attachments** (v2.7.0) - `addAttachments()` batch-add multiple images each on its own page
 
 ---
 
