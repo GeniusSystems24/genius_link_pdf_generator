@@ -112,6 +112,7 @@ Future<Uint8List> buildSimpleDocumentBytes() async {
                           style: pw.TextStyle(
                               fontWeight: pw.FontWeight.bold, fontSize: 14)),
                       pw.SizedBox(height: 12),
+                      // ignore: deprecated_member_use
                       pw.Table.fromTextArray(
                         headerDecoration:
                             const pw.BoxDecoration(color: lightBg),

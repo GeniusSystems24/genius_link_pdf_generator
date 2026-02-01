@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:typed_data';
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors, PdfColor;
 
+// ignore: depend_on_referenced_packages
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfTextStyle, PdfGridStyle, PdfBorderStyle, PdfGridColumn, PdfGridRow;
 
@@ -151,11 +152,7 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
 
   // Draw Rich Text Section
   if (data.includeRichText) {
-    final richText = GeniusPdfRichTextBuilder(
-            config: data.config,
-            baseFont: regularFont,
-            boldFont: boldFont,
-            isRTL: isRtl)
+    final richText = GeniusPdfRichTextBuilder(config: data.config)
         .text('This is a ')
         .bold('custom report ')
         .text('generated using the ')
