@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_import, implementation_imports
+// ignore_for_file: unnecessary_import, implementation_imports, deprecated_member_use
 
 import 'dart:math' as math;
 import 'dart:ui';
@@ -220,9 +220,16 @@ class GeniusPdfPieChart {
     final labelFont = config.baseFont;
     final valueFont = config.baseFont;
 
+    // حساب الزاوية المتاحة بعد طرح المسافات بين الشرائح
+    final sliceSpacingRad = settings.sliceSpacing * math.pi / 180;
+    final totalSpacing = dataPoints.length > 1
+        ? sliceSpacingRad * dataPoints.length
+        : 0.0;
+    final availableSweep = 2 * math.pi - totalSpacing;
+
     for (int i = 0; i < dataPoints.length; i++) {
       final point = dataPoints[i];
-      final sweepAngle = (point.value / total) * 2 * math.pi;
+      final sweepAngle = (point.value / total) * availableSweep;
       final color = point.color ??
           colors?[i % (colors?.length ?? 1)] ??
           GeniusChartColors.getColor(i);
@@ -254,7 +261,7 @@ class GeniusPdfPieChart {
         );
       }
 
-      currentAngle += sweepAngle + (settings.sliceSpacing * math.pi / 180);
+      currentAngle += sweepAngle + sliceSpacingRad;
     }
 
     // رسم الدائرة الداخلية للمخطط المجوف
@@ -394,10 +401,9 @@ class GeniusPdfPieChart {
         center.dx + labelRadius * math.cos(midAngle),
         center.dy + labelRadius * math.sin(midAngle),
       );
-      alignment =
-          midAngle.abs() < math.pi / 2 || midAngle.abs() > 3 * math.pi / 2
-              ? PdfTextAlignment.left
-              : PdfTextAlignment.right;
+      alignment = math.cos(midAngle) >= 0
+          ? PdfTextAlignment.left
+          : PdfTextAlignment.right;
     }
 
     graphics.drawString(
@@ -502,7 +508,7 @@ class GeniusPdfPieChart {
   }
 
   PdfColor _colorToPdfColor(Color color) {
-    return PdfColor(color.red, color.green, color.blue);
+    return PdfColor(color.red, color.green, color.blue, color.alpha);
   }
 
   /// Creates a PdfLayoutResult for the given bounds using PdfTextElement.

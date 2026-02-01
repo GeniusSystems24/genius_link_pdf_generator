@@ -110,18 +110,7 @@ class GeniusPdfBarChart {
     // رسم الحدود
     if (style.showBorder) {
       graphics.drawRectangle(
-        pen: PdfPen(PdfColor.fromCMYK(
-          0,
-          0,
-          0,
-          (100 -
-                  ((style.borderColor.red +
-                              style.borderColor.green +
-                              style.borderColor.blue) /
-                          7.65)
-                      .round())
-              .toDouble(),
-        )),
+        pen: PdfPen(_colorToPdfColor(style.borderColor)),
         bounds: chartBounds,
       );
     }
@@ -197,6 +186,31 @@ class GeniusPdfBarChart {
     );
   }
 
+  /// حساب القيمة القصوى بحسب نوع المخطط
+  double _calculateMaxValue() {
+    if (settings.type == GeniusBarChartType.stacked) {
+      if (series.isEmpty) return 0;
+      final pointCount = series.first.dataPoints.length;
+      double maxStacked = 0;
+      for (int i = 0; i < pointCount; i++) {
+        double stackedValue = 0;
+        for (final s in series) {
+          if (i < s.dataPoints.length) {
+            stackedValue += s.dataPoints[i].value;
+          }
+        }
+        if (stackedValue > maxStacked) maxStacked = stackedValue;
+      }
+      return maxStacked;
+    } else {
+      double maxValue = 0;
+      for (final s in series) {
+        if (s.maxValue > maxValue) maxValue = s.maxValue;
+      }
+      return maxValue;
+    }
+  }
+
   void _drawAxes(PdfGraphics graphics, Rect plotArea) {
     final axisPen = PdfPen(_colorToPdfColor(style.axisColor), width: 1);
     final gridPen = PdfPen(_colorToPdfColor(xAxis.gridLineColor), width: 0.5);
@@ -204,11 +218,7 @@ class GeniusPdfBarChart {
     final font = config.baseFont;
 
     // حساب القيم القصوى
-    double maxValue = 0;
-    for (final s in series) {
-      final seriesMax = s.maxValue;
-      if (seriesMax > maxValue) maxValue = seriesMax;
-    }
+    double maxValue = _calculateMaxValue();
     maxValue = _roundUpToNice(maxValue);
 
     // رسم المحور الصادي
@@ -269,11 +279,7 @@ class GeniusPdfBarChart {
   void _drawBars(PdfGraphics graphics, Rect plotArea) {
     if (series.isEmpty) return;
 
-    double maxValue = 0;
-    for (final s in series) {
-      final seriesMax = s.maxValue;
-      if (seriesMax > maxValue) maxValue = seriesMax;
-    }
+    double maxValue = _calculateMaxValue();
     maxValue = _roundUpToNice(maxValue);
 
     final dataPoints = series.first.dataPoints;
@@ -364,19 +370,6 @@ class GeniusPdfBarChart {
   ) {
     final dataPoints = series.first.dataPoints;
 
-    // حساب المجموع الأقصى للأعمدة المكدسة
-    double maxStackedValue = 0;
-    for (int i = 0; i < dataPoints.length; i++) {
-      double stackedValue = 0;
-      for (final s in series) {
-        if (i < s.dataPoints.length) {
-          stackedValue += s.dataPoints[i].value;
-        }
-      }
-      if (stackedValue > maxStackedValue) maxStackedValue = stackedValue;
-    }
-    maxStackedValue = _roundUpToNice(maxStackedValue);
-
     for (int i = 0; i < dataPoints.length; i++) {
       final barX =
           startX + barTotalWidth * i + (barTotalWidth - settings.barWidth) / 2;
@@ -386,7 +379,7 @@ class GeniusPdfBarChart {
         if (i >= series[s].dataPoints.length) continue;
 
         final value = series[s].dataPoints[i].value;
-        final barHeight = (value / maxStackedValue) * plotArea.height;
+        final barHeight = (value / maxValue) * plotArea.height;
         currentY -= barHeight;
 
         final color = series[s].color;
@@ -531,7 +524,7 @@ class GeniusPdfBarChart {
   }
 
   PdfColor _colorToPdfColor(Color color) {
-    return PdfColor(color.red, color.green, color.blue);
+    return PdfColor(color.red, color.green, color.blue, color.alpha);
   }
 
   /// Creates a PdfLayoutResult for the given bounds using PdfTextElement.

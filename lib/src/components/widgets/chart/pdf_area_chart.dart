@@ -373,15 +373,12 @@ class GeniusPdfAreaChart {
 
     final path = PdfPath();
 
-    // بناء قائمة النقاط للمضلع
-    final polygonPoints = <Offset>[];
-
-    // البدء من أسفل اليسار
-    polygonPoints.add(Offset(points.first.dx, plotArea.bottom));
-
     // رسم الخط العلوي
     if (settings.lineType == GeniusLineChartType.curved && points.length > 2) {
-      polygonPoints.add(points.first);
+      // البدء من أسفل اليسار ثم الصعود لأول نقطة
+      path.startFigure();
+      path.addLine(Offset(points.first.dx, plotArea.bottom), points.first);
+
       for (int i = 0; i < points.length - 1; i++) {
         final p0 = i > 0 ? points[i - 1] : points[i];
         final p1 = points[i];
@@ -403,6 +400,10 @@ class GeniusPdfAreaChart {
       path.addLine(points.last, Offset(points.last.dx, plotArea.bottom));
       path.closeFigure();
     } else {
+      // بناء قائمة النقاط للمضلع
+      final polygonPoints = <Offset>[];
+      // البدء من أسفل اليسار
+      polygonPoints.add(Offset(points.first.dx, plotArea.bottom));
       // إضافة جميع النقاط
       polygonPoints.addAll(points);
       // الإغلاق من أسفل اليمين
@@ -436,13 +437,10 @@ class GeniusPdfAreaChart {
     // بناء قائمة النقاط للمضلع
     final polygonPoints = <Offset>[];
 
-    // البدء من أول نقطة سابقة
-    polygonPoints.add(previousPoints.first);
-
-    // رسم الخط العلوي
+    // رسم الخط العلوي (المنحنى الحالي)
     polygonPoints.addAll(currentPoints);
 
-    // رسم الخط السفلي (عكسي)
+    // رسم الخط السفلي عكسياً (المنحنى السابق)
     for (int i = previousPoints.length - 1; i >= 0; i--) {
       polygonPoints.add(previousPoints[i]);
     }
@@ -569,7 +567,7 @@ class GeniusPdfAreaChart {
   }
 
   PdfColor _colorToPdfColor(Color color) {
-    return PdfColor(color.red, color.green, color.blue);
+    return PdfColor(color.red, color.green, color.blue, color.alpha);
   }
 
   /// Creates a PdfLayoutResult for the given bounds using PdfTextElement.

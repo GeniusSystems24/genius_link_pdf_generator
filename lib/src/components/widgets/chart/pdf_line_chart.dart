@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_import, implementation_imports
+// ignore_for_file: unnecessary_import, implementation_imports, deprecated_member_use
 
 import 'dart:math' as math;
 import 'dart:ui';
@@ -479,7 +479,7 @@ class GeniusPdfLineChart {
   }
 
   PdfColor _colorToPdfColor(Color color) {
-    return PdfColor(color.red, color.green, color.blue);
+    return PdfColor(color.red, color.green, color.blue, color.alpha);
   }
 
   /// Creates a PdfLayoutResult for the given bounds using PdfTextElement.
