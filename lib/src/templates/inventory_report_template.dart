@@ -155,16 +155,12 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
 
   @override
   void build() {
-    // Add repeating footer with QR code and user info on all pages
-    if (showQRCode || printedBy != null) {
-      final qrUrl =
-          reportId != null ? 'https://localhost:443/report/$reportId' : null;
+    // Add repeating footer with user info on all pages
+    if (printedBy != null || showQRCode) {
       addFooter(
         userName: printedBy,
         printTime: _formatDate(DateTime.now()),
         showPageNumber: true,
-        qrCodeUrl: qrUrl,
-        qrCodeSize: 55,
       );
     }
 
@@ -185,6 +181,11 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
     // Notes section
     if (showNotes) {
       _drawNotes();
+    }
+
+    // QR Code section
+    if (showQRCode && reportId != null) {
+      _drawQRCodeSection();
     }
 
     // Signatures section (without QR code since it's in footer)
@@ -532,5 +533,34 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
         );
+  }
+
+  void _drawQRCodeSection() {
+    // Ensure we have enough space or start new page
+    if (currentY > pageHeight - 150) {
+      newPage();
+    }
+
+    addSectionDivider(
+      title: config.isLTR ? 'Report Verification' : 'التحقق من التقرير',
+      spacing: 10,
+    );
+
+    final qrUrl = 'https://localhost:443/report/$reportId';
+
+    final urlQR = GeniusPdfQRCodeGenerator.url(
+      url: qrUrl,
+      config: config,
+      caption: 'ID: $reportId',
+    );
+
+    addQRCode(
+      urlQR,
+      alignment: GeniusPdfImageAlignment.start,
+      spacing: 10,
+      size: 100,
+    );
+
+    addSpace(20);
   }
 }

@@ -1,4 +1,3 @@
-
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
@@ -110,7 +109,9 @@ class QRAttachmentsDemoBuilder extends GeniusPdfDocumentBuilder {
 
     // vCard QR Code — end aligned
     addLine(
-      isRTL ? 'رمز QR لبطاقة جهة اتصال (نهاية):' : 'vCard QR Code (end-aligned):',
+      isRTL
+          ? 'رمز QR لبطاقة جهة اتصال (نهاية):'
+          : 'vCard QR Code (end-aligned):',
       topMargin: 5,
     );
     addSpace(5);

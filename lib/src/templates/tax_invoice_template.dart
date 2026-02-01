@@ -159,7 +159,12 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     // VAT breakdown
     _drawVatBreakdown();
 
-    // QR Code and Signature
+    // QR Code section
+    if (showQRCode) {
+      _drawQRCodeSection();
+    }
+
+    // Signature
     _drawFooterSection();
   }
 
@@ -440,25 +445,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
         ),
       );
     }
-
-    // QR Code on the right
-    if (showQRCode && qrCode != null) {
-      final qr = GeniusPdfQRCode(
-        config: config,
-        image: qrCode!,
-        size: 70,
-      );
-
-      qr.draw(
-        page: currentPage,
-        bounds: Rect.fromLTWH(
-          config.isRTL ? 0 : pageWidth - 80,
-          bottomY,
-          80,
-          90,
-        ),
-      );
-    }
   }
 
   String _formatDate(DateTime date) {
@@ -704,5 +690,34 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     }
 
     return convert(number);
+  }
+
+  void _drawQRCodeSection() {
+    // Ensure we have enough space or start new page
+    if (currentY > pageHeight - 150) {
+      newPage();
+    }
+
+    addSectionDivider(
+      title: config.isLTR ? 'Invoice Verification' : 'التحقق من الفاتورة',
+      spacing: 10,
+    );
+
+    final qrUrl = 'https://localhost:443/invoice/${invoice.invoiceNumber}';
+
+    final urlQR = GeniusPdfQRCodeGenerator.url(
+      url: qrUrl,
+      config: config,
+      caption: 'ID: ${invoice.invoiceNumber}',
+    );
+
+    addQRCode(
+      urlQR,
+      alignment: GeniusPdfImageAlignment.start,
+      spacing: 10,
+      size: 100,
+    );
+
+    addSpace(20);
   }
 }

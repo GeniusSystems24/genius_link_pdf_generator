@@ -28,6 +28,10 @@ TrialBalanceTemplate buildTrialBalanceTemplate({required bool isRtl}) {
     config: config,
     company: SampleData.companyInfo,
     data: SampleData.trialBalanceData,
+    reportId: "123456789",
+    printedBy: config.isRTL ? "أنور السياري" : "Anwar Al-saiary",
+    showSignatures: true,
+    showQRCode: true,
   );
 }
 
@@ -49,5 +53,9 @@ InventoryReportTemplate buildInventoryReportTemplate({required bool isRtl}) {
     config: config,
     company: SampleData.companyInfo,
     data: SampleData.inventoryData,
+    printedBy: config.isRTL ? "أنور السياري" : "Anwar Al-saiary",
+    reportId: "123456789",
+    showSignatures: true,
+    showQRCode: true,
   );
 }
