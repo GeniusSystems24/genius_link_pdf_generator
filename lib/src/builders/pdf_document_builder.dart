@@ -503,7 +503,7 @@ abstract class GeniusPdfDocumentBuilder {
     if (userName != null) {
       final label = userLabel ?? (isRTL ? 'المستخدم : ' : 'User: ');
       final userText = '$label$userName';
-      final userX = isRTL ? availableWidth - 10 : 5;
+      final userX = isRTL ? availableWidth - 10 : 5.0;
 
       PdfTextElement(
         text: userText,
