@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../components/widgets/pdf_data_grid.dart';
+import '../components/widgets/pdf_summary.dart';
 import '../core/pdf_config.dart';
 import '../core/pdf_logger.dart';
 import '../models/pdf_image.dart';
@@ -657,6 +659,233 @@ abstract class GeniusPdfDocumentBuilder {
         return (pageWidth - width) / 2;
       case GeniusPdfImageAlignment.end:
         return isRTL ? 0 : (pageWidth - width);
+    }
+  }
+
+  // ============================================================
+  // GRID & SUMMARY METHODS (v2.5.0)
+  // ============================================================
+
+  /// Draws a [GeniusPdfDataGrid] at the current Y position.
+  ///
+  /// The grid is rendered starting at [currentY] + [spacing]. After drawing,
+  /// [currentY] advances to the bottom of the grid. The grid uses Syncfusion's
+  /// built-in pagination — if the grid overflows the page, continuation pages
+  /// are created by the grid itself.
+  ///
+  /// Returns the [PdfLayoutResult] from the grid draw operation (or `null`
+  /// if no rows were drawn).
+  ///
+  /// ## Example
+  /// ```dart
+  /// final grid = GeniusPdfDataGrid(
+  ///   config: config,
+  ///   columns: myColumns,
+  ///   rows: myRows,
+  /// );
+  /// addGrid(grid, spacing: 10);
+  /// ```
+  PdfLayoutResult? addGrid(
+    GeniusPdfDataGrid grid, {
+    double spacing = 0,
+  }) {
+    final page = currentPage;
+    final drawY = _currentY + spacing;
+
+    GeniusPdfLogger.debug(
+      'Drawing grid at Y=$drawY (${grid.columns.length} cols, ${grid.rows.length} rows)',
+      tag: 'Builder',
+    );
+
+    final result = grid.drawAt(
+      page: page,
+      x: 0,
+      y: drawY,
+      width: pageWidth,
+    );
+
+    if (result != null) {
+      _currentY = result.bounds.bottom;
+      GeniusPdfLogger.debug(
+        'Grid drawn → Y=${_currentY.toStringAsFixed(1)}',
+        tag: 'Builder',
+      );
+    }
+
+    return result;
+  }
+
+  /// Draws a [GeniusPdfSummarySection] at the current Y position.
+  ///
+  /// The summary is rendered starting at [currentY] + [spacing]. After drawing,
+  /// [currentY] advances to the bottom of the summary box.
+  ///
+  /// Returns the bounding [Rect] of the drawn summary.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final summary = GeniusPdfSummarySection(
+  ///   config: config,
+  ///   items: [
+  ///     GeniusPdfSummaryItem.subtotal(label: 'Subtotal', labelAr: 'المجموع', value: '1,000'),
+  ///     GeniusPdfSummaryItem.total(label: 'Total', labelAr: 'الإجمالي', value: '1,150'),
+  ///   ],
+  /// );
+  /// addSummary(summary, spacing: 10);
+  /// ```
+  Rect addSummary(
+    GeniusPdfSummarySection summary, {
+    double spacing = 0,
+  }) {
+    final page = currentPage;
+    final drawY = _currentY + spacing;
+
+    GeniusPdfLogger.debug(
+      'Drawing summary at Y=$drawY (${summary.items.length} items)',
+      tag: 'Builder',
+    );
+
+    final bounds = summary.draw(
+      page: page,
+      bounds: Rect.fromLTWH(0, drawY, pageWidth, remainingHeight),
+    );
+
+    _currentY = bounds.bottom;
+    GeniusPdfLogger.debug(
+      'Summary drawn → Y=${_currentY.toStringAsFixed(1)}',
+      tag: 'Builder',
+    );
+
+    return bounds;
+  }
+
+  /// Draws a grid followed by its summary section.
+  ///
+  /// This is a convenience method that combines [addGrid] and [addSummary].
+  /// The grid is drawn first, then the summary is drawn below it with
+  /// [summarySpacing] pixels of gap between them.
+  ///
+  /// Returns a record containing both results.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addGridWithSummary(
+  ///   grid: myGrid,
+  ///   summary: mySummary,
+  ///   gridSpacing: 10,
+  ///   summarySpacing: 15,
+  /// );
+  /// ```
+  ({PdfLayoutResult? gridResult, Rect summaryBounds}) addGridWithSummary({
+    required GeniusPdfDataGrid grid,
+    required GeniusPdfSummarySection summary,
+    double gridSpacing = 0,
+    double summarySpacing = 10,
+  }) {
+    final gridResult = addGrid(grid, spacing: gridSpacing);
+    final summaryBounds = addSummary(summary, spacing: summarySpacing);
+    return (gridResult: gridResult, summaryBounds: summaryBounds);
+  }
+
+  /// Draws an overall report summary that aggregates data from multiple grids.
+  ///
+  /// Use this to add a final summary at the end of a report that totals up
+  /// values from all previous grids. An optional [title] is drawn as a bold
+  /// heading above the summary.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addReportSummary(
+  ///   summary: GeniusPdfSummarySection(
+  ///     config: config,
+  ///     items: [
+  ///       GeniusPdfSummaryItem.subtotal(label: 'Total Sales', labelAr: 'إجمالي المبيعات', value: '50,000'),
+  ///       GeniusPdfSummaryItem.total(label: 'Grand Total', labelAr: 'الإجمالي الكلي', value: '57,500'),
+  ///     ],
+  ///   ),
+  ///   title: 'Report Summary',
+  ///   titleAr: 'ملخص التقرير',
+  ///   spacing: 20,
+  /// );
+  /// ```
+  Rect addReportSummary({
+    required GeniusPdfSummarySection summary,
+    String? title,
+    String? titleAr,
+    double spacing = 15,
+  }) {
+    addSpace(spacing);
+
+    // Draw title if provided.
+    if (title != null || titleAr != null) {
+      final displayTitle = (isRTL && titleAr != null) ? titleAr : title;
+      if (displayTitle != null) {
+        addSectionDivider(title: displayTitle, spacing: 0);
+        addSpace(10);
+      }
+    }
+
+    return addSummary(summary, spacing: 0);
+  }
+
+  /// Draws a section divider — a horizontal line with an optional centered title.
+  ///
+  /// Useful for separating report sections visually. If [title] is provided,
+  /// the text is centered on the divider line with a small gap.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addSectionDivider(title: 'Sales Section', spacing: 15);
+  /// ```
+  void addSectionDivider({
+    String? title,
+    double spacing = 10,
+    PdfPen? pen,
+    PdfFont? font,
+    PdfBrush? brush,
+  }) {
+    final dividerPen = pen ?? PdfPen(PdfColor(180, 180, 180));
+    final dividerFont = font ?? baseFont;
+    final dividerBrush = brush ?? PdfSolidBrush(PdfColor(120, 120, 120));
+
+    _advanceY(spacing);
+
+    if (title != null) {
+      // Draw a line-title-line pattern.
+      final page = currentPage;
+      final textSize = dividerFont.measureString(title);
+      final gapWidth = 10.0;
+      final textX = (pageWidth - textSize.width) / 2;
+      final lineY = _currentY + textSize.height / 2;
+
+      // Left line.
+      page.graphics.drawLine(
+        dividerPen,
+        Offset(0, lineY),
+        Offset(textX - gapWidth, lineY),
+      );
+
+      // Title text.
+      page.graphics.drawString(
+        title,
+        dividerFont,
+        brush: dividerBrush,
+        bounds: Rect.fromLTWH(textX, _currentY, textSize.width, 0),
+        format: PdfStringFormat(alignment: PdfTextAlignment.center),
+      );
+
+      // Right line.
+      page.graphics.drawLine(
+        dividerPen,
+        Offset(textX + textSize.width + gapWidth, lineY),
+        Offset(pageWidth, lineY),
+      );
+
+      _advanceY(textSize.height + spacing);
+    } else {
+      // Simple horizontal line.
+      addHorizontalLine(pen: dividerPen, spacing: 0);
+      _advanceY(spacing);
     }
   }
 

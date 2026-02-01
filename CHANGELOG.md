@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-02-01
+
+### Added
+
+#### GeniusPdfDocumentBuilder — Grid & Summary Integration
+- **`addGrid(GeniusPdfDataGrid)`** — Draw a data grid at the current Y position with automatic position advancement; supports Syncfusion's built-in pagination for multi-page grids
+- **`addSummary(GeniusPdfSummarySection)`** — Draw a summary section at the current Y position with automatic position advancement
+- **`addGridWithSummary()`** — Convenience method that draws a grid followed by its summary section in a single call; returns both results as a record
+- **`addReportSummary()`** — Overall report summary with optional title/titleAr heading; useful for aggregating totals from multiple grids
+- **`addSectionDivider()`** — Visual divider with optional centered title text; draws a line-title-line pattern or a plain horizontal line
+- **Example** — `MultiGridSummaryDemoBuilder` in `example/lib/documents/` demonstrates multiple grids, per-grid summaries, section dividers, and an overall report summary
+
+---
+
 ## [2.4.0] - 2026-02-01
 
 ### Added

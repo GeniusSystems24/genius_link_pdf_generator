@@ -96,6 +96,11 @@ A comprehensive PDF generation and preview library for Flutter applications with
 🖼️ **Image Alignment** (v2.4.0) - Direction-aware image alignment (start/center/end) with position advancement
 📏 **Builder Utilities** (v2.4.0) - `remainingHeight`, `canFit()`, `contentBounds`, `resetY()`, `pageCount`
 🔧 **Enhanced Footer** (v2.4.0) - Configurable `userLabel`, `pageNumberFormat`, dynamic positioning
+📊 **Grid Integration** (v2.5.0) - `addGrid()` draws data grids at current position with auto Y-advancement
+📋 **Summary Integration** (v2.5.0) - `addSummary()` draws summary sections with auto Y-advancement
+🔗 **Grid+Summary Combo** (v2.5.0) - `addGridWithSummary()` combines grid and summary in one call
+📈 **Report Summary** (v2.5.0) - `addReportSummary()` for overall report totals aggregating multiple grids
+➖ **Section Divider** (v2.5.0) - `addSectionDivider()` visual divider with optional centered title
 
 ---
 
@@ -279,6 +284,56 @@ class MyReport extends GeniusPdfDocumentBuilder {
 | `pageCount` | Total pages created so far |
 | `resetY([y])` | Reset position (e.g., after absolute drawing) |
 | `isRTL` / `isLTR` | Text direction convenience getters |
+
+### Grid & Summary Integration (v2.5.0)
+
+The builder now provides methods to draw data grids and summaries directly, with automatic position tracking. You can also combine multiple grids with per-grid summaries and an overall report summary.
+
+```dart
+class SalesReport extends GeniusPdfDocumentBuilder {
+  SalesReport({required GeniusPdfConfig config}) : super(config);
+
+  @override
+  void build() {
+    addHeader(title: 'Sales Report');
+
+    // Section divider with centered title
+    addSectionDivider(title: 'Q1 Sales', spacing: 10);
+
+    // Draw grid + summary in one call
+    addGridWithSummary(
+      grid: salesGrid,
+      summary: salesSummary,
+      gridSpacing: 5,
+      summarySpacing: 10,
+    );
+
+    // Another section
+    addSectionDivider(title: 'Q2 Sales', spacing: 15);
+    addGrid(q2Grid, spacing: 5);
+    addSummary(q2Summary, spacing: 10);
+
+    // Overall report summary
+    addReportSummary(
+      summary: overallSummary,
+      title: 'Annual Summary',
+      titleAr: 'الملخص السنوي',
+      spacing: 20,
+    );
+
+    addFooter(showPageNumber: true);
+  }
+}
+```
+
+**Grid & Summary APIs:**
+| API | Description |
+|-----|-------------|
+| `addGrid(grid, {spacing})` | Draw data grid at current position |
+| `addSummary(summary, {spacing})` | Draw summary section at current position |
+| `addGridWithSummary(grid, summary)` | Combined grid + summary in one call |
+| `addReportSummary(summary, {title})` | Overall report summary with heading |
+| `addSectionDivider({title, spacing})` | Visual divider with optional title |
 
 ### 3. Generate and Display
 
