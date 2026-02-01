@@ -101,6 +101,10 @@ A comprehensive PDF generation and preview library for Flutter applications with
 🔗 **Grid+Summary Combo** (v2.5.0) - `addGridWithSummary()` combines grid and summary in one call
 📈 **Report Summary** (v2.5.0) - `addReportSummary()` for overall report totals aggregating multiple grids
 ➖ **Section Divider** (v2.5.0) - `addSectionDivider()` visual divider with optional centered title
+📊 **Builder Bar Chart** (v2.6.0) - `addBarChart()` draws bar charts at current position with auto page-break
+📈 **Builder Line Chart** (v2.6.0) - `addLineChart()` draws line charts with auto Y-advancement
+🥧 **Builder Pie Chart** (v2.6.0) - `addPieChart()` draws pie charts at current position
+📉 **Builder Area Chart** (v2.6.0) - `addAreaChart()` draws area charts with auto page-break
 
 ---
 

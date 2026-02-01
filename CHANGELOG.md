@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-02-01
+
+### Added
+
+#### GeniusPdfDocumentBuilder — Charts Integration
+- **`addBarChart(GeniusPdfBarChart)`** — Draw a bar chart at the current Y position with auto page-break and position advancement
+- **`addLineChart(GeniusPdfLineChart)`** — Draw a line chart at the current Y position
+- **`addPieChart(GeniusPdfPieChart)`** — Draw a pie chart at the current Y position
+- **`addAreaChart(GeniusPdfAreaChart)`** — Draw an area chart at the current Y position
+- **`_addChart()` internal helper** — Unified chart drawing with auto page-break, spacing, and logging
+- **Example** — `ChartsInBuilderDemoBuilder` in `example/lib/documents/` demonstrates all four chart types with section dividers
+
+---
+
 ## [2.5.0] - 2026-02-01
 
 ### Added

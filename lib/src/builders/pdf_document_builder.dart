@@ -2,7 +2,11 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../components/widgets/pdf_area_chart.dart';
+import '../components/widgets/pdf_bar_chart.dart';
 import '../components/widgets/pdf_data_grid.dart';
+import '../components/widgets/pdf_line_chart.dart';
+import '../components/widgets/pdf_pie_chart.dart';
 import '../components/widgets/pdf_summary.dart';
 import '../core/pdf_config.dart';
 import '../core/pdf_logger.dart';
@@ -887,6 +891,100 @@ abstract class GeniusPdfDocumentBuilder {
       addHorizontalLine(pen: dividerPen, spacing: 0);
       _advanceY(spacing);
     }
+  }
+
+  // ============================================================
+  // CHART METHODS (v2.6.0)
+  // ============================================================
+
+  /// Draws a [GeniusPdfBarChart] at the current Y position.
+  ///
+  /// The chart is drawn at [currentY] + [spacing] with the specified [height].
+  /// After drawing, [currentY] advances to the bottom of the chart.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addBarChart(myBarChart, spacing: 10, height: 200);
+  /// ```
+  PdfLayoutResult addBarChart(
+    GeniusPdfBarChart chart, {
+    double spacing = 0,
+    double height = 250,
+  }) {
+    return _addChart(chart.draw, spacing: spacing, height: height, tag: 'BarChart');
+  }
+
+  /// Draws a [GeniusPdfLineChart] at the current Y position.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addLineChart(myLineChart, spacing: 10, height: 200);
+  /// ```
+  PdfLayoutResult addLineChart(
+    GeniusPdfLineChart chart, {
+    double spacing = 0,
+    double height = 250,
+  }) {
+    return _addChart(chart.draw, spacing: spacing, height: height, tag: 'LineChart');
+  }
+
+  /// Draws a [GeniusPdfPieChart] at the current Y position.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addPieChart(myPieChart, spacing: 10, height: 200);
+  /// ```
+  PdfLayoutResult addPieChart(
+    GeniusPdfPieChart chart, {
+    double spacing = 0,
+    double height = 250,
+  }) {
+    return _addChart(chart.draw, spacing: spacing, height: height, tag: 'PieChart');
+  }
+
+  /// Draws a [GeniusPdfAreaChart] at the current Y position.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addAreaChart(myAreaChart, spacing: 10, height: 200);
+  /// ```
+  PdfLayoutResult addAreaChart(
+    GeniusPdfAreaChart chart, {
+    double spacing = 0,
+    double height = 250,
+  }) {
+    return _addChart(chart.draw, spacing: spacing, height: height, tag: 'AreaChart');
+  }
+
+  /// Internal helper that draws any chart using its draw function.
+  PdfLayoutResult _addChart(
+    PdfLayoutResult Function(PdfPage, Rect) drawFn, {
+    required double spacing,
+    required double height,
+    required String tag,
+  }) {
+    final drawY = _currentY + spacing;
+    final totalNeeded = height + spacing;
+
+    // Auto page-break if chart doesn't fit.
+    final page = _ensureSpace(totalNeeded);
+    final actualY = page == currentPage ? drawY : _currentY;
+
+    GeniusPdfLogger.debug(
+      'Drawing $tag at Y=${actualY.toStringAsFixed(1)} (height=$height)',
+      tag: 'Builder',
+    );
+
+    final bounds = Rect.fromLTWH(0, actualY, pageWidth, height);
+    final result = drawFn(page, bounds);
+
+    _currentY = result.bounds.bottom;
+    GeniusPdfLogger.debug(
+      '$tag drawn → Y=${_currentY.toStringAsFixed(1)}',
+      tag: 'Builder',
+    );
+
+    return result;
   }
 
   // ============================================================
