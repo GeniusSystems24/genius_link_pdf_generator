@@ -1423,3 +1423,418 @@ abstract class GeniusPdfDocumentBuilder {
     _document.dispose();
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GeniusPdfReportComposer (v2.9.0)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// A fluent API for composing PDF reports without subclassing.
+///
+/// [GeniusPdfReportComposer] provides a chainable interface for building
+/// PDF documents. Instead of creating a subclass of [GeniusPdfDocumentBuilder]
+/// and overriding [build], you compose the report by chaining method calls.
+///
+/// ## Example
+/// ```dart
+/// final composer = GeniusPdfReportComposer(config: myConfig);
+/// final bytes = composer
+///     .withHeader(title: 'Sales Report', titleAr: 'تقرير المبيعات')
+///     .withFooter(userName: 'Admin', showPageNumber: true)
+///     .section('Overview', sectionAr: 'نظرة عامة')
+///     .text('This report covers Q1 2026 sales data.')
+///     .space(10)
+///     .grid(salesGrid)
+///     .summary(salesSummary)
+///     .section('Charts', sectionAr: 'المخططات')
+///     .barChart(barChart)
+///     .page()
+///     .section('Attachments')
+///     .qrCode(qr)
+///     .build();
+/// composer.dispose();
+/// ```
+class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
+  /// Creates a new [GeniusPdfReportComposer].
+  GeniusPdfReportComposer({required GeniusPdfConfig config}) : super(config);
+
+  /// Build actions queued by the fluent API.
+  final List<void Function()> _actions = [];
+
+  // Footer settings (deferred to end of build).
+  String? _footerUserName;
+  String? _footerUserLabel;
+  String? _footerPrintTime;
+  bool _footerShowPageNumber = false;
+  PdfFont? _footerFont;
+  String _footerPageNumberFormat = '{0}/{1}';
+  bool _hasFooter = false;
+
+  @override
+  void build() {
+    for (final action in _actions) {
+      action();
+    }
+    if (_hasFooter) {
+      addFooter(
+        userName: _footerUserName,
+        userLabel: _footerUserLabel,
+        printTime: _footerPrintTime,
+        showPageNumber: _footerShowPageNumber,
+        font: _footerFont,
+        pageNumberFormat: _footerPageNumberFormat,
+      );
+    }
+  }
+
+  /// Generates the PDF bytes from all queued actions.
+  ///
+  /// This is a convenience method that calls [generate] on the parent.
+  /// Returns the PDF bytes ready for saving or sharing.
+  List<int> buildPdf() => generate();
+
+  // ────────────────────────────────────────────────────────
+  // Header & Footer
+  // ────────────────────────────────────────────────────────
+
+  /// Configures a header for all pages.
+  GeniusPdfReportComposer withHeader({
+    GeniusPdfImage? image,
+    String? title,
+    PdfFont? font,
+    Color? backgroundColor,
+  }) {
+    _actions.add(() => addHeader(
+          image: image,
+          title: title,
+          font: font,
+          backgroundColor: backgroundColor,
+        ));
+    return this;
+  }
+
+  /// Configures a report header (v2.8.0 style).
+  GeniusPdfReportComposer withReportHeader(
+    GeniusPdfReportHeader reportHeader, {
+    double spacing = 0,
+    double height = 100,
+  }) {
+    _actions.add(() => addReportHeader(
+          reportHeader,
+          spacing: spacing,
+          height: height,
+        ));
+    return this;
+  }
+
+  /// Configures a footer for all pages.
+  GeniusPdfReportComposer withFooter({
+    String? userName,
+    String? userLabel,
+    String? printTime,
+    bool showPageNumber = false,
+    PdfFont? font,
+    String pageNumberFormat = '{0}/{1}',
+  }) {
+    _hasFooter = true;
+    _footerUserName = userName;
+    _footerUserLabel = userLabel;
+    _footerPrintTime = printTime;
+    _footerShowPageNumber = showPageNumber;
+    _footerFont = font;
+    _footerPageNumberFormat = pageNumberFormat;
+    return this;
+  }
+
+  // ────────────────────────────────────────────────────────
+  // Text
+  // ────────────────────────────────────────────────────────
+
+  /// Adds a text line.
+  GeniusPdfReportComposer text(
+    String content, {
+    PdfFont? font,
+    PdfBrush? brush,
+    double topMargin = 10,
+  }) {
+    _actions.add(() => addLine(
+          content,
+          font: font,
+          brush: brush,
+          topMargin: topMargin,
+        ));
+    return this;
+  }
+
+  /// Adds a bold text line.
+  GeniusPdfReportComposer boldText(String content, {double topMargin = 10}) {
+    _actions.add(() => addLine(
+          content,
+          font: config.boldFont,
+          topMargin: topMargin,
+        ));
+    return this;
+  }
+
+  /// Adds rich text.
+  GeniusPdfReportComposer richText(
+    GeniusPdfRichText content, {
+    double spacing = 0,
+  }) {
+    _actions.add(() => addRichText(content, spacing: spacing));
+    return this;
+  }
+
+  // ────────────────────────────────────────────────────────
+  // Layout
+  // ────────────────────────────────────────────────────────
+
+  /// Adds vertical spacing.
+  GeniusPdfReportComposer space(double height) {
+    _actions.add(() => addSpace(height));
+    return this;
+  }
+
+  /// Adds a horizontal line.
+  GeniusPdfReportComposer line({double spacing = 5}) {
+    _actions.add(() => addHorizontalLine(spacing: spacing));
+    return this;
+  }
+
+  /// Adds a section divider with optional title.
+  GeniusPdfReportComposer section(
+    String? title, {
+    String? sectionAr,
+    double spacing = 10,
+  }) {
+    _actions.add(() {
+      final displayTitle = (isRTL && sectionAr != null) ? sectionAr : title;
+      addSectionDivider(title: displayTitle, spacing: spacing);
+    });
+    return this;
+  }
+
+  /// Creates a new page.
+  GeniusPdfReportComposer page({PdfPen? borderPen}) {
+    _actions.add(() => newPage(borderPen: borderPen));
+    return this;
+  }
+
+  // ────────────────────────────────────────────────────────
+  // Components
+  // ────────────────────────────────────────────────────────
+
+  /// Adds a data grid.
+  GeniusPdfReportComposer grid(
+    GeniusPdfDataGrid dataGrid, {
+    double spacing = 0,
+  }) {
+    _actions.add(() => addGrid(dataGrid, spacing: spacing));
+    return this;
+  }
+
+  /// Adds a summary section.
+  GeniusPdfReportComposer summary(
+    GeniusPdfSummarySection summarySection, {
+    double spacing = 0,
+  }) {
+    _actions.add(() => addSummary(summarySection, spacing: spacing));
+    return this;
+  }
+
+  /// Adds a grid with its summary.
+  GeniusPdfReportComposer gridWithSummary({
+    required GeniusPdfDataGrid dataGrid,
+    required GeniusPdfSummarySection summarySection,
+    double gridSpacing = 0,
+    double summarySpacing = 10,
+  }) {
+    _actions.add(() => addGridWithSummary(
+          grid: dataGrid,
+          summary: summarySection,
+          gridSpacing: gridSpacing,
+          summarySpacing: summarySpacing,
+        ));
+    return this;
+  }
+
+  /// Adds an overall report summary.
+  GeniusPdfReportComposer reportSummary({
+    required GeniusPdfSummarySection summarySection,
+    String? title,
+    String? titleAr,
+    double spacing = 15,
+  }) {
+    _actions.add(() => addReportSummary(
+          summary: summarySection,
+          title: title,
+          titleAr: titleAr,
+          spacing: spacing,
+        ));
+    return this;
+  }
+
+  /// Adds an info box.
+  GeniusPdfReportComposer infoBox(
+    GeniusPdfInfoBox box, {
+    double spacing = 0,
+  }) {
+    _actions.add(() => addInfoBox(box, spacing: spacing));
+    return this;
+  }
+
+  /// Adds a two-column layout.
+  GeniusPdfReportComposer twoColumns({
+    required double Function(PdfPage page, Rect bounds) leftContent,
+    required double Function(PdfPage page, Rect bounds) rightContent,
+    double spacing = 0,
+    double gap = 10,
+  }) {
+    _actions.add(() => addTwoColumns(
+          leftContent: leftContent,
+          rightContent: rightContent,
+          spacing: spacing,
+          gap: gap,
+        ));
+    return this;
+  }
+
+  // ────────────────────────────────────────────────────────
+  // Charts
+  // ────────────────────────────────────────────────────────
+
+  /// Adds a bar chart.
+  GeniusPdfReportComposer barChart(
+    GeniusPdfBarChart chart, {
+    double spacing = 0,
+    double height = 250,
+  }) {
+    _actions.add(() => addBarChart(chart, spacing: spacing, height: height));
+    return this;
+  }
+
+  /// Adds a line chart.
+  GeniusPdfReportComposer lineChart(
+    GeniusPdfLineChart chart, {
+    double spacing = 0,
+    double height = 250,
+  }) {
+    _actions.add(() => addLineChart(chart, spacing: spacing, height: height));
+    return this;
+  }
+
+  /// Adds a pie chart.
+  GeniusPdfReportComposer pieChart(
+    GeniusPdfPieChart chart, {
+    double spacing = 0,
+    double height = 250,
+  }) {
+    _actions.add(() => addPieChart(chart, spacing: spacing, height: height));
+    return this;
+  }
+
+  /// Adds an area chart.
+  GeniusPdfReportComposer areaChart(
+    GeniusPdfAreaChart chart, {
+    double spacing = 0,
+    double height = 250,
+  }) {
+    _actions.add(() => addAreaChart(chart, spacing: spacing, height: height));
+    return this;
+  }
+
+  // ────────────────────────────────────────────────────────
+  // QR & Images
+  // ────────────────────────────────────────────────────────
+
+  /// Adds a QR code.
+  GeniusPdfReportComposer qrCode(
+    GeniusPdfQRCodeGenerator qr, {
+    double size = 120,
+    GeniusPdfImageAlignment alignment = GeniusPdfImageAlignment.start,
+    double spacing = 0,
+  }) {
+    _actions.add(() => addQRCode(
+          qr,
+          size: size,
+          alignment: alignment,
+          spacing: spacing,
+        ));
+    return this;
+  }
+
+  /// Adds an image.
+  GeniusPdfReportComposer image(
+    GeniusPdfImage img, {
+    GeniusPdfImageAlignment alignment = GeniusPdfImageAlignment.start,
+    double spacing = 0,
+  }) {
+    _actions.add(() => addImage(img, alignment: alignment, spacing: spacing));
+    return this;
+  }
+
+  /// Adds a labeled image attachment.
+  GeniusPdfReportComposer imageAttachment(
+    GeniusPdfImage img, {
+    String? title,
+    String? titleAr,
+    double spacing = 10,
+  }) {
+    _actions.add(() => addImageAttachment(
+          img,
+          title: title,
+          titleAr: titleAr,
+          spacing: spacing,
+        ));
+    return this;
+  }
+
+  /// Adds an image on a dedicated new page.
+  GeniusPdfReportComposer imagePage(
+    GeniusPdfImage img, {
+    String? title,
+    String? titleAr,
+  }) {
+    _actions.add(() => addImagePage(img, title: title, titleAr: titleAr));
+    return this;
+  }
+
+  /// Adds multiple image pages.
+  GeniusPdfReportComposer attachments(
+    List<GeniusPdfImage> images, {
+    List<String>? titles,
+    List<String>? titlesAr,
+  }) {
+    _actions.add(() => addAttachments(
+          images,
+          titles: titles,
+          titlesAr: titlesAr,
+        ));
+    return this;
+  }
+
+  // ────────────────────────────────────────────────────────
+  // Custom
+  // ────────────────────────────────────────────────────────
+
+  /// Executes a custom action within the build chain.
+  ///
+  /// Use this for any operation not covered by the fluent API.
+  /// The callback receives the composer itself for access to all builder methods.
+  ///
+  /// ## Example
+  /// ```dart
+  /// composer
+  ///   .text('Hello')
+  ///   .custom((c) {
+  ///     // Direct access to all builder methods
+  ///     c.addTextAt('Custom positioned text', x: 100, y: 200);
+  ///   })
+  ///   .text('World');
+  /// ```
+  GeniusPdfReportComposer custom(
+    void Function(GeniusPdfReportComposer composer) action,
+  ) {
+    _actions.add(() => action(this));
+    return this;
+  }
+}

@@ -114,6 +114,7 @@ A comprehensive PDF generation and preview library for Flutter applications with
 🏢 **Builder Report Header** (v2.8.0) - `addReportHeader()` professional headers with company info
 📐 **Two-Column Layout** (v2.8.0) - `addTwoColumns()` flexible two-column layout with callbacks
 🎭 **Page Templates** (v2.8.0) - `setPageTemplate()` stamps, watermarks, and template elements
+🔗 **Report Composer** (v2.9.0) - `GeniusPdfReportComposer` fluent API for chainable report building without subclassing
 
 ---
 
@@ -347,6 +348,28 @@ class SalesReport extends GeniusPdfDocumentBuilder {
 | `addGridWithSummary(grid, summary)` | Combined grid + summary in one call |
 | `addReportSummary(summary, {title})` | Overall report summary with heading |
 | `addSectionDivider({title, spacing})` | Visual divider with optional title |
+
+### Report Composer — Fluent API (v2.9.0)
+
+The `GeniusPdfReportComposer` lets you build PDF reports without subclassing, using a chainable fluent API:
+
+```dart
+final composer = GeniusPdfReportComposer(config: myConfig);
+final bytes = composer
+    .withHeader(title: 'Sales Report')
+    .withFooter(userName: 'Admin', showPageNumber: true)
+    .section('Q1 Sales')
+    .text('Revenue summary for Q1 2026.')
+    .gridWithSummary(dataGrid: grid, summarySection: summary)
+    .section('Charts')
+    .barChart(salesChart, height: 200)
+    .page()
+    .section('Attachments')
+    .qrCode(invoiceQR, alignment: GeniusPdfImageAlignment.center)
+    .imagePage(scannedInvoice, title: 'Supplier Invoice')
+    .buildPdf();
+composer.dispose();
+```
 
 ### 3. Generate and Display
 

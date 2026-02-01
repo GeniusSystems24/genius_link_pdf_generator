@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.0] - 2026-02-01
+
+### Added
+
+#### GeniusPdfReportComposer — Fluent API for Report Building
+- **`GeniusPdfReportComposer`** — Concrete implementation of `GeniusPdfDocumentBuilder` with a chainable fluent API; no subclassing needed
+- **Header/Footer**: `withHeader()`, `withReportHeader()`, `withFooter()` — Configure page headers and footers
+- **Text**: `text()`, `boldText()`, `richText()` — Add text content with various styles
+- **Layout**: `space()`, `line()`, `section()`, `page()` — Spacing, dividers, sections, and page breaks
+- **Components**: `grid()`, `summary()`, `gridWithSummary()`, `reportSummary()`, `infoBox()`, `twoColumns()` — All builder components as chainable methods
+- **Charts**: `barChart()`, `lineChart()`, `pieChart()`, `areaChart()` — Add charts with chaining
+- **QR & Images**: `qrCode()`, `image()`, `imageAttachment()`, `imagePage()`, `attachments()` — QR codes and image attachments
+- **Custom**: `custom()` — Execute arbitrary code within the fluent chain
+- **`buildPdf()`** — Convenience method to generate and return PDF bytes
+- **Example** — `buildComposerDemoReport()` in `example/lib/documents/` demonstrates a complete sales report using the fluent API
+
+---
+
 ## [2.8.0] - 2026-02-01
 
 ### Added
