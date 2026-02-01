@@ -31,13 +31,13 @@ import '../extensions/color_extensions.dart';
 /// final bytes = builder.generate();
 /// ```
 abstract class GeniusPdfDocumentBuilder {
-
   /// Creates a new [GeniusPdfDocumentBuilder] with the given configuration.
   GeniusPdfDocumentBuilder(this.config) {
     _document = PdfDocument();
     _applySettings();
     _setupFormat();
   }
+
   /// Configuration for this PDF document.
   final GeniusPdfConfig config;
 
@@ -376,7 +376,7 @@ abstract class GeniusPdfDocumentBuilder {
       )..numberStyle = PdfNumberStyle.numeric;
 
       PdfCompositeField(
-        font: font ?? PdfStandardFont(PdfFontFamily.timesRoman, 12),
+        font: font ?? PdfTrueTypeFont(config.baseFontBytes, 12),
         brush: PdfBrushes.black,
         text: '{0}/{1}',
         fields: [pageNumber, pageCount],

@@ -233,7 +233,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strikethrough decoration was defined but never drawn
 - Superscript/subscript had no visual effect (no size reduction or positioning)
 - Letter spacing property was ignored during drawing
-- `_createLayoutResult` used hardcoded `PdfStandardFont(PdfFontFamily.helvetica, 1)` instead of `baseFont`
+- `_createLayoutResult` used hardcoded `PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 1)` instead of `baseFont`
 - Multi-column `GeniusPdfKeyValueList` could crash when `startIndex >= items.length`
 - **Duplicate `GeniusPrinterService` class** causing "name already defined" error — removed old version, kept enhanced version with share/raster/save methods
 - **`GeniusPdfGridRow` missing properties** — `GeniusConditionalFormattingExtension.withFormatting()` used non-existent `type`, `spanColumns`, `customRenderer`, `isPageBreakBefore` — now uses `copyWith()`

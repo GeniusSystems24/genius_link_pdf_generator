@@ -1,5 +1,8 @@
 import 'dart:ui';
 
+
+
+
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
@@ -466,7 +469,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
     final bottomY = pageHeight - 80;
 
     // Prepared by
-    final preparedBy = GeniusPdfSignatureArea(
+    final preparedBy = GeniusPdfSignatureArea(config: config,
       title: 'Prepared By',
       titleAr: 'أعده',
     );
@@ -477,7 +480,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
     );
 
     // Approved by
-    final approvedBy = GeniusPdfSignatureArea(
+    final approvedBy = GeniusPdfSignatureArea(config: config,
       title: 'Approved By',
       titleAr: 'اعتمده',
     );

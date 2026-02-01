@@ -241,6 +241,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
   void _drawTotals() {
     // Grand total bar
     final totalBar = GeniusPdfTotalBar(
+      config: config,
       label: 'Total',
       labelAr: 'الإجمالي',
       value:
@@ -267,7 +268,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
       x: pageWidth - 100,
       y: pageHeight - 20,
       font: config.configAssets == null
-          ? PdfStandardFont(PdfFontFamily.helvetica, 8)
+          ? PdfTrueTypeFont(config.baseFontBytes, 8)
           : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 8,
               style: PdfFontStyle.regular),
       brush: PdfSolidBrush(const Color(0xFF757575).toPdfColor()),

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridRow, PdfGridStyle, PdfGridColumn, PdfTextStyle;
 
@@ -474,7 +475,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
   }
 
   void _drawSignature() {
-    final signature = GeniusPdfSignatureArea(
+    final signature = GeniusPdfSignatureArea(config: config,
       title: 'Authorized Signature',
       titleAr: 'التوقيع المعتمد',
     );

@@ -5,14 +5,13 @@
   "packages": [
     {
       "name": "genius_link_pdf_generator",
-      "version": "2.3.3+6",
+      "version": "2.3.3+10",
       "dependencies": [
         "barcode",
         "cross_file",
         "flutter",
         "image",
         "intl",
-        "logger",
         "open_file",
         "path_provider",
         "pdf",
@@ -122,13 +121,6 @@
         "url_launcher_windows",
         "web",
         "win32"
-      ]
-    },
-    {
-      "name": "logger",
-      "version": "2.6.2",
-      "dependencies": [
-        "meta"
       ]
     },
     {

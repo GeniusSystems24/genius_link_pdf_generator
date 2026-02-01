@@ -1,5 +1,10 @@
 import 'dart:ui';
 
+
+
+
+
+
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
 import '../core/pdf_config.dart';
@@ -422,7 +427,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
     // Signature area on the left
     if (showSignature) {
-      final signature = GeniusPdfSignatureArea(
+      final signature = GeniusPdfSignatureArea(config: config,
         title: 'Authorized Signature',
         titleAr: 'التوقيع المعتمد',
       );
@@ -440,7 +445,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
     // QR Code on the right
     if (showQRCode && qrCode != null) {
-      final qr = GeniusPdfQRCode(
+      final qr = GeniusPdfQRCode(config: config,
         image: qrCode!,
         size: 70,
       );

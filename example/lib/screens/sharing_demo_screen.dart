@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
+import 'package:genius_pdf_example/main.dart';
 
 import '../theme/app_theme.dart';
 
@@ -94,9 +95,9 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
       final document = PdfDocument();
       final page = document.pages.add();
       final graphics = page.graphics;
-      final font = PdfStandardFont(PdfFontFamily.helvetica, 12);
+      final font = PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 12);
       final titleFont =
-          PdfStandardFont(PdfFontFamily.helvetica, 18, style: PdfFontStyle.bold);
+          PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 18, style: PdfFontStyle.bold);
 
       graphics.drawString(
         'Genius Link PDF Generator',

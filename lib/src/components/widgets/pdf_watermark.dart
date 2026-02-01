@@ -266,8 +266,7 @@ class GeniusPdfWatermark {
     final pageSize = page.getClientSize();
 
     // Create font
-    final font = PdfStandardFont(
-      PdfFontFamily.helvetica,
+    final font = PdfTrueTypeFont(config.baseFontBytes,
       settings.fontSize,
       style: settings.isBold ? PdfFontStyle.bold : PdfFontStyle.regular,
     );
@@ -317,8 +316,7 @@ class GeniusPdfWatermark {
     final pageSize = page.getClientSize();
 
     // Create font
-    final font = PdfStandardFont(
-      PdfFontFamily.helvetica,
+    final font = PdfTrueTypeFont(config.baseFontBytes,
       settings.fontSize,
       style: settings.isBold ? PdfFontStyle.bold : PdfFontStyle.regular,
     );

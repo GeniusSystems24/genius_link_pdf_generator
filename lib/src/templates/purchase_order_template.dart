@@ -1,5 +1,8 @@
 import 'dart:ui';
 
+
+
+
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
@@ -562,7 +565,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     final bottomY = pageHeight - 80;
 
     // Prepared by
-    final preparedBy = GeniusPdfSignatureArea(
+    final preparedBy = GeniusPdfSignatureArea(config: config,
       title: 'Prepared By',
       titleAr: 'أعده',
     );
@@ -573,7 +576,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     );
 
     // Approved by
-    final approvedBy = GeniusPdfSignatureArea(
+    final approvedBy = GeniusPdfSignatureArea(config: config,
       title: 'Approved By',
       titleAr: 'اعتمده',
     );
@@ -584,7 +587,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     );
 
     // Received by vendor
-    final receivedBy = GeniusPdfSignatureArea(
+    final receivedBy = GeniusPdfSignatureArea(config: config,
       title: 'Received By Vendor',
       titleAr: 'استلمه المورد',
     );

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridRow, PdfTextStyle, PdfBorderStyle, PdfGridColumn, PdfGridStyle;
 
@@ -285,6 +286,7 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
   void _drawGrandTotal() {
     // Grand total bar
     final totalBar = GeniusPdfTotalBar(
+      config: config,
       label: config.isRTL ? 'إجمالي قيمة المخزون' : 'Total Inventory Value',
       labelAr: 'إجمالي قيمة المخزون',
       value: _formatCurrency(data.totalValue),

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
@@ -495,7 +496,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
     final bottomY = pageHeight - 100;
 
     // Delivered by
-    final deliveredBy = GeniusPdfSignatureArea(
+    final deliveredBy = GeniusPdfSignatureArea(config: config,
       title: 'Delivered By',
       titleAr: 'سلمه',
     );
@@ -506,7 +507,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
     );
 
     // Received by
-    final receivedBy = GeniusPdfSignatureArea(
+    final receivedBy = GeniusPdfSignatureArea(config: config,
       title: 'Received By',
       titleAr: 'استلمه',
     );

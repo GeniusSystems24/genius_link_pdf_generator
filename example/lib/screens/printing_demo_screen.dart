@@ -79,11 +79,11 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
       try {
         font = geniusPdfConfig.baseFont;
         titleFont =
-            PdfStandardFont(PdfFontFamily.helvetica, 18, style: PdfFontStyle.bold);
+            PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 18, style: PdfFontStyle.bold);
       } catch (_) {
-        font = PdfStandardFont(PdfFontFamily.helvetica, 12);
+        font = PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 12);
         titleFont =
-            PdfStandardFont(PdfFontFamily.helvetica, 18, style: PdfFontStyle.bold);
+            PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 18, style: PdfFontStyle.bold);
       }
 
       // Page 1: Title page
