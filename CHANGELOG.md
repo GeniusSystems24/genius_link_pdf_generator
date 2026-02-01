@@ -5,11 +5,95 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.1] - 2026-02-02
+
+### Added
+
+#### GeniusPdfDocumentBuilder — Enhanced Component Methods
+
+- **`addReportHeader(GeniusPdfReportHeader)`** — Draw a report header at the current Y position with automatic Y advancement
+- **`addDualInfoBox(leftBox, rightBox)`** — Draw two info boxes side by side with equal or flexible heights
+- **`addRichText(GeniusPdfRichText)`** — Draw rich text at the current Y position with auto advancement
+- **`addBulletList(GeniusPdfBulletList)`** — Draw bullet lists at the current Y position
+- **`addInfoBox(GeniusPdfInfoBox)`** — Draw an info box at the current Y position with automatic Y advancement
+
+### Changed
+
+- **Config-driven component settings** — `GeniusPdfRichTextBuilder` no longer accepts per-instance font/RTL overrides; fonts and direction now come from `GeniusPdfConfig`
+- **Section constructor cleanup** — removed deprecated parameters from `GeniusPdfSection` in favor of `GeniusPdfSectionStyle`
+
+### Example
+
+```dart
+class MyReportBuilder extends GeniusPdfDocumentBuilder {
+  MyReportBuilder(super.config);
+
+  @override
+  void build() {
+    newPage();
+    
+    addSectionDivider(title: 'Report Header');
+    addSpace(10);
+    
+    addReportHeader(
+      GeniusPdfReportHeader(
+        config: config,
+        title: 'Invoice',
+        titleAr: 'فاتورة',
+        company: companyInfo,
+      ),
+      spacing: 15,
+    );
+    
+    addDualInfoBox(
+      leftBox: customerBox,
+      rightBox: companyBox,
+      equalHeight: true,
+      boxSpacing: 20,
+      spacing: 10,
+    );
+    
+    addRichText(
+      GeniusPdfRichTextBuilder(config: config)
+        .text('Hello ')
+        .bold('World')
+        .build(),
+      spacing: 5,
+    );
+    
+    addBulletList(
+      GeniusPdfBulletList(
+        items: [
+          GeniusPdfBulletItem.simple('First item'),
+          GeniusPdfBulletItem.simple('Second item'),
+        ],
+        config: config,
+      ),
+      spacing: 10,
+    );
+    
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        title: 'Note',
+        titleAr: 'ملاحظة',
+        items: [...],
+        style: GeniusPdfInfoBoxStyle.info(),
+      ),
+      spacing: 10,
+    );
+  }
+}
+```
+
+---
+
 ## [2.9.0] - 2026-02-01
 
 ### Added
 
 #### GeniusPdfReportComposer — Fluent API for Report Building
+
 - **`GeniusPdfReportComposer`** — Concrete implementation of `GeniusPdfDocumentBuilder` with a chainable fluent API; no subclassing needed
 - **Header/Footer**: `withHeader()`, `withReportHeader()`, `withFooter()` — Configure page headers and footers
 - **Text**: `text()`, `boldText()`, `richText()` — Add text content with various styles
@@ -28,6 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### GeniusPdfDocumentBuilder — Advanced Layout
+
 - **`addRichText(GeniusPdfRichText)`** — Draw rich text (bold, colors, links, styled spans) at the current Y position with auto advancement
 - **`addInfoBox(GeniusPdfInfoBox)`** — Draw an info box with labeled values at the current Y position; supports multi-column layouts
 - **`addReportHeader(GeniusPdfReportHeader)`** — Draw a professional report header with company info, bilingual titles, and document metadata
@@ -42,6 +127,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### GeniusPdfDocumentBuilder — QR Code & Image Attachments
+
 - **`addQRCode(GeniusPdfQRCodeGenerator)`** — Draw a QR code at the current Y position with configurable size and alignment (start/center/end)
 - **`addImageAttachment(GeniusPdfImage)`** — Draw a labeled image attachment inline with optional title, auto-scaling to page width
 - **`addImagePage(GeniusPdfImage)`** — Add an image on a dedicated new page, scaled to fit the full content area (ideal for scanned documents)
@@ -55,6 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### GeniusPdfDocumentBuilder — Charts Integration
+
 - **`addBarChart(GeniusPdfBarChart)`** — Draw a bar chart at the current Y position with auto page-break and position advancement
 - **`addLineChart(GeniusPdfLineChart)`** — Draw a line chart at the current Y position
 - **`addPieChart(GeniusPdfPieChart)`** — Draw a pie chart at the current Y position
@@ -69,6 +156,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### GeniusPdfDocumentBuilder — Grid & Summary Integration
+
 - **`addGrid(GeniusPdfDataGrid)`** — Draw a data grid at the current Y position with automatic position advancement; supports Syncfusion's built-in pagination for multi-page grids
 - **`addSummary(GeniusPdfSummarySection)`** — Draw a summary section at the current Y position with automatic position advancement
 - **`addGridWithSummary()`** — Convenience method that draws a grid followed by its summary section in a single call; returns both results as a record
@@ -83,6 +171,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### GeniusPdfDocumentBuilder — Position Engine & Page Management
+
 - **`_currentY` position tracker** — Independent Y-position tracking replaces the old `_spaceOffset` + `_layoutResult` combo; all draw methods now update `_currentY` automatically
 - **`_ensureSpace(double needed)`** — Auto page-break: if the remaining vertical space is insufficient, a new page is created transparently
 - **`_advanceY(double height)`** — Internal helper to move the Y position with debug logging
@@ -104,6 +193,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Example** — `PositionTrackingDemoBuilder` in `example/lib/documents/` demonstrates all v2.4.0 features
 
 ### Fixed
+
 - **`availableWidth` bug** — In portrait orientation, `availableWidth` incorrectly used `pageSize.height` instead of `pageSize.width`; now correctly calculates `pageSize.width - (margins.left + margins.right)`
 - **`addImage()` not advancing position** — Images no longer leave `currentY` unchanged; subsequent content renders correctly below
 - **`addHorizontalLine()` not advancing position** — Horizontal lines now advance `currentY` so following content doesn't overlap
@@ -111,6 +201,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`addFooter()` hardcoded time position** — Replaced `const Rect.fromLTWH(200, ...)` with dynamic `availableWidth * 0.35`
 
 ### Changed
+
 - **`addLine()` uses `_ensureSpace`** — Text that overflows the page triggers an automatic page-break instead of drawing off-page
 - **`newPage()` resets `_currentY`** — Consistent position tracking across page transitions
 - **`addSpace()` uses `_advanceY`** — Spacing is tracked precisely in the position system
@@ -123,6 +214,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### GeniusPdfRichText — Enhanced Links & Auto-Detection
+
 - **`GeniusPdfMarkdownConfig`** — New configuration class for parser with `linkColor`, `autoDetectUrls`, `autoDetectEmails`, `autoDetectPhones`, `autoLinkColor`
 - **Auto-detect bare URLs** — `https://...`, `http://...`, `www.…` auto-converted to clickable link spans (opt-in via config)
 - **Auto-detect emails** — `user@domain.com` auto-converted to `mailto:` link spans (opt-in via config)
@@ -133,6 +225,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Preset configs** — `GeniusPdfMarkdownConfig.defaultConfig` (auto-detect on) and `.noAutoDetect` (backward-compatible)
 
 ### Changed
+
 - **`GeniusPdfSimpleMarkdownParser.parse()`** — Added optional `config` parameter (backward-compatible, defaults to no auto-detect)
 - **`toLinkSpan()` extension** — Now accepts optional `color` parameter
 - **`parseMarkdownSpans()` extension** — Now accepts optional `config` parameter
@@ -146,6 +239,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### GeniusPdfReportHeader Overhaul
+
 - **Direction-Aware Enums** - `GeniusPdfLogoPosition` now uses `start`, `end`, `center`, `centerTop`, `centerBottom`, `background` (resolves based on RTL/LTR)
 - **Direction-Aware Title Alignment** - `GeniusPdfTitleAlignment` now uses `start`, `end`, `center` (resolves based on RTL/LTR)
 - **Bilingual Split Layout** - New `GeniusPdfReportHeaderLayout.bilingualSplit` with English info on left, logo centered, Arabic info on right
@@ -160,11 +254,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Logger Integration** - Debug logging for header draw operations
 
 ### Fixed
+
 - **Border overlapping date** - Print date was drawn overlapping the bottom border line; now date is drawn above the border with proper `dateSpacing`
 - **Logo position not applied** - `logoPosition` property was ignored in draw methods; now properly used to position logo via `_resolveLogoX()`
 - **Title alignment not applied** - `titleAlignment` and `companyInfoAlignment` were ignored; now properly resolved via `_resolveTextAlignment()`
 
 ### Changed
+
 - **Spacing improvements** - Proper spacing between logo/company info row, title section, subtitle section, and date/border
 - **Extracted reusable helpers** - `_drawBackground`, `_drawDateSection`, `_drawBottomBorder`, `_drawCompanyInfoBlock`, `_drawTitleBlock`, `_drawSubtitleBlock`, `_drawDocumentInfo`
 - **Layout enum expanded** - Added `bilingualSplit`, `letterhead`, `reportCard`, `minimal`, `fullWidth` values
@@ -176,6 +272,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### GeniusPdfInfoBox Overhaul
+
 - **Status-Themed Style Presets** - 4 new factory constructors: `GeniusPdfInfoBoxStyle.info()`, `.warning()`, `.success()`, `.error()` with distinct colors and icons
 - **New Style Factories** - `GeniusPdfInfoBoxStyle.corporate()`, `.minimal()`, `.saudi()`, `.invoice()` for professional presets
 - **Item Separators** - `showItemSeparators`, `itemSeparatorColor`, `itemSeparatorWidth` properties on style
@@ -191,10 +288,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tag Support** - `tag` property for component identification
 
 #### GeniusPdfInfoBox Factories
+
 - `GeniusPdfInfoBox.company()` - Pre-configured company info box with name, VAT, CR, city, phone, email fields
 - `GeniusPdfInfoBox.contact()` - Pre-configured contact info box with name, phone, email, address fields
 
 #### GeniusPdfDualInfoBox Enhancements
+
 - **equalHeight Implementation** - Pre-calculates both box heights and forces the max via `copyWith` on style's `minHeight`
 - `GeniusPdfDualInfoBox.customerInvoice()` - Pre-configured customer + invoice dual box
 - `GeniusPdfDualInfoBox.shippingBilling()` - Pre-configured shipping + billing dual box
@@ -203,12 +302,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Padding & Alignment** - `padding` and `alignment` properties
 
 #### GeniusPdfSection Enhancements
+
 - New `GeniusPdfSectionStyle` class with `copyWith()` and factory constructors (`corporate`, `minimal`, `card`, `saudi`)
 - `GeniusPdfSection.corporate()` and `GeniusPdfSection.card()` factory constructors
 - Subtitle support, shadow support, title background, title underline
 - `keepTogether`, `pageBreakBefore`, `minHeight`, `maxHeight` properties
 
 ### Fixed
+
 - **Missing style presets** - `GeniusPdfInfoBoxStyle.info()` and `.warning()` were referenced in examples but didn't exist (compilation error)
 - **Null-safety issues** - Removed all unnecessary `!` operators on non-nullable `baseFont` / `boldFont` fields
 - **Color null-safety** - Added null-coalescing for `style.contentStyle.color` before `.withValues()` call
@@ -217,6 +318,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **equalHeight not implemented** - `equalHeight` property in `GeniusPdfDualInfoBox` was declared but never used in draw methods
 
 ### Changed
+
 - Logger integration added across all InfoBox, DualInfoBox, and Section components
 - `GeniusPdfSection` old constructor parameters deprecated in favor of new `style` parameter
 
@@ -227,6 +329,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Enhanced Logger System (`GeniusPdfLogger`)
+
 - **Automatic Source Location** - Logger automatically detects caller file and line via `StackTrace.current`
   - Console output includes clickable `→ lib/src/xxx.dart:42` paths for IDE navigation
   - `GeniusSourceLocation` class with `file` and `line` properties
@@ -245,11 +348,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **ANSI Color Improvements** - Gray for debug, cyan for info, yellow for warning, red for error
 
 #### Library-Wide Logger Integration
+
 - **Printing Module** - Logging in `GeniusPrinterService` (print, share, raster, save, cancel), `GeniusPrintPreview` (print, share, save actions)
 - **Services Module** - Logging in `GeniusPdfService` (generate, merge, split, watermark, rotate, extract), `GeniusPdfGenerationManager` (add/process/cancel/pause/resume jobs), `GeniusPdfExportService` (export, batch export)
 - **Components Module** - Logging in `GeniusPdfDataGrid` (grid drawing), `GeniusPdfRichText` (rich text drawing), `GeniusPdfBarcode` (barcode/QR generation with error logging)
 
 ### Changed
+
 - `pdf_config.dart` now uses `GeniusPdfLogger.configureFrom(loggerConfig)` instead of manual parameter passing
 - Replaced all `Logger()` (from `logger` package) usage in `pdf_service.dart` with `GeniusPdfLogger`
 - Removed `logger` package dependency from `pubspec.yaml` (no longer needed)
@@ -261,6 +366,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Rich Text Engine Overhaul (`GeniusPdfRichText`)
+
 - **Background Color Rendering** - Background highlights now correctly draw behind text
   - `backgroundColor` property on spans is now fully rendered with configurable padding
   - `backgroundPadding` parameter on `GeniusPdfRichText` for control over highlight size
@@ -281,6 +387,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fixed `_createLayoutResult`** - No longer uses hardcoded Helvetica; uses `baseFont` instead
 
 #### New TextSpan Factories
+
 - `GeniusPdfTextSpan.italic()` - Italic text
 - `GeniusPdfTextSpan.boldItalic()` - Bold-italic text
 - `GeniusPdfTextSpan.label()` - Form field label style (bold, 11pt, gray)
@@ -291,6 +398,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New properties: `wordSpacing`, `isOverline`, `opacity`, `textDirectionOverride`
 
 #### Enhanced Builder (`GeniusPdfRichTextBuilder`)
+
 - New text methods: `italic()`, `boldItalic()`, `highlight()`, `superscript()`, `subscript()`, `strikethrough()`, `code()`, `label()`, `heading()`, `small()`, `badge()`, `currency()`
 - Spacing helpers: `tab()` (4 spaces), `separator()` (styled delimiter like " | ")
 - Conditional methods: `addIf()`, `textIf()`, `boldIf()` - add spans conditionally
@@ -300,6 +408,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `build()` now accepts `maxLines` and `overflow` parameters
 
 #### Bullet & Numbered Lists (`GeniusPdfBulletList`)
+
 - **Bullet styles**: disc (•), circle (○), square (■), dash (–)
 - **Numbered styles**: Arabic (1. 2. 3.), Arabic-Indic (١. ٢. ٣.), alphabetic (a. b. c.)
 - **Nested sub-items** with automatic style cycling (disc → circle → dash)
@@ -308,12 +417,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable: `bulletColor`, `textColor`, `itemSpacing`, `indentWidth`, `startNumber`
 
 #### Multi-Paragraph Component (`GeniusPdfParagraph`)
+
 - Wraps multiple `GeniusPdfRichText` blocks with `paragraphSpacing`
 - `firstLineIndent` for paragraph indentation
 - `measureHeight()` to pre-calculate total height
 - Automatic vertical overflow handling
 
 #### Text Measurer (`GeniusPdfTextMeasurer`)
+
 - `measureSpan()` - Measure a single span's Size
 - `measureSpanWidth()` / `measureSpansWidth()` - Width calculations
 - `measureRichTextHeight()` - Full rich text height at given width
@@ -321,6 +432,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `estimateLineCount()` - Estimate number of wrapped lines
 
 #### Simple Markdown Parser (`GeniusPdfSimpleMarkdownParser`)
+
 - `**bold**` → bold span
 - `*italic*` → italic span
 - `***bold italic***` → bold-italic span
@@ -331,17 +443,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `[text](url)` → link span
 
 #### String Extensions (`GeniusPdfStringSpanExtension`)
+
 - `toSpan()`, `toBoldSpan()`, `toItalicSpan()`, `toColoredSpan()`
 - `toHighlightSpan()`, `toLinkSpan()`, `toBadgeSpan()`
 - `toLabelSpan()`, `toHeadingSpan()`, `toSmallSpan()`
 - `parseMarkdownSpans()` - Parse markdown string into spans
 
 #### Labeled Value Enhancements (`GeniusPdfLabeledValue`)
+
 - `GeniusPdfLabeledValue.positive()` - Green value styling
 - `GeniusPdfLabeledValue.negative()` - Red value styling
 - New `valueColor` property for explicit value coloring
 
 ### Fixed
+
 - Background color on text spans was defined but never rendered
 - Strikethrough decoration was defined but never drawn
 - Superscript/subscript had no visual effect (no size reduction or positioning)
@@ -406,6 +521,7 @@ final fits = measurer.fitsInSingleLine(mySpans, pageWidth);
 ### Added
 
 #### PDF Manipulation (`GeniusPdfService`)
+
 - **Merge PDFs** - Combine multiple PDF documents into one
   - `mergePdfs()` - Merge with configurable options
   - `GeniusPdfMergeResult` - Result with page count and file size
@@ -429,6 +545,7 @@ final fits = measurer.fitsInSingleLine(mySpans, pageWidth);
   - `GeniusPdfCancellationToken` - Token for operation cancellation
 
 #### Job Scheduling (`GeniusPdfGenerationManager`)
+
 - **Schedule Jobs** - Schedule PDF generation for later
   - `GeniusPdfScheduler` - Timer-based job scheduling
   - `scheduleJob()` - Schedule with delay
@@ -442,6 +559,7 @@ final fits = measurer.fitsInSingleLine(mySpans, pageWidth);
   - `addJob()`, `start()`, `cancel()` - Chain methods
 
 #### Export Validation (`GeniusPdfExportService`)
+
 - **Export Validator** - Validate export configuration
   - `GeniusExportValidator` - Validate before export
   - Validates format, page range, quality, filename
@@ -460,6 +578,7 @@ final fits = measurer.fitsInSingleLine(mySpans, pageWidth);
   - `GeniusExportPresets.thumbnail()` - Small preview images
 
 #### Conditional Formatting (`GeniusPdfDataGrid`)
+
 - **Condition Types** - Multiple condition operators
   - `GeniusConditionType` - equals, greaterThan, lessThan, between, contains, isEmpty, custom, etc.
 - **Formatting Rules** - Define conditional format rules
@@ -561,6 +680,7 @@ final filtered = GeniusDataGridUtils.filter(rows, 'status', 'active');
 ### Added
 
 #### Enhanced Printing Service (`GeniusPrinterService`)
+
 - **PDF Sharing** - Share PDF documents via system share sheet
   - `sharePdf()` - Share using share_plus with subject and text
   - `sharePdfNative()` - Share using printing package's native share
@@ -585,6 +705,7 @@ final filtered = GeniusDataGridUtils.filter(rows, 'status', 'active');
   - `.toThumbnail()` - Generate thumbnail from PDF bytes
 
 #### Enhanced Printer Discovery (`GeniusPrinterDiscovery`)
+
 - **Filtered Printer Lists** - Get printers by category
   - `availablePrinters` - Only ready printers
   - `networkPrinters` - Network-connected printers
@@ -600,6 +721,7 @@ final filtered = GeniusDataGridUtils.filter(rows, 'status', 'active');
   - `getCapabilities()` - Get platform capabilities
 
 #### Enhanced Print Preview (`GeniusPrintPreviewEnhanced`)
+
 - **Share Button** - Share PDF directly from preview
 - **Save Button** - Save PDF to file from preview
 - **Processing Overlay** - Visual feedback during operations
@@ -607,6 +729,7 @@ final filtered = GeniusDataGridUtils.filter(rows, 'status', 'active');
 - **Dialog Helper** - `GeniusPrintPreviewEnhancedDialog.show()`
 
 #### Barcode Validation (`GeniusBarcodeValidator`)
+
 - Validate barcode data before generation
 - Support for all barcode types (EAN-13, EAN-8, UPC-A, Code128, Code39, ITF, QR, DataMatrix, PDF417)
 - `GeniusBarcodeValidationResult` - Result with bilingual error messages
@@ -614,12 +737,14 @@ final filtered = GeniusDataGridUtils.filter(rows, 'status', 'active');
 - `calculateEan13CheckDigit()` - Calculate check digit for EAN-13
 
 #### Barcode Groups (`GeniusBarcodeGroup`)
+
 - Arrange multiple barcodes in layouts
 - `GeniusBarcodeGroupLayout` - horizontal, vertical, grid
 - Configurable spacing and grid columns
 - Group title support (bilingual)
 
 #### Barcode Batch Generation (`GeniusBarcodeGenerator`)
+
 - `generateSequence()` - Generate barcodes with incrementing numbers
 - `fromDataList()` - Generate barcodes from a list of data
 - `validateDataList()` - Validate all data before generation
@@ -699,6 +824,7 @@ final thumbnail = await pdfBytes.toThumbnail(dpi: 72);
 ### Added
 
 #### Barcodes & QR Codes
+
 - `GeniusPdfBarcode` - 1D/2D barcode generation component for PDF documents
   - Factory constructors: `.ean13()`, `.code128()`, `.shipping()`
   - Supports EAN-13, EAN-8, UPC-A, Code 128, Code 39, ITF, QR Code, DataMatrix, PDF417
@@ -718,11 +844,13 @@ final thumbnail = await pdfBytes.toThumbnail(dpi: 72);
 ### Fixed
 
 #### Template Bug Fixes
+
 - **customer_statement_template.dart** - Fixed duplicate info box: right panel was showing identical customer data instead of statement details (period, opening balance, currency)
 - **purchase_order_template.dart** - Fixed status badge text position drawn at (0,0) instead of correct badge rectangle bounds
 - **payslip_template.dart** - Added missing newline between notes label and text content
 
 #### Template Improvements
+
 - **tax_invoice_template.dart** - Implemented proper number-to-words conversion for English and Arabic (supports values up to billions, with currency/sub-currency names: SAR/Halalas, USD/Cents, etc.)
 - **attendance_report_template.dart** - Fixed inconsistent bold font fallback to use `PdfFontStyle.bold` from config assets
 - **balance_sheet_template.dart** - Enhanced unbalanced warning with colored background box (green/red), left accent border, and difference amount display
@@ -739,6 +867,7 @@ final thumbnail = await pdfBytes.toThumbnail(dpi: 72);
 A centralized theming system for all PDF components with preset themes and full customization.
 
 ##### Core Theme Components
+
 - `GeniusPdfPrintTheme` - Main theme class with colors, typography, spacing, and borders
 - `GeniusPdfColorSchemeTheme` - Color definitions (primary, secondary, accent, text, background, border, success, warning, error)
 - `GeniusPdfTypographyTheme` - Font sizes (title, subtitle, header, body, caption, small)
@@ -746,6 +875,7 @@ A centralized theming system for all PDF components with preset themes and full 
 - `GeniusPdfBorderTheme` - Border settings (width, color, radius)
 
 ##### Component-Specific Themes
+
 - `GeniusPdfGridTheme` - Grid styling (header, row, alternate row colors, borders)
 - `GeniusPdfSummaryTheme` - Summary section styling (label, total, spacing)
 - `GeniusPdfInfoBoxTheme` - Info box styling (background, border, title, content)
@@ -753,6 +883,7 @@ A centralized theming system for all PDF components with preset themes and full 
 - `GeniusPdfSectionTheme` - Section styling (title background, content padding)
 
 ##### Preset Themes
+
 - `GeniusPdfPrintTheme.defaults()` - Default professional theme
 - `GeniusPdfPrintTheme.corporate()` - Blue corporate theme
 - `GeniusPdfPrintTheme.minimal()` - Clean minimal theme
@@ -760,12 +891,14 @@ A centralized theming system for all PDF components with preset themes and full 
 - `GeniusPdfPrintTheme.invoice()` - Optimized for invoices
 
 ##### GeniusPdfConfig Integration
+
 - Added `printTheme` parameter to `GeniusPdfConfig` for centralized theme configuration
 - All components can now inherit theme settings from config
 
 #### Enhanced Grid Components
 
 ##### GeniusPdfGridColumn Improvements
+
 - `subtitle` - Optional subtitle text for column headers
 - `subtitleAr` - Arabic subtitle text
 - `sortable` - Mark column as sortable
@@ -783,6 +916,7 @@ A centralized theming system for all PDF components with preset themes and full 
   - `GeniusPdfGridColumn.action()` - Action status column
 
 ##### GeniusPdfGridRow Improvements
+
 - `subtitle` - Row subtitle text
 - `isHighlighted` - Highlight row
 - `highlightColor` - Custom highlight color
@@ -795,12 +929,14 @@ A centralized theming system for all PDF components with preset themes and full 
   - `GeniusPdfGridRow.spacer()` - Empty spacer row
 
 ##### GeniusPdfGridStyle Factory Constructors
+
 - `GeniusPdfGridStyle.corporate()` - Corporate blue style
 - `GeniusPdfGridStyle.minimal()` - Minimal borders style
 - `GeniusPdfGridStyle.saudi()` - Saudi green style
 - `GeniusPdfGridStyle.invoice()` - Invoice optimized style
 
 ##### GeniusPdfGridGroup Improvements
+
 - `level` - Hierarchical group level (for nested groups)
 - `isExpanded` - Expansion state
 - `showSummary` - Show group summary row
@@ -813,6 +949,7 @@ A centralized theming system for all PDF components with preset themes and full 
 #### Enhanced Info Box Components
 
 ##### GeniusPdfInfoBoxStyle Improvements
+
 - `titleFontSize` / `titleColor` / `titleIsBold` - Title styling
 - `contentFontSize` / `contentColor` - Content styling
 - `labelColor` / `valueColor` - Label/value colors
@@ -829,6 +966,7 @@ A centralized theming system for all PDF components with preset themes and full 
   - `GeniusPdfInfoBoxStyle.modern()` - Modern with shadows
 
 ##### GeniusPdfInfoBox Improvements
+
 - `footer` / `footerAr` - Footer text
 - `columns` - Multi-column layout
 - `maxItemsPerColumn` - Items per column limit
@@ -837,11 +975,13 @@ A centralized theming system for all PDF components with preset themes and full 
   - `GeniusPdfInfoBox.address()` - Pre-configured address box
 
 ##### GeniusPdfDualInfoBox Improvements
+
 - `layout` - Layout options (horizontal, vertical, diagonal)
 - `spacing` - Spacing between boxes
 - `alignment` - Dual box alignment
 
 ##### GeniusPdfSection Improvements
+
 - New `GeniusPdfSectionStyle` class with:
   - Title position (top, left, inside, floating)
   - Title alignment and styling
@@ -852,6 +992,7 @@ A centralized theming system for all PDF components with preset themes and full 
 #### Enhanced Report Header Components
 
 ##### GeniusPdfCompanyInfo Improvements
+
 - `address` / `addressAr` - Company address
 - `city` / `cityAr` - City
 - `country` / `countryAr` - Country
@@ -861,6 +1002,7 @@ A centralized theming system for all PDF components with preset themes and full 
 - `additionalInfo` - Map of additional info
 
 ##### GeniusPdfReportHeaderStyle Improvements
+
 - `logoPosition` - Logo placement (left, right, center, background)
 - `showAccentLine` - Accent line under header
 - `accentLineColor` / `accentLineHeight` - Accent styling
@@ -876,6 +1018,7 @@ A centralized theming system for all PDF components with preset themes and full 
   - `GeniusPdfReportHeaderStyle.centered()` - Centered style
 
 ##### GeniusPdfReportHeader Improvements
+
 - `bilingualOrder` - Control Arabic/English order
 - `showDate` / `dateLabel` / `dateLabelAr` - Date display
 - `dateFormat` - Custom date format
@@ -889,6 +1032,7 @@ A centralized theming system for all PDF components with preset themes and full 
 #### Enhanced Summary Components
 
 ##### GeniusPdfSummaryItem Improvements
+
 - `prefix` / `suffix` - Value prefix and suffix
 - `indent` - Item indentation
 - `showLine` - Show separator line
@@ -898,6 +1042,7 @@ A centralized theming system for all PDF components with preset themes and full 
 - `showBackground` - Show item background
 
 ##### GeniusPdfSummaryStyle Improvements
+
 - `itemSpacing` - Spacing between items
 - `showBorder` / `borderColor` - Border settings
 - `borderRadius` - Rounded corners
@@ -913,6 +1058,7 @@ A centralized theming system for all PDF components with preset themes and full 
 #### Enhanced Rich Text Components
 
 ##### GeniusPdfTextSpan Improvements
+
 - `backgroundColor` - Text background color
 - `letterSpacing` - Character spacing
 - `wordSpacing` - Word spacing
@@ -998,6 +1144,7 @@ final header = GeniusPdfReportHeader.invoice(
 ### Changed
 
 #### Architecture: Config Instance Pattern (Breaking Change)
+
 - **No Global Singleton** - Removed `GeniusPdfConfig.instance` and `GeniusPdfConfig.instanceOrNull`
 - **Per-Builder Config** - Each `GeniusPdfDocumentBuilder` must have its own `GeniusPdfConfig` instance
 - **Assets via Config** - `GeniusPdfAssets` is now only accessible through `GeniusPdfConfig.assets`
@@ -1007,6 +1154,7 @@ final header = GeniusPdfReportHeader.invoice(
 ### Migration Guide
 
 #### Before (v2.3.3)
+
 ```dart
 // Global initialization
 await GeniusPdfConfig.initialize(
@@ -1021,6 +1169,7 @@ final font = GeniusPdfAssets.instance.primaryFont;
 ```
 
 #### After (v2.3.3+1)
+
 ```dart
 // Create config instance
 final config = await GeniusPdfConfig.create(
@@ -1037,6 +1186,7 @@ final font = config.assets.primaryFont;
 ```
 
 ### Why This Change?
+
 - **Thread Safety** - Each document generation can have independent configuration
 - **Testing** - Easier to test with isolated config instances
 - **Flexibility** - Different documents can use different settings simultaneously
@@ -1049,6 +1199,7 @@ final font = config.assets.primaryFont;
 ### Added
 
 #### App Sharing Service (`GeniusAppShareService`)
+
 - **Known Apps** - Pre-configured support for popular apps:
   - Messaging: WhatsApp, WhatsApp Business, Telegram, Signal, Viber, Line, WeChat, Messenger
   - Email: Gmail, Outlook
@@ -1093,6 +1244,7 @@ await appService.openInExternalApp(
 ### Added
 
 #### Bluetooth Sharing Service (`GeniusBluetoothShareService`)
+
 - **Device Discovery** - Find nearby Bluetooth devices
 - **Device Types** - Support for computers, phones, tablets, printers
 - **Saved Devices** - Save and manage favorite devices
@@ -1101,6 +1253,7 @@ await appService.openInExternalApp(
 - **Nearby Share** - Support for Android Nearby Share / iOS AirDrop
 
 #### Bluetooth Models
+
 - `GeniusBluetoothDevice` - Device info with type, status, and signal strength
 - `GeniusBluetoothTransfer` - Transfer tracking with progress and speed
 - `GeniusBluetoothResult` - Operation result with detailed status
@@ -1135,6 +1288,7 @@ await btService.shareViaNearby(
 ### Added
 
 #### Email Sharing Service (`GeniusEmailShareService`)
+
 - **Compose Email** - Open email client with pre-filled data
 - **Gmail Integration** - Open Gmail app or web directly
 - **Outlook Integration** - Open Outlook app or web directly
@@ -1143,6 +1297,7 @@ await btService.shareViaNearby(
 - **SMTP Placeholder** - API for future direct SMTP sending
 
 #### Email Models
+
 - `GeniusEmailData` - Email composition data (to, cc, bcc, subject, body)
 - `GeniusEmailAttachment` - Attachment with size and MIME type
 - `GeniusSmtpConfig` - SMTP server configuration
@@ -1189,6 +1344,7 @@ final email = emailService.createFromTemplate(
 ### Added
 
 #### Unified Sharing Service (`GeniusShareService`)
+
 - **Single API** - One service for all sharing methods
 - **Multiple Targets** - System share sheet, email, Bluetooth, apps, cloud, local
 - **Quick Share** - Share to saved contacts with one call
@@ -1196,18 +1352,21 @@ final email = emailService.createFromTemplate(
 - **Share Events** - Stream of sharing updates
 
 #### Share Models
+
 - `GeniusShareTarget` - Define share destination (system, email, bluetooth, app, cloud, local)
 - `GeniusShareResult` - Detailed operation result with status
 - `GeniusShareHistoryItem` - History entry with timestamp and metadata
 - `GeniusShareConfig` - Configuration for size limits, compression, timestamps
 
 #### Quick Share Contacts
+
 - `GeniusQuickShareContact` - Save favorite share recipients
 - **Favorite Contacts** - Mark contacts as favorites
 - **Usage Tracking** - Track share frequency and recent activity
 - **Contact Management** - Add, remove, toggle favorites
 
 #### Message Templates
+
 - `GeniusShareMessageTemplate` - Reusable email templates
 - **Built-in Templates** - Invoice, Report, Document templates
 - **Variable Substitution** - Replace placeholders with values
@@ -1265,6 +1424,7 @@ final successfulShares = shareService.successfulShares;
 ### Added
 
 #### Print Preview Widget (`GeniusPrintPreview`)
+
 - **Visual Preview** - See document before printing with full page rendering
 - **Settings Panel** - Adjust all print settings from the preview screen
 - **Settings Summary** - Quick overview of current settings (paper, orientation, color, copies)
@@ -1272,6 +1432,7 @@ final successfulShares = shareService.successfulShares;
 - **Full Dialog Support** - Use `GeniusPrintPreviewDialog.show()` for modal preview
 
 #### Print Settings Manager (`GeniusPrintSettingsManager`)
+
 - **Save Profiles** - Save custom print settings as reusable profiles
 - **System Presets** - Built-in presets (Default, Eco, High Quality, Draft, Booklet, Presentation)
 - **Profile Management** - Create, update, delete, and organize print profiles
@@ -1281,6 +1442,7 @@ final successfulShares = shareService.successfulShares;
 - **Persistence Support** - Callbacks for saving profiles to storage
 
 #### Print Profile Model (`GeniusPrintProfile`)
+
 - **Profile Data** - Name, Arabic name, icon, settings, and metadata
 - **Usage Statistics** - Track usage count and last used date
 - **JSON Serialization** - Full serialization support for persistence
@@ -1328,6 +1490,7 @@ if (defaultProfile != null) {
 This release introduces a comprehensive printing module with advanced features.
 
 ##### Printer Service (`GeniusPrinterService`)
+
 - **Print with Dialog** - Show native print dialog for user-controlled printing
 - **Direct Printing** - Print directly to a specific printer (when supported)
 - **Print Copies** - Print multiple copies with collation support
@@ -1335,12 +1498,14 @@ This release introduces a comprehensive printing module with advanced features.
 - **Job Management** - Cancel jobs, view history, clear completed jobs
 
 ##### Printer Discovery (`GeniusPrinterDiscovery`)
+
 - **Discover Printers** - Find available printers on the system/network
 - **Printer Info** - Get detailed printer information (name, status, capabilities)
 - **Printer Status** - Check if a printer is available and ready
 - **Caching** - Efficient caching to reduce discovery overhead
 
 ##### Print Settings (`GeniusPrintSettings`)
+
 - **Paper Size** - Support for A3, A4, A5, Letter, Legal, and more
 - **Orientation** - Portrait, Landscape, or Auto-detect
 - **Color Mode** - Color, Grayscale, or Black & White
@@ -1351,6 +1516,7 @@ This release introduces a comprehensive printing module with advanced features.
 - **Scale** - Fit to page or custom scale percentage
 
 ##### Printer Models
+
 - `GeniusPrinterInfo` - Printer information with status and capabilities
 - `GeniusPrinterCapabilities` - Printer feature detection
 - `GeniusPrintJob` - Print job with status tracking
@@ -1397,6 +1563,7 @@ final highQuality = GeniusPrintSettings.highQuality(); // Color, high quality
 ### Added
 
 - **`GeniusPdfConfig.fontBuild()`** - Helper method to build fonts from config assets:
+
   ```dart
   // Build font from config assets with custom size
   final titleFont = GeniusPdfConfig.fontBuild(fontSize: 18);
@@ -1427,6 +1594,7 @@ final highQuality = GeniusPrintSettings.highQuality(); // Color, high quality
 A unified configuration center that merges all PDF settings into a single entry point.
 
 ##### `GeniusPdfConfig` Enhancements
+
 - **Assets as Instance Field** - `configAssets` is now an instance field, allowing each config to have its own assets:
   - Each `GeniusPdfConfig` instance can have its own set of fonts and images
   - Access via `config.configAssets` for local instances
@@ -1439,6 +1607,7 @@ A unified configuration center that merges all PDF settings into a single entry 
   - `GeniusPdfConfig.logger.debug()`, `.info()`, `.warning()`, `.error()` - Log messages
 
 ##### New Configuration Classes
+
 - `GeniusPdfAssetPaths` - Combined paths configuration for fonts and branding
 - `GeniusPdfAssetsData` - Pre-loaded asset data configuration
 - `GeniusPdfLoggerConfig` - Logger configuration (enabled, minLevel, useConsole, etc.)
@@ -1487,9 +1656,11 @@ GeniusPdfConfig.logger.info('PDF generation started');
 ### Added
 
 #### AI-Powered Features
+
 This release introduces intelligent features for PDF creation and analysis.
 
 ##### Content Analysis (`GeniusPdfContentAnalyzer`)
+
 - **Text Extraction** - Extract text content from PDF documents
 - **Document Classification** - Automatically detect document types (invoice, report, letter, contract, etc.)
 - **Language Detection** - Detect languages used in the document with RTL support
@@ -1503,6 +1674,7 @@ This release introduces intelligent features for PDF creation and analysis.
 - **Metadata Extraction** - Extract document metadata
 
 ##### Smart Layout Engine (`GeniusSmartLayoutEngine`)
+
 - **Font Size Analysis** - Suggests optimal font sizes based on content density
 - **Margin Optimization** - Smart margin suggestions for print or screen
 - **Spacing Analysis** - Optimal spacing between elements
@@ -1512,6 +1684,7 @@ This release introduces intelligent features for PDF creation and analysis.
 - **RTL Support** - Full RTL layout support
 
 ##### Smart Text Services (`GeniusSmartTextServices`)
+
 - **Text Summarization** - Summarize long documents with key points extraction
 - **Language Detection** - Detect primary language with confidence scores
 - **Smart Title Generation** - Generate document titles based on content
@@ -1519,6 +1692,7 @@ This release introduces intelligent features for PDF creation and analysis.
 - **RTL Detection** - Automatically detect RTL text
 
 ##### Smart Image Optimizer (`GeniusSmartImageOptimizer`)
+
 - **Image Analysis** - Analyze image dimensions and quality
 - **Optimization Recommendations** - Smart suggestions for image optimization
 - **Size Calculation** - Calculate optimal image sizes for PDF
@@ -1526,6 +1700,7 @@ This release introduces intelligent features for PDF creation and analysis.
 - **Print vs Screen** - Different optimization for print and screen
 
 ### Example
+
 ```dart
 // Analyze PDF content
 final analyzer = GeniusPdfContentAnalyzer();
@@ -1557,6 +1732,7 @@ final analysis = await imageOptimizer.analyze(imageBytes);
 ### Fixed
 
 #### Custom Report Screen
+
 - **custom_report_screen** - Fixed app hanging when generating PDF
   - Changed from PdfStandardFont (Helvetica) to PdfTrueTypeFont for LTR mode
   - Now uses DIN font for LTR and Hacen Tunisia font for RTL
@@ -1565,6 +1741,7 @@ final analysis = await imageOptimizer.analyze(imageBytes);
   - Fixed missing const keyword
 
 ### Changed
+
 - Custom report generation now works reliably in both LTR and RTL modes
 
 ---
@@ -1574,6 +1751,7 @@ final analysis = await imageOptimizer.analyze(imageBytes);
 ### Fixed
 
 #### V2 Architecture Demo Screen
+
 - **v2_architecture_demo_screen** - Fixed missing const keyword
 - Added comprehensive documentation explaining the screen's purpose:
   - Fluent API for building PDFs
@@ -1582,6 +1760,7 @@ final analysis = await imageOptimizer.analyze(imageBytes);
   - Event-driven architecture
 
 ### Changed
+
 - Improved code documentation for better developer experience
 
 ---
@@ -1591,6 +1770,7 @@ final analysis = await imageOptimizer.analyze(imageBytes);
 ### Fixed
 
 #### Template Engine Stability
+
 - **ConditionalElement** - Fixed null check error when condition is null
   - Added safe null handling in `render()` and `calculateHeight()` methods
   - Fixed `toJson()` to handle null condition gracefully
@@ -1598,6 +1778,7 @@ final analysis = await imageOptimizer.analyze(imageBytes);
 - **template_engine_demo_screen** - Fixed missing const keyword causing potential issues
 
 ### Changed
+
 - Improved template engine robustness with better null safety handling
 
 ---
@@ -1607,9 +1788,11 @@ final analysis = await imageOptimizer.analyze(imageBytes);
 ### Added
 
 #### Default Output Path
+
 - **GeniusPdfConfig** - Added `defaultOutputPath` property for setting a default directory for generated PDF files
 
 #### File Opening in Demo Screens
+
 - **job_manager_demo_screen** - Added ability to open generated PDF files directly from the app
   - Files are saved to documents directory
   - Open button appears for completed jobs
@@ -1618,6 +1801,7 @@ final analysis = await imageOptimizer.analyze(imageBytes);
   - Quick open button after successful export
 
 ### Changed
+
 - Updated example app to demonstrate file opening functionality
 - Improved user experience with direct file access after generation
 
@@ -1657,6 +1841,7 @@ final analysis = await imageOptimizer.analyze(imageBytes);
 ### Migration Guide
 
 Before (v2.0.2):
+
 ```dart
 // Fonts were optional, Helvetica was used as fallback
 final grid = GeniusPdfDataGrid(
@@ -1666,6 +1851,7 @@ final grid = GeniusPdfDataGrid(
 ```
 
 After (v2.0.5):
+
 ```dart
 // Fonts must be provided
 final grid = GeniusPdfDataGrid(
@@ -1677,6 +1863,7 @@ final grid = GeniusPdfDataGrid(
 ```
 
 Or use Config:
+
 ```dart
 GeniusPdfConfig.initialize(
   baseFont: PdfTrueTypeFont(arabicFontData, 10),

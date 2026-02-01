@@ -289,6 +289,7 @@ class MyReport extends GeniusPdfDocumentBuilder {
 ```
 
 **Key APIs:**
+
 | API | Description |
 |-----|-------------|
 | `currentY` | Current vertical position on the page |
@@ -341,6 +342,7 @@ class SalesReport extends GeniusPdfDocumentBuilder {
 ```
 
 **Grid & Summary APIs:**
+
 | API | Description |
 |-----|-------------|
 | `addGrid(grid, {spacing})` | Draw data grid at current position |
@@ -497,7 +499,6 @@ final grid = GeniusPdfDataGrid(
     GeniusPdfGridRow.total({'name': 'Total', 'amount': 300.00}),
   ],
   style: GeniusPdfGridStyle.classic(),
-  isRTL: true,
 );
 
 grid.draw(page: page, bounds: bounds);
@@ -927,7 +928,6 @@ final barChart = GeniusPdfBarChart(
     cornerRadius: 4,
   ),
   style: GeniusChartStyle.modern(),
-  isRtl: false,
   height: 250,
 );
 

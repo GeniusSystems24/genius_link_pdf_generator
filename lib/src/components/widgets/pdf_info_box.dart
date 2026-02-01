@@ -2147,13 +2147,6 @@ class GeniusPdfSection {
     this.titleAr,
     this.subtitle,
     this.subtitleAr,
-    @Deprecated('Use style.backgroundColor instead') Color? backgroundColor,
-    @Deprecated('Use style.borderStyle instead')
-    GeniusPdfBorderStyle borderStyle = const GeniusPdfBorderStyle.all(),
-    @Deprecated('Use style.padding instead')
-    GeniusPdfCellPadding padding = const GeniusPdfCellPadding.all(8),
-    @Deprecated('Use style.titleStyle instead') GeniusPdfTextStyle titleStyle =
-        const GeniusPdfTextStyle.header(fontSize: 11),
     GeniusPdfSectionStyle? style,
     this.icon,
     this.iconColor,
@@ -2162,16 +2155,7 @@ class GeniusPdfSection {
     this.pageBreakBefore = false,
     this.minHeight,
     this.maxHeight,
-  })  : style = style ??
-            GeniusPdfSectionStyle(
-              backgroundColor: backgroundColor,
-              borderStyle: borderStyle,
-              padding: padding,
-              titleStyle: titleStyle,
-            ),
-        baseFont = config.baseFont,
-        boldFont = config.boldFont,
-        isRTL = config.isRTL;
+  }) : style = style ?? const GeniusPdfSectionStyle();
 
   /// Creates a titled section with corporate styling.
   factory GeniusPdfSection.corporate({
@@ -2234,13 +2218,13 @@ class GeniusPdfSection {
   final GeniusPdfConfig config;
 
   /// Base font for text.
-  final PdfFont baseFont;
+  PdfFont get baseFont => config.baseFont;
 
   /// Bold font for titles.
-  final PdfFont boldFont;
+  PdfFont get boldFont => config.boldFont;
 
   /// Whether to use RTL layout.
-  final bool isRTL;
+  bool get isRTL => config.isRTL;
 
   /// Optional icon identifier.
   final String? icon;

@@ -1147,24 +1147,21 @@ class GeniusPdfRichTextBuilder {
   GeniusPdfRichTextBuilder({
     required this.config,
     GeniusPdfTextStyle? defaultStyle,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-    this.italicFont,
-    this.boldItalicFont,
-    bool? isRTL,
     this.paragraphAlignment = GeniusPdfParagraphAlignment.start,
-  })  : defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config),
-        baseFont = _resolveRichTextBaseFont(baseFont, config),
-        boldFont = _resolveRichTextBoldFont(boldFont, baseFont, config),
-        isRTL = isRTL ?? config.isRTL;
+  }) : defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config);
 
   final GeniusPdfTextStyle defaultStyle;
   final GeniusPdfConfig config;
-  final PdfFont baseFont;
-  final PdfFont boldFont;
-  final PdfFont? italicFont;
-  final PdfFont? boldItalicFont;
-  final bool isRTL;
+
+  PdfFont get baseFont => config.baseFont;
+
+  PdfFont get boldFont => config.boldFont;
+
+  PdfFont? get italicFont => null;
+
+  PdfFont? get boldItalicFont => null;
+
+  bool get isRTL => config.isRTL;
   final GeniusPdfParagraphAlignment paragraphAlignment;
 
   final List<GeniusPdfTextSpan> _spans = [];

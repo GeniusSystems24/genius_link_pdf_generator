@@ -1489,6 +1489,123 @@ abstract class GeniusPdfDocumentBuilder {
     );
   }
 
+  /// Draws two [GeniusPdfInfoBox] components side by side.
+  ///
+  /// The boxes are rendered at [currentY] + [spacing] with equal widths
+  /// (minus the [boxSpacing] gap between them). After drawing, [currentY]
+  /// advances to the bottom of the taller box.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addDualInfoBox(
+  ///   leftBox: customerBox,
+  ///   rightBox: companyBox,
+  ///   equalHeight: true,
+  ///   boxSpacing: 20,
+  ///   spacing: 10,
+  /// );
+  /// ```
+  void addDualInfoBox({
+    required GeniusPdfInfoBox leftBox,
+    required GeniusPdfInfoBox rightBox,
+    bool equalHeight = true,
+    double boxSpacing = 20,
+    bool swapForRTL = true,
+    double spacing = 0,
+  }) {
+    final page = currentPage;
+    final drawY = _currentY + spacing;
+
+    GeniusPdfLogger.debug(
+      'Drawing dual info box at Y=$drawY',
+      tag: 'Builder',
+    );
+
+    final dualBox = GeniusPdfDualInfoBox(
+      leftBox: leftBox,
+      rightBox: rightBox,
+      equalHeight: equalHeight,
+      spacing: boxSpacing,
+      swapForRTL: swapForRTL,
+    );
+
+    final result = dualBox.draw(
+      page: page,
+      bounds: Rect.fromLTWH(0, drawY, pageWidth, remainingHeight),
+    );
+
+    _currentY = result.bottom;
+    GeniusPdfLogger.debug(
+      'Dual info box drawn → Y=${_currentY.toStringAsFixed(1)}',
+      tag: 'Builder',
+    );
+  }
+
+  /// Draws a [GeniusPdfBulletList] at the current Y position.
+  ///
+  /// The bullet list is rendered starting at [currentY] + [spacing]. After drawing,
+  /// [currentY] advances by an estimated height based on item count.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addBulletList(
+  ///   GeniusPdfBulletList(
+  ///     items: [
+  ///       GeniusPdfBulletItem.simple('First item'),
+  ///       GeniusPdfBulletItem.simple('Second item'),
+  ///     ],
+  ///     config: config,
+  ///     baseFont: baseFont,
+  ///     boldFont: boldFont,
+  ///     isRTL: false,
+  ///   ),
+  ///   spacing: 10,
+  /// );
+  /// ```
+  void addBulletList(
+    GeniusPdfBulletList bulletList, {
+    double spacing = 0,
+    double estimatedHeight = 100,
+  }) {
+    final page = currentPage;
+    final drawY = _currentY + spacing;
+
+    GeniusPdfLogger.debug(
+      'Drawing bullet list at Y=$drawY (${bulletList.items.length} items)',
+      tag: 'Builder',
+    );
+
+    bulletList.draw(
+      page: page,
+      bounds: Rect.fromLTWH(0, drawY, pageWidth, estimatedHeight),
+    );
+
+    _currentY = drawY + estimatedHeight;
+    GeniusPdfLogger.debug(
+      'Bullet list drawn → Y=${_currentY.toStringAsFixed(1)}',
+      tag: 'Builder',
+    );
+  }
+
+  /// Draws a [GeniusPdfInfoBox] at the current Y position.
+  ///
+  /// The info box is rendered starting at [currentY] + [spacing]. After drawing,
+  /// [currentY] advances to the bottom of the info box.
+  ///
+  /// ## Example
+  /// ```dart
+  /// addInfoBox(
+  ///   GeniusPdfInfoBox(
+  ///     config: config,
+  ///     title: 'Note',
+  ///     titleAr: 'ملاحظة',
+  ///     items: [...],
+  ///     style: GeniusPdfInfoBoxStyle.info(),
+  ///   ),
+  ///   spacing: 10,
+  /// );
+  /// ```
+
   // ============================================================
   // ABSTRACT METHODS
   // ============================================================
