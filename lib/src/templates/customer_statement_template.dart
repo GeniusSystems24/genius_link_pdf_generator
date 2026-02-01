@@ -184,9 +184,6 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
       company: company,
       printDate: DateTime.now(),
       style: const GeniusPdfReportHeaderStyle.classic(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
@@ -209,9 +206,6 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
           label: 'Customer Name',
           labelAr: 'اسم العميل',
           value: customer.getName(isArabic: config.isRTL),
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (customer.address != null)
           GeniusPdfLabeledValue(
@@ -221,9 +215,6 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (customer.addressAr ?? customer.address!)
                 : customer.address!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (customer.accountNumber != null)
           GeniusPdfLabeledValue(
@@ -231,9 +222,6 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
             label: 'Account No',
             labelAr: 'رقم الحساب',
             value: customer.accountNumber!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (customer.phone != null)
           GeniusPdfLabeledValue(
@@ -241,15 +229,9 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
             label: 'Phone',
             labelAr: 'رقم الهاتف',
             value: customer.phone!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final periodBox = GeniusPdfInfoBox(
@@ -262,42 +244,27 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
           label: 'Period From',
           labelAr: 'من تاريخ',
           value: _formatDate(data.periodFrom),
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Period To',
           labelAr: 'إلى تاريخ',
           value: _formatDate(data.periodTo),
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Opening Balance',
           labelAr: 'الرصيد الافتتاحي',
           value: _formatNumber(data.openingBalance),
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Currency',
           labelAr: 'العملة',
           value: data.currency,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final dualBox = GeniusPdfDualInfoBox(
@@ -416,9 +383,6 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.classic(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final result = grid.drawAt(
@@ -495,9 +459,6 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
         }),
       ],
       style: const GeniusPdfGridStyle.classic(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final result = agingGrid.drawAt(
@@ -516,8 +477,6 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
     final signature = GeniusPdfSignatureArea(
       title: 'Authorized Signature',
       titleAr: 'التوقيع المعتمد',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     signature.draw(

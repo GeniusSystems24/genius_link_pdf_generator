@@ -701,7 +701,6 @@ final barChart = GeniusPdfBarChart(
     barWidth: ${_barType == GeniusBarChartType.horizontal ? 20 : 30},
     showValues: true,
   ),
-  style: GeniusChartStyle.modern(),
 );''';
   }
 
@@ -729,7 +728,6 @@ final lineChart = GeniusPdfLineChart(
     fillArea: $_lineFillArea,
     fillOpacity: 0.2,
   ),
-  style: GeniusChartStyle.modern(),
 );''';
   }
 
@@ -765,7 +763,6 @@ final pieChart = GeniusPdfPieChart(
     GeniusChartDataPoint(label: 'Marketing', value: 3000),
   ],
   settings: $settings,$legend
-  style: GeniusChartStyle.modern(),
 );''';
   }
 
@@ -789,7 +786,6 @@ final areaChart = GeniusPdfAreaChart(
     showPoints: $points,
     fillOpacity: 0.4,
   ),
-  style: GeniusChartStyle.modern(),
 );''';
   }
 

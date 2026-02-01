@@ -7,7 +7,7 @@
 /// ```dart
 /// // Create config with assets
 /// final config = await GeniusPdfConfig.create(
-///   baseFont: myFont,
+///   baseFontBytes: myFontBytes,
 ///   assetPaths: GeniusPdfAssetPaths(
 ///     fontPaths: GeniusPdfFontPaths(primaryFont: 'assets/fonts/din.ttf'),
 ///   ),
@@ -91,7 +91,7 @@ class GeniusPdfAssetsData {
 /// ```dart
 /// // Create config with assets
 /// final config = await GeniusPdfConfig.create(
-///   baseFont: myFont,
+///   baseFontBytes: myFontBytes,
 ///   assetPaths: GeniusPdfAssetPaths(
 ///     fontPaths: GeniusPdfFontPaths(primaryFont: 'assets/fonts/din.ttf'),
 ///   ),

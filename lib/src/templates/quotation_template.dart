@@ -171,9 +171,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
         titleStyle: GeniusPdfTextStyle.title(fontSize: 20),
         showBorder: false,
       ),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
@@ -197,9 +194,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           labelAr: 'الاسم',
           value:
               config.isRTL ? (customer.nameAr ?? customer.name) : customer.name,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (customer.company != null)
           GeniusPdfLabeledValue(
@@ -209,9 +203,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (customer.companyAr ?? customer.company!)
                 : customer.company!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (customer.address != null)
           GeniusPdfLabeledValue(
@@ -221,9 +212,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (customer.addressAr ?? customer.address!)
                 : customer.address!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (customer.phone != null)
           GeniusPdfLabeledValue(
@@ -231,9 +219,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
             label: 'Phone',
             labelAr: 'الهاتف',
             value: customer.phone!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (customer.email != null)
           GeniusPdfLabeledValue(
@@ -241,15 +226,9 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
             label: 'Email',
             labelAr: 'البريد',
             value: customer.email!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final quotationBox = GeniusPdfInfoBox(
@@ -262,18 +241,12 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           label: 'Quotation No',
           labelAr: 'رقم العرض',
           value: quotation.quotationNumber,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(quotation.quotationDate),
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (quotation.validUntil != null)
           GeniusPdfLabeledValue(
@@ -281,9 +254,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
             label: 'Valid Until',
             labelAr: 'صالح حتى',
             value: _formatDate(quotation.validUntil!),
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (quotation.reference != null)
           GeniusPdfLabeledValue(
@@ -291,9 +261,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
             label: 'Reference',
             labelAr: 'المرجع',
             value: quotation.reference!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (quotation.paymentTerms != null)
           GeniusPdfLabeledValue(
@@ -303,15 +270,9 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (quotation.paymentTermsAr ?? quotation.paymentTerms!)
                 : quotation.paymentTerms!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final dualBox = GeniusPdfDualInfoBox(
@@ -380,9 +341,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
               }))
           .toList(),
       style: const GeniusPdfGridStyle.modern(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final result = grid.drawAt(
@@ -424,9 +382,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       items: items,
       style: const GeniusPdfSummaryStyle.bordered(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       alignment: GeniusPdfSummaryAlignment.right,
       width: pageWidth * 0.4,
     );
@@ -496,8 +451,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
     final signature = GeniusPdfSignatureArea(
       title: 'Authorized Signature',
       titleAr: 'التوقيع المعتمد',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     signature.draw(
@@ -514,8 +467,6 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
     final acceptance = GeniusPdfSignatureArea(
       title: 'Customer Acceptance',
       titleAr: 'موافقة العميل',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     acceptance.draw(

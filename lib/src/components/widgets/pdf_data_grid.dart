@@ -44,14 +44,8 @@ class GeniusPdfDataGrid {
     required this.rows,
     required this.config,
     GeniusPdfGridStyle? style,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-    bool? isRTL,
     this.groups,
-  })  : style = _resolveGridStyle(style, config),
-        baseFont = _resolveBaseFont(baseFont, config),
-        boldFont = _resolveBoldFont(boldFont, baseFont, config),
-        isRTL = isRTL ?? config.isRTL;
+  }) : style = _resolveGridStyle(style, config);
 
   /// Column definitions.
   final List<GeniusPdfGridColumn> columns;
@@ -65,29 +59,8 @@ class GeniusPdfDataGrid {
   /// PDF configuration.
   final GeniusPdfConfig config;
 
-  /// Base font for text.
-  final PdfFont baseFont;
-
-  /// Bold font for headers and totals.
-  final PdfFont boldFont;
-
-  /// Whether to use RTL layout.
-  final bool isRTL;
-
   /// Optional grouped data.
   final List<GeniusPdfGridGroup>? groups;
-
-  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
-    return baseFont ?? config.baseFont;
-  }
-
-  static PdfFont _resolveBoldFont(
-    PdfFont? boldFont,
-    PdfFont? baseFont,
-    GeniusPdfConfig config,
-  ) {
-    return boldFont ?? config.boldFont;
-  }
 
   static GeniusPdfGridStyle _resolveGridStyle(
     GeniusPdfGridStyle? style,
@@ -235,11 +208,11 @@ class GeniusPdfDataGrid {
       _applyRowStyle(headerRow, style.headerStyle, isHeader: true);
 
       for (int i = 0; i < cols.length; i++) {
-        final colIndex = isRTL ? cols.length - 1 - i : i;
+        final colIndex = config.isRTL ? cols.length - 1 - i : i;
         final column = cols[colIndex];
         final cell = headerRow.cells[i];
 
-        cell.value = column.getTitle(isArabic: isRTL);
+        cell.value = column.getTitle(isArabic: config.isRTL);
         _applyCellStyle(
           cell,
           column.headerStyle ?? style.headerStyle,
@@ -270,7 +243,7 @@ class GeniusPdfDataGrid {
     for (final group in groups!) {
       // Add group header
       final groupHeaderRow = grid.rows.add();
-      groupHeaderRow.cells[0].value = group.getTitle(isArabic: isRTL);
+      groupHeaderRow.cells[0].value = group.getTitle(isArabic: config.isRTL);
       groupHeaderRow.cells[0].columnSpan = cols.length;
 
       final groupStyle = group.style ?? style.groupHeaderStyle;
@@ -366,7 +339,7 @@ class GeniusPdfDataGrid {
 
     // Populate cells
     for (int i = 0; i < cols.length; i++) {
-      final colIndex = isRTL ? cols.length - 1 - i : i;
+      final colIndex = config.isRTL ? cols.length - 1 - i : i;
       final column = cols[colIndex];
       final cell = row.cells[i];
 
@@ -419,9 +392,9 @@ class GeniusPdfDataGrid {
     // Font - baseFont and boldFont are required, no fallback to Helvetica
     PdfFont font;
     if (cellStyle.textStyle.isBold || isHeader || isTotal) {
-      font = boldFont;
+      font = config.boldFont;
     } else {
-      font = baseFont;
+      font = config.baseFont;
     }
     cell.style.font = font;
 
@@ -434,8 +407,9 @@ class GeniusPdfDataGrid {
       alignment: alignment.toPdfTextAlignment(),
       lineAlignment:
           cellStyle.textStyle.verticalAlignment.toPdfVerticalAlignment(),
-      textDirection:
-          isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+        textDirection: config.isRTL
+          ? PdfTextDirection.rightToLeft
+          : PdfTextDirection.leftToRight,
     );
   }
 
@@ -508,9 +482,6 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
     String valueHeaderAr = 'القيمة',
     required GeniusPdfConfig config,
     GeniusPdfGridStyle? style,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
   }) {
     return GeniusPdfDataGrid(
       config: config,
@@ -534,9 +505,6 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
               GeniusPdfGridRow(cells: {'label': e.key, 'value': e.value}))
           .toList(),
       style: style ?? const GeniusPdfGridStyle.classic(),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
     );
   }
 
@@ -560,9 +528,6 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
     String balanceHeaderAr = 'الرصيد',
     required GeniusPdfConfig config,
     GeniusPdfGridStyle? style,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
   }) {
     return GeniusPdfDataGrid(
       config: config,
@@ -609,9 +574,6 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
               }))
           .toList(),
       style: style ?? const GeniusPdfGridStyle.classic(),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
     );
   }
 }
@@ -1012,9 +974,6 @@ extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
     required List<GeniusConditionalFormatRule> rules,
     required GeniusPdfConfig config,
     GeniusPdfGridStyle style = const GeniusPdfGridStyle.classic(),
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
     List<GeniusPdfGridGroup>? groups,
   }) {
     // Apply formatting to rows
@@ -1043,9 +1002,6 @@ extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
       columns: columns,
       rows: formattedRows,
       style: style,
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
       groups: groups,
     );
   }

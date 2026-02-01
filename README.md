@@ -129,7 +129,8 @@ void main() async {
   // Create config instance with assets and logger
   final config = await GeniusPdfConfig.create(
     // PDF Configuration
-    baseFont: PdfTrueTypeFont(fontBytes.toList(), 12),
+    baseFontBytes: fontBytes,
+    baseFontSize: 12,
     textDirection: TextDirection.rtl,
     pageSize: GeniusPdfPageSize.a4,
     orientation: PdfPageOrientation.portrait,
@@ -180,7 +181,8 @@ class MyApp extends StatelessWidget {
 ```dart
 // When assets are already loaded
 final config = GeniusPdfConfig.createSync(
-  baseFont: myFont,
+  baseFontBytes: myFontBytes,
+  baseFontSize: 12,
   textDirection: TextDirection.rtl,
   assetData: GeniusPdfAssetsData(
     primaryFont: myFontBytes,
@@ -193,7 +195,8 @@ final config = GeniusPdfConfig.createSync(
 ```dart
 // For simple cases without asset loading
 final config = GeniusPdfConfig(
-  baseFont: PdfTrueTypeFont(fontBytes, 12),
+  baseFontBytes: fontBytes,
+  baseFontSize: 12,
   textDirection: TextDirection.rtl,
   configAssets: myPreloadedAssets,
 );
@@ -229,7 +232,9 @@ final service = GeniusPdfService();
 await service.generateAndOpen(
   builder: InvoiceDocument(
     config: GeniusPdfConfig(
-      baseFont: PdfTrueTypeFont(GeniusPdfAssets.instance.primaryFont, 12),
+      baseFontBytes: fontBytes, // load once and reuse
+      baseFontSize: 12,
+      textDirection: TextDirection.rtl,
     ),
     invoiceNumber: 'INV-001',
     total: 150.00,
@@ -240,81 +245,26 @@ await service.generateAndOpen(
 
 ---
 
-## Global Configuration (GeniusPdfConfig.instance)
+## Configuration Model
 
-The library supports a singleton pattern for `GeniusPdfConfig`, allowing you to initialize the configuration once and access it anywhere in your app.
+There is **no global singleton** for `GeniusPdfConfig`. Each document builder receives its own config instance.
 
-### Initialize Once
-
-```dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize global configuration at app startup
-  GeniusPdfConfig.initialize(
-    baseFont: PdfTrueTypeFont(fontData, 12),          // Required - supports Arabic
-    boldFont: PdfTrueTypeFont(boldFontData, 12),      // Optional - for headers/emphasis
-    headerFont: PdfTrueTypeFont(boldFontData, 16),    // Optional - for large titles
-    smallFont: PdfTrueTypeFont(fontData, 9),          // Optional - for captions
-    pageSize: GeniusPdfPageSize.a4,
-    orientation: PdfPageOrientation.portrait,
-    textDirection: TextDirection.rtl,
-  );
-
-  runApp(MyApp());
-}
-```
-
-### Font Properties
+### Font Properties (Bytes-Based)
 
 | Property | Description | Fallback |
 |----------|-------------|----------|
-| `baseFont` | Primary font for all text (must support Arabic) | Required |
-| `boldFont` | Bold version for headers and emphasis | Falls back to `baseFont` |
-| `headerFont` | Font for large titles | Falls back to `boldFont` or `baseFont` |
-| `smallFont` | Smaller font for captions/footnotes | Falls back to `baseFont` |
+| `baseFontBytes` | Primary font bytes for all text (must support Arabic) | Required |
+| `boldFontBytes` | Bold font bytes for headers/emphasis | Falls back to `baseFontBytes` |
+| `headerFontBytes` | Font bytes for large titles | Falls back to `boldFontBytes` or `baseFontBytes` |
+| `smallFontBytes` | Smaller font bytes for captions/footnotes | Falls back to `baseFontBytes` |
+| `baseFontSize` | Base font size | Theme body size |
+| `boldFontSize` | Bold font size | Theme body size |
+| `headerFontSize` | Header font size | Theme heading size |
+| `smallFontSize` | Small font size | Theme small size |
 
-### Access Anywhere
+### Component Configuration
 
-```dart
-// Get the global instance (throws if not initialized)
-final config = GeniusPdfConfig.instance;
-
-// Safe access (returns null if not initialized)
-final config = GeniusPdfConfig.instanceOrNull;
-
-// Check if initialized
-if (GeniusPdfConfig.isInitialized) {
-  final config = GeniusPdfConfig.instance;
-}
-```
-
-### Update Configuration
-
-```dart
-// Update specific properties of the global config
-GeniusPdfConfig.update(
-  textDirection: TextDirection.ltr,
-  pageSize: GeniusPdfPageSize.letter,
-);
-```
-
-### Using with Templates
-
-```dart
-// Use global config
-final invoice = TaxInvoiceTemplate(
-  config: GeniusPdfConfig.instance,
-  company: companyInfo,
-  // ...
-);
-
-// Or create a local config for specific needs
-final localConfig = GeniusPdfConfig(
-  baseFont: specialFont,
-  pageSize: GeniusPdfPageSize.legal,
-);
-```
+All components (charts, barcodes, info boxes, headers, summaries, watermarks, etc.) **use the config’s fonts and RTL settings**. Per-component overrides for `baseFont`, `boldFont`, and `isRTL` were removed.
 
 ---
 
@@ -334,7 +284,8 @@ final invoiceTheme = GeniusPdfPrintTheme.invoice();     // Invoice optimized
 
 // Apply theme to config
 final config = GeniusPdfConfig(
-  baseFont: myFont,
+  baseFontBytes: myFontBytes,
+  baseFontSize: 12,
   printTheme: corporateTheme,
 );
 ```
@@ -406,6 +357,7 @@ grid.draw(page: page, bounds: bounds);
 ```
 
 **Column Types:**
+
 - `GeniusPdfGridColumn()` - Standard column
 - `GeniusPdfGridColumn.numeric()` - Right-aligned numeric
 - `GeniusPdfGridColumn.currency()` - Currency with formatting
@@ -417,6 +369,7 @@ grid.draw(page: page, bounds: bounds);
 - `GeniusPdfGridColumn.action()` - Action/status column
 
 **Row Types:**
+
 - `GeniusPdfGridRow()` - Standard row
 - `GeniusPdfGridRow.total()` - Total row with bold styling
 - `GeniusPdfGridRow.subtotal()` - Subtotal row
@@ -424,6 +377,7 @@ grid.draw(page: page, bounds: bounds);
 - `GeniusPdfGridRow.spacer()` - Empty spacer row
 
 **Grid Styles:**
+
 - `GeniusPdfGridStyle.classic()` - Traditional bordered
 - `GeniusPdfGridStyle.modern()` - Minimal with accent borders
 - `GeniusPdfGridStyle.corporate()` - Corporate blue style
@@ -432,6 +386,7 @@ grid.draw(page: page, bounds: bounds);
 - `GeniusPdfGridStyle.invoice()` - Optimized for invoices
 
 **Advanced Column Features:**
+
 ```dart
 GeniusPdfGridColumn(
   id: 'price',
@@ -463,6 +418,7 @@ richText.draw(page: page, bounds: bounds);
 ```
 
 **Available Methods:**
+
 - `.text()` - Plain text
 - `.bold()` - Bold text with optional color
 - `.colored()` - Colored text
@@ -471,6 +427,7 @@ richText.draw(page: page, bounds: bounds);
 - `.negative()` - Red (negative amount)
 
 **Enhanced Text Spans:**
+
 ```dart
 // Currency formatting
 GeniusPdfTextSpan.currency(
@@ -508,6 +465,7 @@ GeniusPdfTextSpan.subscript(text: '2')    // H₂O
 ```
 
 **Text Decorations:**
+
 ```dart
 GeniusPdfTextSpan(
   text: 'Strikethrough',
@@ -536,6 +494,7 @@ box.draw(page: page, bounds: bounds);
 ```
 
 **Box Styles:**
+
 - `GeniusPdfInfoBoxStyle()` - Default style
 - `GeniusPdfInfoBoxStyle.card()` - Card with border
 - `GeniusPdfInfoBoxStyle.highlighted()` - Left border accent
@@ -548,6 +507,7 @@ box.draw(page: page, bounds: bounds);
 - `GeniusPdfInfoBoxStyle.modern()` - Modern with shadows
 
 **Address Box Factory:**
+
 ```dart
 final addressBox = GeniusPdfInfoBox.address(
   title: 'Billing Address',
@@ -562,6 +522,7 @@ final addressBox = GeniusPdfInfoBox.address(
 ```
 
 **Multi-Column Layout:**
+
 ```dart
 final box = GeniusPdfInfoBox(
   title: 'Details',
@@ -573,6 +534,7 @@ final box = GeniusPdfInfoBox(
 ```
 
 **Dual Info Box Layouts:**
+
 ```dart
 // Horizontal layout (side by side)
 GeniusPdfDualInfoBox(
@@ -614,12 +576,14 @@ header.draw(page: page, bounds: bounds);
 ```
 
 **Header Layouts:**
+
 - `GeniusPdfReportHeaderLayout.standard` - Logo + company + centered title
 - `GeniusPdfReportHeaderLayout.compact` - Side-by-side layout
 - `GeniusPdfReportHeaderLayout.centered` - Everything centered
 - `GeniusPdfReportHeaderLayout.invoice` - Invoice style
 
 **Header Styles:**
+
 - `GeniusPdfReportHeaderStyle.classic()` - Classic professional
 - `GeniusPdfReportHeaderStyle.modern()` - Modern with accent line
 - `GeniusPdfReportHeaderStyle.corporate()` - Corporate blue
@@ -630,6 +594,7 @@ header.draw(page: page, bounds: bounds);
 - `GeniusPdfReportHeaderStyle.centered()` - Center-aligned
 
 **Enhanced Company Info:**
+
 ```dart
 GeniusPdfCompanyInfo(
   name: 'Integrated Solutions Co.',
@@ -654,6 +619,7 @@ GeniusPdfCompanyInfo(
 ```
 
 **Invoice Header Factory:**
+
 ```dart
 final header = GeniusPdfReportHeader.invoice(
   invoiceNumber: 'INV-2025-001',
@@ -665,6 +631,7 @@ final header = GeniusPdfReportHeader.invoice(
 ```
 
 **Simple Header Factory:**
+
 ```dart
 final header = GeniusPdfReportHeader.simple(
   title: 'Monthly Report',
@@ -675,6 +642,7 @@ final header = GeniusPdfReportHeader.simple(
 ```
 
 **Bilingual Order Control:**
+
 ```dart
 // Arabic text appears first
 GeniusPdfReportHeader(
@@ -721,12 +689,14 @@ summary.draw(page: page, bounds: bounds);
 ```
 
 **Summary Styles:**
+
 - `GeniusPdfSummaryStyle()` - Default style
 - `GeniusPdfSummaryStyle.card()` - Card with background
 - `GeniusPdfSummaryStyle.minimal()` - Clean minimal
 - `GeniusPdfSummaryStyle.invoice()` - Invoice optimized
 
 **Enhanced Summary Items:**
+
 ```dart
 GeniusPdfSummaryItem(
   label: 'Subtotal',
@@ -753,6 +723,7 @@ final section = GeniusPdfSection(
 ```
 
 **Section Styles:**
+
 - `GeniusPdfSectionStyle()` - Default style
 - `GeniusPdfSectionStyle.card()` - Card with shadow
 - `GeniusPdfSectionStyle.panel()` - Panel with header
@@ -760,6 +731,7 @@ final section = GeniusPdfSection(
 - `GeniusPdfSectionStyle.filled()` - Filled background
 
 **Title Position Options:**
+
 ```dart
 GeniusPdfSectionStyle(
   titlePosition: GeniusPdfSectionTitlePosition.top,     // Above content
@@ -816,6 +788,7 @@ barChart.draw(page, bounds);
 ```
 
 **Bar Chart Types:**
+
 - `GeniusBarChartType.vertical` - Standard vertical bars
 - `GeniusBarChartType.horizontal` - Horizontal bars
 - `GeniusBarChartType.stacked` - Stacked bars
@@ -866,6 +839,7 @@ lineChart.draw(page, bounds);
 ```
 
 **Line Chart Types:**
+
 - `GeniusLineChartType.straight` - Straight line segments
 - `GeniusLineChartType.curved` - Smooth curved lines
 - `GeniusLineChartType.stepped` - Stepped/staircase lines
@@ -902,6 +876,7 @@ pieChart.draw(page, bounds);
 ```
 
 **Donut Chart:**
+
 ```dart
 final donutChart = GeniusPdfPieChart(
   // ... same as above
@@ -957,6 +932,7 @@ areaChart.draw(page, bounds);
 ### Chart Styling
 
 **Pre-defined Styles:**
+
 ```dart
 GeniusChartStyle.classic()  // White background, standard colors
 GeniusChartStyle.modern()   // Light gray background, modern look
@@ -964,6 +940,7 @@ GeniusChartStyle.dark()     // Dark background for contrast
 ```
 
 **Color Palettes:**
+
 ```dart
 GeniusChartColors.defaultPalette  // Standard colorful palette
 GeniusChartColors.bluePalette     // Shades of blue
@@ -972,6 +949,7 @@ GeniusChartColors.warmPalette     // Warm colors (red, orange, yellow)
 ```
 
 **Axis Configuration:**
+
 ```dart
 GeniusChartAxis(
   title: 'Revenue (SAR)',
@@ -1738,38 +1716,33 @@ Generate 1D barcodes and 2D QR codes directly in PDF documents with full styling
 ```dart
 // EAN-13 barcode
 final barcode = GeniusPdfBarcode.ean13(
+  config: pdfConfig,
   data: '5901234123457',
   caption: 'Product EAN-13',
   captionAr: 'رمز المنتج',
-  baseFont: baseFont,
-  boldFont: boldFont,
-  isRTL: false,
 );
 
 barcode.draw(page: page, bounds: Rect.fromLTWH(0, 0, 200, 100));
 
 // Code128 barcode
 final code128 = GeniusPdfBarcode.code128(
+  config: pdfConfig,
   data: 'INV-2026-001',
   caption: 'Invoice Barcode',
   captionAr: 'رمز الفاتورة',
-  baseFont: baseFont,
-  boldFont: boldFont,
-  isRTL: false,
 );
 
 // Shipping barcode with preset style
 final shipping = GeniusPdfBarcode.shipping(
+  config: pdfConfig,
   data: 'SHIP-2026-0089',
   caption: 'Shipping Label',
   captionAr: 'بطاقة الشحن',
-  baseFont: baseFont,
-  boldFont: boldFont,
-  isRTL: false,
 );
 ```
 
 **Supported Barcode Types:**
+
 - `GeniusBarcodeType.ean13` - EAN-13 (retail products)
 - `GeniusBarcodeType.ean8` - EAN-8 (small items)
 - `GeniusBarcodeType.upcA` - UPC-A (North America)
@@ -1781,6 +1754,7 @@ final shipping = GeniusPdfBarcode.shipping(
 - `GeniusBarcodeType.pdf417` - PDF417
 
 **Barcode Styles:**
+
 ```dart
 GeniusPdfBarcodeStyle.retail()    // Standard retail barcode
 GeniusPdfBarcodeStyle.shipping()  // Large shipping label
@@ -1793,18 +1767,17 @@ GeniusPdfBarcodeStyle.document()  // Document reference barcode
 ```dart
 // URL QR Code
 final urlQR = GeniusPdfQRCodeGenerator.url(
+  config: pdfConfig,
   url: 'https://example.com/invoice/123',
   caption: 'Scan for details',
   captionAr: 'امسح للتفاصيل',
-  baseFont: baseFont,
-  boldFont: boldFont,
-  isRTL: false,
 );
 
 urlQR.draw(page: page, bounds: Rect.fromLTWH(0, 0, 150, 150));
 
 // ZATCA E-Invoice QR Code (Saudi Arabia)
 final zatcaQR = GeniusPdfQRCodeGenerator.zatca(
+  config: pdfConfig,
   sellerName: 'Integrated Solutions Co.',
   vatNumber: '300012345678903',
   timestamp: DateTime.now(),
@@ -1812,38 +1785,32 @@ final zatcaQR = GeniusPdfQRCodeGenerator.zatca(
   vatAmount: 150.00,
   caption: 'ZATCA QR',
   captionAr: 'رمز هيئة الزكاة',
-  baseFont: baseFont,
-  boldFont: boldFont,
-  isRTL: true,
 );
 
 // WiFi QR Code
 final wifiQR = GeniusPdfQRCodeGenerator.wifi(
+  config: pdfConfig,
   ssid: 'OfficeNetwork',
   password: 'password123',
   encryption: 'WPA',
   caption: 'WiFi Access',
   captionAr: 'شبكة الواي فاي',
-  baseFont: baseFont,
-  boldFont: boldFont,
-  isRTL: false,
 );
 
 // vCard QR Code
 final vCardQR = GeniusPdfQRCodeGenerator.vCard(
+  config: pdfConfig,
   name: 'Mohammed Al-Ahmed',
   phone: '+966 55 123 4567',
   email: 'mohammed@example.com',
   organization: 'Tech Solutions',
   caption: 'Contact Card',
   captionAr: 'بطاقة الاتصال',
-  baseFont: baseFont,
-  boldFont: boldFont,
-  isRTL: false,
 );
 ```
 
 **QR Code Styles:**
+
 ```dart
 GeniusPdfQRCodeStyle.invoice()   // Invoice-sized QR
 GeniusPdfQRCodeStyle.payment()   // Payment QR (large)
@@ -1852,6 +1819,7 @@ GeniusPdfQRCodeStyle.branded()   // Branded with caption
 ```
 
 **Error Correction Levels:**
+
 ```dart
 GeniusQRErrorCorrection.low       // ~7% recovery
 GeniusQRErrorCorrection.medium    // ~15% recovery
@@ -2116,7 +2084,7 @@ final json = template.toJsonString(pretty: true);
 ### Rendering Templates
 
 ```dart
-final engine = PdfTemplateEngine(baseFont: font);
+final engine = PdfTemplateEngine(config: pdfConfig);
 
 // Render with data
 final bytes = await engine.render(
@@ -2593,12 +2561,14 @@ GeniusPdfLogger.disable();
 ```
 
 **Filter by Level:**
+
 ```dart
 // Only show warnings and errors
 GeniusPdfLogger.setMinLevel(GeniusLogLevel.warning);
 ```
 
 **Custom Handlers:**
+
 ```dart
 // Add custom log handler
 GeniusPdfLogger.addHandler((entry) {
@@ -2612,6 +2582,7 @@ GeniusPdfLogger.addHandler((entry) {
 ```
 
 **Log History:**
+
 ```dart
 // Enable history for debugging
 GeniusPdfLogger.enableHistory(maxSize: 200);
@@ -2627,6 +2598,7 @@ GeniusPdfLogger.clearHistory();
 ```
 
 **Stream-based Logging:**
+
 ```dart
 // Listen to logs in real-time
 GeniusPdfLogger.stream.listen((entry) {
@@ -2637,6 +2609,7 @@ GeniusPdfLogger.stream.listen((entry) {
 ```
 
 **Use Mixin in Classes:**
+
 ```dart
 class MyPdfBuilder with GeniusLoggable {
   @override

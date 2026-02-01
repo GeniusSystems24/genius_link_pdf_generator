@@ -147,9 +147,6 @@ class _DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
         }),
       ],
       style: GeniusPdfGridStyle.corporate(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
     );
 
     grid.draw(
@@ -169,15 +166,9 @@ class _DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
           value: _isRTL
               ? 'تم التحقق من الأسعار والكميات تلقائياً.'
               : 'Prices and quantities validated automatically.',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
         ),
       ],
       style: GeniusPdfInfoBoxStyle.info(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
     );
 
     noteBox.draw(
@@ -408,57 +399,39 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
           label: 'Name',
           labelAr: 'الاسم',
           value: _isRTL ? 'أحمد محمد' : 'Ahmed Mohammed',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Phone',
           labelAr: 'الهاتف',
           value: '+966 50 123 4567',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Email',
           labelAr: 'البريد',
           value: 'ahmed@example.com',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Address',
           labelAr: 'العنوان',
           value: _isRTL ? 'الرياض، السعودية' : 'Riyadh, Saudi Arabia',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
         ),
       ],
       style: GeniusPdfInfoBoxStyle.card(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
     );
 
     final companyBox = GeniusPdfInfoBox.company(
-      companyName: _isRTL ? 'شركة الأمل للتجارة' : 'Al-Amal Trading Co.',
-      taxNumber: '300123456789003',
-      commercialReg: '1010123456',
-      address:
-          _isRTL ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia',
-      phone: '+966 11 123 4567',
-      email: 'info@alamal.com',
-      config: config,
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
-    );
+        companyName: _isRTL ? 'شركة الأمل للتجارة' : 'Al-Amal Trading Co.',
+        taxNumber: '300123456789003',
+        commercialReg: '1010123456',
+        address: _isRTL
+            ? 'الرياض، المملكة العربية السعودية'
+            : 'Riyadh, Saudi Arabia',
+        phone: '+966 11 123 4567',
+        email: 'info@alamal.com',
+        config: config);
 
     final dualBox = GeniusPdfDualInfoBox(
       leftBox: _isRTL ? companyBox : customerBox,
@@ -487,15 +460,9 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
           value: _isRTL
               ? 'يرجى الاحتفاظ بهذه الفاتورة'
               : 'Please keep this invoice',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
         ),
       ],
       style: GeniusPdfInfoBoxStyle.info(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
     );
     infoBox.draw(
       page: page,
@@ -503,25 +470,18 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
     );
 
     final warningBox = GeniusPdfInfoBox(
-      config: config,
-      title: _isRTL ? 'تحذير' : 'Warning',
-      titleAr: 'تحذير',
-      items: [
-        GeniusPdfLabeledValue(
-          config: config,
-          label: _isRTL ? 'تنبيه' : 'Alert',
-          labelAr: 'تنبيه',
-          value: _isRTL ? 'مستند للمعاينة فقط' : 'Preview only document',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
-        ),
-      ],
-      style: GeniusPdfInfoBoxStyle.warning(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
-    );
+        config: config,
+        title: _isRTL ? 'تحذير' : 'Warning',
+        titleAr: 'تحذير',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            label: _isRTL ? 'تنبيه' : 'Alert',
+            labelAr: 'تنبيه',
+            value: _isRTL ? 'مستند للمعاينة فقط' : 'Preview only document',
+          ),
+        ],
+        style: GeniusPdfInfoBoxStyle.warning());
     warningBox.draw(
       page: page,
       bounds: Rect.fromLTWH(40 + statusWidth, yOffset, statusWidth, 70),
@@ -529,50 +489,36 @@ class _InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
     yOffset += 85;
 
     final successBox = GeniusPdfInfoBox(
-      config: config,
-      title: _isRTL ? 'نجاح' : 'Success',
-      titleAr: 'نجاح',
-      items: [
-        GeniusPdfLabeledValue(
-          config: config,
-          label: _isRTL ? 'الحالة' : 'Status',
-          labelAr: 'الحالة',
-          value: _isRTL ? 'تم إتمام العملية بنجاح' : 'Operation completed',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
-        ),
-      ],
-      style: GeniusPdfInfoBoxStyle.success(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
-    );
+        config: config,
+        title: _isRTL ? 'نجاح' : 'Success',
+        titleAr: 'نجاح',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            label: _isRTL ? 'الحالة' : 'Status',
+            labelAr: 'الحالة',
+            value: _isRTL ? 'تم إتمام العملية بنجاح' : 'Operation completed',
+          ),
+        ],
+        style: GeniusPdfInfoBoxStyle.success());
     successBox.draw(
       page: page,
       bounds: Rect.fromLTWH(20, yOffset, statusWidth, 70),
     );
 
     final errorBox = GeniusPdfInfoBox(
-      config: config,
-      title: _isRTL ? 'خطأ' : 'Error',
-      titleAr: 'خطأ',
-      items: [
-        GeniusPdfLabeledValue(
-          config: config,
-          label: _isRTL ? 'المشكلة' : 'Issue',
-          labelAr: 'المشكلة',
-          value: _isRTL ? 'فشل في معالجة الطلب' : 'Failed to process',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
-        ),
-      ],
-      style: GeniusPdfInfoBoxStyle.error(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
-    );
+        config: config,
+        title: _isRTL ? 'خطأ' : 'Error',
+        titleAr: 'خطأ',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            label: _isRTL ? 'المشكلة' : 'Issue',
+            labelAr: 'المشكلة',
+            value: _isRTL ? 'فشل في معالجة الطلب' : 'Failed to process',
+          ),
+        ],
+        style: GeniusPdfInfoBoxStyle.error());
     errorBox.draw(
       page: page,
       bounds: Rect.fromLTWH(40 + statusWidth, yOffset, statusWidth, 70),
@@ -627,9 +573,6 @@ class _HeadersDemoBuilder extends GeniusPdfDocumentBuilder {
       company: companyInfo,
       printDate: DateTime.now(),
       style: GeniusPdfReportHeaderStyle.invoice(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
     );
 
     final result = header.draw(
@@ -646,8 +589,6 @@ class _HeadersDemoBuilder extends GeniusPdfDocumentBuilder {
       subtitleAr: 'كما في 31 ديسمبر 2025',
       company: companyInfo,
       date: DateTime.now(),
-      baseFont: baseFont,
-      boldFont: bFont,
     );
 
     bilingualHeader.draw(
@@ -710,9 +651,6 @@ class _SummaryDemoBuilder extends GeniusPdfDocumentBuilder {
         ),
       ],
       style: GeniusPdfSummaryStyle.invoice(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
     );
 
     summary.draw(
@@ -737,15 +675,9 @@ class _SummaryDemoBuilder extends GeniusPdfDocumentBuilder {
           value: _isRTL
               ? 'يتم احتساب ضريبة القيمة المضافة بعد الخصم.'
               : 'VAT is calculated after discount is applied.',
-          baseFont: baseFont,
-          boldFont: bFont,
-          isRTL: _isRTL,
         ),
       ],
       style: GeniusPdfInfoBoxStyle.highlighted(),
-      baseFont: baseFont,
-      boldFont: bFont,
-      isRTL: _isRTL,
     );
 
     note.draw(

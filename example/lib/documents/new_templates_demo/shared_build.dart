@@ -16,7 +16,8 @@ class NewTemplatesDemoBuild {
 
 GeniusPdfConfig createNewTemplatesDemoConfig({required bool isRtl}) {
   return GeniusPdfConfig(
-    baseFont: PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 10),
+    baseFontBytes: geniusPdfConfig.assets.primaryFont,
+    baseFontSize: 10,
     textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
   );
 }

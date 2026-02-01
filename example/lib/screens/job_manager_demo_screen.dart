@@ -1,6 +1,7 @@
 // ignore_for_file: unused_element_parameter
 
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -27,6 +28,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
   List<GeniusPdfJob> _jobs = [];
   final Map<String, String> _jobFilePaths = {};
   PdfFont? _font;
+  Uint8List? _fontBytes;
 
   // Feature categories for testing
   final List<_FeatureCategory> _featureCategories = [];
@@ -219,7 +221,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
   Future<void> _loadFont() async {
     final fontData = await rootBundle.load('assets/fonts/din/din.ttf');
     setState(() {
-      _font = PdfTrueTypeFont(fontData.buffer.asUint8List(), 10);
+      _fontBytes = fontData.buffer.asUint8List();
+      _font = PdfTrueTypeFont(_fontBytes!, 10);
     });
   }
 
@@ -879,9 +882,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
                 {'code': '', 'name': 'Total', 'amount': 4000.00}),
           ],
           style: GeniusPdfGridStyle.classic(),
-          baseFont: geniusPdfConfig.baseFont,
-          boldFont: geniusPdfConfig.boldFont,
-          isRTL: true,
         );
         grid.drawAt(
             page: builder.currentPage,
@@ -893,7 +893,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
   }
 
   GeniusPdfDocumentBuilder? _buildRichTextTest() {
-    var geniusPdfConfig = GeniusPdfConfig(baseFont: _font!);
+    var geniusPdfConfig = GeniusPdfConfig(baseFontBytes: _fontBytes!);
     return _ComponentTestBuilder(
       config: geniusPdfConfig,
       testName: 'RichText Test',
@@ -904,9 +904,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
         // 1. Builder with heading, badge, currency, strikethrough
         final heading = GeniusPdfRichTextBuilder(
           config: geniusPdfConfig,
-          baseFont: geniusPdfConfig.baseFont,
-          boldFont: geniusPdfConfig.boldFont,
-          isRTL: geniusPdfConfig.isRTL,
         )
             .heading('Invoice Summary')
             .space()
@@ -942,9 +939,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
           ],
           config: geniusPdfConfig,
           style: GeniusPdfBulletStyle.disc,
-          baseFont: geniusPdfConfig.baseFont,
-          boldFont: geniusPdfConfig.boldFont,
-          isRTL: false,
         );
         bulletList.draw(
           page: builder.currentPage,
@@ -959,9 +953,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
         final mdRichText = GeniusPdfRichText(
           spans: mdSpans,
           config: geniusPdfConfig,
-          baseFont: geniusPdfConfig.baseFont,
-          boldFont: geniusPdfConfig.boldFont,
-          isRTL: false,
         );
         mdRichText.draw(
           page: builder.currentPage,
@@ -972,7 +963,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
   }
 
   GeniusPdfDocumentBuilder? _buildInfoBoxTest() {
-    var geniusPdfConfig = GeniusPdfConfig(baseFont: _font!);
+    var geniusPdfConfig = GeniusPdfConfig(baseFontBytes: _fontBytes!);
     return _ComponentTestBuilder(
       config: geniusPdfConfig,
       testName: 'InfoBox Test',
@@ -981,28 +972,19 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
           config: geniusPdfConfig,
           title: 'Customer Details',
           titleAr: 'تفاصيل العميل',
-          baseFont: geniusPdfConfig.baseFont,
-          boldFont: geniusPdfConfig.boldFont,
           items: [
             GeniusPdfLabeledValue(
                 config: geniusPdfConfig,
                 label: 'Name',
                 labelAr: 'الاسم',
-                value: 'Ahmed Mohammed',
-                baseFont: geniusPdfConfig.baseFont,
-                boldFont: geniusPdfConfig.boldFont,
-                isRTL: geniusPdfConfig.isRTL),
+              value: 'Ahmed Mohammed'),
             GeniusPdfLabeledValue(
                 config: geniusPdfConfig,
                 label: 'Phone',
                 labelAr: 'الهاتف',
-                value: '+966 12 345 6789',
-                baseFont: geniusPdfConfig.baseFont,
-                boldFont: geniusPdfConfig.boldFont,
-                isRTL: geniusPdfConfig.isRTL),
+              value: '+966 12 345 6789'),
           ],
           style: const GeniusPdfInfoBoxStyle.headerContent(),
-          isRTL: true,
         );
         box.draw(
           page: builder.currentPage,
@@ -1015,7 +997,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildReportHeaderTest() {
     return _ComponentTestBuilder(
-      config: GeniusPdfConfig(baseFont: _font!),
+      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'ReportHeader Test',
       buildContent: (builder) {
         final header = GeniusPdfReportHeader(
@@ -1031,9 +1013,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
           ),
           printDate: DateTime.now(),
           style: GeniusPdfReportHeaderStyle.modern(),
-          baseFont: _font!,
-          boldFont: _font!,
-          isRTL: true,
         );
         header.draw(
           page: builder.currentPage,
@@ -1045,7 +1024,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildSummarySectionTest() {
     return _ComponentTestBuilder(
-      config: GeniusPdfConfig(baseFont: _font!),
+      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'SummarySection Test',
       buildContent: (builder) {
         final summary = GeniusPdfSummarySection(
@@ -1065,9 +1044,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
                 value: '11,500.00 SAR'),
           ],
           style: GeniusPdfSummaryStyle.bordered(),
-          baseFont: _font!,
-          boldFont: _font!,
-          isRTL: true,
           alignment: GeniusPdfSummaryAlignment.right,
           width: builder.pageWidth * 0.45,
         );
@@ -1081,7 +1057,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildBarChartTest() {
     return _ChartTestBuilder(
-      config: GeniusPdfConfig(baseFont: _font!),
+      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'BarChart Test',
       buildChart: (page, bounds) {
         final chart = GeniusPdfBarChart(
@@ -1102,8 +1078,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
           settings: const GeniusBarChartSettings(
               type: GeniusBarChartType.vertical, showValues: true),
           height: 250,
-          baseFont: _font!,
-          boldFont: _font!,
         );
         chart.draw(page, bounds);
       },
@@ -1112,7 +1086,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildLineChartTest() {
     return _ChartTestBuilder(
-      config: GeniusPdfConfig(baseFont: _font!),
+      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'LineChart Test',
       buildChart: (page, bounds) {
         final chart = GeniusPdfLineChart(
@@ -1134,8 +1108,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
           settings: const GeniusLineChartSettings(
               type: GeniusLineChartType.curved, showPoints: true),
           height: 250,
-          baseFont: _font!,
-          boldFont: _font!,
         );
         chart.draw(page, bounds);
       },
@@ -1144,7 +1116,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildPieChartTest() {
     return _ChartTestBuilder(
-      config: GeniusPdfConfig(baseFont: _font!),
+      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'PieChart Test',
       buildChart: (page, bounds) {
         final chart = GeniusPdfPieChart(
@@ -1158,8 +1130,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
           ],
           settings: GeniusPieChartSettings.donut(),
           height: 300,
-          baseFont: _font!,
-          boldFont: _font!,
         );
         chart.draw(page, bounds);
       },
@@ -1168,7 +1138,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildAreaChartTest() {
     return _ChartTestBuilder(
-      config: GeniusPdfConfig(baseFont: _font!),
+      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'AreaChart Test',
       buildChart: (page, bounds) {
         final chart = GeniusPdfAreaChart(
@@ -1189,8 +1159,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
           settings:
               const GeniusAreaChartSettings(stacked: false, fillOpacity: 0.4),
           height: 250,
-          baseFont: _font!,
-          boldFont: _font!,
         );
         chart.draw(page, bounds);
       },
@@ -1200,7 +1168,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
   GeniusPdfDocumentBuilder? _buildTaxInvoiceTest() {
     return TaxInvoiceTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       customer: SampleData.invoiceCustomer,
       invoice: SampleData.invoiceData,
@@ -1211,7 +1179,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
   GeniusPdfDocumentBuilder? _buildTrialBalanceTest() {
     return TrialBalanceTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: SampleData.trialBalanceData,
     );
@@ -1220,7 +1188,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
   GeniusPdfDocumentBuilder? _buildCustomerStatementTest() {
     return CustomerStatementTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       customer: SampleData.statementCustomer,
       data: SampleData.statementData,
@@ -1230,7 +1198,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
   GeniusPdfDocumentBuilder? _buildInventoryReportTest() {
     return InventoryReportTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: SampleData.inventoryData,
     );
@@ -1275,7 +1243,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     );
     return BalanceSheetTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: data,
     );
@@ -1322,7 +1290,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     );
     return IncomeStatementTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: data,
     );
@@ -1363,7 +1331,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     );
     return CashFlowTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: data,
     );
@@ -1387,7 +1355,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     );
     return BudgetReportTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: data,
     );
@@ -1417,7 +1385,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     );
     return QuotationTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       customer: customer,
       quotation: quotation,
@@ -1449,7 +1417,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     );
     return PurchaseOrderTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       vendor: vendor,
       purchaseOrder: po,
@@ -1481,7 +1449,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     );
     return DeliveryNoteTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       recipient: recipient,
       delivery: delivery,
@@ -1517,7 +1485,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     );
     return PayslipTemplate(
       config:
-          GeniusPdfConfig(baseFont: _font!, textDirection: TextDirection.rtl),
+          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       employee: employee,
       payslip: payslip,
@@ -1526,13 +1494,11 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildWatermarkTest() {
     return _SecurityTestBuilder(
-      config: GeniusPdfConfig(baseFont: _font!),
+      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'Watermark Test',
       applySecurityFeature: (document) {
         document.addWatermark(GeniusPdfWatermark.confidential(
           config: geniusPdfConfig,
-          baseFont: _font!,
-          boldFont: _font!,
         ));
       },
     );
@@ -1540,7 +1506,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildTiledWatermarkTest() {
     return _SecurityTestBuilder(
-      config: GeniusPdfConfig(baseFont: _font!),
+      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'TiledWatermark Test',
       applySecurityFeature: (document) {
         GeniusPdfWatermark.tiled(
@@ -1551,8 +1517,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
             color: const Color(0xFF808080),
             opacity: 0.1,
           ),
-          baseFont: _font!,
-          boldFont: _font!,
         ).applyToDocument(document);
       },
     );
@@ -1560,7 +1524,7 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildDigitalSignatureTest() {
     return _SignatureTestBuilder(
-      config: GeniusPdfConfig(baseFont: _font!),
+      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'DigitalSignature Test',
     );
   }
@@ -1987,8 +1951,6 @@ class _SignatureTestBuilder extends GeniusPdfDocumentBuilder {
 
     final signature = GeniusPdfDigitalSignature(
       config: config,
-      baseFont: config.baseFont,
-      boldFont: config.boldFont,
       settings: GeniusDigitalSignatureSettings(
         signerName: 'Test Signer',
         reason: 'Testing signature feature',

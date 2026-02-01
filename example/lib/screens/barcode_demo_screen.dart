@@ -549,8 +549,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       final document = PdfDocument();
       final page = document.pages.add();
       final pageSize = page.getClientSize();
-      final baseFont =
-          PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 10);
       final titleFont =
           PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 18);
 
@@ -577,8 +575,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         caption: 'Product Code',
         captionAr: 'رمز المنتج',
         style: const GeniusPdfBarcodeStyle.retail(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       final ean13Rect = ean13.draw(
         page: page,
@@ -593,8 +589,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         caption: 'Reference Number',
         captionAr: 'الرقم المرجعي',
         style: const GeniusPdfBarcodeStyle.document(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       final code128Rect = code128.draw(
         page: page,
@@ -608,8 +602,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         data: '1Z999AA10123456784',
         trackingLabel: 'Tracking Number',
         trackingLabelAr: 'رقم التتبع',
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       shipping.draw(
         page: page,
@@ -630,8 +622,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       final document = PdfDocument();
       final page = document.pages.add();
       final pageSize = page.getClientSize();
-      final baseFont =
-          PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 10);
       final titleFont =
           PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 18);
 
@@ -659,8 +649,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         caption: 'Visit Website',
         captionAr: 'زيارة الموقع',
         style: const GeniusPdfQRCodeStyle(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       urlQR.draw(
         page: page,
@@ -676,8 +664,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         total: 34615.00,
         vatAmount: 4515.00,
         style: const GeniusPdfQRCodeStyle.invoice(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       zatcaQR.draw(
         page: page,
@@ -694,8 +680,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         style: GeniusPdfQRCodeStyle.branded(
           primaryColor: const Color(0xFF4CAF50),
         ),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       wifiQR.draw(
         page: page,
@@ -710,8 +694,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         email: 'ahmed@example.com',
         company: _isRTL ? 'شركة الأمل' : 'Al-Amal Co.',
         style: const GeniusPdfQRCodeStyle.payment(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       vCardQR.draw(
         page: page,
@@ -732,8 +714,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       final document = PdfDocument();
       final page = document.pages.add();
       final pageSize = page.getClientSize();
-      final baseFont =
-          PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 10);
       final titleFont =
           PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 16);
       final sectionFont =
@@ -778,8 +758,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         data: '5901234123457',
         caption: 'EAN-13',
         style: const GeniusPdfBarcodeStyle.compact(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       final ean13Rect = ean13.draw(
         page: page,
@@ -792,8 +770,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         data: 'GENIUS-2025',
         caption: 'Code 128',
         style: const GeniusPdfBarcodeStyle.compact(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       code128.draw(
         page: page,
@@ -826,8 +802,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         caption: 'URL',
         captionAr: 'رابط',
         style: const GeniusPdfQRCodeStyle.compact(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       urlQR.draw(
         page: page,
@@ -843,8 +817,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         total: 34615.00,
         vatAmount: 4515.00,
         style: const GeniusPdfQRCodeStyle.compact(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       zatcaQR.draw(
         page: page,
@@ -857,8 +829,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         ssid: 'Office',
         password: 'pass123',
         style: const GeniusPdfQRCodeStyle.compact(),
-        baseFont: baseFont,
-        isRTL: _isRTL,
       );
       wifiQR.draw(
         page: page,

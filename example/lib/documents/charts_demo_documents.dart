@@ -56,10 +56,7 @@ Future<Uint8List> buildBarChartPdf({
       showValues: true,
       cornerRadius: 4,
     ),
-    style: GeniusChartStyle.modern(),
     height: 300,
-    baseFont: config.baseFont,
-    boldFont: config.boldFont,
   );
 
   chart.draw(page, Rect.fromLTWH(20, 80, pageSize.width - 40, 300));
@@ -107,10 +104,7 @@ Future<Uint8List> buildLineChartPdf({
       fillArea: fillArea,
       fillOpacity: 0.2,
     ),
-    style: GeniusChartStyle.modern(),
     height: 300,
-    baseFont: config.baseFont,
-    boldFont: config.boldFont,
   );
 
   chart.draw(page, Rect.fromLTWH(20, 80, pageSize.width - 40, 300));
@@ -150,10 +144,7 @@ Future<Uint8List> buildPieChartPdf({
           ? GeniusChartLegendPosition.right
           : GeniusChartLegendPosition.bottom,
     ),
-    style: GeniusChartStyle.modern(),
     height: 350,
-    baseFont: config.baseFont,
-    boldFont: config.boldFont,
   );
 
   chart.draw(page, Rect.fromLTWH(20, 80, pageSize.width - 40, 350));
@@ -203,10 +194,7 @@ Future<Uint8List> buildAreaChartPdf({
       fillOpacity: 0.4,
       showPoints: showPoints,
     ),
-    style: GeniusChartStyle.modern(),
     height: 300,
-    baseFont: config.baseFont,
-    boldFont: config.boldFont,
   );
 
   chart.draw(page, Rect.fromLTWH(20, 80, pageSize.width - 40, 300));

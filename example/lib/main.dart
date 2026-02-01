@@ -24,10 +24,10 @@ void main() async {
   // For the example app, we create a shared config that screens can use.
   geniusPdfConfig = await GeniusPdfConfig.create(
     // PDF Configuration
-    baseFont: PdfTrueTypeFont(fontBytes.toList(), 12),
-    boldFont: PdfTrueTypeFont(fontBytes.toList(), 12),
-    headerFont: PdfTrueTypeFont(fontBytes.toList(), 12),
-    smallFont: PdfTrueTypeFont(fontBytes.toList(), 12),
+    baseFontBytes: fontBytes,
+    boldFontBytes: fontBytes,
+    headerFontBytes: fontBytes,
+    smallFontBytes: fontBytes,
     textDirection: TextDirection.rtl,
     pageSize: GeniusPdfPageSize.a4,
     orientation: PdfPageOrientation.portrait,

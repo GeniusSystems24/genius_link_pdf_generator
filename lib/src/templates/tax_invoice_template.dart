@@ -1,8 +1,5 @@
 import 'dart:ui';
 
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
-
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
 import '../core/pdf_config.dart';
@@ -129,7 +126,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     required this.customer,
     required this.invoice,
     this.qrCode,
-    this.boldFont,
     this.showQRCode = true,
     this.showSignature = true,
   }) : super(config);
@@ -138,16 +134,8 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
   final InvoiceCustomer customer;
   final InvoiceData invoice;
   final GeniusPdfImage? qrCode;
-  final PdfFont? boldFont;
   final bool showQRCode;
   final bool showSignature;
-
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
 
   @override
   void build() {
@@ -186,9 +174,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
         titleStyle: GeniusPdfTextStyle.title(fontSize: 18),
         showBorder: false,
       ),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
@@ -212,9 +197,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           labelAr: 'اسم العميل',
           value:
               config.isRTL ? (customer.nameAr ?? customer.name) : customer.name,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (customer.address != null || customer.addressAr != null)
           GeniusPdfLabeledValue(
@@ -224,9 +206,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (customer.addressAr ?? customer.address!)
                 : customer.address!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (customer.vatNumber != null)
           GeniusPdfLabeledValue(
@@ -234,9 +213,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
             label: 'VAT No',
             labelAr: 'الرقم الضريبي',
             value: customer.vatNumber!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (customer.phone != null)
           GeniusPdfLabeledValue(
@@ -244,15 +220,9 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
             label: 'Phone',
             labelAr: 'رقم الهاتف',
             value: customer.phone!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final invoiceBox = GeniusPdfInfoBox(
@@ -265,18 +235,12 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           label: 'Invoice No',
           labelAr: 'رقم الفاتورة',
           value: invoice.invoiceNumber,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(invoice.invoiceDate),
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (invoice.paymentTerms != null)
           GeniusPdfLabeledValue(
@@ -286,9 +250,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (invoice.paymentTermsAr ?? invoice.paymentTerms!)
                 : invoice.paymentTerms!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (invoice.poNumber != null)
           GeniusPdfLabeledValue(
@@ -296,15 +257,9 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
             label: 'PO No',
             labelAr: 'رقم الطلب',
             value: invoice.poNumber!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final dualBox = GeniusPdfDualInfoBox(
@@ -372,9 +327,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
               }))
           .toList(),
       style: const GeniusPdfGridStyle.classic(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final result = grid.drawAt(
@@ -417,9 +369,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       items: items,
       style: const GeniusPdfSummaryStyle.bordered(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       alignment: GeniusPdfSummaryAlignment.right,
       width: pageWidth * 0.4,
     );
@@ -439,9 +388,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
     final richText = GeniusPdfRichTextBuilder(
       config: config,
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     )
         .bold(config.isRTL ? 'فقط ' : 'Total in Words: ')
         .text(config.isRTL ? amountInWordsAr : amountInWords)
@@ -479,8 +425,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       final signature = GeniusPdfSignatureArea(
         title: 'Authorized Signature',
         titleAr: 'التوقيع المعتمد',
-        baseFont: baseFont,
-        isRTL: config.isRTL,
       );
 
       signature.draw(
@@ -499,8 +443,6 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       final qr = GeniusPdfQRCode(
         image: qrCode!,
         size: 70,
-        baseFont: baseFont,
-        isRTL: config.isRTL,
       );
 
       qr.draw(
@@ -577,13 +519,38 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     if (number == 0) return 'Zero';
 
     const ones = [
-      '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight',
-      'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen',
-      'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen',
+      '',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen',
     ];
     const tens = [
-      '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy',
-      'Eighty', 'Ninety',
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety',
     ];
 
     String convert(int n) {
@@ -616,18 +583,50 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     if (number == 0) return 'صفر';
 
     const ones = [
-      '', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة',
-      'ثمانية', 'تسعة', 'عشرة', 'أحد عشر', 'اثنا عشر', 'ثلاثة عشر',
-      'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر',
+      '',
+      'واحد',
+      'اثنان',
+      'ثلاثة',
+      'أربعة',
+      'خمسة',
+      'ستة',
+      'سبعة',
+      'ثمانية',
+      'تسعة',
+      'عشرة',
+      'أحد عشر',
+      'اثنا عشر',
+      'ثلاثة عشر',
+      'أربعة عشر',
+      'خمسة عشر',
+      'ستة عشر',
+      'سبعة عشر',
+      'ثمانية عشر',
       'تسعة عشر',
     ];
     const tensAr = [
-      '', '', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون',
-      'ثمانون', 'تسعون',
+      '',
+      '',
+      'عشرون',
+      'ثلاثون',
+      'أربعون',
+      'خمسون',
+      'ستون',
+      'سبعون',
+      'ثمانون',
+      'تسعون',
     ];
     const hundreds = [
-      '', 'مائة', 'مائتان', 'ثلاثمائة', 'أربعمائة', 'خمسمائة', 'ستمائة',
-      'سبعمائة', 'ثمانمائة', 'تسعمائة',
+      '',
+      'مائة',
+      'مائتان',
+      'ثلاثمائة',
+      'أربعمائة',
+      'خمسمائة',
+      'ستمائة',
+      'سبعمائة',
+      'ثمانمائة',
+      'تسعمائة',
     ];
 
     String convert(int n) {

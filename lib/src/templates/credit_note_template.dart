@@ -202,9 +202,6 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
         titleStyle: GeniusPdfTextStyle.title(fontSize: 20),
         showBorder: false,
       ),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
@@ -230,9 +227,6 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
           label: 'Name',
           labelAr: 'الاسم',
           value: config.isRTL ? (party.nameAr ?? party.name) : party.name,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (party.address != null)
           GeniusPdfLabeledValue(
@@ -242,9 +236,6 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (party.addressAr ?? party.address!)
                 : party.address!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (party.vatNumber != null)
           GeniusPdfLabeledValue(
@@ -252,9 +243,6 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
             label: 'VAT No',
             labelAr: 'الرقم الضريبي',
             value: party.vatNumber!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (party.accountNumber != null)
           GeniusPdfLabeledValue(
@@ -262,15 +250,9 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
             label: 'Account No',
             labelAr: 'رقم الحساب',
             value: party.accountNumber!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final noteBox = GeniusPdfInfoBox(
@@ -283,18 +265,12 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
           label: 'Note No',
           labelAr: 'رقم الإشعار',
           value: note.noteNumber,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(note.noteDate),
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (note.originalInvoiceNumber != null)
           GeniusPdfLabeledValue(
@@ -302,9 +278,6 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
             label: 'Original Invoice',
             labelAr: 'الفاتورة الأصلية',
             value: note.originalInvoiceNumber!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (note.originalInvoiceDate != null)
           GeniusPdfLabeledValue(
@@ -312,15 +285,9 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
             label: 'Invoice Date',
             labelAr: 'تاريخ الفاتورة',
             value: _formatDate(note.originalInvoiceDate!),
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final dualBox = GeniusPdfDualInfoBox(
@@ -421,9 +388,6 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
               }))
           .toList(),
       style: const GeniusPdfGridStyle.modern(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final result = grid.drawAt(
@@ -468,9 +432,6 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       items: items,
       style: const GeniusPdfSummaryStyle.bordered(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       alignment: GeniusPdfSummaryAlignment.right,
       width: pageWidth * 0.45,
     );
@@ -508,8 +469,6 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
     final preparedBy = GeniusPdfSignatureArea(
       title: 'Prepared By',
       titleAr: 'أعده',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     preparedBy.draw(
@@ -521,8 +480,6 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
     final approvedBy = GeniusPdfSignatureArea(
       title: 'Approved By',
       titleAr: 'اعتمده',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     approvedBy.draw(

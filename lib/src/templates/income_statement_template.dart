@@ -243,9 +243,6 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
         titleStyle: GeniusPdfTextStyle.title(fontSize: 18),
         showBorder: false,
       ),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
@@ -331,9 +328,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       ],
       rows: rows,
       style: const GeniusPdfGridStyle(showHeader: false),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
+
     );
 
     final result = grid.drawAt(

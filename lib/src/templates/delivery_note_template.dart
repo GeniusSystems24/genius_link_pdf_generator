@@ -165,9 +165,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
         titleStyle: GeniusPdfTextStyle.title(fontSize: 20),
         showBorder: false,
       ),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
@@ -219,9 +216,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
           value: config.isRTL
               ? (recipient.nameAr ?? recipient.name)
               : recipient.name,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (recipient.company != null)
           GeniusPdfLabeledValue(
@@ -231,9 +225,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (recipient.companyAr ?? recipient.company!)
                 : recipient.company!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (recipient.address != null)
           GeniusPdfLabeledValue(
@@ -243,9 +234,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (recipient.addressAr ?? recipient.address!)
                 : recipient.address!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (recipient.phone != null)
           GeniusPdfLabeledValue(
@@ -253,15 +241,9 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
             label: 'Phone',
             labelAr: 'الهاتف',
             value: recipient.phone!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final deliveryBox = GeniusPdfInfoBox(
@@ -274,18 +256,12 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
           label: 'Delivery No',
           labelAr: 'رقم التسليم',
           value: delivery.deliveryNumber,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(delivery.deliveryDate),
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (delivery.salesOrderRef != null)
           GeniusPdfLabeledValue(
@@ -293,9 +269,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
             label: 'Sales Order',
             labelAr: 'أمر البيع',
             value: delivery.salesOrderRef!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (delivery.invoiceRef != null)
           GeniusPdfLabeledValue(
@@ -303,9 +276,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
             label: 'Invoice Ref',
             labelAr: 'رقم الفاتورة',
             value: delivery.invoiceRef!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (delivery.driverName != null)
           GeniusPdfLabeledValue(
@@ -313,9 +283,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
             label: 'Driver',
             labelAr: 'السائق',
             value: delivery.driverName!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (delivery.vehicleNumber != null)
           GeniusPdfLabeledValue(
@@ -323,15 +290,9 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
             label: 'Vehicle',
             labelAr: 'المركبة',
             value: delivery.vehicleNumber!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final dualBox = GeniusPdfDualInfoBox(
@@ -457,9 +418,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.modern(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final result = grid.drawAt(
@@ -540,8 +498,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
     final deliveredBy = GeniusPdfSignatureArea(
       title: 'Delivered By',
       titleAr: 'سلمه',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     deliveredBy.draw(
@@ -553,8 +509,6 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
     final receivedBy = GeniusPdfSignatureArea(
       title: 'Received By',
       titleAr: 'استلمه',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     receivedBy.draw(

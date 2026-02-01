@@ -626,15 +626,9 @@ class GeniusPdfSummarySection {
     this.titleAr,
     required this.config,
     GeniusPdfSummaryStyle? style,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-    bool? isRTL,
     this.alignment = GeniusPdfSummaryAlignment.right,
     this.width,
-  })  : style = _resolveSummaryStyle(style, config),
-        baseFont = _resolveBaseFont(baseFont, config),
-        boldFont = _resolveBoldFont(boldFont, baseFont, config),
-        isRTL = isRTL ?? config.isRTL;
+  }) : style = _resolveSummaryStyle(style, config);
 
   /// Summary items to display.
   final List<GeniusPdfSummaryItem> items;
@@ -652,31 +646,19 @@ class GeniusPdfSummarySection {
   final GeniusPdfConfig config;
 
   /// Base font for text.
-  final PdfFont baseFont;
+  PdfFont get baseFont => config.baseFont;
 
   /// Bold font for highlighted items.
-  final PdfFont boldFont;
+  PdfFont get boldFont => config.boldFont;
 
   /// Whether to use RTL layout.
-  final bool isRTL;
+  bool get isRTL => config.isRTL;
 
   /// Horizontal alignment of the summary box.
   final GeniusPdfSummaryAlignment alignment;
 
   /// Fixed width (optional, uses default proportion if null).
   final double? width;
-
-  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
-    return baseFont ?? config.baseFont;
-  }
-
-  static PdfFont _resolveBoldFont(
-    PdfFont? boldFont,
-    PdfFont? baseFont,
-    GeniusPdfConfig config,
-  ) {
-    return boldFont ?? config.boldFont;
-  }
 
   static GeniusPdfSummaryStyle _resolveSummaryStyle(
     GeniusPdfSummaryStyle? style,

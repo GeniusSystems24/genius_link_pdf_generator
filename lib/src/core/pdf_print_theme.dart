@@ -17,7 +17,7 @@ import '../components/models/pdf_styles.dart';
 /// );
 ///
 /// final config = GeniusPdfConfig(
-///   baseFont: myFont,
+///   baseFontBytes: myFontBytes,
 ///   printTheme: theme,
 /// );
 /// ```

@@ -201,9 +201,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
         titleStyle: GeniusPdfTextStyle.title(fontSize: 20),
         showBorder: false,
       ),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
@@ -257,9 +254,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
           label: 'Name',
           labelAr: 'الاسم',
           value: config.isRTL ? (vendor.nameAr ?? vendor.name) : vendor.name,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (vendor.vendorCode != null)
           GeniusPdfLabeledValue(
@@ -267,9 +261,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
             label: 'Vendor Code',
             labelAr: 'كود المورد',
             value: vendor.vendorCode!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (vendor.address != null)
           GeniusPdfLabeledValue(
@@ -279,9 +270,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (vendor.addressAr ?? vendor.address!)
                 : vendor.address!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (vendor.vatNumber != null)
           GeniusPdfLabeledValue(
@@ -289,9 +277,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
             label: 'VAT No',
             labelAr: 'الرقم الضريبي',
             value: vendor.vatNumber!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (vendor.phone != null)
           GeniusPdfLabeledValue(
@@ -299,9 +284,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
             label: 'Phone',
             labelAr: 'الهاتف',
             value: vendor.phone!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (vendor.contactPerson != null)
           GeniusPdfLabeledValue(
@@ -309,15 +291,9 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
             label: 'Contact',
             labelAr: 'جهة الاتصال',
             value: vendor.contactPerson!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final poBox = GeniusPdfInfoBox(
@@ -330,18 +306,12 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
           label: 'PO Number',
           labelAr: 'رقم الطلب',
           value: purchaseOrder.poNumber,
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         GeniusPdfLabeledValue(
           config: config,
           label: 'Date',
           labelAr: 'التاريخ',
           value: _formatDate(purchaseOrder.poDate),
-          baseFont: baseFont,
-          boldFont: _boldFont,
-          isRTL: config.isRTL,
         ),
         if (purchaseOrder.expectedDeliveryDate != null)
           GeniusPdfLabeledValue(
@@ -349,9 +319,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
             label: 'Expected Delivery',
             labelAr: 'التسليم المتوقع',
             value: _formatDate(purchaseOrder.expectedDeliveryDate!),
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (purchaseOrder.quotationRef != null)
           GeniusPdfLabeledValue(
@@ -359,9 +326,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
             label: 'Quotation Ref',
             labelAr: 'مرجع العرض',
             value: purchaseOrder.quotationRef!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
         if (purchaseOrder.paymentTerms != null)
           GeniusPdfLabeledValue(
@@ -371,15 +335,9 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? (purchaseOrder.paymentTermsAr ?? purchaseOrder.paymentTerms!)
                 : purchaseOrder.paymentTerms!,
-            baseFont: baseFont,
-            boldFont: _boldFont,
-            isRTL: config.isRTL,
           ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final dualBox = GeniusPdfDualInfoBox(
@@ -458,9 +416,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
         return GeniusPdfGridRow(cells: cells);
       }).toList(),
       style: const GeniusPdfGridStyle.modern(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
     );
 
     final result = grid.drawAt(
@@ -502,9 +457,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       items: items,
       style: const GeniusPdfSummaryStyle.bordered(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       alignment: GeniusPdfSummaryAlignment.right,
       width: pageWidth * 0.4,
     );
@@ -613,8 +565,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     final preparedBy = GeniusPdfSignatureArea(
       title: 'Prepared By',
       titleAr: 'أعده',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     preparedBy.draw(
@@ -626,8 +576,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     final approvedBy = GeniusPdfSignatureArea(
       title: 'Approved By',
       titleAr: 'اعتمده',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     approvedBy.draw(
@@ -639,8 +587,6 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     final receivedBy = GeniusPdfSignatureArea(
       title: 'Received By Vendor',
       titleAr: 'استلمه المورد',
-      baseFont: baseFont,
-      isRTL: config.isRTL,
     );
 
     receivedBy.draw(

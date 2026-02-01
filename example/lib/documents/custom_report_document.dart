@@ -136,14 +136,9 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
           config: data.config,
           label: data.infoBoxTitle,
           value: data.infoBoxContent,
-          baseFont: regularFont,
-          boldFont: boldFont,
         ),
       ],
       style: infoBoxStyle,
-      baseFont: regularFont,
-      boldFont: boldFont,
-      isRTL: isRtl,
     );
 
     final result = infoBox.draw(
@@ -207,9 +202,6 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
             GeniusPdfCellStyle(backgroundColor: const Color(0xFFF8F9FA)),
         borderStyle: GeniusPdfBorderStyle.all(color: const Color(0xFFDEE2E6)),
       ),
-      baseFont: regularFont,
-      boldFont: boldFont,
-      isRTL: isRtl,
     );
 
     final gridResult = dataGrid.draw(
@@ -243,11 +235,8 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
       ],
       title: 'Total',
       titleAr: 'الإجمالي',
-      isRTL: isRtl,
       alignment: GeniusPdfSummaryAlignment.right,
       width: contentWidth / 2,
-      baseFont: regularFont,
-      boldFont: boldFont,
     );
 
     final summaryBounds = Rect.fromLTWH(

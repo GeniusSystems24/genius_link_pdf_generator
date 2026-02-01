@@ -11,34 +11,13 @@ class GeniusPdfDigitalSignature {
   GeniusPdfDigitalSignature({
     required this.settings,
     required this.config,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-  })  : baseFont = _resolveBaseFont(baseFont, config),
-        boldFont = _resolveBoldFont(boldFont, baseFont, config);
+  });
 
   /// إعدادات التوقيع
   final GeniusDigitalSignatureSettings settings;
 
   /// PDF configuration.
   final GeniusPdfConfig config;
-
-  /// الخط الأساسي (مطلوب للنصوص العربية)
-  final PdfFont baseFont;
-
-  /// الخط العريض (مطلوب للعناوين)
-  final PdfFont boldFont;
-
-  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
-    return baseFont ?? config.baseFont;
-  }
-
-  static PdfFont _resolveBoldFont(
-    PdfFont? boldFont,
-    PdfFont? baseFont,
-    GeniusPdfConfig config,
-  ) {
-    return boldFont ?? config.boldFont;
-  }
 
   /// إضافة التوقيع للمستند
   /// Add signature to document
@@ -175,8 +154,8 @@ class GeniusPdfDigitalSignature {
 
     double yOffset = 8;
     // Font - baseFont is required for Arabic support, no fallback to Helvetica
-    final fontToUse = baseFont;
-    final boldFontToUse = boldFont;
+    final fontToUse = config.baseFont;
+    final boldFontToUse = config.boldFont;
     final textBrush = PdfSolidBrush(PdfColor(
       appearance.textColor.red,
       appearance.textColor.green,
@@ -274,8 +253,8 @@ class GeniusPdfDigitalSignature {
 
     double yOffset = bounds.top + 8;
     // Font - baseFont is required for Arabic support, no fallback to Helvetica
-    final fontToUse = baseFont;
-    final boldFontToUse = boldFont;
+    final fontToUse = config.baseFont;
+    final boldFontToUse =  config.boldFont;
     final textBrush = PdfSolidBrush(PdfColor(
       appearance.textColor.red,
       appearance.textColor.green,
@@ -506,9 +485,7 @@ extension PdfDocumentSignatureExtension on PdfDocument {
     PdfFont? boldFont}) {
     GeniusPdfDigitalSignature(
       settings: settings,
-      config: config,
-      baseFont: baseFont,
-      boldFont: boldFont)
+      config: config)
         .addToDocument(this);
   }
 

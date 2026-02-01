@@ -19,17 +19,10 @@ class GeniusPdfAreaChart {
     this.yAxis = const GeniusChartAxis(),
     this.legend = const GeniusChartLegend(),
     required this.config,
-    GeniusChartStyle? style,
     this.settings = const GeniusAreaChartSettings(),
     this.width,
     this.height = 250,
-    bool? isRtl,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-  })  : style = _resolveChartStyle(style, config),
-        baseFont = _resolveBaseFont(baseFont, config),
-        boldFont = _resolveBoldFont(boldFont, baseFont, config),
-        isRtl = isRtl ?? config.isRTL;
+  }) : style = _chartStyleFromTheme(config.printTheme);
 
   /// عنوان المخطط
   final String? title;
@@ -64,35 +57,6 @@ class GeniusPdfAreaChart {
   /// الارتفاع
   final double height;
 
-  /// اتجاه النص من اليمين لليسار
-  final bool isRtl;
-
-  /// الخط الأساسي (مطلوب للنصوص العربية)
-  final PdfFont baseFont;
-
-  /// الخط العريض (مطلوب للعناوين)
-  final PdfFont boldFont;
-
-  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
-    return baseFont ?? config.baseFont;
-  }
-
-  static PdfFont _resolveBoldFont(
-    PdfFont? boldFont,
-    PdfFont? baseFont,
-    GeniusPdfConfig config,
-  ) {
-    return boldFont ?? config.boldFont;
-  }
-
-  static GeniusChartStyle _resolveChartStyle(
-    GeniusChartStyle? style,
-    GeniusPdfConfig config,
-  ) {
-    if (style != null) return style;
-    return _chartStyleFromTheme(config.printTheme);
-  }
-
   static GeniusChartStyle _chartStyleFromTheme(GeniusPdfPrintTheme theme) {
     final colors = theme.colorScheme;
     final typography = theme.typography;
@@ -111,7 +75,7 @@ class GeniusPdfAreaChart {
   }
 
   /// الحصول على العنوان حسب اتجاه النص
-  String? get displayTitle => isRtl ? (titleAr ?? title) : title;
+  String? get displayTitle => config.isRTL ? (titleAr ?? title) : title;
 
   /// رسم المخطط على الصفحة
   PdfLayoutResult draw(PdfPage page, Rect bounds) {
@@ -208,7 +172,7 @@ class GeniusPdfAreaChart {
 
   void _drawTitle(PdfGraphics graphics, Rect area) {
     // Font - baseFont and boldFont are required for Arabic support, no fallback to Helvetica
-    final font = boldFont;
+    final font = config.boldFont;
     graphics.drawString(
       displayTitle!,
       font,
@@ -225,7 +189,7 @@ class GeniusPdfAreaChart {
     final axisPen = PdfPen(_colorToPdfColor(style.axisColor), width: 1);
     final gridPen = PdfPen(_colorToPdfColor(xAxis.gridLineColor), width: 0.5);
     // Font - baseFont is required for Arabic support, no fallback to Helvetica
-    final font = baseFont;
+    final font = config.baseFont;
 
     // حساب القيم القصوى
     double maxValue = _calculateMaxValue();
@@ -284,7 +248,7 @@ class GeniusPdfAreaChart {
         }
 
         graphics.drawString(
-          dataPoints[i].getLabel(isRtl),
+          dataPoints[i].getLabel(config.isRTL),
           font,
           brush: PdfSolidBrush(_colorToPdfColor(style.textColor)),
           bounds: Rect.fromLTWH(x - 25, plotArea.bottom + 5, 50, 20),
@@ -551,7 +515,7 @@ class GeniusPdfAreaChart {
 
   void _drawLegend(PdfGraphics graphics, Rect area) {
     // Font - baseFont is required for Arabic support, no fallback to Helvetica
-    final font = baseFont;
+    final font = config.baseFont;
     const itemWidth = 80.0;
     final totalWidth = series.length * itemWidth;
     var startX = area.left + (area.width - totalWidth) / 2;
@@ -574,7 +538,7 @@ class GeniusPdfAreaChart {
 
       // رسم الاسم
       graphics.drawString(
-        s.getName(isRtl),
+        s.getName(config.isRTL),
         font,
         brush: PdfSolidBrush(_colorToPdfColor(style.textColor)),
         bounds: Rect.fromLTWH(startX + legend.iconSize + 4, y,

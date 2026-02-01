@@ -120,23 +120,14 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
     required GeniusPdfConfig config,
     required this.company,
     required this.data,
-    this.boldFont,
     this.showCategories = true,
     this.showCategorySubtotals = true,
   }) : super(config);
 
   final GeniusPdfCompanyInfo company;
   final InventoryReportData data;
-  final PdfFont? boldFont;
   final bool showCategories;
   final bool showCategorySubtotals;
-
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
 
   @override
   void build() {
@@ -162,9 +153,6 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
       company: company,
       printDate: DateTime.now(),
       style: const GeniusPdfReportHeaderStyle.classic(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
@@ -279,9 +267,7 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
       columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.classic(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
+   
     );
 
     final result = grid.drawAt(
@@ -304,9 +290,6 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
       value: _formatCurrency(data.totalValue),
       backgroundColor: const Color(0xFF1565C0),
       textColor: const Color(0xFFFFFFFF),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       fontSize: 12,
     );
 

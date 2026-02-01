@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:genius_link_pdf_generator/src/core/pdf_assets.dart';
@@ -19,8 +20,8 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 /// Use the async factory method to create a config with assets:
 /// ```dart
 /// final config = await GeniusPdfConfig.create(
-///   baseFont: PdfTrueTypeFont(fontData, 12),
-///   boldFont: PdfTrueTypeFont(boldFontData, 12),
+///   baseFontBytes: fontData,
+///   boldFontBytes: boldFontData,
 ///   textDirection: TextDirection.rtl,
 ///   assetPaths: GeniusPdfAssetPaths(
 ///     fontPaths: GeniusPdfFontPaths(primaryFont: 'assets/fonts/din.ttf'),
@@ -44,8 +45,8 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 /// ## Direct Constructor Usage
 /// ```dart
 /// final config = GeniusPdfConfig(
-///   baseFont: PdfTrueTypeFont(fontData, 12),
-///   boldFont: PdfTrueTypeFont(boldFontData, 12),
+///   baseFontBytes: fontData,
+///   boldFontBytes: boldFontData,
 ///   pageSize: GeniusPdfPageSize.a4,
 ///   orientation: PdfPageOrientation.portrait,
 ///   textDirection: TextDirection.rtl,
@@ -59,10 +60,14 @@ class GeniusPdfConfig {
   /// Creates a new [GeniusPdfConfig] instance.
   ///
   /// ## Parameters
-  /// - [baseFont]: The primary font for the document (required).
-  /// - [boldFont]: Bold version of the font (optional, falls back to baseFont).
-  /// - [headerFont]: Font for headers/titles (optional, falls back to boldFont or baseFont).
-  /// - [smallFont]: Smaller font for captions (optional, falls back to baseFont).
+  /// - [baseFontBytes]: The primary font bytes for the document (required).
+  /// - [boldFontBytes]: Bold font bytes (optional, falls back to baseFontBytes).
+  /// - [headerFontBytes]: Header font bytes (optional, falls back to boldFontBytes or baseFontBytes).
+  /// - [smallFontBytes]: Smaller font bytes (optional, falls back to baseFontBytes).
+  /// - [baseFontSize]: Default base font size (defaults to theme body size).
+  /// - [boldFontSize]: Default bold font size (defaults to theme body size).
+  /// - [headerFontSize]: Default header font size (defaults to theme heading size).
+  /// - [smallFontSize]: Default small font size (defaults to theme small size).
   /// - [pageSize]: Page dimensions (defaults to A4).
   /// - [orientation]: Page orientation (defaults to portrait).
   /// - [textDirection]: Text direction (defaults to RTL).
@@ -70,10 +75,18 @@ class GeniusPdfConfig {
   /// - [compressionLevel]: PDF compression level.
   /// - [configAssets]: Optional assets (fonts, images) for this config.
   GeniusPdfConfig({
-    required this.baseFont,
+    required this.baseFontBytes,
+    Uint8List? boldFontBytes,
+    Uint8List? headerFontBytes,
+    Uint8List? smallFontBytes,
+    PdfFont? baseFont,
     PdfFont? boldFont,
     PdfFont? headerFont,
     PdfFont? smallFont,
+    double? baseFontSize,
+    double? boldFontSize,
+    double? headerFontSize,
+    double? smallFontSize,
     this.pageSize = GeniusPdfPageSize.a4,
     this.orientation = PdfPageOrientation.portrait,
     this.textDirection = TextDirection.rtl,
@@ -83,16 +96,28 @@ class GeniusPdfConfig {
     this.defaultOutputPath,
     this.configAssets,
     GeniusPdfPrintTheme? printTheme,
-  })  : boldFont = boldFont ?? baseFont,
-        headerFont = headerFont ?? boldFont ?? baseFont,
-        smallFont = smallFont ?? baseFont,
+  })  : boldFontBytes = boldFontBytes ?? baseFontBytes,
+        headerFontBytes = headerFontBytes ?? boldFontBytes ?? baseFontBytes,
+        smallFontBytes = smallFontBytes ?? baseFontBytes,
+        baseFontOverride = baseFont,
+        boldFontOverride = boldFont,
+        headerFontOverride = headerFont,
+        smallFontOverride = smallFont,
         margins = margins ?? (PdfMargins()..all = 20),
         layoutFormat = layoutFormat ??
             PdfLayoutFormat(
               layoutType: PdfLayoutType.paginate,
               breakType: PdfLayoutBreakType.fitPage,
             ),
-        printTheme = printTheme ?? GeniusPdfPrintTheme.defaults();
+        printTheme = printTheme ?? GeniusPdfPrintTheme.defaults(),
+        baseFontSize =
+            baseFontSize ?? (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.bodySize,
+        boldFontSize =
+            boldFontSize ?? (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.bodySize,
+        headerFontSize =
+            headerFontSize ?? (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.headingSize,
+        smallFontSize =
+            smallFontSize ?? (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.smallSize;
 
   // ==================== Assets Access ====================
 
@@ -145,8 +170,8 @@ class GeniusPdfConfig {
   /// ## Example
   /// ```dart
   /// final config = await GeniusPdfConfig.create(
-  ///   baseFont: PdfTrueTypeFont(fontData, 12),
-  ///   boldFont: PdfTrueTypeFont(boldFontData, 12),
+  ///   baseFontBytes: fontData,
+  ///   boldFontBytes: boldFontData,
   ///   textDirection: TextDirection.rtl,
   ///   assetPaths: GeniusPdfAssetPaths(
   ///     fontPaths: GeniusPdfFontPaths(primaryFont: 'assets/fonts/din.ttf'),
@@ -158,10 +183,14 @@ class GeniusPdfConfig {
   /// final builder = MyDocumentBuilder(config);
   /// ```
   static Future<GeniusPdfConfig> create({
-    required PdfFont baseFont,
-    PdfFont? boldFont,
-    PdfFont? headerFont,
-    PdfFont? smallFont,
+    required Uint8List baseFontBytes,
+    Uint8List? boldFontBytes,
+    Uint8List? headerFontBytes,
+    Uint8List? smallFontBytes,
+    double? baseFontSize,
+    double? boldFontSize,
+    double? headerFontSize,
+    double? smallFontSize,
     Size pageSize = GeniusPdfPageSize.a4,
     PdfPageOrientation orientation = PdfPageOrientation.portrait,
     TextDirection textDirection = TextDirection.rtl,
@@ -205,10 +234,14 @@ class GeniusPdfConfig {
 
     // Create and return new config instance
     return GeniusPdfConfig(
-      baseFont: baseFont,
-      boldFont: boldFont,
-      headerFont: headerFont,
-      smallFont: smallFont,
+      baseFontBytes: baseFontBytes,
+      boldFontBytes: boldFontBytes,
+      headerFontBytes: headerFontBytes,
+      smallFontBytes: smallFontBytes,
+      baseFontSize: baseFontSize,
+      boldFontSize: boldFontSize,
+      headerFontSize: headerFontSize,
+      smallFontSize: smallFontSize,
       pageSize: pageSize,
       orientation: orientation,
       textDirection: textDirection,
@@ -226,10 +259,14 @@ class GeniusPdfConfig {
   /// Use this when you don't need to load assets from the asset bundle,
   /// or when assets are already loaded.
   static GeniusPdfConfig createSync({
-    required PdfFont baseFont,
-    PdfFont? boldFont,
-    PdfFont? headerFont,
-    PdfFont? smallFont,
+    required Uint8List baseFontBytes,
+    Uint8List? boldFontBytes,
+    Uint8List? headerFontBytes,
+    Uint8List? smallFontBytes,
+    double? baseFontSize,
+    double? boldFontSize,
+    double? headerFontSize,
+    double? smallFontSize,
     Size pageSize = GeniusPdfPageSize.a4,
     PdfPageOrientation orientation = PdfPageOrientation.portrait,
     TextDirection textDirection = TextDirection.rtl,
@@ -265,10 +302,14 @@ class GeniusPdfConfig {
 
     // Create and return new config instance
     return GeniusPdfConfig(
-      baseFont: baseFont,
-      boldFont: boldFont,
-      headerFont: headerFont,
-      smallFont: smallFont,
+      baseFontBytes: baseFontBytes,
+      boldFontBytes: boldFontBytes,
+      headerFontBytes: headerFontBytes,
+      smallFontBytes: smallFontBytes,
+      baseFontSize: baseFontSize,
+      boldFontSize: boldFontSize,
+      headerFontSize: headerFontSize,
+      smallFontSize: smallFontSize,
       pageSize: pageSize,
       orientation: orientation,
       textDirection: textDirection,
@@ -286,29 +327,64 @@ class GeniusPdfConfig {
   /// ## Parameters
   /// - [fontSize]: The font size to use (defaults to 18).
   ///
-  /// Returns baseFont if no assets are configured.
-  PdfFont fontBuild({double fontSize = 18}) {
-    return configAssets == null
-        ? baseFont
-        : PdfTrueTypeFont(configAssets!.primaryFont.toList(), fontSize);
+  /// Returns a font built from bytes or assets.
+  PdfFont fontBuild({double fontSize = 18, Uint8List? fontBytes}) {
+    final resolvedBytes = fontBytes ?? configAssets?.primaryFont ?? baseFontBytes;
+    return PdfTrueTypeFont(resolvedBytes, fontSize);
   }
 
-  /// The base font used throughout the PDF document.
-  /// This font must support all characters used in the document (including Arabic if needed).
-  final PdfFont baseFont;
+    /// The base font bytes used throughout the PDF document.
+    /// This font must support all characters used in the document (including Arabic if needed).
+    final Uint8List baseFontBytes;
 
-  /// Bold version of the base font.
-  /// Used for headers, titles, and emphasized text.
-  /// Falls back to [baseFont] if not provided.
-  final PdfFont boldFont;
+    /// Bold font bytes (optional).
+    final Uint8List? boldFontBytes;
 
-  /// Font for headers and titles.
-  /// Falls back to [boldFont] or [baseFont] if not provided.
-  final PdfFont headerFont;
+    /// Header font bytes (optional).
+    final Uint8List? headerFontBytes;
 
-  /// Smaller font for captions and footnotes.
-  /// Falls back to [baseFont] if not provided.
-  final PdfFont smallFont;
+    /// Smaller font bytes (optional).
+    final Uint8List? smallFontBytes;
+
+    /// Base font override.
+    final PdfFont? baseFontOverride;
+
+    /// Bold font override.
+    final PdfFont? boldFontOverride;
+
+    /// Header font override.
+    final PdfFont? headerFontOverride;
+
+    /// Small font override.
+    final PdfFont? smallFontOverride;
+
+    /// Default base font size.
+    final double baseFontSize;
+
+    /// Default bold font size.
+    final double boldFontSize;
+
+    /// Default header font size.
+    final double headerFontSize;
+
+    /// Default small font size.
+    final double smallFontSize;
+
+    /// The base font used throughout the PDF document.
+    PdfFont get baseFont =>
+      baseFontOverride ?? PdfTrueTypeFont(baseFontBytes, baseFontSize);
+
+    /// Bold version of the base font.
+    PdfFont get boldFont => boldFontOverride ??
+      PdfTrueTypeFont(boldFontBytes ?? baseFontBytes, boldFontSize);
+
+    /// Font for headers and titles.
+    PdfFont get headerFont => headerFontOverride ?? PdfTrueTypeFont(
+      headerFontBytes ?? boldFontBytes ?? baseFontBytes, headerFontSize);
+
+    /// Smaller font for captions and footnotes.
+    PdfFont get smallFont => smallFontOverride ??
+      PdfTrueTypeFont(smallFontBytes ?? baseFontBytes, smallFontSize);
 
   /// Page size for the PDF document.
   ///
@@ -352,7 +428,7 @@ class GeniusPdfConfig {
   /// ## Example
   /// ```dart
   /// final config = GeniusPdfConfig(
-  ///   baseFont: myFont,
+  ///   baseFontBytes: myFontBytes,
   ///   printTheme: GeniusPdfPrintTheme.corporate(
   ///     primaryColor: Color(0xFF1565C0),
   ///   ),
@@ -368,10 +444,18 @@ class GeniusPdfConfig {
 
   /// Creates a copy of this config with the given fields replaced.
   GeniusPdfConfig copyWith({
+    Uint8List? baseFontBytes,
+    Uint8List? boldFontBytes,
+    Uint8List? headerFontBytes,
+    Uint8List? smallFontBytes,
     PdfFont? baseFont,
     PdfFont? boldFont,
     PdfFont? headerFont,
     PdfFont? smallFont,
+    double? baseFontSize,
+    double? boldFontSize,
+    double? headerFontSize,
+    double? smallFontSize,
     Size? pageSize,
     PdfPageOrientation? orientation,
     TextDirection? textDirection,
@@ -383,10 +467,18 @@ class GeniusPdfConfig {
     GeniusPdfPrintTheme? printTheme,
   }) {
     return GeniusPdfConfig(
-      baseFont: baseFont ?? this.baseFont,
-      boldFont: boldFont ?? this.boldFont,
-      headerFont: headerFont ?? this.headerFont,
-      smallFont: smallFont ?? this.smallFont,
+      baseFontBytes: baseFontBytes ?? this.baseFontBytes,
+      boldFontBytes: boldFontBytes ?? this.boldFontBytes,
+      headerFontBytes: headerFontBytes ?? this.headerFontBytes,
+      smallFontBytes: smallFontBytes ?? this.smallFontBytes,
+      baseFont: baseFont ?? baseFontOverride,
+      boldFont: boldFont ?? boldFontOverride,
+      headerFont: headerFont ?? headerFontOverride,
+      smallFont: smallFont ?? smallFontOverride,
+      baseFontSize: baseFontSize ?? this.baseFontSize,
+      boldFontSize: boldFontSize ?? this.boldFontSize,
+      headerFontSize: headerFontSize ?? this.headerFontSize,
+      smallFontSize: smallFontSize ?? this.smallFontSize,
       pageSize: pageSize ?? this.pageSize,
       orientation: orientation ?? this.orientation,
       textDirection: textDirection ?? this.textDirection,

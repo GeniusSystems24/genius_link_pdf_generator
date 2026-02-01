@@ -161,9 +161,6 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
         titleStyle: GeniusPdfTextStyle.title(fontSize: 18),
         showBorder: false,
       ),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
@@ -233,9 +230,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
       ],
       rows: rows,
       style: const GeniusPdfGridStyle.modern(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
+
     );
 
     final result = grid.drawAt(
@@ -286,9 +281,6 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       items: summaryItems,
       style: const GeniusPdfSummaryStyle.bordered(),
-      baseFont: baseFont,
-      boldFont: _boldFont,
-      isRTL: config.isRTL,
       alignment: GeniusPdfSummaryAlignment.right,
       width: pageWidth * 0.5,
     );

@@ -18,18 +18,11 @@ class GeniusPdfPieChart {
     required this.dataPoints,
     this.legend = const GeniusChartLegend(),
     required this.config,
-    GeniusChartStyle? style,
     this.settings = const GeniusPieChartSettings(),
     this.width,
     this.height = 250,
-    bool? isRtl,
     this.colors,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-  })  : style = _resolveChartStyle(style, config),
-        baseFont = _resolveBaseFont(baseFont, config),
-        boldFont = _resolveBoldFont(boldFont, baseFont, config),
-        isRtl = isRtl ?? config.isRTL;
+  }) : style = _chartStyleFromTheme(config.printTheme);
 
   /// عنوان المخطط
   final String? title;
@@ -58,37 +51,8 @@ class GeniusPdfPieChart {
   /// الارتفاع
   final double height;
 
-  /// اتجاه النص من اليمين لليسار
-  final bool isRtl;
-
   /// ألوان مخصصة
   final List<Color>? colors;
-
-  /// الخط الأساسي (مطلوب للنصوص العربية)
-  final PdfFont baseFont;
-
-  /// الخط العريض (مطلوب للعناوين)
-  final PdfFont boldFont;
-
-  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
-    return baseFont ?? config.baseFont;
-  }
-
-  static PdfFont _resolveBoldFont(
-    PdfFont? boldFont,
-    PdfFont? baseFont,
-    GeniusPdfConfig config,
-  ) {
-    return boldFont ?? config.boldFont;
-  }
-
-  static GeniusChartStyle _resolveChartStyle(
-    GeniusChartStyle? style,
-    GeniusPdfConfig config,
-  ) {
-    if (style != null) return style;
-    return _chartStyleFromTheme(config.printTheme);
-  }
 
   static GeniusChartStyle _chartStyleFromTheme(GeniusPdfPrintTheme theme) {
     final colors = theme.colorScheme;
@@ -108,7 +72,7 @@ class GeniusPdfPieChart {
   }
 
   /// الحصول على العنوان حسب اتجاه النص
-  String? get displayTitle => isRtl ? (titleAr ?? title) : title;
+  String? get displayTitle => config.isRTL ? (titleAr ?? title) : title;
 
   /// الحصول على المجموع الكلي
   double get total => dataPoints.fold(0, (sum, p) => sum + p.value);
@@ -230,7 +194,7 @@ class GeniusPdfPieChart {
 
   void _drawTitle(PdfGraphics graphics, Rect area) {
     // Font - baseFont and boldFont are required for Arabic support, no fallback to Helvetica
-    final font = boldFont;
+    final font = config.boldFont;
     graphics.drawString(
       displayTitle!,
       font,
@@ -252,8 +216,8 @@ class GeniusPdfPieChart {
 
     double currentAngle = settings.startAngle * math.pi / 180;
     // Font - baseFont is required for Arabic support, no fallback to Helvetica
-    final labelFont = baseFont;
-    final valueFont = baseFont;
+    final labelFont = config.baseFont;
+    final valueFont = config.baseFont;
 
     for (int i = 0; i < dataPoints.length; i++) {
       final point = dataPoints[i];
@@ -302,7 +266,7 @@ class GeniusPdfPieChart {
       // رسم المجموع في المنتصف
       if (settings.innerRadiusRatio >= 0.4) {
         // Font - baseFont and boldFont are required for Arabic support
-        final totalFont = boldFont;
+        final totalFont = config.boldFont;
         graphics.drawString(
           _formatValue(total),
           totalFont,
@@ -400,7 +364,7 @@ class GeniusPdfPieChart {
 
     String labelText = '';
     if (settings.showLabels) {
-      labelText = point.getLabel(isRtl);
+      labelText = point.getLabel(config.isRTL);
     }
     if (settings.showPercentages) {
       final percentText = '${percentage.toStringAsFixed(1)}%';
@@ -455,7 +419,7 @@ class GeniusPdfPieChart {
 
   void _drawLegend(PdfGraphics graphics, Rect area) {
     // Font - baseFont is required for Arabic support, no fallback to Helvetica
-    final font = baseFont;
+    final font = config.baseFont;
     final itemHeight = legend.iconSize + 4;
 
     if (legend.position == GeniusChartLegendPosition.right ||
@@ -479,7 +443,7 @@ class GeniusPdfPieChart {
         // رسم الاسم والنسبة
         final percentage = (point.value / total) * 100;
         final text =
-            '${point.getLabel(isRtl)} (${percentage.toStringAsFixed(1)}%)';
+            '${point.getLabel(config.isRTL)} (${percentage.toStringAsFixed(1)}%)';
         graphics.drawString(
           text,
           font,
@@ -516,7 +480,7 @@ class GeniusPdfPieChart {
 
         // رسم الاسم
         graphics.drawString(
-          point.getLabel(isRtl),
+          point.getLabel(config.isRTL),
           font,
           brush: PdfSolidBrush(_colorToPdfColor(style.textColor)),
           bounds: Rect.fromLTWH(x + legend.iconSize + 4, y,

@@ -432,7 +432,8 @@ class GeniusPdfReportHeaderStyle {
 
   /// Creates a header style from [GeniusPdfPrintTheme].
   factory GeniusPdfReportHeaderStyle.fromTheme(GeniusPdfPrintTheme theme) {
-    final headerTheme = theme.headerTheme ?? const GeniusPdfHeaderTheme.defaults();
+    final headerTheme =
+        theme.headerTheme ?? const GeniusPdfHeaderTheme.defaults();
     final typography = theme.typography;
 
     return GeniusPdfReportHeaderStyle(
@@ -626,8 +627,7 @@ class GeniusPdfReportHeaderStyle {
       titleAlignment: GeniusPdfTitleAlignment.center,
       companyInfoAlignment: GeniusPdfTitleAlignment.start,
       accentColor: effectiveAccent,
-      accentLinePosition:
-          showAccentLine ? GeniusPdfLogoPosition.start : null,
+      accentLinePosition: showAccentLine ? GeniusPdfLogoPosition.start : null,
       accentLineWidth: 4,
     );
   }
@@ -660,8 +660,7 @@ class GeniusPdfReportHeaderStyle {
         width: 1,
         color: accentColor,
       ),
-      padding:
-          const GeniusPdfCellPadding.symmetric(horizontal: 0, vertical: 8),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 0, vertical: 8),
       spacing: 6,
       logoMaxWidth: 100,
       logoMaxHeight: 40,
@@ -1070,9 +1069,6 @@ class GeniusPdfReportHeader {
     this.referenceLabelAr,
     required this.config,
     GeniusPdfReportHeaderStyle? style,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-    bool? isRTL,
     this.showPrintDate = true,
     this.showCompanyInfo = true,
     this.showBilingualTitle = true,
@@ -1083,10 +1079,7 @@ class GeniusPdfReportHeader {
     this.showPageNumber = false,
     this.customFields,
     this.tag,
-  })  : style = _resolveHeaderStyle(style, config),
-        baseFont = _resolveBaseFont(baseFont, config),
-        boldFont = _resolveBoldFont(boldFont, baseFont, config),
-        isRTL = isRTL ?? config.isRTL;
+  }) : style = _resolveHeaderStyle(style, config);
 
   /// Creates a report header for invoices/receipts.
   factory GeniusPdfReportHeader.invoice({
@@ -1102,14 +1095,7 @@ class GeniusPdfReportHeader {
     String documentNumberLabelAr = 'رقم الفاتورة',
     required GeniusPdfConfig config,
     GeniusPdfReportHeaderStyle? style,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-    bool? isRTL,
   }) {
-    final resolvedBase = _resolveBaseFont(baseFont, config);
-    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
-    final resolvedIsRtl = isRTL ?? config.isRTL;
-
     return GeniusPdfReportHeader(
       title: title,
       titleAr: titleAr,
@@ -1123,9 +1109,6 @@ class GeniusPdfReportHeader {
       documentNumberLabelAr: documentNumberLabelAr,
       config: config,
       style: style ?? GeniusPdfReportHeaderStyle.invoice(),
-      baseFont: resolvedBase,
-      boldFont: resolvedBold,
-      isRTL: resolvedIsRtl,
       layout: GeniusPdfReportHeaderLayout.invoice,
     );
   }
@@ -1139,14 +1122,7 @@ class GeniusPdfReportHeader {
     DateTime? date,
     required GeniusPdfConfig config,
     GeniusPdfReportHeaderStyle? style,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-    bool? isRTL,
   }) {
-    final resolvedBase = _resolveBaseFont(baseFont, config);
-    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
-    final resolvedIsRtl = isRTL ?? config.isRTL;
-
     return GeniusPdfReportHeader(
       title: title,
       titleAr: titleAr,
@@ -1155,9 +1131,6 @@ class GeniusPdfReportHeader {
       printDate: date,
       config: config,
       style: style ?? GeniusPdfReportHeaderStyle.minimal(),
-      baseFont: resolvedBase,
-      boldFont: resolvedBold,
-      isRTL: resolvedIsRtl,
       showCompanyInfo: false,
       layout: GeniusPdfReportHeaderLayout.compact,
     );
@@ -1173,14 +1146,7 @@ class GeniusPdfReportHeader {
     DateTime? date,
     required GeniusPdfConfig config,
     GeniusPdfReportHeaderStyle? style,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
-    bool? isRTL,
   }) {
-    final resolvedBase = _resolveBaseFont(baseFont, config);
-    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
-    final resolvedIsRtl = isRTL ?? config.isRTL;
-
     return GeniusPdfReportHeader(
       title: title,
       titleAr: titleAr,
@@ -1190,9 +1156,6 @@ class GeniusPdfReportHeader {
       printDate: date,
       config: config,
       style: style ?? const GeniusPdfReportHeaderStyle.modern(),
-      baseFont: resolvedBase,
-      boldFont: resolvedBold,
-      isRTL: resolvedIsRtl,
       showCompanyInfo: true,
       layout: GeniusPdfReportHeaderLayout.standard,
     );
@@ -1208,12 +1171,7 @@ class GeniusPdfReportHeader {
     DateTime? date,
     required GeniusPdfConfig config,
     GeniusPdfReportHeaderStyle? style,
-    PdfFont? baseFont,
-    PdfFont? boldFont,
   }) {
-    final resolvedBase = _resolveBaseFont(baseFont, config);
-    final resolvedBold = _resolveBoldFont(boldFont, baseFont, config);
-
     return GeniusPdfReportHeader(
       title: title,
       titleAr: titleAr,
@@ -1223,9 +1181,6 @@ class GeniusPdfReportHeader {
       printDate: date,
       config: config,
       style: style ?? GeniusPdfReportHeaderStyle.bilingualSplit(),
-      baseFont: resolvedBase,
-      boldFont: resolvedBold,
-      isRTL: true,
       showCompanyInfo: true,
       showBilingualTitle: true,
       layout: GeniusPdfReportHeaderLayout.bilingualSplit,
@@ -1284,13 +1239,13 @@ class GeniusPdfReportHeader {
   final GeniusPdfConfig config;
 
   /// Base font for text.
-  final PdfFont baseFont;
+  PdfFont get baseFont => config.baseFont;
 
   /// Bold font for titles.
-  final PdfFont boldFont;
+  PdfFont get boldFont => config.boldFont;
 
   /// Whether to use RTL layout.
-  final bool isRTL;
+  bool get isRTL => config.isRTL;
 
   /// Whether to show print date.
   final bool showPrintDate;
@@ -1321,18 +1276,6 @@ class GeniusPdfReportHeader {
 
   /// Custom tag for identification.
   final String? tag;
-
-  static PdfFont _resolveBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
-    return baseFont ?? config.baseFont;
-  }
-
-  static PdfFont _resolveBoldFont(
-    PdfFont? boldFont,
-    PdfFont? baseFont,
-    GeniusPdfConfig config,
-  ) {
-    return boldFont ?? config.boldFont;
-  }
 
   static GeniusPdfReportHeaderStyle _resolveHeaderStyle(
     GeniusPdfReportHeaderStyle? style,
@@ -1528,9 +1471,7 @@ class GeniusPdfReportHeader {
       final dateAlignment = style.showDateOnRight
           ? PdfTextAlignment.right
           : PdfTextAlignment.left;
-      final dateX = style.showDateOnRight
-          ? contentLeft
-          : contentLeft;
+      final dateX = style.showDateOnRight ? contentLeft : contentLeft;
       final dateWidth = contentRight - contentLeft;
 
       graphics.drawString(
@@ -1554,8 +1495,8 @@ class GeniusPdfReportHeader {
         pageInfo,
         dateFont,
         brush: dateBrush,
-        bounds: Rect.fromLTWH(
-            contentLeft, currentY, contentRight - contentLeft, 0),
+        bounds:
+            Rect.fromLTWH(contentLeft, currentY, contentRight - contentLeft, 0),
         format: PdfStringFormat(alignment: pageAlignment),
       );
       if (dateHeight == 0) dateHeight = dateFontSize + 2;
@@ -1588,9 +1529,8 @@ class GeniusPdfReportHeader {
 
     double infoY = y;
     final nameAlignment = _resolveTextAlignment(alignment);
-    final dir = isArabic
-        ? PdfTextDirection.rightToLeft
-        : PdfTextDirection.leftToRight;
+    final dir =
+        isArabic ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
 
     // Company name
     graphics.drawString(
@@ -1702,8 +1642,7 @@ class GeniusPdfReportHeader {
 
     // Company divider
     if (style.showCompanyDivider) {
-      final dividerColor =
-          style.companyDividerColor ?? const Color(0xFFCCCCCC);
+      final dividerColor = style.companyDividerColor ?? const Color(0xFFCCCCCC);
       graphics.drawLine(
         PdfPen(dividerColor.toPdfColor(), width: style.companyDividerWidth),
         Offset(x, infoY + 2),
@@ -1818,8 +1757,7 @@ class GeniusPdfReportHeader {
         baseFont,
         brush: style.subtitleStyle.toBrush(),
         bounds: Rect.fromLTWH(contentLeft, subY, contentWidth, 0),
-        format:
-            _textFormatDir(pdfAlignment, PdfTextDirection.rightToLeft),
+        format: _textFormatDir(pdfAlignment, PdfTextDirection.rightToLeft),
       );
       subY += style.subtitleStyle.fontSize + 2;
     }
@@ -1831,8 +1769,7 @@ class GeniusPdfReportHeader {
         baseFont,
         brush: style.subtitleStyle.toBrush(),
         bounds: Rect.fromLTWH(contentLeft, subY, contentWidth, 0),
-        format:
-            _textFormatDir(pdfAlignment, PdfTextDirection.leftToRight),
+        format: _textFormatDir(pdfAlignment, PdfTextDirection.leftToRight),
       );
       subY += style.subtitleStyle.fontSize + 2;
     }
@@ -1874,10 +1811,9 @@ class GeniusPdfReportHeader {
         baseFont,
         brush: dateBrush,
         bounds: Rect.fromLTWH(contentLeft, docY, contentWidth, 0),
-        format: _textFormat(
-            style.showDateOnRight
-                ? GeniusPdfTitleAlignment.end
-                : GeniusPdfTitleAlignment.start),
+        format: _textFormat(style.showDateOnRight
+            ? GeniusPdfTitleAlignment.end
+            : GeniusPdfTitleAlignment.start),
       );
       docY += fontSize + 2;
     }
@@ -1889,10 +1825,9 @@ class GeniusPdfReportHeader {
         baseFont,
         brush: dateBrush,
         bounds: Rect.fromLTWH(contentLeft, docY, contentWidth, 0),
-        format: _textFormat(
-            style.showDateOnRight
-                ? GeniusPdfTitleAlignment.end
-                : GeniusPdfTitleAlignment.start),
+        format: _textFormat(style.showDateOnRight
+            ? GeniusPdfTitleAlignment.end
+            : GeniusPdfTitleAlignment.start),
       );
       docY += fontSize + 2;
     }
@@ -1981,7 +1916,8 @@ class GeniusPdfReportHeader {
 
     if (logoPos == GeniusPdfLogoPosition.centerTop && scaledLogo != null) {
       // Logo centered above everything
-      final logoX = _resolveLogoX(logoPos, contentLeft, contentRight, logoWidth);
+      final logoX =
+          _resolveLogoX(logoPos, contentLeft, contentRight, logoWidth);
       graphics.drawImage(
         PdfBitmap(scaledLogo.data),
         Rect.fromLTWH(logoX, currentY, logoWidth, logoHeight),
@@ -1996,8 +1932,12 @@ class GeniusPdfReportHeader {
       final scale = bgLogoWidth / scaledLogo.width;
       final bgLogoHeight = scaledLogo.height * scale;
       final logoX = contentLeft + (contentWidth - bgLogoWidth) / 2;
-      final logoY = currentY + (bounds.height - style.padding.top -
-              style.padding.bottom - bgLogoHeight) / 2;
+      final logoY = currentY +
+          (bounds.height -
+                  style.padding.top -
+                  style.padding.bottom -
+                  bgLogoHeight) /
+              2;
       graphics.setTransparency(0.08);
       graphics.drawImage(
         PdfBitmap(scaledLogo.data),
@@ -2069,13 +2009,21 @@ class GeniusPdfReportHeader {
 
     // --- Title section ---
     final titleHeight = _drawTitleBlock(
-      graphics, currentY, contentLeft, contentWidth, style.titleAlignment,
+      graphics,
+      currentY,
+      contentLeft,
+      contentWidth,
+      style.titleAlignment,
     );
     currentY += titleHeight;
 
     // --- Subtitle section ---
     final subtitleHeight = _drawSubtitleBlock(
-      graphics, currentY, contentLeft, contentWidth, style.titleAlignment,
+      graphics,
+      currentY,
+      contentLeft,
+      contentWidth,
+      style.titleAlignment,
     );
     currentY += subtitleHeight;
 
@@ -2164,13 +2112,21 @@ class GeniusPdfReportHeader {
 
     // Bilingual title
     final titleHeight = _drawTitleBlock(
-      graphics, currentY, titleX, titleWidth, style.titleAlignment,
+      graphics,
+      currentY,
+      titleX,
+      titleWidth,
+      style.titleAlignment,
     );
     currentY += titleHeight;
 
     // Subtitle
     final subtitleHeight = _drawSubtitleBlock(
-      graphics, currentY, titleX, titleWidth, style.titleAlignment,
+      graphics,
+      currentY,
+      titleX,
+      titleWidth,
+      style.titleAlignment,
     );
     currentY += subtitleHeight;
 
@@ -2225,21 +2181,32 @@ class GeniusPdfReportHeader {
         boldFont,
         brush: style.companyNameStyle.toBrush(),
         bounds: Rect.fromLTWH(contentLeft, currentY, contentWidth, 0),
-        format: _textFormatDir(PdfTextAlignment.center,
-            isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight),
+        format: _textFormatDir(
+            PdfTextAlignment.center,
+            isRTL
+                ? PdfTextDirection.rightToLeft
+                : PdfTextDirection.leftToRight),
       );
       currentY += style.companyNameStyle.fontSize + style.spacing;
     }
 
     // Title
     final titleHeight = _drawTitleBlock(
-      graphics, currentY, contentLeft, contentWidth, centerAlign,
+      graphics,
+      currentY,
+      contentLeft,
+      contentWidth,
+      centerAlign,
     );
     currentY += titleHeight;
 
     // Subtitle
     final subtitleHeight = _drawSubtitleBlock(
-      graphics, currentY, contentLeft, contentWidth, centerAlign,
+      graphics,
+      currentY,
+      contentLeft,
+      contentWidth,
+      centerAlign,
     );
     currentY += subtitleHeight;
 
@@ -2331,13 +2298,21 @@ class GeniusPdfReportHeader {
 
     // Title centered
     final titleHeight = _drawTitleBlock(
-      graphics, currentY, contentLeft, contentWidth, style.titleAlignment,
+      graphics,
+      currentY,
+      contentLeft,
+      contentWidth,
+      style.titleAlignment,
     );
     currentY += titleHeight;
 
     // Subtitle
     final subtitleHeight = _drawSubtitleBlock(
-      graphics, currentY, contentLeft, contentWidth, style.titleAlignment,
+      graphics,
+      currentY,
+      contentLeft,
+      contentWidth,
+      style.titleAlignment,
     );
     currentY += subtitleHeight;
 
@@ -2437,13 +2412,21 @@ class GeniusPdfReportHeader {
     // Title centered (bilingual)
     const centerAlign = GeniusPdfTitleAlignment.center;
     final titleHeight = _drawTitleBlock(
-      graphics, currentY, contentLeft, contentWidth, centerAlign,
+      graphics,
+      currentY,
+      contentLeft,
+      contentWidth,
+      centerAlign,
     );
     currentY += titleHeight;
 
     // Subtitle
     final subtitleHeight = _drawSubtitleBlock(
-      graphics, currentY, contentLeft, contentWidth, centerAlign,
+      graphics,
+      currentY,
+      contentLeft,
+      contentWidth,
+      centerAlign,
     );
     currentY += subtitleHeight;
 

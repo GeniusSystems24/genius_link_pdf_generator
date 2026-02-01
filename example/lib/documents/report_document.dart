@@ -4,12 +4,16 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 import 'package:pdf/pdf.dart' hide PdfFont;
 import 'package:pdf/widgets.dart' as pw;
-import 'package:syncfusion_flutter_pdf/pdf.dart';
+
+import '../main.dart' show geniusPdfConfig;
 
 Future<Uint8List> buildMultiPageReportBytes() async {
     return GeniusPdfBuilder(
                 id: 'monthly-report',
-                config: GeniusPdfConfig(baseFont: PdfStandardFont(PdfFontFamily.helvetica, 10)),
+                                config: GeniusPdfConfig(
+                                    baseFontBytes: geniusPdfConfig.assets.primaryFont,
+                                    baseFontSize: 10,
+                                ),
             )
       .metadata(title: 'Monthly Report', author: 'System')
       .pageFormat(PdfPageFormat.a4)

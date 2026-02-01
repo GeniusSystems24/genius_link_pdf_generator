@@ -296,22 +296,16 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
         case 'confidential':
           document.addWatermark(GeniusPdfWatermark.confidential(
             config: geniusPdfConfig,
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
           ));
           break;
         case 'draft':
           document.addWatermark(GeniusPdfWatermark.draft(
             config: geniusPdfConfig,
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
           ));
           break;
         case 'copy':
           document.addWatermark(GeniusPdfWatermark.copy(
             config: geniusPdfConfig,
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
           ));
           break;
         case 'tiled':
@@ -325,8 +319,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
               horizontalSpacing: 100,
               verticalSpacing: 80,
             ),
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
           ).applyToDocument(document);
           break;
         case 'custom':
@@ -340,8 +332,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
               rotation: -30,
               isBold: true,
             ),
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
           ).applyToDocument(document);
           break;
       }
@@ -453,8 +443,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
         case 'visual':
           final signature = GeniusPdfDigitalSignature(
             config: geniusPdfConfig,
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
             settings: GeniusDigitalSignatureSettings(
               signerName: 'John Doe',
               pageNumber: 0,
@@ -465,8 +453,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
         case 'detailed':
           final signature = GeniusPdfDigitalSignature(
             config: geniusPdfConfig,
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
             settings: GeniusDigitalSignatureSettings(
               signerName: 'Jane Smith',
               reason: 'Document Review and Approval',
@@ -486,8 +472,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
         case 'multiple':
           final sig1 = GeniusPdfDigitalSignature(
             config: geniusPdfConfig,
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
             settings: GeniusDigitalSignatureSettings(
               signerName: 'Reviewer 1',
               reason: 'Technical Review',
@@ -500,8 +484,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
 
           final sig2 = GeniusPdfDigitalSignature(
             config: geniusPdfConfig,
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
             settings: GeniusDigitalSignatureSettings(
               signerName: 'Reviewer 2',
               reason: 'Management Approval',
@@ -534,8 +516,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
               bounds: Rect.fromLTWH(pageSize.width / 2 - 100, 300, 200, 100),
               pageNumber: 0,
             ),
-            baseFont: geniusPdfConfig.baseFont,
-            boldFont: geniusPdfConfig.boldFont,
           );
           signature.drawOnPage(
               page, Rect.fromLTWH(pageSize.width / 2 - 100, 300, 200, 100));
@@ -569,8 +549,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
       GeniusPdfWatermark.text(
         config: geniusPdfConfig,
         GeniusTextWatermarkSettings.confidential(opacity: 0.15),
-        baseFont: geniusPdfConfig.baseFont,
-        boldFont: geniusPdfConfig.boldFont,
       ).applyToPage(page1);
 
       GeniusPdfWatermark.tiled(
@@ -580,8 +558,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
           fontSize: 18,
           opacity: 0.08,
         ),
-        baseFont: geniusPdfConfig.baseFont,
-        boldFont: geniusPdfConfig.boldFont,
       ).applyToPage(page2);
 
       final signature = GeniusPdfDigitalSignature(config: geniusPdfConfig,
@@ -597,8 +573,6 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
           ),
           pageNumber: 2,
         ),
-        baseFont: geniusPdfConfig.baseFont,
-        boldFont: geniusPdfConfig.boldFont,
       );
       signature.drawOnPage(page3);
 

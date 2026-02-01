@@ -178,8 +178,7 @@ class GeniusPdfTextSpan {
         textDirectionOverride = null;
 
   /// Creates a colored text span.
-  const GeniusPdfTextSpan.colored(this.text, this.color,
-      {this.backgroundColor})
+  const GeniusPdfTextSpan.colored(this.text, this.color, {this.backgroundColor})
       : style = null,
         link = null,
         fontSize = null,
@@ -406,7 +405,8 @@ class GeniusPdfTextSpan {
         textDirectionOverride = null;
 
   /// Creates a small/caption text span — smaller font, gray.
-  const GeniusPdfTextSpan.small(this.text, {this.color = const Color(0xFF757575)})
+  const GeniusPdfTextSpan.small(this.text,
+      {this.color = const Color(0xFF757575)})
       : style = null,
         link = null,
         backgroundColor = null,
@@ -571,12 +571,14 @@ class GeniusPdfTextSpan {
       fontFamily: fontFamily ?? this.fontFamily,
       tooltip: tooltip ?? this.tooltip,
       opacity: opacity ?? this.opacity,
-      textDirectionOverride: textDirectionOverride ?? this.textDirectionOverride,
+      textDirectionOverride:
+          textDirectionOverride ?? this.textDirectionOverride,
     );
   }
 
   @override
-  String toString() => 'GeniusPdfTextSpan("$text", bold=$isBold, italic=$isItalic)';
+  String toString() =>
+      'GeniusPdfTextSpan("$text", bold=$isBold, italic=$isItalic)';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -641,7 +643,7 @@ class GeniusPdfRichText {
   })  : baseFont = _resolveRichTextBaseFont(baseFont, config),
         boldFont = _resolveRichTextBoldFont(boldFont, baseFont, config),
         defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config),
-      isRTL = isRTL ?? config.isRTL;
+        isRTL = isRTL ?? config.isRTL;
 
   /// Text spans to render.
   final List<GeniusPdfTextSpan> spans;
@@ -745,7 +747,8 @@ class GeniusPdfRichText {
     PdfLayoutFormat? layoutFormat,
   }) {
     if (spans.isEmpty) return null;
-    GeniusPdfLogger.debug('Drawing rich text: ${spans.length} spans', tag: 'RichText');
+    GeniusPdfLogger.debug('Drawing rich text: ${spans.length} spans',
+        tag: 'RichText');
 
     final graphics = page.graphics;
     final textDirection =
@@ -806,8 +809,7 @@ class GeniusPdfRichText {
         }
 
         // Resolve color + opacity
-        final baseColor =
-            span.color ?? span.style?.color ?? defaultStyle.color;
+        final baseColor = span.color ?? span.style?.color ?? defaultStyle.color;
         final effectiveColor = span.opacity < 1.0
             ? Color.fromARGB(
                 (baseColor.alpha * span.opacity).round(),
@@ -851,7 +853,10 @@ class GeniusPdfRichText {
           font,
           brush: brush,
           bounds: Rect.fromLTWH(
-            drawX, drawY, drawWidth + 10, effectiveFontSize + 4,
+            drawX,
+            drawY,
+            drawWidth + 10,
+            effectiveFontSize + 4,
           ),
           format: format,
         );
@@ -890,7 +895,10 @@ class GeniusPdfRichText {
         // ── Add link annotation ──────────────────────────────────
         if (span.hasLink) {
           final linkBounds = Rect.fromLTWH(
-            drawX, drawY, drawWidth, textSize.height,
+            drawX,
+            drawY,
+            drawWidth,
+            textSize.height,
           );
           page.annotations.add(PdfUriAnnotation(
             bounds: linkBounds,
@@ -969,9 +977,7 @@ class GeniusPdfRichText {
     switch (paragraphAlignment) {
       case GeniusPdfParagraphAlignment.center:
         final centerOffset = (bounds.width - lineWidth) / 2;
-        return isRTL
-            ? bounds.right - centerOffset
-            : bounds.left + centerOffset;
+        return isRTL ? bounds.right - centerOffset : bounds.left + centerOffset;
       case GeniusPdfParagraphAlignment.end:
         return isRTL ? bounds.left + lineWidth : bounds.right - lineWidth;
       case GeniusPdfParagraphAlignment.start:
@@ -994,7 +1000,8 @@ class GeniusPdfRichText {
         lines.add(_RichTextLine(
           segments: List.unmodifiable(currentSegments),
           width: currentLineWidth,
-          height: currentLineHeight > 0 ? currentLineHeight : _defaultLineHeight(),
+          height:
+              currentLineHeight > 0 ? currentLineHeight : _defaultLineHeight(),
         ));
         currentSegments = [];
         currentLineWidth = 0;
@@ -1149,7 +1156,7 @@ class GeniusPdfRichTextBuilder {
   })  : defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config),
         baseFont = _resolveRichTextBaseFont(baseFont, config),
         boldFont = _resolveRichTextBoldFont(boldFont, baseFont, config),
-      isRTL = isRTL ?? config.isRTL;
+        isRTL = isRTL ?? config.isRTL;
 
   final GeniusPdfTextStyle defaultStyle;
   final GeniusPdfConfig config;
@@ -1277,7 +1284,8 @@ class GeniusPdfRichTextBuilder {
   }
 
   /// Adds a badge-style span.
-  GeniusPdfRichTextBuilder badge(String text, {Color? backgroundColor, Color? color}) {
+  GeniusPdfRichTextBuilder badge(String text,
+      {Color? backgroundColor, Color? color}) {
     _spans.add(GeniusPdfTextSpan.badge(
       text,
       backgroundColor: backgroundColor ?? const Color(0xFF1976D2),
@@ -1409,9 +1417,6 @@ class GeniusPdfLabeledValue {
     this.valueStyle,
     this.valueColor,
     this.separator = ': ',
-    required this.baseFont,
-    required this.boldFont,
-    this.isRTL = true,
   });
 
   /// Creates a labeled value where the value is styled as positive (green).
@@ -1420,9 +1425,6 @@ class GeniusPdfLabeledValue {
     required String value,
     String? labelAr,
     required GeniusPdfConfig config,
-    required PdfFont baseFont,
-    required PdfFont boldFont,
-    bool isRTL = true,
   }) {
     return GeniusPdfLabeledValue(
       config: config,
@@ -1430,9 +1432,6 @@ class GeniusPdfLabeledValue {
       value: value,
       labelAr: labelAr,
       valueColor: const Color(0xFF2E7D32),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
     );
   }
 
@@ -1444,7 +1443,6 @@ class GeniusPdfLabeledValue {
     required GeniusPdfConfig config,
     required PdfFont baseFont,
     required PdfFont boldFont,
-    bool isRTL = true,
   }) {
     return GeniusPdfLabeledValue(
       config: config,
@@ -1452,9 +1450,6 @@ class GeniusPdfLabeledValue {
       value: value,
       labelAr: labelAr,
       valueColor: const Color(0xFFC62828),
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
     );
   }
 
@@ -1466,13 +1461,10 @@ class GeniusPdfLabeledValue {
   final GeniusPdfTextStyle? valueStyle;
   final Color? valueColor;
   final String separator;
-  final PdfFont baseFont;
-  final PdfFont boldFont;
-  final bool isRTL;
 
   /// Gets the display label based on locale.
   String getLabel() {
-    if (isRTL && labelAr != null) return labelAr!;
+    if (config.isRTL && labelAr != null) return labelAr!;
     return label;
   }
 
@@ -1495,9 +1487,9 @@ class GeniusPdfLabeledValue {
         valueSpan,
       ],
       config: config,
-      baseFont: baseFont,
-      boldFont: boldFont,
-      isRTL: isRTL,
+      baseFont: config.baseFont,
+      boldFont: config.boldFont,
+      isRTL: config.isRTL,
     );
 
     return richText.draw(
@@ -1554,9 +1546,6 @@ class GeniusPdfKeyValueList {
           valueStyle: item.valueStyle,
           valueColor: item.valueColor,
           separator: item.separator,
-          baseFont: baseFont ?? item.baseFont,
-          boldFont: boldFont ?? item.boldFont,
-          isRTL: isRTL,
         );
 
         lastResult = labeledValue.draw(
@@ -1596,9 +1585,6 @@ class GeniusPdfKeyValueList {
             labelAr: item.labelAr,
             value: item.value,
             valueColor: item.valueColor,
-            baseFont: baseFont ?? item.baseFont,
-            boldFont: boldFont ?? item.boldFont,
-            isRTL: isRTL,
           );
 
           lastResult = labeledValue.draw(
@@ -1964,6 +1950,7 @@ class GeniusPdfParagraph {
   });
 
   final GeniusPdfConfig config;
+
   /// Rich text blocks, one per paragraph.
   final List<GeniusPdfRichText> blocks;
 
@@ -2203,8 +2190,7 @@ class GeniusPdfSimpleMarkdownParser {
   // ── Auto-detection patterns ──────────────────────────────────────────────
 
   /// Matches bare URLs: https://..., http://..., www.…
-  static final _urlPattern =
-      RegExp(r'https?://[^\s<>\]\)]+|www\.[^\s<>\]\)]+');
+  static final _urlPattern = RegExp(r'https?://[^\s<>\]\)]+|www\.[^\s<>\]\)]+');
 
   /// Matches email addresses: user@domain.com
   static final _emailPattern =
@@ -2296,7 +2282,8 @@ class GeniusPdfSimpleMarkdownParser {
         final end = input.indexOf('~~', i + 2);
         if (end != -1) {
           _flushBuffer(buffer, spans);
-          spans.add(GeniusPdfTextSpan.strikethrough(input.substring(i + 2, end)));
+          spans.add(
+              GeniusPdfTextSpan.strikethrough(input.substring(i + 2, end)));
           i = end + 2;
           continue;
         }
@@ -2402,8 +2389,7 @@ class GeniusPdfSimpleMarkdownParser {
         for (final m in _emailPattern.allMatches(text)) {
           // Avoid matching emails that overlap with URLs
           final email = m.group(0)!;
-          matches
-              .add(_AutoMatch(m.start, m.end, email, _AutoType.email));
+          matches.add(_AutoMatch(m.start, m.end, email, _AutoType.email));
         }
       }
       if (config.autoDetectPhones) {
@@ -2412,8 +2398,7 @@ class GeniusPdfSimpleMarkdownParser {
           // Only match if the phone has at least 7 digits
           final digits = phone.replaceAll(RegExp(r'\D'), '');
           if (digits.length >= 7) {
-            matches
-                .add(_AutoMatch(m.start, m.end, phone, _AutoType.phone));
+            matches.add(_AutoMatch(m.start, m.end, phone, _AutoType.phone));
           }
         }
       }
@@ -2449,8 +2434,7 @@ class GeniusPdfSimpleMarkdownParser {
             url = 'mailto:${match.text}';
             break;
           case _AutoType.phone:
-            url =
-                'tel:${match.text.replaceAll(RegExp(r'[\s\-\(\)]'), '')}';
+            url = 'tel:${match.text.replaceAll(RegExp(r'[\s\-\(\)]'), '')}';
             break;
         }
 
@@ -2552,7 +2536,8 @@ extension GeniusPdfStringSpanExtension on String {
 
   /// Converts to a link text span.
   GeniusPdfTextSpan toLinkSpan(String url, {Color? color}) =>
-      GeniusPdfTextSpan.link(this, link: url, color: color ?? const Color(0xFF1565C0));
+      GeniusPdfTextSpan.link(this,
+          link: url, color: color ?? const Color(0xFF1565C0));
 
   /// Converts to a badge text span.
   GeniusPdfTextSpan toBadgeSpan({Color? backgroundColor, Color? color}) =>
@@ -2575,6 +2560,7 @@ extension GeniusPdfStringSpanExtension on String {
   ///
   /// If [config] is provided, enables auto-detection of URLs, emails, and
   /// phone numbers, and customizes link colors.
-  List<GeniusPdfTextSpan> parseMarkdownSpans({GeniusPdfMarkdownConfig? config}) =>
+  List<GeniusPdfTextSpan> parseMarkdownSpans(
+          {GeniusPdfMarkdownConfig? config}) =>
       GeniusPdfSimpleMarkdownParser.parse(this, config: config);
 }
