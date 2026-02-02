@@ -227,13 +227,18 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     final items = [
       _DrawerItem('dashboard', 'Dashboard', Icons.dashboard_rounded),
       _DrawerItem('components', 'Components', Icons.widgets_rounded),
-      _DrawerItem('charts', 'Charts', Icons.bar_chart_rounded),
+      _DrawerItem('grid_charts', 'Grid+Charts', Icons.bar_chart_rounded),
+      _DrawerItem('grid_qrcode', 'Grid+QR', Icons.qr_code_rounded),
+      _DrawerItem('grid_infobox', 'Grid+Info', Icons.view_agenda_rounded),
+      _DrawerItem('grid_watermark', 'Grid+Watermark', Icons.water_drop_rounded),
+      _DrawerItem('grid_richtext', 'Grid+RichText', Icons.format_quote_rounded),
+      _DrawerItem('charts', 'Charts', Icons.show_chart_rounded),
       _DrawerItem('templates', 'Templates', Icons.description_rounded),
       _DrawerItem('templates_demo', 'Templates Demo', Icons.view_quilt_rounded),
       _DrawerItem(
           'new_templates', 'Business Templates', Icons.auto_awesome_rounded),
       _DrawerItem('template_engine', 'Template Engine', Icons.tune_rounded),
-      _DrawerItem('barcodes', 'Barcodes & QR', Icons.qr_code_rounded),
+      _DrawerItem('barcodes', 'Barcodes & QR', Icons.qr_code_2_rounded),
       _DrawerItem('security', 'Security', Icons.security_rounded),
       _DrawerItem('examples', 'Examples', Icons.auto_awesome_mosaic_rounded),
       _DrawerItem('export', 'Export', Icons.file_download_rounded),
@@ -574,6 +579,11 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       case 'info_box':
       case 'headers':
       case 'summary':
+      case 'grid_charts':
+      case 'grid_qrcode':
+      case 'grid_infobox':
+      case 'grid_watermark':
+      case 'grid_richtext':
         return 'Components';
       case 'charts':
       case 'bar_chart':
@@ -632,6 +642,16 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         return const ComponentsDemoScreen(initialTab: 3);
       case 'summary':
         return const ComponentsDemoScreen(initialTab: 4);
+      case 'grid_charts':
+        return const ComponentsDemoScreen(initialTab: 5);
+      case 'grid_qrcode':
+        return const ComponentsDemoScreen(initialTab: 6);
+      case 'grid_infobox':
+        return const ComponentsDemoScreen(initialTab: 7);
+      case 'grid_watermark':
+        return const ComponentsDemoScreen(initialTab: 8);
+      case 'grid_richtext':
+        return const ComponentsDemoScreen(initialTab: 9);
 
       // Charts
       case 'charts':

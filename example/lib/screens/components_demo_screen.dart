@@ -56,6 +56,36 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
       icon: Icons.calculate_rounded,
       gradient: AppColors.warningGradient,
     ),
+    CustomTabItem(
+      id: 'grid_charts',
+      title: 'Grid+Charts',
+      icon: Icons.bar_chart_rounded,
+      gradient: AppColors.primaryGradient,
+    ),
+    CustomTabItem(
+      id: 'grid_qrcode',
+      title: 'Grid+QR',
+      icon: Icons.qr_code_rounded,
+      gradient: AppColors.purpleGradient,
+    ),
+    CustomTabItem(
+      id: 'grid_infobox',
+      title: 'Grid+Info',
+      icon: Icons.view_agenda_rounded,
+      gradient: AppColors.cyanGradient,
+    ),
+    CustomTabItem(
+      id: 'grid_watermark',
+      title: 'Grid+Watermark',
+      icon: Icons.water_drop_rounded,
+      gradient: AppColors.successGradient,
+    ),
+    CustomTabItem(
+      id: 'grid_richtext',
+      title: 'Grid+RichText',
+      icon: Icons.format_quote_rounded,
+      gradient: AppColors.warningGradient,
+    ),
   ];
 
   @override
@@ -96,6 +126,11 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
                 _buildInfoBoxTab(isDark),
                 _buildHeadersTab(isDark),
                 _buildSummaryTab(isDark),
+                _buildGridChartsTab(isDark),
+                _buildGridQrcodeTab(isDark),
+                _buildGridInfoboxTab(isDark),
+                _buildGridWatermarkTab(isDark),
+                _buildGridRichtextTab(isDark),
               ],
             ),
           ),
@@ -823,6 +858,194 @@ final summary = GeniusPdfSummarySection(
                     (isDark ? AppColors.darkText : AppColors.lightText),
               )),
         ],
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Grid Combination Demo Tabs
+  // ─────────────────────────────────────────────────────────────────────────
+
+  Widget _buildGridChartsTab(bool isDark) {
+    return _ComponentPage(
+      title: 'Grid + Charts',
+      description:
+          'Combines data grids with Bar, Line, and Pie charts for visual data reporting.',
+      icon: Icons.bar_chart_rounded,
+      gradient: AppColors.primaryGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: () => _generatePdf('grid_charts'),
+      codeExample: '''
+// Grid + Bar Chart combo
+addGrid(GeniusPdfDataGrid(...));
+
+final chart = GeniusPdfBarChart(
+  config: config,
+  title: 'Regional Sales',
+  series: [...],
+  settings: GeniusBarChartSettings(
+    type: GeniusBarChartType.grouped,
+  ),
+);
+addChart(chart);''',
+      preview: _buildGenericPreview(
+          isDark, Icons.bar_chart_rounded, 'Grid + Charts'),
+    );
+  }
+
+  Widget _buildGridQrcodeTab(bool isDark) {
+    return _ComponentPage(
+      title: 'Grid + QR Code',
+      description:
+          'Invoice grids with ZATCA-compliant QR codes for e-invoicing.',
+      icon: Icons.qr_code_rounded,
+      gradient: AppColors.purpleGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: () => _generatePdf('grid_qrcode'),
+      codeExample: '''
+addGrid(GeniusPdfDataGrid(...));
+
+addQRCode(
+  GeniusPdfQRCodeGenerator.zatca(
+    sellerName: 'Company',
+    vatNumber: '300123456789003',
+    timestamp: DateTime.now(),
+    total: 14058.75,
+    vatAmount: 1833.75,
+    config: config,
+  ),
+  size: 120,
+);''',
+      preview:
+          _buildGenericPreview(isDark, Icons.qr_code_rounded, 'Grid + QR Code'),
+    );
+  }
+
+  Widget _buildGridInfoboxTab(bool isDark) {
+    return _ComponentPage(
+      title: 'Grid + Info Boxes',
+      description:
+          'Data grids with styled info boxes for notices and summaries.',
+      icon: Icons.view_agenda_rounded,
+      gradient: AppColors.cyanGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: () => _generatePdf('grid_infobox'),
+      codeExample: '''
+addDualInfoBox(
+  leftBox: customerBox,
+  rightBox: companyBox,
+  equalHeight: true,
+);
+
+addGrid(GeniusPdfDataGrid(...));
+
+addInfoBox(GeniusPdfInfoBox(...));''',
+      preview: _buildGenericPreview(
+          isDark, Icons.view_agenda_rounded, 'Grid + Info Boxes'),
+    );
+  }
+
+  Widget _buildGridWatermarkTab(bool isDark) {
+    return _ComponentPage(
+      title: 'Grid + Watermarks',
+      description: 'Secure reports with watermarks for confidential documents.',
+      icon: Icons.water_drop_rounded,
+      gradient: AppColors.successGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: () => _generatePdf('grid_watermark'),
+      codeExample: '''
+addGrid(GeniusPdfDataGrid(...));
+
+// Apply watermark at document level
+final watermark = GeniusPdfWatermark.diagonal(
+  GeniusDiagonalWatermarkSettings(text: 'CONFIDENTIAL'),
+  config: config,
+);
+watermark.applyToDocument(doc);''',
+      preview: _buildGenericPreview(
+          isDark, Icons.water_drop_rounded, 'Grid + Watermarks'),
+    );
+  }
+
+  Widget _buildGridRichtextTab(bool isDark) {
+    return _ComponentPage(
+      title: 'Grid + Rich Text',
+      description: 'Financial analysis reports with styled text commentary.',
+      icon: Icons.format_quote_rounded,
+      gradient: AppColors.warningGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: () => _generatePdf('grid_richtext'),
+      codeExample: '''
+addGrid(GeniusPdfDataGrid(...));
+
+addRichText(
+  GeniusPdfRichTextBuilder(config: config)
+    .text('Revenue shows ')
+    .positive('+15.6%')
+    .text(' growth.')
+    .build(),
+);''',
+      preview: _buildGenericPreview(
+          isDark, Icons.format_quote_rounded, 'Grid + Rich Text'),
+    );
+  }
+
+  Widget _buildGenericPreview(bool isDark, IconData icon, String label) {
+    return Container(
+      height: 200,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primary.withOpacity(0.1),
+            AppColors.secondary.withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 48, color: AppColors.primary),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppColors.darkText : AppColors.lightText,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Click "Generate PDF" to preview',
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

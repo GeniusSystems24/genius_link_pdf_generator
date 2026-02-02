@@ -4,6 +4,11 @@ import 'dart:ui' show Rect;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 import 'package:genius_pdf_example/documents/components/data_grid_demo_builder.dart';
+import 'package:genius_pdf_example/documents/components/grid_charts_demo_builder.dart';
+import 'package:genius_pdf_example/documents/components/grid_infobox_demo_builder.dart';
+import 'package:genius_pdf_example/documents/components/grid_qrcode_demo_builder.dart';
+import 'package:genius_pdf_example/documents/components/grid_richtext_demo_builder.dart';
+import 'package:genius_pdf_example/documents/components/grid_watermark_demo_builder.dart';
 import 'package:genius_pdf_example/documents/components/headers_demo_builder.dart';
 import 'package:genius_pdf_example/documents/components/info_box_demo_builder.dart';
 import 'package:genius_pdf_example/documents/components/rich_text_demo_builder.dart';
@@ -29,6 +34,21 @@ Future<Uint8List> buildComponentDemoBytes({
       break;
     case 'summary':
       builder = SummaryDemoBuilder(config);
+      break;
+    case 'grid_charts':
+      builder = GridChartsDemoBuilder(config);
+      break;
+    case 'grid_qrcode':
+      builder = GridQrcodeDemoBuilder(config);
+      break;
+    case 'grid_infobox':
+      builder = GridInfoboxDemoBuilder(config);
+      break;
+    case 'grid_watermark':
+      builder = GridWatermarkDemoBuilder(config);
+      break;
+    case 'grid_richtext':
+      builder = GridRichtextDemoBuilder(config);
       break;
     default:
       throw ArgumentError('Unsupported component: $component');
