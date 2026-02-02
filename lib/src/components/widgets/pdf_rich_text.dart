@@ -765,21 +765,22 @@ class GeniusPdfRichText {
     // Build a cache key from style + size.
     final wantBold = span.isBold || (span.style?.isBold ?? false);
     final wantItalic = span.isItalic;
-    final cacheKey = '${wantBold ? 'b' : ''}${wantItalic ? 'i' : ''}_$desiredSize';
+    final cacheKey =
+        '${wantBold ? 'b' : ''}${wantItalic ? 'i' : ''}_$desiredSize';
 
     if (_fontCache.containsKey(cacheKey)) return _fontCache[cacheKey]!;
 
     // Create a sized font from config bytes.
     final Uint8List bytes;
     if (wantBold) {
-      bytes = config.boldFontBytes;
+      bytes = config.boldFontBytes ?? config.baseFontBytes;
     } else {
       bytes = config.baseFontBytes;
     }
 
     PdfFontStyle style = PdfFontStyle.regular;
     if (wantBold && wantItalic) {
-      style = PdfFontStyle.boldItalic;
+      style = PdfFontStyle.bold;
     } else if (wantBold) {
       style = PdfFontStyle.bold;
     } else if (wantItalic) {
@@ -925,8 +926,7 @@ class GeniusPdfRichText {
         if (span.hasLink) {
           // Use PdfTextWebLink for proper clickable hyperlinks.
           final linkFormat = PdfStringFormat(
-            alignment:
-                isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+            alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
             textDirection: textDirection,
             characterSpacing: span.letterSpacing ?? 0,
             wordSpacing: span.wordSpacing ?? 0,
@@ -942,8 +942,7 @@ class GeniusPdfRichText {
           webLink.draw(page, Offset(drawX, drawY));
         } else {
           final format = PdfStringFormat(
-            alignment:
-                isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+            alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
             textDirection: textDirection,
             characterSpacing: span.letterSpacing ?? 0,
             wordSpacing: span.wordSpacing ?? 0,
@@ -2221,7 +2220,6 @@ class GeniusPdfTextMeasurer {
 /// );
 /// ```
 class GeniusPdfMarkdownConfig {
-
   /// Creates a markdown configuration.
   const GeniusPdfMarkdownConfig({
     this.linkColor = const Color(0xFF1565C0),
@@ -2230,6 +2228,7 @@ class GeniusPdfMarkdownConfig {
     this.autoDetectPhones = false,
     this.autoLinkColor,
   });
+
   /// Color applied to explicit markdown links `[text](url)`.
   final Color linkColor;
 

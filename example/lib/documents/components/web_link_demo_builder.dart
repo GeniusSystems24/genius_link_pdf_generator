@@ -36,9 +36,7 @@ class WebLinkDemoBuilder extends GeniusPdfDocumentBuilder {
 
     // ── Section 1: PdfTextWebLink via Builder ──────────────────
     addSectionDivider(
-      title: isRTL
-          ? '1. روابط الويب عبر الباني'
-          : '1. Web Links via Builder',
+      title: isRTL ? '1. روابط الويب عبر الباني' : '1. Web Links via Builder',
       spacing: 10,
     );
     addSpace(10);
@@ -77,9 +75,7 @@ class WebLinkDemoBuilder extends GeniusPdfDocumentBuilder {
 
     // ── Section 2: Factory Constructor ─────────────────────────
     addSectionDivider(
-      title: isRTL
-          ? '2. المُنشئ المباشر'
-          : '2. Factory Constructor',
+      title: isRTL ? '2. المُنشئ المباشر' : '2. Factory Constructor',
       spacing: 10,
     );
     addSpace(10);
@@ -89,14 +85,14 @@ class WebLinkDemoBuilder extends GeniusPdfDocumentBuilder {
         config: config,
         spans: [
           GeniusPdfTextSpan(
-            isRTL ? 'التقرير متاح على ' : 'Report available at ',
+            text: isRTL ? 'التقرير متاح على ' : 'Report available at ',
           ),
           GeniusPdfTextSpan.webLink(
             isRTL ? 'بوابة التقارير' : 'Reports Portal',
             url: 'https://reports.example.com',
             color: const Color(0xFF1565C0),
           ),
-          GeniusPdfTextSpan('.'),
+          GeniusPdfTextSpan(text: '.'),
         ],
       ),
       spacing: 5,
@@ -106,9 +102,7 @@ class WebLinkDemoBuilder extends GeniusPdfDocumentBuilder {
 
     // ── Section 3: String Extension ────────────────────────────
     addSectionDivider(
-      title: isRTL
-          ? '3. امتداد النص'
-          : '3. String Extension',
+      title: isRTL ? '3. امتداد النص' : '3. String Extension',
       spacing: 10,
     );
     addSpace(10);
@@ -117,11 +111,10 @@ class WebLinkDemoBuilder extends GeniusPdfDocumentBuilder {
       GeniusPdfRichText(
         config: config,
         spans: [
-          GeniusPdfTextSpan(isRTL ? 'انقر ' : 'Click '),
-          (isRTL ? 'هنا' : 'here')
-              .toWebLinkSpan('https://example.com'),
+          GeniusPdfTextSpan(text: isRTL ? 'انقر ' : 'Click '),
+          (isRTL ? 'هنا' : 'here').toWebLinkSpan('https://example.com'),
           GeniusPdfTextSpan(
-            isRTL ? ' للتحميل.' : ' to download.',
+            text: isRTL ? ' للتحميل.' : ' to download.',
           ),
         ],
       ),
@@ -132,9 +125,7 @@ class WebLinkDemoBuilder extends GeniusPdfDocumentBuilder {
 
     // ── Section 4: Font Sizing Fix ─────────────────────────────
     addSectionDivider(
-      title: isRTL
-          ? '4. إصلاح حجم الخط'
-          : '4. Font Size Fix',
+      title: isRTL ? '4. إصلاح حجم الخط' : '4. Font Size Fix',
       spacing: 10,
     );
     addSpace(10);
@@ -144,20 +135,20 @@ class WebLinkDemoBuilder extends GeniusPdfDocumentBuilder {
         config: config,
         spans: [
           GeniusPdfTextSpan(
-            isRTL ? 'حجم عادي، ' : 'Normal size, ',
+            text: isRTL ? 'حجم عادي، ' : 'Normal size, ',
           ),
           GeniusPdfTextSpan(
-            isRTL ? 'حجم كبير، ' : 'Large size, ',
+            text: isRTL ? 'حجم كبير، ' : 'Large size, ',
             fontSize: 18,
             color: const Color(0xFFE65100),
           ),
           GeniusPdfTextSpan(
-            isRTL ? 'حجم صغير، ' : 'Small size, ',
+            text: isRTL ? 'حجم صغير، ' : 'Small size, ',
             fontSize: 8,
             color: const Color(0xFF1B5E20),
           ),
           GeniusPdfTextSpan(
-            isRTL ? 'حجم عادي مرة أخرى.' : 'Normal again.',
+            text: isRTL ? 'حجم عادي مرة أخرى.' : 'Normal again.',
           ),
         ],
       ),
@@ -184,9 +175,7 @@ class WebLinkDemoBuilder extends GeniusPdfDocumentBuilder {
 
     // ── Section 5: Mixed Links and Styles ──────────────────────
     addSectionDivider(
-      title: isRTL
-          ? '5. روابط مختلطة مع أنماط'
-          : '5. Mixed Links with Styles',
+      title: isRTL ? '5. روابط مختلطة مع أنماط' : '5. Mixed Links with Styles',
       spacing: 10,
     );
     addSpace(10);
@@ -229,9 +218,7 @@ class WebLinkDemoBuilder extends GeniusPdfDocumentBuilder {
     addSpace(15);
 
     addLine(
-      isRTL
-          ? 'عدد الصفحات: $pageCount'
-          : 'Total pages: $pageCount',
+      isRTL ? 'عدد الصفحات: $pageCount' : 'Total pages: $pageCount',
       font: config.boldFont,
       topMargin: 10,
     );
