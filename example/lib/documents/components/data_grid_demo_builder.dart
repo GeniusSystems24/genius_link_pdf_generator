@@ -292,12 +292,11 @@ class DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
           GeniusPdfGridGroup(
             title: 'Electronics',
             titleAr: 'إلكترونيات',
-            level: 0,
+            rows: const [],
             subgroups: [
               GeniusPdfGridGroup.withSummary(
                 title: 'Computers',
                 titleAr: 'حواسيب',
-                level: 1,
                 rows: [
                   GeniusPdfGridRow(cells: {'item': config.isRTL ? 'لابتوب HP' : 'HP Laptop', 'qty': 5, 'price': 3200, 'total': 16000}),
                   GeniusPdfGridRow(cells: {'item': config.isRTL ? 'لابتوب Dell' : 'Dell Laptop', 'qty': 3, 'price': 4500, 'total': 13500}),
@@ -310,7 +309,6 @@ class DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
               GeniusPdfGridGroup.withSummary(
                 title: 'Accessories',
                 titleAr: 'ملحقات',
-                level: 1,
                 rows: [
                   GeniusPdfGridRow(cells: {'item': config.isRTL ? 'ماوس لاسلكي' : 'Wireless Mouse', 'qty': 20, 'price': 85, 'total': 1700}),
                   GeniusPdfGridRow(cells: {'item': config.isRTL ? 'لوحة مفاتيح' : 'Keyboard', 'qty': 15, 'price': 120, 'total': 1800}),
