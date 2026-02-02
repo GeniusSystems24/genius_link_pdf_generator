@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui';
 
 import '../../../genius_link_pdf_generator.dart';
@@ -164,6 +165,41 @@ class GeniusPdfTextSpan {
   })  : style = null,
         backgroundColor = null,
         fontSize = null,
+        letterSpacing = null,
+        wordSpacing = null,
+        isBold = false,
+        isItalic = false,
+        isUnderline = true,
+        isStrikethrough = false,
+        isOverline = false,
+        isSuperscript = false,
+        isSubscript = false,
+        fontFamily = null,
+        opacity = 1.0,
+        textDirectionOverride = null;
+
+  /// Creates a web link text span rendered via [PdfTextWebLink].
+  ///
+  /// Similar to [GeniusPdfTextSpan.link], but explicitly intended for web URLs.
+  /// The link is rendered using Syncfusion's [PdfTextWebLink] for proper
+  /// clickable hyperlink behavior in PDF viewers.
+  ///
+  /// ```dart
+  /// GeniusPdfTextSpan.webLink(
+  ///   'Visit Google',
+  ///   url: 'https://www.google.com',
+  ///   color: Color(0xFF0D47A1),
+  /// )
+  /// ```
+  const GeniusPdfTextSpan.webLink(
+    this.text, {
+    required String url,
+    this.color = const Color(0xFF1565C0),
+    this.tooltip,
+    this.fontSize,
+  })  : style = null,
+        link = url,
+        backgroundColor = null,
         letterSpacing = null,
         wordSpacing = null,
         isBold = false,
@@ -687,6 +723,9 @@ class GeniusPdfRichText {
   /// Padding around background highlight rectangles.
   final double backgroundPadding;
 
+  /// Cache for sized fonts to avoid repeated PdfTrueTypeFont construction.
+  final Map<String, PdfFont> _fontCache = {};
+
   /// Gets the combined plain text of all spans.
   String get plainText => spans.map((s) => s.text).join();
 
@@ -696,7 +735,7 @@ class GeniusPdfRichText {
   /// Whether there are no spans.
   bool get isEmpty => spans.isEmpty;
 
-  /// Resolves the font for a given span.
+  /// Resolves the font for a given span (base style resolution, no sizing).
   PdfFont _resolveFont(GeniusPdfTextSpan span) {
     final wantBold = span.isBold || (span.style?.isBold ?? false);
     final wantItalic = span.isItalic;
@@ -709,6 +748,47 @@ class GeniusPdfRichText {
       return italicFont ?? baseFont;
     }
     return baseFont;
+  }
+
+  /// Resolves a font at the correct size for a span.
+  ///
+  /// If [span.fontSize] differs from the default or if the span is
+  /// superscript/subscript, creates a font at the appropriate size
+  /// using config font bytes. Falls back to the base-resolved font.
+  PdfFont _resolveSizedFont(GeniusPdfTextSpan span) {
+    final font = _resolveFont(span);
+    final desiredSize = _resolveEffectiveFontSize(span);
+
+    // If the font is already at the desired size, use it as-is.
+    if ((font.size - desiredSize).abs() < 0.01) return font;
+
+    // Build a cache key from style + size.
+    final wantBold = span.isBold || (span.style?.isBold ?? false);
+    final wantItalic = span.isItalic;
+    final cacheKey = '${wantBold ? 'b' : ''}${wantItalic ? 'i' : ''}_$desiredSize';
+
+    if (_fontCache.containsKey(cacheKey)) return _fontCache[cacheKey]!;
+
+    // Create a sized font from config bytes.
+    final Uint8List bytes;
+    if (wantBold) {
+      bytes = config.boldFontBytes;
+    } else {
+      bytes = config.baseFontBytes;
+    }
+
+    PdfFontStyle style = PdfFontStyle.regular;
+    if (wantBold && wantItalic) {
+      style = PdfFontStyle.boldItalic;
+    } else if (wantBold) {
+      style = PdfFontStyle.bold;
+    } else if (wantItalic) {
+      style = PdfFontStyle.italic;
+    }
+
+    final sizedFont = PdfTrueTypeFont(bytes, desiredSize, style: style);
+    _fontCache[cacheKey] = sizedFont;
+    return sizedFont;
   }
 
   /// Resolves the effective font size for a span, accounting for
@@ -790,8 +870,8 @@ class GeniusPdfRichText {
       for (int si = 0; si < line.segments.length; si++) {
         final seg = line.segments[si];
         final span = seg.span;
-        final font = seg.font;
-        final textSize = seg.size;
+        final sizedFont = _resolveSizedFont(span);
+        final textSize = _measureText(seg.text, sizedFont);
         final effectiveFontSize = _resolveEffectiveFontSize(span);
 
         // Apply ellipsis on last segment of last truncated line
@@ -801,7 +881,7 @@ class GeniusPdfRichText {
             si == line.segments.length - 1 &&
             overflow == GeniusPdfTextOverflow.ellipsis) {
           const ellipsis = '…';
-          final ellipsisSize = _measureText(ellipsis, font);
+          final ellipsisSize = _measureText(ellipsis, sizedFont);
           if (drawWidth + ellipsisSize.width <= bounds.width) {
             drawText = '${seg.text}$ellipsis';
             drawWidth += ellipsisSize.width;
@@ -828,8 +908,9 @@ class GeniusPdfRichText {
 
         // ── Draw background ──────────────────────────────────────
         if (span.hasBackground) {
+          final bgX = math.max(0.0, drawX - backgroundPadding);
           final bgRect = Rect.fromLTWH(
-            drawX - backgroundPadding,
+            bgX,
             drawY - backgroundPadding,
             drawWidth + backgroundPadding * 2,
             textSize.height + backgroundPadding * 2,
@@ -840,32 +921,54 @@ class GeniusPdfRichText {
           );
         }
 
-        // ── Draw text ────────────────────────────────────────────
-        final format = PdfStringFormat(
-          alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-          textDirection: textDirection,
-          characterSpacing: span.letterSpacing ?? 0,
-          wordSpacing: span.wordSpacing ?? 0,
-        );
+        // ── Draw text / link ─────────────────────────────────────
+        if (span.hasLink) {
+          // Use PdfTextWebLink for proper clickable hyperlinks.
+          final linkFormat = PdfStringFormat(
+            alignment:
+                isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+            textDirection: textDirection,
+            characterSpacing: span.letterSpacing ?? 0,
+            wordSpacing: span.wordSpacing ?? 0,
+          );
+          final webLink = PdfTextWebLink(
+            url: span.link!,
+            text: drawText,
+            font: sizedFont,
+            brush: brush,
+            pen: PdfPen(PdfColor(0, 0, 0, 0), width: 0),
+            format: linkFormat,
+          );
+          webLink.draw(page, Offset(drawX, drawY));
+        } else {
+          final format = PdfStringFormat(
+            alignment:
+                isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+            textDirection: textDirection,
+            characterSpacing: span.letterSpacing ?? 0,
+            wordSpacing: span.wordSpacing ?? 0,
+          );
 
-        graphics.drawString(
-          drawText,
-          font,
-          brush: brush,
-          bounds: Rect.fromLTWH(
-            drawX,
-            drawY,
-            drawWidth + 10,
-            effectiveFontSize + 4,
-          ),
-          format: format,
-        );
+          graphics.drawString(
+            drawText,
+            sizedFont,
+            brush: brush,
+            bounds: Rect.fromLTWH(
+              drawX,
+              drawY,
+              drawWidth + (span.letterSpacing ?? 0) * drawText.length + 2,
+              effectiveFontSize + 4,
+            ),
+            format: format,
+          );
+        }
 
         // ── Draw decorations ─────────────────────────────────────
         final penColor = effectiveColor.toPdfColor();
         final decorPen = PdfPen(penColor, width: 0.5);
 
-        if (span.isUnderline) {
+        // Skip manual underline for links — PdfTextWebLink handles it.
+        if (span.isUnderline && !span.hasLink) {
           final uY = drawY + textSize.height - 1;
           graphics.drawLine(
             decorPen,
@@ -890,20 +993,6 @@ class GeniusPdfRichText {
             Offset(drawX, oY),
             Offset(drawX + drawWidth, oY),
           );
-        }
-
-        // ── Add link annotation ──────────────────────────────────
-        if (span.hasLink) {
-          final linkBounds = Rect.fromLTWH(
-            drawX,
-            drawY,
-            drawWidth,
-            textSize.height,
-          );
-          page.annotations.add(PdfUriAnnotation(
-            bounds: linkBounds,
-            uri: span.link!,
-          ));
         }
 
         // Advance cursor
@@ -992,24 +1081,44 @@ class GeniusPdfRichText {
     double currentLineWidth = 0;
     double currentLineHeight = 0;
 
+    void flushLine() {
+      // Trim trailing whitespace from the last segment on this line.
+      if (currentSegments.isNotEmpty) {
+        final lastSeg = currentSegments.last;
+        final trimmed = lastSeg.text.trimRight();
+        if (trimmed != lastSeg.text) {
+          final trimmedSize = _measureText(trimmed, lastSeg.font);
+          final widthDiff = lastSeg.size.width - trimmedSize.width;
+          currentSegments[currentSegments.length - 1] = _RichTextSegment(
+            text: trimmed,
+            span: lastSeg.span,
+            font: lastSeg.font,
+            size: trimmedSize,
+          );
+          currentLineWidth -= widthDiff;
+        }
+      }
+      lines.add(_RichTextLine(
+        segments: List.unmodifiable(currentSegments),
+        width: currentLineWidth,
+        height:
+            currentLineHeight > 0 ? currentLineHeight : _defaultLineHeight(),
+      ));
+      currentSegments = [];
+      currentLineWidth = 0;
+      currentLineHeight = 0;
+    }
+
     for (final span in spans) {
       if (span.isEmpty) continue;
 
       // Handle explicit newlines
       if (span.text == '\n') {
-        lines.add(_RichTextLine(
-          segments: List.unmodifiable(currentSegments),
-          width: currentLineWidth,
-          height:
-              currentLineHeight > 0 ? currentLineHeight : _defaultLineHeight(),
-        ));
-        currentSegments = [];
-        currentLineWidth = 0;
-        currentLineHeight = 0;
+        flushLine();
         continue;
       }
 
-      final font = _resolveFont(span);
+      final font = _resolveSizedFont(span);
       final words = _splitIntoWords(span.text);
 
       for (final word in words) {
@@ -1020,15 +1129,7 @@ class GeniusPdfRichText {
         // Check if word fits on current line
         if (currentLineWidth + wordWidth > maxWidth &&
             currentSegments.isNotEmpty) {
-          // Flush current line
-          lines.add(_RichTextLine(
-            segments: List.unmodifiable(currentSegments),
-            width: currentLineWidth,
-            height: currentLineHeight,
-          ));
-          currentSegments = [];
-          currentLineWidth = 0;
-          currentLineHeight = 0;
+          flushLine();
         }
 
         // Add word as segment
@@ -1045,17 +1146,15 @@ class GeniusPdfRichText {
 
     // Flush remaining segments
     if (currentSegments.isNotEmpty) {
-      lines.add(_RichTextLine(
-        segments: List.unmodifiable(currentSegments),
-        width: currentLineWidth,
-        height: currentLineHeight,
-      ));
+      flushLine();
     }
 
     return lines;
   }
 
-  /// Splits text into words preserving spaces and delimiters.
+  /// Splits text into words, attaching trailing space to each word.
+  ///
+  /// Example: `"hello world"` → `["hello ", "world"]`
   List<String> _splitIntoWords(String text) {
     final words = <String>[];
     final buffer = StringBuffer();
@@ -1080,13 +1179,17 @@ class GeniusPdfRichText {
   }
 
   PdfLayoutResult? _createLayoutResult(PdfPage page, Rect bounds) {
+    // Draw a minimal invisible element so that result.bounds.bottom
+    // equals the actual content bottom, not content bottom + font height.
+    final fontHeight = baseFont.height;
+    final drawY = (bounds.bottom - fontHeight).clamp(0.0, bounds.bottom);
     final dummyElement = PdfTextElement(
       text: ' ',
       font: baseFont,
     );
     return dummyElement.draw(
       page: page,
-      bounds: Rect.fromLTWH(bounds.left, bounds.bottom, 1, 1),
+      bounds: Rect.fromLTWH(bounds.left, drawY, 1, fontHeight + 1),
     );
   }
 }
@@ -1212,6 +1315,19 @@ class GeniusPdfRichTextBuilder {
     _spans.add(GeniusPdfTextSpan.link(
       text,
       link: url,
+      color: color ?? const Color(0xFF1565C0),
+    ));
+    return this;
+  }
+
+  /// Adds a web link rendered via [PdfTextWebLink].
+  ///
+  /// Creates a proper clickable hyperlink in the PDF using
+  /// Syncfusion's PdfTextWebLink annotation.
+  GeniusPdfRichTextBuilder webLink(String text, String url, {Color? color}) {
+    _spans.add(GeniusPdfTextSpan.webLink(
+      text,
+      url: url,
       color: color ?? const Color(0xFF1565C0),
     ));
     return this;
@@ -2535,6 +2651,11 @@ extension GeniusPdfStringSpanExtension on String {
   GeniusPdfTextSpan toLinkSpan(String url, {Color? color}) =>
       GeniusPdfTextSpan.link(this,
           link: url, color: color ?? const Color(0xFF1565C0));
+
+  /// Converts to a web link text span rendered via [PdfTextWebLink].
+  GeniusPdfTextSpan toWebLinkSpan(String url, {Color? color}) =>
+      GeniusPdfTextSpan.webLink(this,
+          url: url, color: color ?? const Color(0xFF1565C0));
 
   /// Converts to a badge text span.
   GeniusPdfTextSpan toBadgeSpan({Color? backgroundColor, Color? color}) =>

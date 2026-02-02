@@ -116,6 +116,7 @@ A comprehensive PDF generation and preview library for Flutter applications with
 🎭 **Page Templates** (v2.8.0) - `setPageTemplate()` stamps, watermarks, and template elements
 🔗 **Report Composer** (v2.9.0) - `GeniusPdfReportComposer` fluent API for chainable report building without subclassing
 📐 **Smart Space Management** (v2.10.0) - Automatic header/footer space deduction, footer-aware `remainingHeight`, and auto page-break for all non-Grid components
+🔗 **PdfTextWebLink Hyperlinks** (v2.11.0) - Proper clickable hyperlinks via Syncfusion's `PdfTextWebLink`, sized font support, and rich text bug fixes
 
 ---
 
@@ -415,6 +416,27 @@ Key properties:
 - `effectivePageHeight` — page height minus header and footer
 - `remainingHeight` — accounts for both currentY and footer
 - `reserveHeaderSpace()` / `reserveFooterSpace()` — for custom headers/footers
+
+### PdfTextWebLink Hyperlinks (v2.11.0)
+
+Rich text links now use Syncfusion's `PdfTextWebLink` for proper clickable hyperlinks. Font sizing is also fixed — `span.fontSize` and superscript/subscript scaling now render at the correct size.
+
+```dart
+// Builder API
+final richText = GeniusPdfRichTextBuilder(config: config)
+    .text('Visit ')
+    .webLink('Google', 'https://www.google.com')
+    .text(' or ')
+    .webLink('GitHub', 'https://github.com', color: Color(0xFF6E5494))
+    .text(' for more info.')
+    .build();
+
+// Factory constructor
+GeniusPdfTextSpan.webLink('Click here', url: 'https://example.com')
+
+// String extension
+'Documentation'.toWebLinkSpan('https://docs.example.com')
+```
 
 ### 3. Generate and Display
 

@@ -5,6 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.0] - 2026-02-02
+
+### Added
+
+#### PdfTextWebLink Integration & Rich Text Improvements
+
+- **`PdfTextWebLink` for hyperlinks** — Link spans now use Syncfusion's `PdfTextWebLink` instead of manual `PdfUriAnnotation`, producing proper clickable hyperlinks with built-in annotation handling
+- **`GeniusPdfTextSpan.webLink` factory** — New constructor for creating web link spans: `GeniusPdfTextSpan.webLink('Click here', url: 'https://example.com')`
+- **`GeniusPdfRichTextBuilder.webLink()` method** — Fluent builder method for adding web links: `.webLink('Google', 'https://google.com')`
+- **`String.toWebLinkSpan()` extension** — Quick conversion from String to web link span: `'Click'.toWebLinkSpan('https://example.com')`
+- **Font size caching** — Sized fonts are cached by style+size key to avoid repeated `PdfTrueTypeFont` construction
+
+### Changed
+
+- **`_resolveSizedFont()` replaces `_resolveFont()` in draw/layout** — When `span.fontSize` is set or superscript/subscript scaling applies, a correctly sized font is now created from config font bytes, ensuring text renders at the intended size
+- **Drawing bounds use calculated padding** — Replaced magic `drawWidth + 10` constant with `drawWidth + letterSpacing * textLength + 2` for accurate text bounds
+- **Trailing whitespace trimming** — `flushLine()` now trims trailing whitespace from the last segment on each line, preventing extra width at line boundaries
+- **Background X clamped** — `drawX - backgroundPadding` is now clamped to `>= 0` to prevent background rectangles from extending outside the page
+
+### Fixed
+
+- **`_createLayoutResult` Y overshoot** — Previously drew a dummy element at `bounds.bottom`, causing `result.bounds.bottom` to overshoot by one font height. Now draws at `bounds.bottom - fontHeight` so the returned bounds are accurate
+- **`span.fontSize` ignored during rendering** — Text was always rendered at the base font's built-in size regardless of `span.fontSize`. Now creates a properly sized font from config bytes
+- **Superscript/subscript size not applied** — The `_scriptSizeRatio` scaling was calculated but never used to create a smaller font. Now uses `_resolveSizedFont()` which respects the scaling
+- **Link underline double-drawn** — Manual underline decoration was drawn for link spans even though `PdfTextWebLink` renders its own underline. Now skips manual underline for `span.hasLink`
+- **Line height 0 on empty newlines** — Flushing a newline line could produce height `0`. Now falls back to `_defaultLineHeight()` for empty lines
+
+### Example
+
+```dart
+// Using PdfTextWebLink via the builder
+final richText = GeniusPdfRichTextBuilder(config: config)
+    .text('Visit ')
+    .webLink('Google', 'https://www.google.com')
+    .text(' or ')
+    .webLink('GitHub', 'https://github.com', color: Color(0xFF6E5494))
+    .text(' for more info.')
+    .build();
+
+// Using the factory directly
+final spans = [
+  GeniusPdfTextSpan('Read the '),
+  GeniusPdfTextSpan.webLink('documentation', url: 'https://docs.example.com'),
+];
+
+// Using String extension
+final span = 'Click here'.toWebLinkSpan('https://example.com');
+```
+
+---
+
 ## [2.10.0] - 2026-02-02
 
 ### Added
