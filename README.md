@@ -10,118 +10,453 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
 ## Features
 
-✨ **Clean Architecture** - Well-organized code with separation of concerns
-🔤 **RTL/LTR Support** - Full support for Arabic, Hebrew, and other RTL languages
-🔄 **Background Processing** - Generate PDFs without blocking the UI
-📄 **Preview Widgets** - Built-in widgets for PDF display and interaction
-🎨 **Asset Management** - Centralized font and image management
-📤 **Export Options** - Save, share, and print PDFs easily
-⚡ **Fluent API** - Easy-to-use builder pattern for document creation
-📊 **Reusable Components** - Data grids, rich text, info boxes, headers, summaries
-📈 **Charts & Graphs** - Bar, line, pie, and area charts with RTL support
-💧 **Watermarks** - Text, image, diagonal, and tiled watermarks
-🔒 **Security** - Password protection, encryption, and permissions
-✍️ **Digital Signatures** - Certificate-based digital signatures
-📑 **Report Templates** - Tax invoices, trial balance, customer statements, inventory reports
-📋 **Financial Templates** - Balance sheet, income statement, cash flow, budget reports
-🛒 **Sales Templates** - Quotations, purchase orders, delivery notes, credit/debit notes
-👥 **HR Templates** - Payslips, employee reports, attendance reports, leave reports
-📊 **Barcodes & QR Codes** - EAN-13, Code128, QR Code, DataMatrix, PDF417, ZATCA QR
-📤 **Multi-Format Export** - Export to PNG, JPEG, HTML, Text, and PDF/A
-🔄 **Batch Export** - Export multiple documents with progress tracking
-🔧 **Template Engine** - Dynamic templates with variables, conditions, and loops
-📦 **Template Registry** - Manage and share template definitions
-🌐 **Bilingual Support** - Arabic/English text throughout all components
-🔌 **Plugin System** (v2.0) - Extend functionality with custom plugins
-💉 **Dependency Injection** (v2.0) - Clean dependency management
-📡 **Event-Driven** (v2.0) - React to document lifecycle events
-⚡ **Fluent API v2** (v2.0) - Enhanced chainable API for document creation
-🧠 **Smart Caching** (v2.0) - Intelligent caching with multiple strategies
-🖥️ **Platform Support** (v2.0) - Consistent API across Web, Mobile, and Desktop
-📋 **Logging System** (v2.0.2) - Built-in logger with enable/disable control
-🤖 **AI Features** (v2.1.0) - Content analysis, smart layout, text summarization
-📊 **Content Analyzer** (v2.1.0) - Extract text, detect document types, find keywords
-🎨 **Smart Layout** (v2.1.0) - Automatic font size and margin optimization
-📝 **Text Services** (v2.1.0) - Summarization, language detection, title generation
-🖼️ **Image Optimizer** (v2.1.0) - Smart image analysis and optimization
-🖨️ **Advanced Printing** (v2.2.0) - Printer discovery, print settings, job tracking
-📋 **Print Settings** (v2.2.0) - Paper size, orientation, quality, duplex, copies
-🔍 **Printer Discovery** (v2.2.0) - Find and manage available printers
-👁️ **Print Preview** (v2.2.1) - Visual preview with settings adjustment
-💾 **Print Profiles** (v2.2.1) - Save and manage custom print settings
-📤 **Unified Sharing** (v2.3.0) - Single API for all sharing methods
-📧 **Email Sharing** (v2.3.1) - Direct email with attachments and templates
-📶 **Bluetooth Sharing** (v2.3.2) - Nearby device sharing, Nearby Share/AirDrop
-📱 **App Sharing** (v2.3.3) - WhatsApp, Telegram, cloud apps, local storage
-🖨️ **PDF Rasterization** (v2.3.3+4) - Convert PDF pages to images (PNG/JPEG)
-📄 **Enhanced Sharing** (v2.3.3+4) - Share PDF via system share sheet with share_plus
-💾 **Save to File** (v2.3.3+4) - Save PDF to documents or custom directory
-🔍 **Barcode Validation** (v2.3.3+4) - Validate barcode data before generation
-📊 **Barcode Groups** (v2.3.3+4) - Arrange multiple barcodes in rows, columns, or grids
-🏷️ **Batch Barcodes** (v2.3.3+4) - Generate sequences of barcodes with auto-incrementing data
-👁️ **Enhanced Preview** (v2.3.3+4) - Print preview with share, save, and settings options
-🔀 **PDF Merge/Split** (v2.3.3+5) - Combine or split PDF documents
-📄 **Page Extraction** (v2.3.3+5) - Extract specific pages from PDFs
-💧 **Watermark Pages** (v2.3.3+5) - Add text watermarks with custom position and opacity
-🔄 **Page Rotation** (v2.3.3+5) - Rotate pages by 90, 180, or 270 degrees
-📊 **PDF Info** (v2.3.3+5) - Get document metadata and page information
-⏰ **Job Scheduling** (v2.3.3+5) - Schedule PDF generation for later execution
-📈 **Job Statistics** (v2.3.3+5) - Track generation metrics and success rates
-🔗 **Job Chains** (v2.3.3+5) - Chain jobs with dependencies
-✅ **Export Validation** (v2.3.3+5) - Validate export configuration before processing
-📦 **Export Presets** (v2.3.3+5) - Pre-configured export settings for common use cases
-🎨 **Conditional Formatting** (v2.3.3+5) - Excel-like conditional formatting for data grids
-🔢 **Grid Calculations** (v2.3.3+5) - Calculate totals, averages, sort and filter grid data
-📊 **Multi-Total Rows** (v2.12.0) - Multiple auto-calculated total rows per grid (sum, avg, count, min, max)
-📐 **Percentage Columns** (v2.12.0) - Set column widths as percentages with `widthPercent`
-🗂️ **Nested Groups** (v2.12.0) - Recursive subgroups with per-level totals and summaries
-🔄 **Auto-Grouping** (v2.12.0) - `GeniusDataGridUtils.autoGroup()` for automatic data grouping
-⚙️ **Smart Column Widths** (v2.12.0) - Multi-pass constraint redistribution algorithm
-✏️ **Rich Text Engine** (v2.3.3+6) - Complete rewrite with background, strikethrough, superscript/subscript rendering
-📝 **Italic Font Support** (v2.3.3+6) - Italic and bold-italic font resolution for rich text
-📑 **Bullet Lists** (v2.3.3+6) - Bulleted, numbered (Arabic/Arabic-Indic/alphabetic), and nested lists
-📐 **Text Measurer** (v2.3.3+6) - Pre-measure text dimensions before drawing
-📋 **Markdown Parser** (v2.3.3+6) - Convert simple markdown to styled text spans
-🏷️ **Text Span Factories** (v2.3.3+6) - Currency, badge, label, heading, small span constructors
-🔤 **String Extensions** (v2.3.3+6) - Quick span conversion methods on String
-📄 **Multi-Paragraph** (v2.3.3+6) - Multi-paragraph component with spacing and indent
-✂️ **Text Overflow** (v2.3.3+6) - Max lines with ellipsis or clip overflow
-📋 **Enhanced Logger** (v2.3.3+7) - Source location tracking with clickable file:line paths
-🔍 **Automatic Source Location** (v2.3.3+7) - StackTrace-based caller detection for precise navigation
-⏱️ **Performance Timers** (v2.3.3+7) - Built-in timer support to measure operation durations
-🎯 **Library-Wide Logging** (v2.3.3+7) - Logger integrated across all modules (printing, services, components)
-⚙️ **Logger Configuration** (v2.3.3+7) - Enable/disable logging, filter by level, toggle timestamps and locations
-📦 **InfoBox Overhaul** (v2.3.3+8) - Complete rewrite with bug fixes, icon rendering, RTL alignment, actual bounds
-🎨 **Status Presets** (v2.3.3+8) - Info, warning, success, error style presets for info boxes
-🏢 **Company/Contact Factories** (v2.3.3+8) - Pre-configured info box factories for common use cases
-⚖️ **Equal Height** (v2.3.3+8) - DualInfoBox equalHeight synchronization between paired boxes
-📐 **Section Styles** (v2.3.3+8) - New GeniusPdfSectionStyle class with corporate, minimal, card, saudi presets
-📍 **Position Engine** (v2.4.0) - Precise Y-position tracking with independent `_currentY` tracker
-📄 **Auto Page-Break** (v2.4.0) - Automatic page creation when content exceeds available space
-🖼️ **Image Alignment** (v2.4.0) - Direction-aware image alignment (start/center/end) with position advancement
-📏 **Builder Utilities** (v2.4.0) - `remainingHeight`, `canFit()`, `contentBounds`, `resetY()`, `pageCount`
-🔧 **Enhanced Footer** (v2.4.0) - Configurable `userLabel`, `pageNumberFormat`, dynamic positioning
-📊 **Grid Integration** (v2.5.0) - `addGrid()` draws data grids at current position with auto Y-advancement
-📋 **Summary Integration** (v2.5.0) - `addSummary()` draws summary sections with auto Y-advancement
-🔗 **Grid+Summary Combo** (v2.5.0) - `addGridWithSummary()` combines grid and summary in one call
-📈 **Report Summary** (v2.5.0) - `addReportSummary()` for overall report totals aggregating multiple grids
-➖ **Section Divider** (v2.5.0) - `addSectionDivider()` visual divider with optional centered title
-📊 **Builder Bar Chart** (v2.6.0) - `addBarChart()` draws bar charts at current position with auto page-break
-📈 **Builder Line Chart** (v2.6.0) - `addLineChart()` draws line charts with auto Y-advancement
-🥧 **Builder Pie Chart** (v2.6.0) - `addPieChart()` draws pie charts at current position
-📉 **Builder Area Chart** (v2.6.0) - `addAreaChart()` draws area charts with auto page-break
-📱 **Builder QR Code** (v2.7.0) - `addQRCode()` draws QR codes with alignment at current position
-🖼️ **Image Attachment** (v2.7.0) - `addImageAttachment()` labeled inline image with auto-scaling
-📄 **Image Page** (v2.7.0) - `addImagePage()` full-page image attachment for scanned documents
-📎 **Batch Attachments** (v2.7.0) - `addAttachments()` batch-add multiple images each on its own page
-📝 **Builder Rich Text** (v2.8.0) - `addRichText()` draws styled text (bold, links, colors) with auto Y-advancement
-📦 **Builder Info Box** (v2.8.0) - `addInfoBox()` draws info boxes with labeled values at current position
-🏢 **Builder Report Header** (v2.8.0) - `addReportHeader()` professional headers with company info
-📐 **Two-Column Layout** (v2.8.0) - `addTwoColumns()` flexible two-column layout with callbacks
-🎭 **Page Templates** (v2.8.0) - `setPageTemplate()` stamps, watermarks, and template elements
-🔗 **Report Composer** (v2.9.0) - `GeniusPdfReportComposer` fluent API for chainable report building without subclassing
-📐 **Smart Space Management** (v2.10.0) - Automatic header/footer space deduction, footer-aware `remainingHeight`, and auto page-break for all non-Grid components
-🔗 **PdfTextWebLink Hyperlinks** (v2.11.0) - Proper clickable hyperlinks via Syncfusion's `PdfTextWebLink`, sized font support, and rich text bug fixes
+### ✨ **Clean Architecture**
+
+  Well-organized code with separation of concerns
+
+### 🔤 **RTL/LTR Support**
+
+  Full support for Arabic, Hebrew, and other RTL languages
+
+### 🔄 **Background Processing**
+
+  Generate PDFs without blocking the UI
+
+### 📄 **Preview Widgets**
+
+  Built-in widgets for PDF display and interaction
+
+### 🎨 **Asset Management**
+
+  Centralized font and image management
+
+### 📤 **Export Options**
+
+  Save, share, and print PDFs easily
+
+### ⚡ **Fluent API**
+
+  Easy-to-use builder pattern for document creation
+
+### 📊 **Reusable Components**
+
+  Data grids, rich text, info boxes, headers, summaries
+
+### 📈 **Charts & Graphs**
+
+  Bar, line, pie, and area charts with RTL support
+
+### 💧 **Watermarks**
+
+  Text, image, diagonal, and tiled watermarks
+
+### 🔒 **Security**
+
+  Password protection, encryption, and permissions
+
+### ✍️ **Digital Signatures**
+
+  Certificate-based digital signatures
+
+### 📑 **Report Templates**
+
+  Tax invoices, trial balance, customer statements, inventory reports
+
+### 📋 **Financial Templates**
+
+  Balance sheet, income statement, cash flow, budget reports
+
+### 🛒 **Sales Templates**
+
+  Quotations, purchase orders, delivery notes, credit/debit notes
+
+### 👥 **HR Templates**
+
+  Payslips, employee reports, attendance reports, leave reports
+
+### 📊 **Barcodes & QR Codes**
+
+  EAN-13, Code128, QR Code, DataMatrix, PDF417, ZATCA QR
+
+### 📤 **Multi-Format Export**
+
+  Export to PNG, JPEG, HTML, Text, and PDF/A
+
+### 🔄 **Batch Export**
+
+  Export multiple documents with progress tracking
+
+### 🔧 **Template Engine**
+
+  Dynamic templates with variables, conditions, and loops
+
+### 📦 **Template Registry**
+
+  Manage and share template definitions
+
+### 🌐 **Bilingual Support**
+
+  Arabic/English text throughout all components
+
+### 🔌 **Plugin System** (v2.0)
+
+Extend functionality with custom plugins
+
+### 💉 **Dependency Injection** (v2.0)
+
+Clean dependency management
+
+### 📡 **Event-Driven** (v2.0)
+
+React to document lifecycle events
+
+### ⚡ **Fluent API v2** (v2.0)
+
+Enhanced chainable API for document creation
+
+### 🧠 **Smart Caching** (v2.0)
+
+Intelligent caching with multiple strategies
+
+### 🖥️ **Platform Support** (v2.0)
+
+Consistent API across Web, Mobile, and Desktop
+
+### 📋 **Logging System** (v2.0.2)
+
+Built-in logger with enable/disable control
+
+### 🤖 **AI Features** (v2.1.0)
+
+Content analysis, smart layout, text summarization
+
+### 📊 **Content Analyzer** (v2.1.0)
+
+Extract text, detect document types, find keywords
+
+### 🎨 **Smart Layout** (v2.1.0)
+
+Automatic font size and margin optimization
+
+### 📝 **Text Services** (v2.1.0)
+
+Summarization, language detection, title generation
+
+### 🖼️ **Image Optimizer** (v2.1.0)
+
+Smart image analysis and optimization
+
+### 🖨️ **Advanced Printing** (v2.2.0)
+
+Printer discovery, print settings, job tracking
+
+### 📋 **Print Settings** (v2.2.0)
+
+Paper size, orientation, quality, duplex, copies
+
+### 🔍 **Printer Discovery** (v2.2.0)
+
+Find and manage available printers
+
+### 👁️ **Print Preview** (v2.2.1)
+
+Visual preview with settings adjustment
+
+### 💾 **Print Profiles** (v2.2.1)
+
+Save and manage custom print settings
+
+### 📤 **Unified Sharing** (v2.3.0)
+
+Single API for all sharing methods
+
+### 📧 **Email Sharing** (v2.3.1)
+
+Direct email with attachments and templates
+
+### 📶 **Bluetooth Sharing** (v2.3.2)
+
+Nearby device sharing, Nearby Share/AirDrop
+
+### 📱 **App Sharing** (v2.3.3)
+
+WhatsApp, Telegram, cloud apps, local storage
+
+### 🖨️ **PDF Rasterization** (v2.3.3+4)
+
+Convert PDF pages to images (PNG/JPEG)
+
+### 📄 **Enhanced Sharing** (v2.3.3+4)
+
+Share PDF via system share sheet with share_plus
+
+### 💾 **Save to File** (v2.3.3+4)
+
+Save PDF to documents or custom directory
+
+### 🔍 **Barcode Validation** (v2.3.3+4)
+
+Validate barcode data before generation
+
+### 📊 **Barcode Groups** (v2.3.3+4)
+
+Arrange multiple barcodes in rows, columns, or grids
+
+### 🏷️ **Batch Barcodes** (v2.3.3+4)
+
+Generate sequences of barcodes with auto-incrementing data
+
+### 👁️ **Enhanced Preview** (v2.3.3+4)
+
+Print preview with share, save, and settings options
+
+### 🔀 **PDF Merge/Split** (v2.3.3+5)
+
+Combine or split PDF documents
+
+### 📄 **Page Extraction** (v2.3.3+5)
+
+Extract specific pages from PDFs
+
+### 💧 **Watermark Pages** (v2.3.3+5)
+
+Add text watermarks with custom position and opacity
+
+### 🔄 **Page Rotation** (v2.3.3+5)
+
+Rotate pages by 90, 180, or 270 degrees
+
+### 📊 **PDF Info** (v2.3.3+5)
+
+Get document metadata and page information
+
+### ⏰ **Job Scheduling** (v2.3.3+5)
+
+Schedule PDF generation for later execution
+
+### 📈 **Job Statistics** (v2.3.3+5)
+
+Track generation metrics and success rates
+
+### 🔗 **Job Chains** (v2.3.3+5)
+
+Chain jobs with dependencies
+
+### ✅ **Export Validation** (v2.3.3+5)
+
+Validate export configuration before processing
+
+### 📦 **Export Presets** (v2.3.3+5)
+
+Pre-configured export settings for common use cases
+
+### 🎨 **Conditional Formatting** (v2.3.3+5)
+
+Excel-like conditional formatting for data grids
+
+### 🔢 **Grid Calculations** (v2.3.3+5)
+
+Calculate totals, averages, sort and filter grid data
+
+### 📊 **Multi-Total Rows** (v2.12.0)
+
+Multiple auto-calculated total rows per grid (sum, avg, count, min, max)
+
+### 📐 **Percentage Columns** (v2.12.0)
+
+Set column widths as percentages with `widthPercent`
+
+### 🗂️ **Nested Groups** (v2.12.0)
+
+Recursive subgroups with per-level totals and summaries
+
+### 🔄 **Auto-Grouping** (v2.12.0)
+
+`GeniusDataGridUtils.autoGroup()` for automatic data grouping
+
+### ⚙️ **Smart Column Widths** (v2.12.0)
+
+Multi-pass constraint redistribution algorithm
+
+### ✏️ **Rich Text Engine** (v2.3.3+6)
+
+Complete rewrite with background, strikethrough, superscript/subscript rendering
+
+### 📝 **Italic Font Support** (v2.3.3+6)
+
+Italic and bold-italic font resolution for rich text
+
+### 📑 **Bullet Lists** (v2.3.3+6)
+
+Bulleted, numbered (Arabic/Arabic-Indic/alphabetic), and nested lists
+
+### 📐 **Text Measurer** (v2.3.3+6)
+
+Pre-measure text dimensions before drawing
+
+### 📋 **Markdown Parser** (v2.3.3+6)
+
+Convert simple markdown to styled text spans
+
+### 🏷️ **Text Span Factories** (v2.3.3+6)
+
+Currency, badge, label, heading, small span constructors
+
+### 🔤 **String Extensions** (v2.3.3+6)
+
+Quick span conversion methods on String
+
+### 📄 **Multi-Paragraph** (v2.3.3+6)
+
+Multi-paragraph component with spacing and indent
+
+### ✂️ **Text Overflow** (v2.3.3+6)
+
+Max lines with ellipsis or clip overflow
+
+### 📋 **Enhanced Logger** (v2.3.3+7)
+
+Source location tracking with clickable file:line paths
+
+### 🔍 **Automatic Source Location** (v2.3.3+7)
+
+StackTrace-based caller detection for precise navigation
+
+### ⏱️ **Performance Timers** (v2.3.3+7)
+
+Built-in timer support to measure operation durations
+
+### 🎯 **Library-Wide Logging** (v2.3.3+7)
+
+Logger integrated across all modules (printing, services, components)
+
+### ⚙️ **Logger Configuration** (v2.3.3+7)
+
+Enable/disable logging, filter by level, toggle timestamps and locations
+
+### 📦 **InfoBox Overhaul** (v2.3.3+8)
+
+Complete rewrite with bug fixes, icon rendering, RTL alignment, actual bounds
+
+### 🎨 **Status Presets** (v2.3.3+8)
+
+Info, warning, success, error style presets for info boxes
+
+### 🏢 **Company/Contact Factories** (v2.3.3+8)
+
+Pre-configured info box factories for common use cases
+
+### ⚖️ **Equal Height** (v2.3.3+8)
+
+DualInfoBox equalHeight synchronization between paired boxes
+
+### 📐 **Section Styles** (v2.3.3+8)
+
+New GeniusPdfSectionStyle class with corporate, minimal, card, saudi presets
+
+### 📍 **Position Engine** (v2.4.0)
+
+Precise Y-position tracking with independent `_currentY` tracker
+
+### 📄 **Auto Page-Break** (v2.4.0)
+
+Automatic page creation when content exceeds available space
+
+### 🖼️ **Image Alignment** (v2.4.0)
+
+Direction-aware image alignment (start/center/end) with position advancement
+
+### 📏 **Builder Utilities** (v2.4.0)
+
+`remainingHeight`, `canFit()`, `contentBounds`, `resetY()`, `pageCount`
+
+### 🔧 **Enhanced Footer** (v2.4.0)
+
+Configurable `userLabel`, `pageNumberFormat`, dynamic positioning
+
+### 📊 **Grid Integration** (v2.5.0)
+
+`addGrid()` draws data grids at current position with auto Y-advancement
+
+### 📋 **Summary Integration** (v2.5.0)
+
+`addSummary()` draws summary sections with auto Y-advancement
+
+### 🔗 **Grid+Summary Combo** (v2.5.0)
+
+`addGridWithSummary()` combines grid and summary in one call
+
+### 📈 **Report Summary** (v2.5.0)
+
+`addReportSummary()` for overall report totals aggregating multiple grids
+
+### ➖ **Section Divider** (v2.5.0)
+
+`addSectionDivider()` visual divider with optional centered title
+
+### 📊 **Builder Bar Chart** (v2.6.0)
+
+`addBarChart()` draws bar charts at current position with auto page-break
+
+### 📈 **Builder Line Chart** (v2.6.0)
+
+`addLineChart()` draws line charts with auto Y-advancement
+
+### 🥧 **Builder Pie Chart** (v2.6.0)
+
+`addPieChart()` draws pie charts at current position
+
+### 📉 **Builder Area Chart** (v2.6.0)
+
+`addAreaChart()` draws area charts with auto page-break
+
+### 📱 **Builder QR Code** (v2.7.0)
+
+`addQRCode()` draws QR codes with alignment at current position
+
+### 🖼️ **Image Attachment** (v2.7.0)
+
+`addImageAttachment()` labeled inline image with auto-scaling
+
+### 📄 **Image Page** (v2.7.0)
+
+`addImagePage()` full-page image attachment for scanned documents
+
+### 📎 **Batch Attachments** (v2.7.0)
+
+`addAttachments()` batch-add multiple images each on its own page
+
+### 📝 **Builder Rich Text** (v2.8.0)
+
+`addRichText()` draws styled text (bold, links, colors) with auto Y-advancement
+
+### 📦 **Builder Info Box** (v2.8.0)
+
+`addInfoBox()` draws info boxes with labeled values at current position
+
+### 🏢 **Builder Report Header** (v2.8.0)
+
+`addReportHeader()` professional headers with company info
+
+### 📐 **Two-Column Layout** (v2.8.0)
+
+`addTwoColumns()` flexible two-column layout with callbacks
+
+### 🎭 **Page Templates** (v2.8.0)
+
+`setPageTemplate()` stamps, watermarks, and template elements
+
+### 🔗 **Report Composer** (v2.9.0)
+
+`GeniusPdfReportComposer` fluent API for chainable report building without subclassing
+
+### 📐 **Smart Space Management** (v2.10.0)
+
+Automatic header/footer space deduction, footer-aware `remainingHeight`, and auto page-break for all non-Grid components
+
+### 🔗 **PdfTextWebLink Hyperlinks** (v2.11.0)
+
+Proper clickable hyperlinks via Syncfusion's `PdfTextWebLink`, sized font support, and rich text bug fixes
 
 ---
 
@@ -417,6 +752,7 @@ class SmartReport extends GeniusPdfDocumentBuilder {
 ```
 
 Key properties:
+
 - `headerHeight` / `footerHeight` — read reserved space
 - `effectivePageHeight` — page height minus header and footer
 - `remainingHeight` — accounts for both currentY and footer
@@ -961,10 +1297,14 @@ GeniusPdfSectionStyle(
 
 ### Additional Components
 
-- **GeniusPdfDualInfoBox** - Two info boxes with flexible layouts
-- **GeniusPdfTotalBar** - Highlighted total bar
-- **GeniusPdfSignatureArea** - Signature line with date
-- **GeniusPdfQRCode** - QR code display for invoices
+- **GeniusPdfDualInfoBox**
+  Two info boxes with flexible layouts
+- **GeniusPdfTotalBar**
+  Highlighted total bar
+- **GeniusPdfSignatureArea**
+  Signature line with date
+- **GeniusPdfQRCode**
+  QR code display for invoices
 
 ---
 
