@@ -52,7 +52,7 @@ class IncomeStatementSection {
   double? get previousTotal {
     if (items.every((item) => item.previousAmount == null)) return null;
     return items.fold(
-        0.0, (sum, item) => (sum ?? 0) + (item.previousAmount ?? 0));
+        0.0, (double sum, item) => sum + (item.previousAmount ?? 0));
   }
 }
 
@@ -136,30 +136,28 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
   final bool showComparative;
   final bool showPercentages;
 
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
+  /// Cached bold font — created once, reused across all methods.
+  late final PdfFont _cachedBoldFont = boldFont ?? config.boldFont;
+
+  /// Cached net income font (slightly larger, bold).
+  late final PdfFont _cachedNetFont =
+      config.fontBuild(fontSize: config.printTheme.typography.bodySize + 2);
 
   @override
   void build() {
     newPage();
 
-    // Header
     _drawHeader();
 
-    // Revenue section
+    // Revenue
     _drawSectionWithTotal(
       data.revenue,
       'Total Revenue',
       'إجمالي الإيرادات',
     );
-
     addSpace(10);
 
-    // Cost of Sales section
+    // Cost of Sales
     _drawSectionWithTotal(
       data.costOfSales,
       'Total Cost of Sales',
@@ -168,10 +166,9 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
 
     // Gross Profit
     _drawSubtotalLine('Gross Profit', 'إجمالي الربح', data.grossProfit);
-
     addSpace(10);
 
-    // Operating Expenses section
+    // Operating Expenses
     _drawSectionWithTotal(
       data.operatingExpenses,
       'Total Operating Expenses',
@@ -181,10 +178,9 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
     // Operating Income
     _drawSubtotalLine(
         'Operating Income', 'الدخل التشغيلي', data.operatingIncome);
-
     addSpace(10);
 
-    // Other Income (if any)
+    // Other Income
     if (data.otherIncome != null && data.otherIncome!.items.isNotEmpty) {
       _drawSectionWithTotal(
         data.otherIncome!,
@@ -193,7 +189,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       );
     }
 
-    // Other Expenses (if any)
+    // Other Expenses
     if (data.otherExpenses != null && data.otherExpenses!.items.isNotEmpty) {
       _drawSectionWithTotal(
         data.otherExpenses!,
@@ -227,6 +223,10 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
     }
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Header
+  // ──────────────────────────────────────────────────────────
+
   void _drawHeader() {
     final periodText =
         '${_formatDate(data.periodStart)} - ${_formatDate(data.periodEnd)}';
@@ -246,13 +246,13 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
-    header.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, 0, pageWidth, 100),
-    );
-
-    addSpace(110);
+    addReportHeader(header, height: 100, spacing: 0);
+    addSpace(10);
   }
+
+  // ──────────────────────────────────────────────────────────
+  // Section with Items Grid + Total
+  // ──────────────────────────────────────────────────────────
 
   void _drawSectionWithTotal(
     IncomeStatementSection section,
@@ -263,17 +263,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
     final titleText =
         config.isRTL ? (section.titleAr ?? section.title) : section.title;
 
-    currentPage.graphics.drawString(
-      titleText,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 20),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
-    );
-
-    addSpace(25);
+    addLine(titleText, font: _cachedBoldFont, topMargin: 5);
 
     // Section items
     final rows = <GeniusPdfGridRow>[];
@@ -293,7 +283,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       ));
     }
 
-    // Section total
+    // Section total row
     rows.add(GeniusPdfGridRow(
       cells: {
         'code': '',
@@ -330,6 +320,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       style: const GeniusPdfGridStyle(showHeader: false),
     );
 
+    // Use drawAt + updateFromLayoutResult for multi-page safety.
     final result = grid.drawAt(
       page: currentPage,
       x: 0,
@@ -338,63 +329,87 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
     );
 
     if (result != null) {
-      addSpace(result.bounds.height + 5);
+      updateFromLayoutResult(result, spacing: 5);
     }
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Subtotal Line (highlighted background)
+  // ──────────────────────────────────────────────────────────
+
   void _drawSubtotalLine(String label, String labelAr, double amount) {
+    // Ensure space before drawing.
+    final lineHeight = 22.0;
+    if (remainingHeight < lineHeight + 6) newPage();
+
     final displayLabel = config.isRTL ? labelAr : label;
     final isProfit = amount >= 0;
     final color = isProfit ? PdfColor(0, 100, 0) : PdfColor(180, 0, 0);
 
-    currentPage.graphics.drawRectangle(
+    final page = currentPage;
+    final labelX = config.isRTL ? pageWidth * 0.4 : 10.0;
+    final labelW = pageWidth * 0.6 - 10;
+    final amountX = config.isRTL ? 10.0 : pageWidth * 0.6;
+    final amountW = pageWidth * 0.4 - 10;
+
+    page.graphics.drawRectangle(
       brush: PdfSolidBrush(PdfColor(240, 240, 240)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 22),
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, lineHeight),
     );
 
-    currentPage.graphics.drawString(
+    page.graphics.drawString(
       displayLabel,
-      _boldFont,
-      bounds: Rect.fromLTWH(10, currentY + 4, pageWidth * 0.6, 18),
+      _cachedBoldFont,
+      bounds: Rect.fromLTWH(labelX, currentY + 4, labelW, 18),
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
       ),
     );
 
-    currentPage.graphics.drawString(
+    page.graphics.drawString(
       _formatCurrency(amount),
-      _boldFont,
+      _cachedBoldFont,
       brush: PdfSolidBrush(color),
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.6, currentY + 4, pageWidth * 0.4 - 10, 18),
+      bounds: Rect.fromLTWH(amountX, currentY + 4, amountW, 18),
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
       ),
     );
 
-    addSpace(28);
+    addSpace(lineHeight + 6);
   }
 
-  void _drawSimpleLine(String label, String labelAr, double amount) {
-    final displayLabel = config.isRTL ? labelAr : label;
+  // ──────────────────────────────────────────────────────────
+  // Simple Line (indented, for deductions like tax)
+  // ──────────────────────────────────────────────────────────
 
-    currentPage.graphics.drawString(
+  void _drawSimpleLine(String label, String labelAr, double amount) {
+    if (remainingHeight < 22) newPage();
+
+    final displayLabel = config.isRTL ? labelAr : label;
+    final page = currentPage;
+
+    final labelX = config.isRTL ? pageWidth * 0.4 : 20.0;
+    final labelW = pageWidth * 0.6 - 20;
+    final amountX = config.isRTL ? 10.0 : pageWidth * 0.6;
+    final amountW = pageWidth * 0.4 - 10;
+
+    page.graphics.drawString(
       displayLabel,
       baseFont,
-      bounds: Rect.fromLTWH(20, currentY, pageWidth * 0.6, 18),
+      bounds: Rect.fromLTWH(labelX, currentY, labelW, 18),
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
       ),
     );
 
-    currentPage.graphics.drawString(
+    page.graphics.drawString(
       '(${_formatCurrency(amount)})',
       baseFont,
-      bounds:
-          Rect.fromLTWH(pageWidth * 0.6, currentY, pageWidth * 0.4 - 10, 18),
+      bounds: Rect.fromLTWH(amountX, currentY, amountW, 18),
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
@@ -404,118 +419,122 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
     addSpace(22);
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Net Income (highlighted box)
+  // ──────────────────────────────────────────────────────────
+
   void _drawNetIncome() {
+    final boxHeight = 30.0;
+    if (remainingHeight < boxHeight + 10) newPage();
+
     final label = config.isRTL ? 'صافي الدخل' : 'Net Income';
     final isProfit = data.netIncome >= 0;
     final bgColor =
         isProfit ? PdfColor(200, 255, 200) : PdfColor(255, 200, 200);
     final textColor = isProfit ? PdfColor(0, 100, 0) : PdfColor(180, 0, 0);
 
-    final netFont = config.configAssets == null
-        ? config.baseFont
-        : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 12,
-            style: PdfFontStyle.bold);
+    final page = currentPage;
+    final labelX = config.isRTL ? pageWidth * 0.4 : 10.0;
+    final labelW = pageWidth * 0.6 - 10;
+    final amountX = config.isRTL ? 10.0 : pageWidth * 0.6;
+    final amountW = pageWidth * 0.4 - 10;
 
-    currentPage.graphics.drawRectangle(
+    page.graphics.drawRectangle(
       brush: PdfSolidBrush(bgColor),
       pen: PdfPen(PdfColor(100, 100, 100)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 30),
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, boxHeight),
     );
 
-    currentPage.graphics.drawString(
+    page.graphics.drawString(
       label,
-      netFont,
-      bounds: Rect.fromLTWH(10, currentY + 7, pageWidth * 0.6, 20),
+      _cachedNetFont,
+      bounds: Rect.fromLTWH(labelX, currentY + 7, labelW, 20),
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
       ),
     );
 
-    currentPage.graphics.drawString(
+    page.graphics.drawString(
       _formatCurrency(data.netIncome),
-      netFont,
+      _cachedNetFont,
       brush: PdfSolidBrush(textColor),
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.6, currentY + 7, pageWidth * 0.4 - 10, 20),
+      bounds: Rect.fromLTWH(amountX, currentY + 7, amountW, 20),
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
       ),
     );
 
-    addSpace(40);
+    addSpace(boxHeight + 10);
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Profitability Ratios
+  // ──────────────────────────────────────────────────────────
+
   void _drawProfitabilityRatios() {
+    // Need ~60px for title + two ratio lines.
+    if (remainingHeight < 60) newPage();
+
     final title = config.isRTL ? 'مؤشرات الربحية' : 'Profitability Ratios';
 
-    currentPage.graphics.drawString(
-      title,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 20),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
-    );
-
-    addSpace(25);
+    addLine(title, font: _cachedBoldFont, topMargin: 5);
 
     final ratios = [
       (
         config.isRTL ? 'هامش الربح الإجمالي' : 'Gross Profit Margin',
-        data.grossProfitMargin
+        data.grossProfitMargin,
       ),
       (
         config.isRTL ? 'هامش صافي الربح' : 'Net Profit Margin',
-        data.netProfitMargin
+        data.netProfitMargin,
       ),
     ];
 
     for (final ratio in ratios) {
-      currentPage.graphics.drawString(
+      addLine(
         '${ratio.$1}: ${ratio.$2.toStringAsFixed(2)}%',
-        baseFont,
-        bounds: Rect.fromLTWH(20, currentY, pageWidth - 20, 18),
-        format: PdfStringFormat(
-          alignment:
-              config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        ),
+        topMargin: 5,
       );
-      addSpace(18);
     }
 
     addSpace(10);
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Notes
+  // ──────────────────────────────────────────────────────────
+
   void _drawNotes() {
+    if (remainingHeight < 40) newPage();
+
     final notesText =
         config.isRTL ? (data.notesAr ?? data.notes!) : data.notes!;
     final notesLabel = config.isRTL ? 'ملاحظات:' : 'Notes:';
 
-    currentPage.graphics.drawString(
-      '$notesLabel\n$notesText',
-      baseFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 60),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
-    );
-
-    addSpace(65);
+    addLine(notesLabel, font: _cachedBoldFont, topMargin: 10);
+    addLine(notesText, topMargin: 3);
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Formatting Utilities
+  // ──────────────────────────────────────────────────────────
+
   String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
   }
 
   String _formatCurrency(double amount) {
-    final formatted = amount.toStringAsFixed(2).replaceAllMapped(
+    final isNegative = amount < 0;
+    final absAmount = amount.abs();
+    final formatted = absAmount.toStringAsFixed(2).replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
         );
-    return '$formatted ${data.currency}';
+    final value = '$formatted ${data.currency}';
+    return isNegative ? '($value)' : value;
   }
 }

@@ -143,30 +143,19 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
   void build() {
     newPage();
 
-    // Header
     _drawHeader();
-
-    // Customer and Invoice Info boxes
     _drawInfoSection();
-
-    // Items table
     _drawItemsTable();
-
-    // Summary and totals
     _drawSummary();
-
-    // Amount in words
     _drawAmountInWords();
-
-    // VAT breakdown
     _drawVatBreakdown();
-
-    // Draw Footer Section (Notes + QR Code)
     _drawFooterSection();
-
-    // Signature
     _drawSignature();
   }
+
+  // ──────────────────────────────────────────────────────────
+  // Header
+  // ──────────────────────────────────────────────────────────
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
@@ -179,13 +168,12 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       layout: GeniusPdfReportHeaderLayout.bilingualSplit,
     );
 
-    header.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, 0, pageWidth, 100),
-    );
-
-    addSpace(100);
+    addReportHeader(header, height: 100, spacing: 0);
   }
+
+  // ──────────────────────────────────────────────────────────
+  // Customer & Invoice Info
+  // ──────────────────────────────────────────────────────────
 
   void _drawInfoSection() {
     final customerBox = GeniusPdfInfoBox(
@@ -197,8 +185,9 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           config: config,
           label: 'Customer Name',
           labelAr: 'اسم العميل',
-          value:
-              config.isRTL ? (customer.nameAr ?? customer.name) : customer.name,
+          value: config.isRTL
+              ? (customer.nameAr ?? customer.name)
+              : customer.name,
         ),
         if (customer.address != null || customer.addressAr != null)
           GeniusPdfLabeledValue(
@@ -223,6 +212,13 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
             labelAr: 'رقم الهاتف',
             value: customer.phone!,
           ),
+        if (customer.email != null)
+          GeniusPdfLabeledValue(
+            config: config,
+            label: 'Email',
+            labelAr: 'البريد الإلكتروني',
+            value: customer.email!,
+          ),
       ],
       style: const GeniusPdfInfoBoxStyle.headerContent(),
     );
@@ -244,6 +240,13 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           labelAr: 'التاريخ',
           value: _formatDate(invoice.invoiceDate),
         ),
+        if (invoice.dueDate != null)
+          GeniusPdfLabeledValue(
+            config: config,
+            label: 'Due Date',
+            labelAr: 'تاريخ الاستحقاق',
+            value: _formatDate(invoice.dueDate!),
+          ),
         if (invoice.paymentTerms != null)
           GeniusPdfLabeledValue(
             config: config,
@@ -264,19 +267,19 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       style: const GeniusPdfInfoBoxStyle.headerContent(),
     );
 
-    final dualBox = GeniusPdfDualInfoBox(
+    addDualInfoBox(
       leftBox: config.isRTL ? invoiceBox : customerBox,
       rightBox: config.isRTL ? customerBox : invoiceBox,
-      spacing: 20,
+      boxSpacing: 20,
+      spacing: 10,
     );
 
-    final result = dualBox.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, currentY + 10, pageWidth, 150),
-    );
-
-    addSpace(result.height + 20);
+    addSpace(10);
   }
+
+  // ──────────────────────────────────────────────────────────
+  // Items Table
+  // ──────────────────────────────────────────────────────────
 
   void _drawItemsTable() {
     final grid = GeniusPdfDataGrid(
@@ -309,6 +312,14 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           width: 80,
           currencySymbol: '',
         ),
+        if (invoice.items.any((item) => item.discount > 0))
+          GeniusPdfGridColumn.currency(
+            id: 'discount',
+            title: 'Discount',
+            titleAr: 'الخصم',
+            width: 70,
+            currencySymbol: '',
+          ),
         GeniusPdfGridColumn.currency(
           id: 'total',
           title: 'Total',
@@ -323,14 +334,17 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
                 'item': config.isRTL
                     ? (item.descriptionAr ?? item.description)
                     : item.description,
-                'qty': item.quantity,
+                'qty': '${item.quantity}${item.unit != null ? ' ${item.unit}' : ''}',
                 'price': item.unitPrice,
+                if (invoice.items.any((i) => i.discount > 0))
+                  'discount': item.discount,
                 'total': item.lineTotal,
               }))
           .toList(),
       style: const GeniusPdfGridStyle.classic(),
     );
 
+    // Use drawAt + updateFromLayoutResult for multi-page grid safety.
     final result = grid.drawAt(
       page: currentPage,
       x: 0,
@@ -339,11 +353,13 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     );
 
     if (result != null) {
-      // Update current page and Y position from the grid result
-      // This handles multi-page grids correctly in both RTL and LTR modes
       updateFromLayoutResult(result, spacing: 15);
     }
   }
+
+  // ──────────────────────────────────────────────────────────
+  // Summary & Totals
+  // ──────────────────────────────────────────────────────────
 
   void _drawSummary() {
     final items = <GeniusPdfSummaryItem>[
@@ -354,12 +370,21 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       ),
     ];
 
-    // Add each tax
     for (final tax in invoice.taxes) {
       items.add(GeniusPdfSummaryItem(
         label: '${tax.name} (${tax.rate}%)',
         labelAr: '${tax.nameAr ?? tax.name} (${tax.rate}%)',
         value: _formatCurrency(tax.calculate(invoice.subtotal)),
+      ));
+    }
+
+    if (invoice.items.any((item) => item.discount > 0)) {
+      final totalDiscount =
+          invoice.items.fold(0.0, (sum, item) => sum + item.discount);
+      items.add(GeniusPdfSummaryItem(
+        label: 'Total Discount',
+        labelAr: 'إجمالي الخصم',
+        value: '(${_formatCurrency(totalDiscount)})',
       ));
     }
 
@@ -377,33 +402,32 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       width: pageWidth * 0.4,
     );
 
-    final result = summary.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 150),
-    );
-
-    addSpace(result.height + 15);
+    addSummary(summary, spacing: 5);
+    addSpace(10);
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Amount in Words
+  // ──────────────────────────────────────────────────────────
+
   void _drawAmountInWords() {
-    final amountInWords = _numberToWords(invoice.grandTotal, invoice.currency);
+    final amountInWords =
+        _numberToWords(invoice.grandTotal, invoice.currency);
     final amountInWordsAr =
         _numberToWordsArabic(invoice.grandTotal, invoice.currency);
 
-    final richText = GeniusPdfRichTextBuilder(
-      config: config,
-    )
+    final richText = GeniusPdfRichTextBuilder(config: config)
         .bold(config.isRTL ? 'فقط ' : 'Total in Words: ')
         .text(config.isRTL ? amountInWordsAr : amountInWords)
         .build();
 
-    richText.drawSimple(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 30),
-    );
-
-    addSpace(25);
+    addRichText(richText, spacing: 5);
+    addSpace(10);
   }
+
+  // ──────────────────────────────────────────────────────────
+  // VAT Breakdown
+  // ──────────────────────────────────────────────────────────
 
   void _drawVatBreakdown() {
     if (invoice.taxes.isEmpty) return;
@@ -412,146 +436,133 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
         ? 'تفصيل الضريبة: الإجمالي الخاضع (${_formatCurrency(invoice.subtotal)}), مبلغ الضريبة (${_formatCurrency(invoice.totalTax)})'
         : 'VAT Breakdown: Taxable Amount (${_formatCurrency(invoice.subtotal)}), VAT Amount (${_formatCurrency(invoice.totalTax)})';
 
-    addLine(
-      vatText,
-      font: baseFont,
-      topMargin: 5,
-    );
+    addLine(vatText, font: baseFont, topMargin: 5);
+    addSpace(10);
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // Footer Section (Notes + QR Code)
+  // ──────────────────────────────────────────────────────────
+
+  void _drawFooterSection() {
+    final hasNotes = invoice.notes != null || invoice.notesAr != null;
+
+    if (!hasNotes && !showQRCode) return;
+
+    addSpace(10);
+
+    if (hasNotes && showQRCode) {
+      // Draw side-by-side: Notes (2/3) | QR (1/3)
+      addTwoColumns(
+        spacing: 10,
+        leftFlex: config.isLTR ? 2 : 1,
+        rightFlex: config.isLTR ? 1 : 2,
+        leftContent: config.isLTR ? _drawNotesContent : _drawQRCodeContent,
+        rightContent: config.isLTR ? _drawQRCodeContent : _drawNotesContent,
+      );
+    } else if (hasNotes) {
+      _drawNotesInline();
+    } else {
+      _drawQRCodeInline();
+    }
 
     addSpace(15);
   }
 
-  void _drawFooterSection() {
-    if (!showQRCode) {
-      if (invoice.notes != null || invoice.notesAr != null) {
-        _drawNotes(width: pageWidth);
-      }
-      return;
-    }
+  void _drawNotesInline() {
+    final displayNotes = config.isRTL
+        ? (invoice.notesAr ?? invoice.notes)
+        : (invoice.notes ?? invoice.notesAr);
+    if (displayNotes == null) return;
 
-    addSpace(20);
-
-    // Notes Section check
-    final hasNotes = invoice.notes != null || invoice.notesAr != null;
-
-    if (!hasNotes && showQRCode) {
-      _drawQRCodeSection(width: pageWidth);
-      return;
-    }
-
-    if (hasNotes && !showQRCode) {
-      _drawNotes(width: pageWidth);
-      return;
-    }
-
-    // Draw side-by-side if both are present
-    // LTR: Notes (2/3) | QR (1/3)
-    addTwoColumns(
-      spacing: 10,
-      leftFlex: config.isLTR ? 2 : 1,
-      rightFlex: config.isLTR ? 1 : 2,
-      leftContent: (page, bounds) {
-        if (config.isLTR) {
-          return _drawNotesContent(page, bounds);
-        } else {
-          return _drawQRCodeContent(page, bounds);
-        }
-      },
-      rightContent: (page, bounds) {
-        if (config.isLTR) {
-          return _drawQRCodeContent(page, bounds);
-        } else {
-          return _drawNotesContent(page, bounds);
-        }
-      },
-    );
-
-    addSpace(20);
-  }
-
-  void _drawNotes({required double width}) {
-    _drawNotesContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+    final notesLabel = config.isRTL ? 'ملاحظات:' : 'Notes:';
+    addLine(notesLabel, font: config.boldFont, topMargin: 5);
+    addLine(displayNotes, topMargin: 3);
   }
 
   double _drawNotesContent(PdfPage page, Rect bounds) {
-    final displayNotes =
-        invoice.notes ?? (config.isRTL ? invoice.notesAr : invoice.notes);
-    final defaultNotes = config.isRTL ? 'ملاحظات:' : 'Notes:';
+    final displayNotes = config.isRTL
+        ? (invoice.notesAr ?? invoice.notes)
+        : (invoice.notes ?? invoice.notesAr);
+    if (displayNotes == null) return 0;
 
-    final notesText =
-        displayNotes != null ? '$defaultNotes\n$displayNotes' : null;
+    final notesLabel = config.isRTL ? 'ملاحظات:' : 'Notes:';
+    final notesText = '$notesLabel\n$displayNotes';
 
-    if (notesText == null) return 0;
-
-    final font = config.baseFont;
     final element = PdfTextElement(
       text: notesText,
-      font: font,
+      font: config.baseFont,
       format: config.isLTR
           ? null
           : PdfStringFormat(
               textDirection: PdfTextDirection.rightToLeft,
-              alignment: PdfTextAlignment.right),
+              alignment: PdfTextAlignment.right,
+            ),
     );
 
     final result = element.draw(
       page: page,
-      bounds: bounds,
+      bounds: Rect.fromLTWH(
+        bounds.left,
+        bounds.top,
+        bounds.width,
+        bounds.height > 0 ? bounds.height : pageHeight - bounds.top,
+      ),
     );
 
     return result?.bounds.height ?? 0;
   }
 
-  void _drawQRCodeSection({required double width}) {
-    _drawQRCodeContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  void _drawQRCodeInline() {
+    if (qrCode != null) {
+      addImage(
+        qrCode!,
+        alignment: GeniusPdfImageAlignment.center,
+        spacing: 5,
+      );
+    } else {
+      _drawGeneratedQR(currentPage, 0, currentY, pageWidth);
+    }
   }
 
   double _drawQRCodeContent(PdfPage page, Rect bounds) {
-    if (qrCode == null && !showQRCode) return 0;
-
-    // Use passed QR code image or generate URL QR if needed, but template takes nullable image
-    // If qrCode is provided as image, we use it.
-    // If not, we generate standard URL QR.
-
-    // For this template, `qrCode` is `GeniusPdfImage?`.
-    // We should prefer that if available, otherwise fallback to URL generation logic
-    // similar to inventory/trial balance if distinct logic is needed.
-    // However, existing `_drawQRCodeSection` used `_drawQRCodeSection` (logic below) which used URL generation
-    // BUT the property `qrCode` exists in class.
-    // OLD code: `final qrUrl = 'https://localhost:443/invoice/${invoice.invoiceNumber}';`
-    // It ignored `this.qrCode` property? Let's check old code again.
-    // Old code generated URL. The property `qrCode` seems unused/optional override.
-    // I will stick to URL generation for consistency with old code, unless `qrCode` image is set.
-
     if (qrCode != null) {
-      // Draw image
-      // Center it
       final size = 80.0;
       final x = bounds.left + (bounds.width - size) / 2;
-      return _drawQRImage(page, x, bounds.top, size);
+      page.graphics.drawImage(
+        PdfBitmap(qrCode!.data),
+        Rect.fromLTWH(x, bounds.top, size, size),
+      );
+      return size;
     }
+    return _drawGeneratedQR(page, bounds.left, bounds.top, bounds.width);
+  }
 
+  double _drawGeneratedQR(
+      PdfPage page, double x, double y, double width) {
     final qrUrl = 'https://localhost:443/invoice/${invoice.invoiceNumber}';
     final caption = 'ID: ${invoice.invoiceNumber}';
+    final qrSize = 80.0;
 
-    final captionFont = config.baseFont;
-    final captionLayout = PdfTextElement(
+    final captionElement = PdfTextElement(
       text: caption,
-      font: captionFont,
+      font: config.baseFont,
       format: PdfStringFormat(
         alignment: PdfTextAlignment.center,
         textDirection: config.isRTL
             ? PdfTextDirection.rightToLeft
             : PdfTextDirection.leftToRight,
       ),
-    ).draw(
-        page: page,
-        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
+    );
 
-    final captionHeight = captionLayout?.bounds.height ?? 0;
-    final qrSize = 80.0;
-    final x = bounds.left + (bounds.width - qrSize) / 2;
-    final y = bounds.top + captionHeight + 5;
+    final captionResult = captionElement.draw(
+      page: page,
+      bounds: Rect.fromLTWH(x, y, width, 20),
+    );
+
+    final captionHeight = captionResult?.bounds.height ?? 0;
+    final qrX = x + (width - qrSize) / 2;
+    final qrY = y + captionHeight + 5;
 
     final urlQR = GeniusPdfQRCodeGenerator.url(
       url: qrUrl,
@@ -561,48 +572,55 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
     urlQR.draw(
       page: page,
-      bounds: Rect.fromLTWH(x, y, qrSize, qrSize),
+      bounds: Rect.fromLTWH(qrX, qrY, qrSize, qrSize),
     );
 
     return captionHeight + 5 + qrSize;
   }
 
-  double _drawQRImage(PdfPage page, double x, double y, double size) {
-    if (qrCode == null) return 0;
-    final image = qrCode!;
-    page.graphics.drawImage(
-      PdfBitmap(image.data),
-      Rect.fromLTWH(x, y, size, size),
-    );
-    return size;
-  }
+  // ──────────────────────────────────────────────────────────
+  // Signature
+  // ──────────────────────────────────────────────────────────
 
   void _drawSignature() {
-    final bottomY = pageHeight - 80;
+    if (!showSignature) return;
 
-    // Signature area on the left
-    if (showSignature) {
-      final signature = GeniusPdfSignatureArea(
-        config: config,
-        title: 'Authorized Signature',
-        titleAr: 'التوقيع المعتمد',
-        showDate: false,
-      );
-
-      signature.draw(
-        page: currentPage,
-        bounds: Rect.fromLTWH(
-          config.isRTL ? pageWidth - 200 : 0,
-          bottomY,
-          200,
-          60,
-        ),
-      );
+    // Ensure enough space for signature area.
+    final signatureHeight = 70.0;
+    if (remainingHeight < signatureHeight) {
+      newPage();
     }
+
+    addSpace(10);
+
+    final signature = GeniusPdfSignatureArea(
+      config: config,
+      title: 'Authorized Signature',
+      titleAr: 'التوقيع المعتمد',
+      showDate: false,
+    );
+
+    signature.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? pageWidth - 200 : 0,
+        currentY,
+        200,
+        60,
+      ),
+    );
+
+    addSpace(signatureHeight);
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Formatting Utilities
+  // ──────────────────────────────────────────────────────────
+
   String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
   }
 
   String _formatCurrency(double amount) {
@@ -612,6 +630,10 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
         );
     return '$formatted ${invoice.currency}';
   }
+
+  // ──────────────────────────────────────────────────────────
+  // Number-to-Words (English)
+  // ──────────────────────────────────────────────────────────
 
   String _numberToWords(double amount, String currency) {
     final wholePart = amount.floor();
@@ -626,6 +648,10 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     return '$wholeWords $currencyName Only';
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Number-to-Words (Arabic)
+  // ──────────────────────────────────────────────────────────
+
   String _numberToWordsArabic(double amount, String currency) {
     final wholePart = amount.floor();
     final fractionalPart = ((amount - wholePart) * 100).round();
@@ -639,6 +665,10 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     return '$wholeWords $currencyName لا غير';
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Currency Name Lookups
+  // ──────────────────────────────────────────────────────────
+
   static String _getCurrencyName(String code) {
     const names = {
       'SAR': 'Saudi Riyals',
@@ -646,6 +676,12 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       'EUR': 'Euros',
       'GBP': 'British Pounds',
       'AED': 'UAE Dirhams',
+      'KWD': 'Kuwaiti Dinars',
+      'BHD': 'Bahraini Dinars',
+      'OMR': 'Omani Rials',
+      'QAR': 'Qatari Riyals',
+      'EGP': 'Egyptian Pounds',
+      'JOD': 'Jordanian Dinars',
     };
     return names[code] ?? code;
   }
@@ -657,6 +693,12 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       'EUR': 'Cents',
       'GBP': 'Pence',
       'AED': 'Fils',
+      'KWD': 'Fils',
+      'BHD': 'Fils',
+      'OMR': 'Baisas',
+      'QAR': 'Dirhams',
+      'EGP': 'Piastres',
+      'JOD': 'Fils',
     };
     return names[code] ?? 'units';
   }
@@ -668,6 +710,12 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       'EUR': 'يورو',
       'GBP': 'جنيهاً إسترلينياً',
       'AED': 'درهماً إماراتياً',
+      'KWD': 'ديناراً كويتياً',
+      'BHD': 'ديناراً بحرينياً',
+      'OMR': 'ريالاً عمانياً',
+      'QAR': 'ريالاً قطرياً',
+      'EGP': 'جنيهاً مصرياً',
+      'JOD': 'ديناراً أردنياً',
     };
     return names[code] ?? code;
   }
@@ -679,46 +727,32 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       'EUR': 'سنتاً',
       'GBP': 'بنساً',
       'AED': 'فلساً',
+      'KWD': 'فلساً',
+      'BHD': 'فلساً',
+      'OMR': 'بيسة',
+      'QAR': 'درهماً',
+      'EGP': 'قرشاً',
+      'JOD': 'فلساً',
     };
     return names[code] ?? '';
   }
+
+  // ──────────────────────────────────────────────────────────
+  // English Number Conversion
+  // ──────────────────────────────────────────────────────────
 
   static String _convertWholeToEnglish(int number) {
     if (number == 0) return 'Zero';
 
     const ones = [
-      '',
-      'One',
-      'Two',
-      'Three',
-      'Four',
-      'Five',
-      'Six',
-      'Seven',
-      'Eight',
-      'Nine',
-      'Ten',
-      'Eleven',
-      'Twelve',
-      'Thirteen',
-      'Fourteen',
-      'Fifteen',
-      'Sixteen',
-      'Seventeen',
-      'Eighteen',
-      'Nineteen',
+      '', 'One', 'Two', 'Three', 'Four', 'Five',
+      'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+      'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen',
+      'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen',
     ];
     const tens = [
-      '',
-      '',
-      'Twenty',
-      'Thirty',
-      'Forty',
-      'Fifty',
-      'Sixty',
-      'Seventy',
-      'Eighty',
-      'Ninety',
+      '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty',
+      'Sixty', 'Seventy', 'Eighty', 'Ninety',
     ];
 
     String convert(int n) {
@@ -747,54 +781,26 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     return convert(number);
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Arabic Number Conversion
+  // ──────────────────────────────────────────────────────────
+
   static String _convertWholeToArabic(int number) {
     if (number == 0) return 'صفر';
 
     const ones = [
-      '',
-      'واحد',
-      'اثنان',
-      'ثلاثة',
-      'أربعة',
-      'خمسة',
-      'ستة',
-      'سبعة',
-      'ثمانية',
-      'تسعة',
-      'عشرة',
-      'أحد عشر',
-      'اثنا عشر',
-      'ثلاثة عشر',
-      'أربعة عشر',
-      'خمسة عشر',
-      'ستة عشر',
-      'سبعة عشر',
-      'ثمانية عشر',
-      'تسعة عشر',
+      '', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة',
+      'ستة', 'سبعة', 'ثمانية', 'تسعة', 'عشرة',
+      'أحد عشر', 'اثنا عشر', 'ثلاثة عشر', 'أربعة عشر', 'خمسة عشر',
+      'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر',
     ];
     const tensAr = [
-      '',
-      '',
-      'عشرون',
-      'ثلاثون',
-      'أربعون',
-      'خمسون',
-      'ستون',
-      'سبعون',
-      'ثمانون',
-      'تسعون',
+      '', '', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون',
+      'ستون', 'سبعون', 'ثمانون', 'تسعون',
     ];
     const hundreds = [
-      '',
-      'مائة',
-      'مائتان',
-      'ثلاثمائة',
-      'أربعمائة',
-      'خمسمائة',
-      'ستمائة',
-      'سبعمائة',
-      'ثمانمائة',
-      'تسعمائة',
+      '', 'مائة', 'مائتان', 'ثلاثمائة', 'أربعمائة', 'خمسمائة',
+      'ستمائة', 'سبعمائة', 'ثمانمائة', 'تسعمائة',
     ];
 
     String convert(int n) {
@@ -817,7 +823,9 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
             ? 'ألف'
             : thousands == 2
                 ? 'ألفان'
-                : '${convert(thousands)} آلاف';
+                : thousands >= 3 && thousands <= 10
+                    ? '${convert(thousands)} آلاف'
+                    : '${convert(thousands)} ألف';
         if (remainder == 0) return thousandWord;
         return '$thousandWord و ${convert(remainder)}';
       }
@@ -828,7 +836,9 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
             ? 'مليون'
             : millions == 2
                 ? 'مليونان'
-                : '${convert(millions)} ملايين';
+                : millions >= 3 && millions <= 10
+                    ? '${convert(millions)} ملايين'
+                    : '${convert(millions)} مليون';
         if (remainder == 0) return millionWord;
         return '$millionWord و ${convert(remainder)}';
       }
@@ -838,7 +848,9 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
           ? 'مليار'
           : billions == 2
               ? 'ملياران'
-              : '${convert(billions)} مليارات';
+              : billions >= 3 && billions <= 10
+                  ? '${convert(billions)} مليارات'
+                  : '${convert(billions)} مليار';
       if (remainder == 0) return billionWord;
       return '$billionWord و ${convert(remainder)}';
     }
