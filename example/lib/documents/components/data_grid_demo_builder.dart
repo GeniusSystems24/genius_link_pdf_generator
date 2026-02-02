@@ -1,6 +1,8 @@
+import 'dart:ui';
+
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
-/// Builds a Data Grid demo PDF document with extended details (v2.12.0).
+/// Builds a Data Grid demo PDF document with extended details (v2.12.x).
 ///
 /// Demonstrates:
 /// 1. Basic invoice grid with percentage-based column widths
@@ -8,6 +10,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 /// 3. Explicit footer rows (tax, discount, grand total)
 /// 4. Grouped data with nested subgroups
 /// 5. Auto-grouping utility
+/// 6. Grid style showcase with customizable primary colors (v2.12.2)
 class DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
   DataGridDemoBuilder(super.config);
 
@@ -554,6 +557,287 @@ class DataGridDemoBuilder extends GeniusPdfDocumentBuilder {
             value: config.isRTL
                 ? 'خوارزمية محسّنة متعددة المراحل مع إعادة توزيع القيود'
                 : 'Multi-pass algorithm with constraint redistribution',
+          ),
+        ],
+        style: GeniusPdfInfoBoxStyle.info(),
+      ),
+      spacing: 10,
+    );
+
+    // ================================================================
+    // PAGE 4: Grid Styles Showcase (v2.12.2)
+    // ================================================================
+    newPage();
+
+    addSectionDivider(
+      title: config.isRTL
+          ? 'مثال ٦: عرض أنماط الجدول v2.12.2'
+          : 'Example 6: Grid Styles Showcase v2.12.2',
+      spacing: 10,
+    );
+
+    addLine(
+      config.isRTL
+          ? 'جميع الأنماط تدعم اللون الرئيسي القابل للتخصيص عبر primaryColor.'
+          : 'All styles support customizable primary color via the primaryColor parameter.',
+      topMargin: 5,
+    );
+
+    // Shared sample data for style demos
+    final styleColumns = [
+      GeniusPdfGridColumn(
+        id: 'name',
+        title: 'Product',
+        titleAr: 'المنتج',
+        flexFactor: 2,
+      ),
+      GeniusPdfGridColumn.numeric(
+        id: 'qty',
+        title: 'Qty',
+        titleAr: 'الكمية',
+        width: 50,
+        alignment: GeniusPdfTextAlign.center,
+      ),
+      GeniusPdfGridColumn.currency(
+        id: 'price',
+        title: 'Price',
+        titleAr: 'السعر',
+        width: 80,
+        isNumeric: true,
+      ),
+      GeniusPdfGridColumn.currency(
+        id: 'total',
+        title: 'Total',
+        titleAr: 'الإجمالي',
+        width: 90,
+        isNumeric: true,
+      ),
+    ];
+
+    final styleRows = [
+      GeniusPdfGridRow(cells: {
+        'name': config.isRTL ? 'لابتوب' : 'Laptop',
+        'qty': 3,
+        'price': 4500,
+        'total': 13500,
+      }),
+      GeniusPdfGridRow(cells: {
+        'name': config.isRTL ? 'شاشة' : 'Monitor',
+        'qty': 5,
+        'price': 1200,
+        'total': 6000,
+      }),
+      GeniusPdfGridRow(cells: {
+        'name': config.isRTL ? 'طابعة' : 'Printer',
+        'qty': 2,
+        'price': 2800,
+        'total': 5600,
+      }),
+    ];
+
+    final styleFooter = [
+      GeniusPdfGridRow.total({
+        'name': config.isRTL ? 'الإجمالي' : 'Total',
+        'total': 25100,
+      }),
+    ];
+
+    // Helper to build a styled grid
+    GeniusPdfDataGrid buildStyleGrid(GeniusPdfGridStyle gridStyle) {
+      return GeniusPdfDataGrid(
+        config: config,
+        columns: styleColumns,
+        rows: styleRows,
+        footerRows: styleFooter,
+        style: gridStyle,
+      );
+    }
+
+    addSpace(10);
+
+    // --- Style 1: Modern (Teal) ---
+    addLine(
+      config.isRTL
+          ? 'modern — اللون الرئيسي: أزرق مخضر (Teal)'
+          : 'modern — primaryColor: Teal',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(
+        GeniusPdfGridStyle.modern(primaryColor: const Color(0xFF00897B)),
+      ),
+      spacing: 8,
+    );
+
+    // --- Style 2: Classic (Indigo) ---
+    addLine(
+      config.isRTL
+          ? 'classic — اللون الرئيسي: نيلي (Indigo)'
+          : 'classic — primaryColor: Indigo',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(
+        GeniusPdfGridStyle.classic(primaryColor: const Color(0xFF3F51B5)),
+      ),
+      spacing: 8,
+    );
+
+    // --- Style 3: Striped (Blue Grey) ---
+    addLine(
+      config.isRTL
+          ? 'striped — اللون الرئيسي: رمادي مُزرق'
+          : 'striped — primaryColor: Blue Grey',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(
+        GeniusPdfGridStyle.striped(primaryColor: const Color(0xFF546E7A)),
+      ),
+      spacing: 8,
+    );
+
+    // --- Style 4: Dark (Dark Blue) ---
+    addLine(
+      config.isRTL
+          ? 'dark — اللون الرئيسي: أزرق داكن'
+          : 'dark — primaryColor: Dark Blue',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(
+        GeniusPdfGridStyle.dark(primaryColor: const Color(0xFF1A237E)),
+      ),
+      spacing: 8,
+    );
+
+    // ================================================================
+    // PAGE 5: More Styles with Custom Colors
+    // ================================================================
+    newPage();
+
+    addSectionDivider(
+      title: config.isRTL
+          ? 'مثال ٧: أنماط إضافية مع ألوان مخصصة'
+          : 'Example 7: More Styles with Custom Colors',
+      spacing: 10,
+    );
+
+    // --- Style 5: Elegant (Brown) ---
+    addLine(
+      config.isRTL
+          ? 'elegant — اللون الرئيسي: بني (Brown)'
+          : 'elegant — primaryColor: Brown',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(
+        GeniusPdfGridStyle.elegant(primaryColor: const Color(0xFF5D4037)),
+      ),
+      spacing: 8,
+    );
+
+    // --- Style 6: Pastel (Purple) ---
+    addLine(
+      config.isRTL
+          ? 'pastel — اللون الرئيسي: بنفسجي (Purple)'
+          : 'pastel — primaryColor: Purple',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(
+        GeniusPdfGridStyle.pastel(primaryColor: const Color(0xFF7E57C2)),
+      ),
+      spacing: 8,
+    );
+
+    // --- Style 7: Bordered (Green) ---
+    addLine(
+      config.isRTL
+          ? 'bordered — اللون الرئيسي: أخضر (Green)'
+          : 'bordered — primaryColor: Green',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(
+        GeniusPdfGridStyle.bordered(primaryColor: const Color(0xFF2E7D32)),
+      ),
+      spacing: 8,
+    );
+
+    // --- Style 8: Minimal (Orange) ---
+    addLine(
+      config.isRTL
+          ? 'minimal — اللون الرئيسي: برتقالي (Orange)'
+          : 'minimal — primaryColor: Orange',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(
+        GeniusPdfGridStyle.minimal(primaryColor: const Color(0xFFE65100)),
+      ),
+      spacing: 8,
+    );
+
+    // --- Style 9: Saudi (Default Green) ---
+    addLine(
+      config.isRTL
+          ? 'saudi — اللون الافتراضي: أخضر سعودي'
+          : 'saudi — default primaryColor: Saudi Green',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(GeniusPdfGridStyle.saudi()),
+      spacing: 8,
+    );
+
+    // --- Style 10: Invoice (Custom Red) ---
+    addLine(
+      config.isRTL
+          ? 'invoice — اللون الرئيسي: أحمر (Red)'
+          : 'invoice — primaryColor: Red',
+      topMargin: 6,
+    );
+    addSpace(4);
+    addGrid(
+      buildStyleGrid(
+        GeniusPdfGridStyle.invoice(primaryColor: const Color(0xFFC62828)),
+      ),
+      spacing: 8,
+    );
+
+    addSpace(15);
+
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        title: config.isRTL
+            ? 'الأنماط المتاحة v2.12.2'
+            : 'Available Styles v2.12.2',
+        titleAr: 'الأنماط المتاحة v2.12.2',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            label: config.isRTL ? 'الأنماط' : 'Styles',
+            labelAr: 'الأنماط',
+            value: 'modern, classic, corporate, minimal, saudi, invoice, striped, dark, elegant, pastel, bordered',
+          ),
+          GeniusPdfLabeledValue(
+            config: config,
+            label: config.isRTL ? 'التخصيص' : 'Customization',
+            labelAr: 'التخصيص',
+            value: config.isRTL
+                ? 'جميع الأنماط تدعم primaryColor لتخصيص اللون الرئيسي'
+                : 'All styles accept primaryColor for color customization',
           ),
         ],
         style: GeniusPdfInfoBoxStyle.info(),

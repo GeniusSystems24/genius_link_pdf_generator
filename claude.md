@@ -658,6 +658,47 @@ final groups = GeniusDataGridUtils.autoGroup(
 );
 ```
 
+## أنماط جدول البيانات (v2.12.2+)
+
+### 1. الأنماط المتاحة مع تخصيص اللون
+
+جميع الأنماط تقبل `primaryColor` لتخصيص اللون الرئيسي:
+
+```dart
+// أنماط أصلية (محدّثة)
+GeniusPdfGridStyle.modern(primaryColor: Color(0xFF00897B))    // أزرق مخضر
+GeniusPdfGridStyle.classic(primaryColor: Color(0xFF3F51B5))   // نيلي
+GeniusPdfGridStyle.corporate(primaryColor: Color(0xFFD84315)) // برتقالي
+GeniusPdfGridStyle.minimal(primaryColor: Color(0xFFE65100))   // برتقالي داكن
+GeniusPdfGridStyle.invoice(primaryColor: Color(0xFFC62828))   // أحمر
+
+// أنماط جديدة (v2.12.2)
+GeniusPdfGridStyle.striped(primaryColor: Color(0xFF546E7A))   // صفوف متناوبة بارزة
+GeniusPdfGridStyle.dark(primaryColor: Color(0xFF1A237E))      // رأس داكن مع نص أبيض
+GeniusPdfGridStyle.elegant(primaryColor: Color(0xFF5D4037))   // خطوط أفقية رفيعة
+GeniusPdfGridStyle.pastel(primaryColor: Color(0xFF7E57C2))    // ألوان ناعمة باستيل
+GeniusPdfGridStyle.bordered(primaryColor: Color(0xFF2E7D32))  // حدود قوية ورأس ملون
+```
+
+### 2. طريقة عمل primaryColor
+
+اللون الرئيسي يُستخدم تلقائياً لتوليد:
+- خلفية الرأس (`alpha: 0.08 ~ 0.12` أو لون كامل)
+- لون نص الرأس
+- لون الحدود (`alpha: 0.15 ~ 0.4`)
+- خلفية صفوف الإجمالي
+- خلفية رأس المجموعة
+- خلفية الصفوف المتناوبة (`alpha: 0.03 ~ 0.07`)
+
+### 3. الأنماط الداكنة (dark / striped)
+
+تستخدم اللون الرئيسي كخلفية كاملة للرأس مع نص أبيض:
+
+```dart
+GeniusPdfGridStyle.dark()     // رأس أسود مع نص أبيض
+GeniusPdfGridStyle.striped()  // صفوف zebra بدون حدود
+```
+
 ---
 
 *آخر تحديث: فبراير 2026*

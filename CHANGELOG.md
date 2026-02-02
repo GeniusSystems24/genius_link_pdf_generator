@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.2] - 2026-02-02
+
+### Added
+
+#### Customizable Grid Styles with `primaryColor`
+
+- **5 new `GeniusPdfGridStyle` factories** — `striped()`, `dark()`, `elegant()`, `pastel()`, `bordered()` — each with a `primaryColor` parameter that drives all header, border, total row, and group header colors.
+- **`primaryColor` added to all existing style factories** — `modern()`, `classic()`, `minimal()`, and `invoice()` now accept an optional `primaryColor` parameter. Colors for header backgrounds, borders, total rows, and group headers are automatically derived from the primary color using alpha blending.
+
+### Changed
+
+- **`GeniusPdfGridStyle.modern()` and `.classic()` converted from `const` to `factory`** — Necessary to support `primaryColor` parameter. All call sites updated to remove `const` keyword.
+- **`GeniusPdfGridStyle.minimal()` renamed `accentColor` to `primaryColor`** — For consistent API across all styles.
+
+### Style Reference
+
+| Style | Default primaryColor | Description |
+|-------|---------------------|-------------|
+| `modern` | `#1565C0` (Blue) | Bottom-border header, no vertical lines |
+| `classic` | `#333333` (Dark Grey) | All borders, traditional grid |
+| `corporate` | `#1565C0` (Blue) | Filled header, professional look |
+| `minimal` | `#424242` (Grey) | Top/bottom borders only, clean |
+| `saudi` | `#006C35` (Green) | Saudi-themed with green accents |
+| `invoice` | `#555555` (Grey) | Financial grid with outer border |
+| `striped` | `#37474F` (Blue Grey) | Strong alternating rows, no borders |
+| `dark` | `#263238` (Dark Slate) | Dark header/footer with white text |
+| `elegant` | `#5D4037` (Brown) | Horizontal rules, no grid lines |
+| `pastel` | `#7E57C2` (Purple) | Soft pastel tints, light borders |
+| `bordered` | `#1B5E20` (Green) | Strong borders, filled header |
+
+### Example
+
+```dart
+// Use any style with a custom primary color
+GeniusPdfGridStyle.striped(primaryColor: Color(0xFF00897B))  // Teal striped
+GeniusPdfGridStyle.dark(primaryColor: Color(0xFF1A237E))      // Indigo dark
+GeniusPdfGridStyle.elegant(primaryColor: Color(0xFF5D4037))   // Brown elegant
+GeniusPdfGridStyle.pastel(primaryColor: Color(0xFF7E57C2))    // Purple pastel
+GeniusPdfGridStyle.bordered(primaryColor: Color(0xFF2E7D32))  // Green bordered
+
+// Existing styles with custom colors
+GeniusPdfGridStyle.modern(primaryColor: Color(0xFFD84315))    // Orange modern
+GeniusPdfGridStyle.classic(primaryColor: Color(0xFF3F51B5))   // Indigo classic
+GeniusPdfGridStyle.invoice(primaryColor: Color(0xFFC62828))   // Red invoice
+```
+
+---
+
 ## [2.12.1] - 2026-02-02
 
 ### Fixed

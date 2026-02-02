@@ -129,7 +129,7 @@ class MultiGridSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
           'total': 3000.00,
         }),
       ],
-      style: const GeniusPdfGridStyle.classic(),
+      style: GeniusPdfGridStyle.classic(),
     );
 
     final salesSubtotal = 37500.00;
@@ -223,7 +223,7 @@ class MultiGridSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
           'amount': 3500.00,
         }),
       ],
-      style: const GeniusPdfGridStyle.classic(),
+      style: GeniusPdfGridStyle.classic(),
     );
 
     final expensesTotal = 26500.00;

@@ -229,7 +229,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
         ),
       ],
       rows: rows,
-      style: const GeniusPdfGridStyle.modern(),
+      style: GeniusPdfGridStyle.modern(),
     );
 
     final result = grid.drawAt(

@@ -483,7 +483,7 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       columns: columns,
       rows: rows,
-      style: const GeniusPdfGridStyle.modern(),
+      style: GeniusPdfGridStyle.modern(),
       
     );
 

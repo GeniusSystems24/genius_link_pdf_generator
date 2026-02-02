@@ -268,7 +268,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       columns: columns,
       rows: rows,
-      style: const GeniusPdfGridStyle.classic(),
+      style: GeniusPdfGridStyle.classic(),
     );
 
     final result = grid.drawAt(

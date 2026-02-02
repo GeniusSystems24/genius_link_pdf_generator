@@ -722,7 +722,7 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
           .map((e) =>
               GeniusPdfGridRow(cells: {'label': e.key, 'value': e.value}))
           .toList(),
-      style: style ?? const GeniusPdfGridStyle.classic(),
+      style: style ?? GeniusPdfGridStyle.classic(),
     );
   }
 
@@ -791,7 +791,7 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
                 balanceColumn: e[balanceColumn],
               }))
           .toList(),
-      style: style ?? const GeniusPdfGridStyle.classic(),
+      style: style ?? GeniusPdfGridStyle.classic(),
     );
   }
 
@@ -1288,7 +1288,7 @@ extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
     required List<GeniusPdfGridRow> rows,
     required List<GeniusConditionalFormatRule> rules,
     required GeniusPdfConfig config,
-    GeniusPdfGridStyle style = const GeniusPdfGridStyle.classic(),
+    GeniusPdfGridStyle style = GeniusPdfGridStyle.classic(),
     List<GeniusPdfGridGroup>? groups,
     List<GeniusPdfGridRow>? footerRows,
     List<GeniusPdfAutoTotal>? autoTotals,

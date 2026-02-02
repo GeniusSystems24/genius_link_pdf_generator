@@ -341,7 +341,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
                 'total': item.lineTotal,
               }))
           .toList(),
-      style: const GeniusPdfGridStyle.classic(),
+      style: GeniusPdfGridStyle.classic(),
     );
 
     // Use drawAt + updateFromLayoutResult for multi-page grid safety.

@@ -418,7 +418,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
         }
         return GeniusPdfGridRow(cells: cells);
       }).toList(),
-      style: const GeniusPdfGridStyle.modern(),
+      style: GeniusPdfGridStyle.modern(),
     );
 
     final result = grid.drawAt(

@@ -391,7 +391,7 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       columns: columns,
       rows: rows,
-      style: const GeniusPdfGridStyle.modern(),
+      style: GeniusPdfGridStyle.modern(),
     );
 
     final result = grid.drawAt(
@@ -492,7 +492,7 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
                   },
                 ))
             .toList(),
-        style: const GeniusPdfGridStyle.modern(),
+        style: GeniusPdfGridStyle.modern(),
 
       );
 

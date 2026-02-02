@@ -62,7 +62,7 @@ List<int> buildComposerDemoReport({
         'amount': 7500.00,
       }),
     ],
-    style: const GeniusPdfGridStyle.classic(),
+    style: GeniusPdfGridStyle.classic(),
   );
 
   final salesSummary = GeniusPdfSummarySection(

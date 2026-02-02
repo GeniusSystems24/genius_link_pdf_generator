@@ -458,6 +458,34 @@ Automatic header/footer space deduction, footer-aware `remainingHeight`, and aut
 
 Proper clickable hyperlinks via Syncfusion's `PdfTextWebLink`, sized font support, and rich text bug fixes
 
+### 📊 **Multi-Total Rows** (v2.12.0)
+
+Multiple auto-calculated total rows per grid (sum, avg, count, min, max)
+
+### 📐 **Percentage Columns** (v2.12.0)
+
+Set column widths as percentages with `widthPercent`
+
+### 🗂️ **Nested Groups** (v2.12.0)
+
+Recursive subgroups with per-level totals and summaries
+
+### 🔄 **Auto-Grouping** (v2.12.0)
+
+`GeniusDataGridUtils.autoGroup()` for automatic data grouping
+
+### ⚙️ **Smart Column Widths** (v2.12.0)
+
+Multi-pass constraint redistribution algorithm
+
+### 🎨 **Customizable Grid Styles** (v2.12.2)
+
+11 style presets with `primaryColor` customization
+
+### 🖌️ **New Style Presets** (v2.12.2)
+
+striped, dark, elegant, pastel, bordered grid styles
+
 ---
 
 ## Installation
@@ -930,7 +958,7 @@ grid.draw(page: page, bounds: bounds);
 - `GeniusPdfGridRow.separator()` - Visual separator
 - `GeniusPdfGridRow.spacer()` - Empty spacer row
 
-**Grid Styles:**
+**Grid Styles (all support `primaryColor` customization):**
 
 - `GeniusPdfGridStyle.classic()` - Traditional bordered
 - `GeniusPdfGridStyle.modern()` - Minimal with accent borders
@@ -938,6 +966,11 @@ grid.draw(page: page, bounds: bounds);
 - `GeniusPdfGridStyle.minimal()` - Minimal borders
 - `GeniusPdfGridStyle.saudi()` - Saudi green theme
 - `GeniusPdfGridStyle.invoice()` - Optimized for invoices
+- `GeniusPdfGridStyle.striped()` - Prominent alternating rows (v2.12.2)
+- `GeniusPdfGridStyle.dark()` - Dark header/footer with white text (v2.12.2)
+- `GeniusPdfGridStyle.elegant()` - Thin horizontal rules, refined (v2.12.2)
+- `GeniusPdfGridStyle.pastel()` - Soft pastel tints (v2.12.2)
+- `GeniusPdfGridStyle.bordered()` - Strong borders, filled header (v2.12.2)
 
 **Advanced Column Features:**
 

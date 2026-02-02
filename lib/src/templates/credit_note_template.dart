@@ -387,7 +387,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
                 'total': item.lineTotal,
               }))
           .toList(),
-      style: const GeniusPdfGridStyle.modern(),
+      style: GeniusPdfGridStyle.modern(),
     );
 
     final result = grid.drawAt(

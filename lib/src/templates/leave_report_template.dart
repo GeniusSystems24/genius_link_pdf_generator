@@ -462,7 +462,7 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
                 },
               ))
           .toList(),
-      style: const GeniusPdfGridStyle.modern(),
+      style: GeniusPdfGridStyle.modern(),
     );
 
     final result = grid.drawAt(
@@ -562,7 +562,7 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
                 },
               ))
           .toList(),
-      style: const GeniusPdfGridStyle.modern(),
+      style: GeniusPdfGridStyle.modern(),
     );
 
     final result = grid.drawAt(
