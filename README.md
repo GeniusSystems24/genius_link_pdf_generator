@@ -115,6 +115,7 @@ A comprehensive PDF generation and preview library for Flutter applications with
 📐 **Two-Column Layout** (v2.8.0) - `addTwoColumns()` flexible two-column layout with callbacks
 🎭 **Page Templates** (v2.8.0) - `setPageTemplate()` stamps, watermarks, and template elements
 🔗 **Report Composer** (v2.9.0) - `GeniusPdfReportComposer` fluent API for chainable report building without subclassing
+📐 **Smart Space Management** (v2.10.0) - Automatic header/footer space deduction, footer-aware `remainingHeight`, and auto page-break for all non-Grid components
 
 ---
 
@@ -372,6 +373,48 @@ final bytes = composer
     .buildPdf();
 composer.dispose();
 ```
+
+### Smart Space Management (v2.10.0)
+
+The builder automatically tracks header and footer template heights and deducts them from the available page space. All non-Grid drawing methods (`addSummary`, `addInfoBox`, `addRichText`, `addReportHeader`, `addBulletList`, `addDualInfoBox`, `addSectionDivider`) auto page-break when content doesn't fit.
+
+```dart
+class SmartReport extends GeniusPdfDocumentBuilder {
+  SmartReport(super.config);
+
+  @override
+  void build() {
+    // Header/footer heights are tracked automatically.
+    addHeader(title: 'Report');
+    addFooter(userName: 'Admin', showPageNumber: true);
+
+    newPage(); // starts at headerHeight, not 0
+
+    // Auto page-break if content doesn't fit:
+    addReportHeader(header, height: 100);
+    addInfoBox(infoBox, spacing: 10);
+    addSummary(summary, spacing: 10);
+
+    // Grid handles its own multi-page pagination:
+    addGrid(grid, spacing: 10);
+
+    // remainingHeight accounts for footer space:
+    if (canFit(200)) {
+      addBarChart(chart, height: 200);
+    }
+
+    // Reserve space for custom-drawn headers/footers:
+    reserveHeaderSpace(50);
+    reserveFooterSpace(30);
+  }
+}
+```
+
+Key properties:
+- `headerHeight` / `footerHeight` — read reserved space
+- `effectivePageHeight` — page height minus header and footer
+- `remainingHeight` — accounts for both currentY and footer
+- `reserveHeaderSpace()` / `reserveFooterSpace()` — for custom headers/footers
 
 ### 3. Generate and Display
 

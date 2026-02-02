@@ -101,6 +101,20 @@ abstract class GeniusPdfDocumentBuilder {
   /// value after rendering. Use [currentY] to read the current position.
   double _currentY = 0;
 
+  /// Height reserved by the page header template.
+  ///
+  /// When a header is added via [addHeader], this value is set to the
+  /// header's height. All new pages start with [currentY] offset by this
+  /// amount, and [remainingHeight] accounts for it automatically.
+  double _headerHeight = 0;
+
+  /// Height reserved by the page footer template.
+  ///
+  /// When a footer is added via [addFooter], this value is set to the
+  /// footer's height. [remainingHeight] subtracts this to prevent content
+  /// from overlapping the footer area.
+  double _footerHeight = 0;
+
   void _applySettings() {
     _document.pageSettings.orientation = config.orientation;
     _document.pageSettings.size = config.pageSize;
@@ -159,12 +173,22 @@ abstract class GeniusPdfDocumentBuilder {
   /// etc.) automatically advance this value after rendering.
   double get currentY => _currentY;
 
+  /// The height reserved by the page header template.
+  double get headerHeight => _headerHeight;
+
+  /// The height reserved by the page footer template.
+  double get footerHeight => _footerHeight;
+
+  /// The effective page height available for content (excluding header and footer).
+  double get effectivePageHeight => pageHeight - _headerHeight - _footerHeight;
+
   /// The remaining vertical space on the current page.
   ///
+  /// Accounts for both the current Y position and the footer reserved area.
   /// Returns `0` if no page exists yet.
   double get remainingHeight {
     if (_currentPage == null) return 0;
-    return pageHeight - _currentY;
+    return pageHeight - _currentY - _footerHeight;
   }
 
   /// Whether content of the given [height] can fit on the current page.
@@ -173,7 +197,7 @@ abstract class GeniusPdfDocumentBuilder {
   /// The bounds of the available content area on the current page.
   ///
   /// Returns a [Rect] starting at `(0, currentY)` with the full page width
-  /// and the remaining height.
+  /// and the remaining height (accounting for footer).
   Rect get contentBounds =>
       Rect.fromLTWH(0, _currentY, pageWidth, remainingHeight);
 
@@ -223,9 +247,34 @@ abstract class GeniusPdfDocumentBuilder {
     return currentPage;
   }
 
-  /// Resets the Y position to [y] (defaults to 0 — top of content area).
-  void resetY([double y = 0]) {
-    _currentY = y;
+  /// Resets the Y position to [y] (defaults to the header height —
+  /// top of the content area below the header).
+  void resetY([double? y]) {
+    _currentY = y ?? _headerHeight;
+  }
+
+  /// Manually reserves header space without adding a visual header.
+  ///
+  /// Use this when you draw your own custom header and need the builder
+  /// to account for the occupied space on new pages.
+  void reserveHeaderSpace(double height) {
+    _headerHeight = height;
+    GeniusPdfLogger.debug(
+      'Header space reserved: $height',
+      tag: 'Builder',
+    );
+  }
+
+  /// Manually reserves footer space without adding a visual footer.
+  ///
+  /// Use this when you draw your own custom footer and need the builder
+  /// to prevent content from overlapping the footer area.
+  void reserveFooterSpace(double height) {
+    _footerHeight = height;
+    GeniusPdfLogger.debug(
+      'Footer space reserved: $height',
+      tag: 'Builder',
+    );
   }
 
   /// Sets the current page to [page] and optionally updates the Y position.
@@ -274,17 +323,18 @@ abstract class GeniusPdfDocumentBuilder {
 
   /// Creates a new page and sets it as the current page.
   ///
-  /// Resets [currentY] to `0`. Optionally draws a border around the page.
+  /// Resets [currentY] to [headerHeight] (the top of the content area below
+  /// the header template). Optionally draws a border around the page.
   /// Returns the newly created [PdfPage].
   PdfPage newPage({PdfPen? borderPen}) {
     final page = _document.pages.add();
     _currentIndex++;
     _currentPage = page;
     _layoutResult = null;
-    _currentY = 0;
+    _currentY = _headerHeight;
 
     GeniusPdfLogger.debug(
-      'New page created: index=$_currentIndex',
+      'New page created: index=$_currentIndex, startY=$_headerHeight',
       tag: 'Builder',
     );
 
@@ -510,6 +560,20 @@ abstract class GeniusPdfDocumentBuilder {
     );
 
     _document.template.top = header;
+
+    // Store header height for space calculations.
+    _headerHeight = headerHeight;
+
+    // Adjust current page Y if we're on the first page and still at 0.
+    if (_currentPage != null && _currentY < _headerHeight) {
+      _currentY = _headerHeight;
+    }
+
+    GeniusPdfLogger.debug(
+      'Header added: height=$headerHeight, _currentY=$_currentY',
+      tag: 'Builder',
+    );
+
     return header;
   }
 
@@ -659,6 +723,15 @@ abstract class GeniusPdfDocumentBuilder {
     );
 
     _document.template.bottom = footer;
+
+    // Store footer height for space calculations.
+    _footerHeight = footerHeight;
+
+    GeniusPdfLogger.debug(
+      'Footer added: height=$footerHeight',
+      tag: 'Builder',
+    );
+
     return footer;
   }
 
@@ -836,7 +909,9 @@ abstract class GeniusPdfDocumentBuilder {
     GeniusPdfSummarySection summary, {
     double spacing = 0,
   }) {
-    final page = currentPage;
+    // Estimate: each item ~20px + padding.
+    final estimatedHeight = summary.items.length * 20.0 + 20.0 + spacing;
+    final page = _ensureSpace(estimatedHeight);
     final drawY = _currentY + spacing;
 
     GeniusPdfLogger.debug(
@@ -946,6 +1021,10 @@ abstract class GeniusPdfDocumentBuilder {
     final dividerPen = pen ?? PdfPen(PdfColor(180, 180, 180));
     final dividerFont = font ?? baseFont;
     final dividerBrush = brush ?? PdfSolidBrush(PdfColor(120, 120, 120));
+
+    // Ensure space for divider line + text + spacing.
+    final neededHeight = (title != null ? dividerFont.height : 1.0) + spacing * 2;
+    _ensureSpace(neededHeight);
 
     _advanceY(spacing);
 
@@ -1276,8 +1355,10 @@ abstract class GeniusPdfDocumentBuilder {
     GeniusPdfRichText richText, {
     double spacing = 0,
   }) {
+    // Estimate minimum height: at least one line of text.
+    final minHeight = baseFont.height + spacing + 10;
+    final page = _ensureSpace(minHeight);
     final drawY = _currentY + spacing;
-    final page = currentPage;
 
     GeniusPdfLogger.debug(
       'Drawing rich text at Y=$drawY',
@@ -1318,8 +1399,11 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     double? height,
   }) {
+    // Estimate: title (~20px) + items (~18px each) + padding.
+    final estimatedHeight =
+        height ?? (20.0 + infoBox.items.length * 18.0 + 10.0 + spacing);
+    final page = _ensureSpace(estimatedHeight);
     final drawY = _currentY + spacing;
-    final page = currentPage;
 
     GeniusPdfLogger.debug(
       'Drawing info box at Y=$drawY',
@@ -1365,8 +1449,8 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     double height = 100,
   }) {
+    final page = _ensureSpace(height + spacing);
     final drawY = _currentY + spacing;
-    final page = currentPage;
 
     GeniusPdfLogger.debug(
       'Drawing report header at Y=$drawY',
@@ -1513,7 +1597,12 @@ abstract class GeniusPdfDocumentBuilder {
     bool swapForRTL = true,
     double spacing = 0,
   }) {
-    final page = currentPage;
+    // Estimate: max of both boxes' item counts * 18px + title + padding.
+    final maxItems = leftBox.items.length > rightBox.items.length
+        ? leftBox.items.length
+        : rightBox.items.length;
+    final estimatedHeight = 20.0 + maxItems * 18.0 + 10.0 + spacing;
+    final page = _ensureSpace(estimatedHeight);
     final drawY = _currentY + spacing;
 
     GeniusPdfLogger.debug(
@@ -1567,6 +1656,7 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     double estimatedHeight = 100,
   }) {
+    _ensureSpace(estimatedHeight + spacing);
     final page = currentPage;
     final drawY = _currentY + spacing;
 
@@ -1623,7 +1713,7 @@ abstract class GeniusPdfDocumentBuilder {
   ///
   /// Calls [build] to populate the document, then serializes to bytes.
   List<int> generate() {
-    _currentY = 0;
+    _currentY = _headerHeight;
     build();
     final bytes = _document.saveSync();
     return bytes;
@@ -1671,19 +1761,35 @@ class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
   /// Build actions queued by the fluent API.
   final List<void Function()> _actions = [];
 
-  // Footer settings (deferred to end of build).
+  // Header settings (applied before actions for correct space calculations).
+  GeniusPdfImage? _headerImage;
+  String? _headerTitle;
+  PdfFont? _headerFont;
+  Color? _headerBackgroundColor;
+  bool _hasHeader = false;
+
+  // Footer settings (applied before actions for correct space calculations).
   String? _footerUserName;
   String? _footerUserLabel;
   String? _footerPrintTime;
   bool _footerShowPageNumber = false;
   PdfFont? _footerFont;
   String _footerPageNumberFormat = '{0}/{1}';
+  String? _footerQrCodeUrl;
+  double _footerQrCodeSize = 50;
   bool _hasFooter = false;
 
   @override
   void build() {
-    for (final action in _actions) {
-      action();
+    // Apply header and footer BEFORE actions so that _headerHeight and
+    // _footerHeight are set correctly for all space calculations.
+    if (_hasHeader) {
+      addHeader(
+        image: _headerImage,
+        title: _headerTitle,
+        font: _headerFont,
+        backgroundColor: _headerBackgroundColor,
+      );
     }
     if (_hasFooter) {
       addFooter(
@@ -1693,7 +1799,13 @@ class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
         showPageNumber: _footerShowPageNumber,
         font: _footerFont,
         pageNumberFormat: _footerPageNumberFormat,
+        qrCodeUrl: _footerQrCodeUrl,
+        qrCodeSize: _footerQrCodeSize,
       );
+    }
+
+    for (final action in _actions) {
+      action();
     }
   }
 
@@ -1708,18 +1820,20 @@ class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
   // ────────────────────────────────────────────────────────
 
   /// Configures a header for all pages.
+  ///
+  /// The header is applied before all actions in [build] so that
+  /// [headerHeight] is available for space calculations.
   GeniusPdfReportComposer withHeader({
     GeniusPdfImage? image,
     String? title,
     PdfFont? font,
     Color? backgroundColor,
   }) {
-    _actions.add(() => addHeader(
-          image: image,
-          title: title,
-          font: font,
-          backgroundColor: backgroundColor,
-        ));
+    _hasHeader = true;
+    _headerImage = image;
+    _headerTitle = title;
+    _headerFont = font;
+    _headerBackgroundColor = backgroundColor;
     return this;
   }
 
@@ -1738,6 +1852,9 @@ class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
   }
 
   /// Configures a footer for all pages.
+  ///
+  /// The footer is applied before all actions in [build] so that
+  /// [footerHeight] is available for space calculations.
   GeniusPdfReportComposer withFooter({
     String? userName,
     String? userLabel,
@@ -1745,6 +1862,8 @@ class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
     bool showPageNumber = false,
     PdfFont? font,
     String pageNumberFormat = '{0}/{1}',
+    String? qrCodeUrl,
+    double qrCodeSize = 50,
   }) {
     _hasFooter = true;
     _footerUserName = userName;
@@ -1753,6 +1872,8 @@ class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
     _footerShowPageNumber = showPageNumber;
     _footerFont = font;
     _footerPageNumberFormat = pageNumberFormat;
+    _footerQrCodeUrl = qrCodeUrl;
+    _footerQrCodeSize = qrCodeSize;
     return this;
   }
 

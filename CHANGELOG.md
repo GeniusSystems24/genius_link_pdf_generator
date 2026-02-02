@@ -5,6 +5,70 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2026-02-02
+
+### Added
+
+#### Smart Space Management in GeniusPdfDocumentBuilder
+
+- **`_headerHeight` / `_footerHeight` tracking** — The builder now tracks header and footer template heights internally, deducting them from available page space automatically
+- **`headerHeight` / `footerHeight` / `effectivePageHeight` getters** — Public read-only access to reserved header/footer space and the effective content area height
+- **`reserveHeaderSpace(double)` / `reserveFooterSpace(double)`** — Manually reserve header/footer space for custom-drawn headers/footers without using `addHeader`/`addFooter`
+- **Automatic page-break for all non-Grid methods** — `addSummary`, `addInfoBox`, `addRichText`, `addReportHeader`, `addBulletList`, `addDualInfoBox`, and `addSectionDivider` now call `_ensureSpace` before drawing, creating a new page automatically if the content doesn't fit
+- **Footer-aware `remainingHeight`** — `remainingHeight` now subtracts `_footerHeight` to prevent content from overlapping the footer area
+- **Header-offset new pages** — `newPage()` sets `currentY` to `_headerHeight` instead of `0`, so content never overlaps the header template
+
+### Changed
+
+- **`addHeader()` stores `_headerHeight`** — After creating the header template, the builder records its height and adjusts the current page's Y position
+- **`addFooter()` stores `_footerHeight`** — After creating the footer template, the builder records its height for `remainingHeight` calculations
+- **`newPage()` respects header height** — New pages start at `_headerHeight` instead of `0`
+- **`generate()` respects header height** — Initial Y position is set to `_headerHeight`
+- **`resetY()` defaults to header height** — Without arguments, resets to `_headerHeight` instead of `0`
+- **`GeniusPdfReportComposer` applies header/footer before actions** — `withHeader()` and `withFooter()` now store parameters and apply them at the start of `build()`, ensuring `_headerHeight` and `_footerHeight` are available during all content rendering
+- **`withFooter()` supports `qrCodeUrl` and `qrCodeSize`** — Previously missing QR code parameters are now available in the Composer's fluent API
+
+### Fixed
+
+- **Content overlapping footer** — Previously, `remainingHeight` did not account for footer space, causing content to render behind the footer template
+- **Content overlapping header on new pages** — Previously, `newPage()` reset Y to `0`, causing content on continuation pages to render behind the header template
+- **Composer header/footer timing** — `withHeader()` used to queue `addHeader()` as an action, meaning `_headerHeight` was `0` during early content rendering; now header/footer are applied first
+
+### Example
+
+```dart
+class SmartLayoutReport extends GeniusPdfDocumentBuilder {
+  SmartLayoutReport(super.config);
+
+  @override
+  void build() {
+    // Header and footer reserve space automatically.
+    addHeader(title: 'Monthly Report');
+    addFooter(userName: 'Admin', showPageNumber: true);
+
+    newPage(); // starts at headerHeight, not 0
+
+    // These methods auto page-break if content won't fit:
+    addReportHeader(myReportHeader, height: 100);
+    addInfoBox(myInfoBox, spacing: 10);
+    addSummary(mySummary, spacing: 10);
+    addRichText(myRichText, spacing: 5);
+    addBulletList(myBulletList, spacing: 10);
+    addSectionDivider(title: 'Details');
+
+    // Grid handles its own pagination — no auto page-break:
+    addGrid(myGrid, spacing: 10);
+
+    // remainingHeight correctly accounts for footer space.
+    if (canFit(200)) {
+      addBarChart(myChart, height: 200);
+    }
+  }
+}
+```
+
+---
+
 ## [2.9.1] - 2026-02-02
 
 ### Added
