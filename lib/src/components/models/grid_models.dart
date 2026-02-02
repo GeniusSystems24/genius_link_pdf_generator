@@ -90,7 +90,6 @@ class GeniusPdfGridColumn {
             }
             return formatted;
           },
-      isNumeric: true,
     );
   }
 
