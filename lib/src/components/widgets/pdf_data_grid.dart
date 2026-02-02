@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
@@ -10,33 +11,64 @@ import '../models/grid_models.dart';
 import '../models/pdf_styles.dart';
 import '../../core/pdf_logger.dart';
 
-/// A powerful data grid component for PDF documents.
+/// A powerful data grid component for PDF documents (v2.12.0).
 ///
 /// [GeniusPdfDataGrid] provides a flexible way to create tables in PDF documents
 /// with support for:
 /// - Custom column definitions with various alignments
 /// - Header rows with RTL/LTR support
 /// - Alternating row colors
-/// - Group headers and totals
+/// - Group headers with nested subgroups
+/// - Multiple total/summary rows per grid (auto-calculated)
+/// - Percentage-based and flex-based column widths
+/// - Multi-pass column width redistribution with min/max constraints
 /// - Automatic pagination
 /// - Currency and number formatting
 ///
-/// ## Example
+/// ## Example — Simple Grid with Auto Totals
 /// ```dart
-/// final grid = PdfDataGrid(
+/// final grid = GeniusPdfDataGrid(
 ///   columns: [
-///     PdfGridColumn(id: 'name', title: 'Name', titleAr: 'الاسم'),
-///     PdfGridColumn.currency(id: 'amount', title: 'Amount', titleAr: 'المبلغ'),
+///     GeniusPdfGridColumn(id: 'name', title: 'Name', titleAr: 'الاسم'),
+///     GeniusPdfGridColumn.currency(id: 'amount', title: 'Amount', titleAr: 'المبلغ'),
 ///   ],
 ///   rows: [
-///     PdfGridRow(cells: {'name': 'Item 1', 'amount': 100.00}),
-///     PdfGridRow(cells: {'name': 'Item 2', 'amount': 200.00}),
-///     PdfGridRow.total({'name': 'Total', 'amount': 300.00}),
+///     GeniusPdfGridRow(cells: {'name': 'Item 1', 'amount': 100.00}),
+///     GeniusPdfGridRow(cells: {'name': 'Item 2', 'amount': 200.00}),
 ///   ],
+///   autoTotals: [
+///     GeniusPdfAutoTotal.sum(
+///       label: 'Total', labelAr: 'الإجمالي', labelColumnId: 'name',
+///     ),
+///   ],
+///   config: config,
 /// );
 ///
-/// // Draw in document
 /// grid.draw(page: currentPage, bounds: Rect.fromLTWH(0, y, width, height));
+/// ```
+///
+/// ## Example — Grouped Grid with Multiple Totals
+/// ```dart
+/// final grid = GeniusPdfDataGrid(
+///   columns: columns,
+///   rows: [],
+///   groups: [
+///     GeniusPdfGridGroup.withSummary(
+///       title: 'Electronics', titleAr: 'إلكترونيات',
+///       rows: electronicsRows, sumColumns: ['total'],
+///       labelColumnId: 'desc',
+///     ),
+///     GeniusPdfGridGroup.withSummary(
+///       title: 'Services', titleAr: 'خدمات',
+///       rows: servicesRows, sumColumns: ['total'],
+///       labelColumnId: 'desc',
+///     ),
+///   ],
+///   footerRows: [
+///     GeniusPdfGridRow.total({'desc': 'Grand Total', 'total': 25000}),
+///   ],
+///   config: config,
+/// );
 /// ```
 class GeniusPdfDataGrid {
   GeniusPdfDataGrid({
@@ -45,6 +77,8 @@ class GeniusPdfDataGrid {
     required this.config,
     GeniusPdfGridStyle? style,
     this.groups,
+    this.footerRows,
+    this.autoTotals,
   }) : style = _resolveGridStyle(style, config);
 
   /// Column definitions.
@@ -61,6 +95,12 @@ class GeniusPdfDataGrid {
 
   /// Optional grouped data.
   final List<GeniusPdfGridGroup>? groups;
+
+  /// Explicit footer/total rows appended after all data rows.
+  final List<GeniusPdfGridRow>? footerRows;
+
+  /// Auto-calculated total rows appended after data rows (before footerRows).
+  final List<GeniusPdfAutoTotal>? autoTotals;
 
   static GeniusPdfGridStyle _resolveGridStyle(
     GeniusPdfGridStyle? style,
@@ -144,6 +184,26 @@ class GeniusPdfDataGrid {
   List<GeniusPdfGridColumn> get visibleColumns =>
       columns.where((c) => c.isVisible).toList();
 
+  /// Collects all data rows (excluding special rows) for total calculations.
+  List<GeniusPdfGridRow> get _allDataRows {
+    if (groups != null && groups!.isNotEmpty) {
+      return groups!.expand((g) => _collectDataRows(g)).toList();
+    }
+    return rows.where((r) => !r.isSpecialRow).toList();
+  }
+
+  /// Recursively collects data rows from a group and its subgroups.
+  List<GeniusPdfGridRow> _collectDataRows(GeniusPdfGridGroup group) {
+    final result = <GeniusPdfGridRow>[];
+    if (group.subgroups != null && group.subgroups!.isNotEmpty) {
+      for (final sub in group.subgroups!) {
+        result.addAll(_collectDataRows(sub));
+      }
+    }
+    result.addAll(group.rows.where((r) => !r.isSpecialRow));
+    return result;
+  }
+
   /// Draws the grid on a PDF page.
   ///
   /// Returns the layout result for positioning subsequent content.
@@ -152,8 +212,12 @@ class GeniusPdfDataGrid {
     required Rect bounds,
     PdfLayoutFormat? layoutFormat,
   }) {
+    final totalAutoRows = autoTotals?.length ?? 0;
+    final totalFooterRows = footerRows?.length ?? 0;
     GeniusPdfLogger.debug(
-        'Drawing grid: ${columns.length} columns, ${rows.length} rows',
+        'Drawing grid: ${columns.length} columns, ${rows.length} rows'
+        '${totalAutoRows > 0 ? ', $totalAutoRows auto-totals' : ''}'
+        '${totalFooterRows > 0 ? ', $totalFooterRows footer rows' : ''}',
         tag: 'DataGrid');
     final grid = _buildGrid(page);
 
@@ -194,7 +258,7 @@ class GeniusPdfDataGrid {
     final grid = PdfGrid();
     final cols = visibleColumns;
 
-    // Calculate column widths
+    // Calculate column widths with improved algorithm (v2.12.0)
     final pageWidth = page.getClientSize().width;
     final columnWidths = _calculateColumnWidths(cols, pageWidth);
 
@@ -232,6 +296,18 @@ class GeniusPdfDataGrid {
       _addDataRows(grid, cols, rows);
     }
 
+    // Add auto-calculated total rows (v2.12.0)
+    if (autoTotals != null && autoTotals!.isNotEmpty) {
+      _addAutoTotalRows(grid, cols);
+    }
+
+    // Add explicit footer rows (v2.12.0)
+    if (footerRows != null && footerRows!.isNotEmpty) {
+      for (final footerRow in footerRows!) {
+        _addSingleRow(grid, cols, footerRow, grid.rows.count);
+      }
+    }
+
     // Configure grid settings
     grid.style.cellSpacing = style.cellSpacing;
     if (style.repeatHeaderOnPages) {
@@ -241,44 +317,116 @@ class GeniusPdfDataGrid {
     return grid;
   }
 
+  /// Adds grouped rows with recursive subgroup support (v2.12.0 enhanced).
   void _addGroupedRows(PdfGrid grid, List<GeniusPdfGridColumn> cols) {
     for (final group in groups!) {
-      // Add group header
+      _addGroup(grid, cols, group);
+    }
+  }
+
+  /// Recursively adds a group and its subgroups to the grid.
+  void _addGroup(
+    PdfGrid grid,
+    List<GeniusPdfGridColumn> cols,
+    GeniusPdfGridGroup group,
+  ) {
+    // Add group header if enabled
+    if (group.showHeader) {
       final groupHeaderRow = grid.rows.add();
       groupHeaderRow.cells[0].value = group.getTitle(isArabic: config.isRTL);
       groupHeaderRow.cells[0].columnSpan = cols.length;
 
-      final groupStyle = group.style ?? style.groupHeaderStyle;
+      final groupStyle =
+          group.headerStyle ?? group.style ?? style.groupHeaderStyle;
       if (groupStyle != null) {
         _applyRowStyle(groupHeaderRow, groupStyle);
+        _applyCellStyle(groupHeaderRow.cells[0], groupStyle, cols[0]);
       } else {
-        // Default group header style
-        _applyRowStyle(
-          groupHeaderRow,
-          GeniusPdfCellStyle(
-            textStyle: const GeniusPdfTextStyle(
-              fontSize: 11,
-              fontWeight: material.FontWeight.bold,
-            ),
-            backgroundColor: const Color(0xFFE0E0E0),
-            border: const GeniusPdfBorderStyle.all(),
-            padding: GeniusPdfCellPadding(
-              left: 4 + (group.level * 10),
-              right: 4,
-              top: 4,
-              bottom: 4,
-            ),
+        // Default group header style with level-based indent
+        final defaultGroupStyle = GeniusPdfCellStyle(
+          textStyle: const GeniusPdfTextStyle(
+            fontSize: 11,
+            fontWeight: material.FontWeight.bold,
+          ),
+          backgroundColor: const Color(0xFFE0E0E0),
+          border: const GeniusPdfBorderStyle.all(),
+          padding: GeniusPdfCellPadding(
+            left: 4 + (group.level * style.groupIndentPerLevel),
+            right: 4,
+            top: 4,
+            bottom: 4,
           ),
         );
+        _applyRowStyle(groupHeaderRow, defaultGroupStyle);
+        _applyCellStyle(groupHeaderRow.cells[0], defaultGroupStyle, cols[0]);
       }
+    }
 
-      // Add group rows
+    // Add subgroups recursively if present
+    if (group.subgroups != null && group.subgroups!.isNotEmpty) {
+      for (final subgroup in group.subgroups!) {
+        _addGroup(grid, cols, subgroup);
+      }
+    } else {
+      // Add group data rows
       _addDataRows(grid, cols, group.rows);
+    }
 
-      // Add group summary if present
+    // Add group summary rows if present
+    if (group.showSummary) {
+      // Primary summary
       if (group.summary != null) {
-        _addSingleRow(grid, cols, group.summary!, grid.rows.count);
+        final summaryRow = group.summaryStyle != null
+            ? group.summary!.copyWith(style: group.summaryStyle)
+            : group.summary!;
+        _addSingleRow(grid, cols, summaryRow, grid.rows.count);
       }
+
+      // Additional summaries (v2.12.0)
+      if (group.summaries != null) {
+        for (final summaryRow in group.summaries!) {
+          final styledRow = group.summaryStyle != null && summaryRow.style == null
+              ? summaryRow.copyWith(style: group.summaryStyle)
+              : summaryRow;
+          _addSingleRow(grid, cols, styledRow, grid.rows.count);
+        }
+      }
+    }
+  }
+
+  /// Adds auto-calculated total rows to the grid (v2.12.0).
+  void _addAutoTotalRows(PdfGrid grid, List<GeniusPdfGridColumn> cols) {
+    final dataRows = _allDataRows;
+
+    for (final autoTotal in autoTotals!) {
+      final calculated = autoTotal.calculate(dataRows, cols);
+      final cells = <String, dynamic>{};
+
+      // Add calculated values
+      cells.addAll(calculated);
+
+      // Add label
+      if (autoTotal.labelColumnId != null) {
+        cells[autoTotal.labelColumnId!] =
+            autoTotal.getLabel(isArabic: config.isRTL) ?? '';
+      }
+
+      // Add extra static cells
+      if (autoTotal.extraCells != null) {
+        cells.addAll(autoTotal.extraCells!);
+      }
+
+      final totalRow = GeniusPdfGridRow.total(
+        cells,
+        style: autoTotal.style,
+      );
+
+      // Apply span if specified
+      final effectiveRow = autoTotal.span != null
+          ? totalRow.copyWith(span: autoTotal.span)
+          : totalRow;
+
+      _addSingleRow(grid, cols, effectiveRow, grid.rows.count);
     }
   }
 
@@ -305,6 +453,10 @@ class GeniusPdfDataGrid {
     GeniusPdfCellStyle rowStyle;
     if (rowData.isTotal) {
       rowStyle = rowData.style ?? style.totalRowStyle;
+    } else if (rowData.isSubtotal) {
+      rowStyle = rowData.style ??
+          style.subtotalRowStyle ??
+          style.totalRowStyle;
     } else if (rowData.isGroupHeader) {
       rowStyle = rowData.style ??
           style.groupHeaderStyle ??
@@ -315,7 +467,7 @@ class GeniusPdfDataGrid {
             ),
             backgroundColor: const Color(0xFFF5F5F5),
             padding: GeniusPdfCellPadding(
-              left: 4 + (rowData.groupLevel * 10),
+              left: 4 + (rowData.groupLevel * style.groupIndentPerLevel),
               right: 4,
               top: 4,
               bottom: 4,
@@ -355,7 +507,12 @@ class GeniusPdfDataGrid {
 
       // Apply cell style
       final cellStyle = column.cellStyle ?? rowStyle;
-      _applyCellStyle(cell, cellStyle, column, isTotal: rowData.isTotal);
+      _applyCellStyle(
+        cell,
+        cellStyle,
+        column,
+        isTotal: rowData.isTotal || rowData.isSubtotal,
+      );
     }
   }
 
@@ -415,61 +572,120 @@ class GeniusPdfDataGrid {
     );
   }
 
+  /// Improved column width calculation with multi-pass constraint
+  /// redistribution, percentage support, and padding awareness (v2.12.0).
   List<double> _calculateColumnWidths(
     List<GeniusPdfGridColumn> cols,
     double availableWidth,
   ) {
-    final widths = <double>[];
-    double usedWidth = 0;
-    int flexCount = 0;
-    int totalFlex = 0;
+    final widths = List<double>.filled(cols.length, 0);
+    // Use a consistent column list (not reversed) for width calculation.
+    // RTL reversal is handled during cell population, not here.
+    final orderedCols = cols;
 
-    // First pass: calculate fixed widths and count flex columns
-    for (final col in (config.isRTL ? cols.reversed : cols)) {
+    double usedWidth = 0;
+    int totalFlex = 0;
+    final flexIndices = <int>[];
+
+    // --- Pass 1: Resolve fixed and percentage-based widths ---
+    for (int i = 0; i < orderedCols.length; i++) {
+      final col = orderedCols[i];
       if (col.width != null) {
-        widths.add(col.width!);
+        // Fixed pixel width
+        widths[i] = col.width!;
         usedWidth += col.width!;
-      } else if (col.flexFactor != null) {
-        widths.add(0); // Placeholder
-        flexCount++;
-        totalFlex += col.flexFactor!;
+      } else if (col.widthPercent != null) {
+        // Percentage-based width
+        final percentWidth = availableWidth * col.widthPercent!.clamp(0.0, 1.0);
+        // Apply min/max constraints immediately
+        widths[i] = _clampWidth(percentWidth, col);
+        usedWidth += widths[i];
       } else {
-        widths.add(0); // Will use default
-        flexCount++;
-        totalFlex++;
+        // Flex column — accumulate flex factor
+        flexIndices.add(i);
+        totalFlex += col.flexFactor ?? 1;
       }
     }
 
-    // Second pass: distribute remaining width
-    final remainingWidth = availableWidth - usedWidth;
-    if (flexCount > 0 && remainingWidth > 0) {
-      final flexUnit = remainingWidth / totalFlex;
-      for (int i = 0; i < cols.length; i++) {
-        if (widths[i] == 0) {
-          final flex = cols[i].flexFactor ?? 1;
-          var calculatedWidth = flexUnit * flex;
+    // --- Pass 2: Distribute remaining width to flex columns ---
+    var remainingWidth = availableWidth - usedWidth;
 
-          // Apply min/max constraints
-          if (cols[i].minWidth != null && calculatedWidth < cols[i].minWidth!) {
-            calculatedWidth = cols[i].minWidth!;
-          }
-          if (cols[i].maxWidth != null && calculatedWidth > cols[i].maxWidth!) {
-            calculatedWidth = cols[i].maxWidth!;
-          }
+    if (flexIndices.isNotEmpty && remainingWidth > 0) {
+      // Multi-pass redistribution: iterate up to 3 times to handle
+      // cases where min/max constraints cause excess/deficit.
+      var unclampedIndices = List<int>.from(flexIndices);
+      var currentFlex = totalFlex;
 
-          widths[i] = calculatedWidth;
+      for (int pass = 0; pass < 3 && unclampedIndices.isNotEmpty; pass++) {
+        final flexUnit =
+            currentFlex > 0 ? remainingWidth / currentFlex : remainingWidth;
+        final newUnclamped = <int>[];
+        double clampedExcess = 0;
+
+        for (final idx in unclampedIndices) {
+          final col = orderedCols[idx];
+          final flex = col.flexFactor ?? 1;
+          final raw = flexUnit * flex;
+          final clamped = _clampWidth(raw, col);
+
+          widths[idx] = clamped;
+
+          if (clamped != raw) {
+            // This column was constrained — its excess goes back to the pool
+            clampedExcess += raw - clamped;
+          } else {
+            newUnclamped.add(idx);
+          }
         }
+
+        if (clampedExcess.abs() < 0.5 || newUnclamped.isEmpty) {
+          break; // Stable — no significant redistribution needed
+        }
+
+        // Redistribute excess to unclamped columns
+        remainingWidth = clampedExcess;
+        currentFlex = 0;
+        for (final idx in newUnclamped) {
+          currentFlex += orderedCols[idx].flexFactor ?? 1;
+          // Reset width so it can be recalculated
+          remainingWidth += widths[idx];
+          widths[idx] = 0;
+        }
+        unclampedIndices = newUnclamped;
       }
-    } else if (flexCount > 0) {
-      // Use default width if no remaining space
-      for (int i = 0; i < cols.length; i++) {
-        if (widths[i] == 0) {
-          widths[i] = style.defaultColumnWidth;
-        }
+    } else if (flexIndices.isNotEmpty) {
+      // No remaining space — use style's defaultColumnWidth
+      for (final idx in flexIndices) {
+        widths[idx] = style.defaultColumnWidth;
+      }
+    }
+
+    // --- Pass 3: Ensure minimum total width matches available width ---
+    final totalWidth = widths.fold<double>(0, (a, b) => a + b);
+    if (totalWidth > 0 && (totalWidth - availableWidth).abs() > 1.0) {
+      // Scale proportionally to fit available width
+      final scale = availableWidth / totalWidth;
+      for (int i = 0; i < widths.length; i++) {
+        widths[i] = (widths[i] * scale).roundToDouble();
+      }
+      // Fix rounding error on the last column
+      final roundedTotal = widths.fold<double>(0, (a, b) => a + b);
+      if (widths.isNotEmpty) {
+        widths[widths.length - 1] += availableWidth - roundedTotal;
       }
     }
 
     return widths;
+  }
+
+  /// Clamps a width value to the column's min/max constraints and
+  /// the grid style's global min/max column width.
+  double _clampWidth(double value, GeniusPdfGridColumn col) {
+    final globalMin = style.minColumnWidth;
+    final globalMax = style.maxColumnWidth;
+    final colMin = col.minWidth ?? globalMin;
+    final colMax = col.maxWidth ?? globalMax;
+    return value.clamp(math.min(colMin, colMax), math.max(colMin, colMax));
   }
 }
 
@@ -576,6 +792,94 @@ extension PdfDataGridExtensions on GeniusPdfDataGrid {
               }))
           .toList(),
       style: style ?? const GeniusPdfGridStyle.classic(),
+    );
+  }
+
+  /// Creates an invoice-style grid with auto-calculated totals (v2.12.0).
+  static GeniusPdfDataGrid invoice({
+    required List<Map<String, dynamic>> items,
+    required GeniusPdfConfig config,
+    String codeColumn = 'code',
+    String descColumn = 'desc',
+    String qtyColumn = 'qty',
+    String priceColumn = 'price',
+    String totalColumn = 'total',
+    double taxRate = 0.15,
+    String currencySymbol = 'SAR',
+    GeniusPdfGridStyle? style,
+  }) {
+    final dataRows = items
+        .map((item) => GeniusPdfGridRow(cells: Map<String, dynamic>.from(item)))
+        .toList();
+
+    // Calculate totals
+    double subtotal = 0;
+    for (final item in items) {
+      final total = item[totalColumn];
+      if (total is num) subtotal += total;
+    }
+    final tax = subtotal * taxRate;
+    final grandTotal = subtotal + tax;
+
+    return GeniusPdfDataGrid(
+      config: config,
+      columns: [
+        GeniusPdfGridColumn(
+          id: codeColumn,
+          title: 'Code',
+          titleAr: 'الكود',
+          width: 60,
+          alignment: GeniusPdfTextAlign.center,
+        ),
+        GeniusPdfGridColumn(
+          id: descColumn,
+          title: 'Description',
+          titleAr: 'الوصف',
+          flexFactor: 3,
+        ),
+        GeniusPdfGridColumn.numeric(
+          id: qtyColumn,
+          title: 'Qty',
+          titleAr: 'الكمية',
+          width: 50,
+          alignment: GeniusPdfTextAlign.center,
+        ),
+        GeniusPdfGridColumn.currency(
+          id: priceColumn,
+          title: 'Price',
+          titleAr: 'السعر',
+          currencySymbol: currencySymbol,
+          width: 90,
+        ),
+        GeniusPdfGridColumn.currency(
+          id: totalColumn,
+          title: 'Total',
+          titleAr: 'الإجمالي',
+          currencySymbol: currencySymbol,
+          width: 100,
+        ),
+      ],
+      rows: dataRows,
+      footerRows: [
+        GeniusPdfGridRow.subtotal({
+          descColumn: config.isRTL ? 'المجموع الفرعي' : 'Subtotal',
+          totalColumn: subtotal,
+        }),
+        GeniusPdfGridRow(
+          cells: {
+            descColumn: config.isRTL
+                ? 'الضريبة (${(taxRate * 100).toStringAsFixed(0)}%)'
+                : 'Tax (${(taxRate * 100).toStringAsFixed(0)}%)',
+            totalColumn: tax,
+          },
+          isSubtotal: true,
+        ),
+        GeniusPdfGridRow.total({
+          descColumn: config.isRTL ? 'الإجمالي الكلي' : 'Grand Total',
+          totalColumn: grandTotal,
+        }),
+      ],
+      style: style ?? GeniusPdfGridStyle.invoice(),
     );
   }
 }
@@ -986,6 +1290,8 @@ extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
     required GeniusPdfConfig config,
     GeniusPdfGridStyle style = const GeniusPdfGridStyle.classic(),
     List<GeniusPdfGridGroup>? groups,
+    List<GeniusPdfGridRow>? footerRows,
+    List<GeniusPdfAutoTotal>? autoTotals,
   }) {
     // Apply formatting to rows
     final formatManager = GeniusConditionalFormatManager(rules: rules);
@@ -1014,6 +1320,8 @@ extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
       rows: formattedRows,
       style: style,
       groups: groups,
+      footerRows: footerRows,
+      autoTotals: autoTotals,
     );
   }
 }
@@ -1095,6 +1403,45 @@ class GeniusDataGridUtils {
     return groups;
   }
 
+  /// Creates [GeniusPdfGridGroup] list from rows grouped by a column (v2.12.0).
+  ///
+  /// Automatically groups data rows by the specified column and optionally
+  /// calculates summaries for each group.
+  static List<GeniusPdfGridGroup> autoGroup({
+    required List<GeniusPdfGridRow> rows,
+    required String groupByColumn,
+    List<String>? sumColumns,
+    String? summaryLabelColumnId,
+    String summaryLabel = 'Subtotal',
+    String? summaryLabelAr,
+    Map<String, String>? titleMap,
+    Map<String, String>? titleArMap,
+  }) {
+    final grouped = groupBy(rows, groupByColumn);
+    return grouped.entries.map((entry) {
+      final groupKey = entry.key?.toString() ?? '';
+      final groupRows = entry.value;
+
+      if (sumColumns != null && sumColumns.isNotEmpty) {
+        return GeniusPdfGridGroup.withSummary(
+          title: titleMap?[groupKey] ?? groupKey,
+          titleAr: titleArMap?[groupKey],
+          rows: groupRows,
+          sumColumns: sumColumns,
+          labelColumnId: summaryLabelColumnId,
+          summaryLabel: summaryLabel,
+          summaryLabelAr: summaryLabelAr,
+        );
+      }
+
+      return GeniusPdfGridGroup.simple(
+        title: titleMap?[groupKey] ?? groupKey,
+        titleAr: titleArMap?[groupKey],
+        rows: groupRows,
+      );
+    }).toList();
+  }
+
   /// Sorts rows by a column value.
   static List<GeniusPdfGridRow> sortBy(
     List<GeniusPdfGridRow> rows,
@@ -1124,5 +1471,54 @@ class GeniusDataGridUtils {
     bool Function(GeniusPdfGridRow row) condition,
   ) {
     return rows.where(condition).toList();
+  }
+
+  /// Creates multiple total rows for common invoice patterns (v2.12.0).
+  ///
+  /// Returns a list of [GeniusPdfGridRow] representing subtotal, tax,
+  /// discount, and grand total rows.
+  static List<GeniusPdfGridRow> invoiceTotals({
+    required double subtotal,
+    required String totalColumnId,
+    String labelColumnId = 'desc',
+    double taxRate = 0.15,
+    double discount = 0,
+    bool isRTL = true,
+    String currencySymbol = 'SAR',
+  }) {
+    final rows = <GeniusPdfGridRow>[];
+
+    // Subtotal
+    rows.add(GeniusPdfGridRow.subtotal({
+      labelColumnId: isRTL ? 'المجموع الفرعي' : 'Subtotal',
+      totalColumnId: subtotal,
+    }));
+
+    // Discount (if any)
+    if (discount > 0) {
+      rows.add(GeniusPdfGridRow.subtotal({
+        labelColumnId: isRTL ? 'الخصم' : 'Discount',
+        totalColumnId: -discount,
+      }));
+    }
+
+    // Tax
+    final taxableAmount = subtotal - discount;
+    final taxAmount = taxableAmount * taxRate;
+    rows.add(GeniusPdfGridRow.subtotal({
+      labelColumnId: isRTL
+          ? 'الضريبة (${(taxRate * 100).toStringAsFixed(0)}%)'
+          : 'Tax (${(taxRate * 100).toStringAsFixed(0)}%)',
+      totalColumnId: taxAmount,
+    }));
+
+    // Grand total
+    final grandTotal = taxableAmount + taxAmount;
+    rows.add(GeniusPdfGridRow.total({
+      labelColumnId: isRTL ? 'الإجمالي الكلي' : 'Grand Total',
+      totalColumnId: grandTotal,
+    }));
+
+    return rows;
   }
 }

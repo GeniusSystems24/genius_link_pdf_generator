@@ -5,6 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.0] - 2026-02-02
+
+### Added
+
+#### Enhanced Data Grid — Column Widths, Multiple Totals & Groups
+
+- **`widthPercent` on `GeniusPdfGridColumn`** — Set column width as a percentage of the available page width (0.0–1.0). Takes priority over `flexFactor`. Example: `widthPercent: 0.30` allocates 30% of grid width.
+- **`footerRows` on `GeniusPdfDataGrid`** — Explicit footer/total rows appended after all data rows. Accepts a `List<GeniusPdfGridRow>` for subtotal, tax, discount, and grand total rows.
+- **`autoTotals` on `GeniusPdfDataGrid`** — Auto-calculated total rows using `GeniusPdfAutoTotal`. Supports sum, average, count, min, max, and custom calculations.
+- **`GeniusPdfAutoTotal` model** — Defines an auto-calculated total row with factories: `.sum()`, `.average()`, `.count()`, `.min()`, `.max()`, `.custom()`. Each can specify label, label column, target columns, style, and extra cells.
+- **`GeniusPdfTotalType` enum** — Calculation types: `sum`, `average`, `count`, `min`, `max`, `custom`.
+- **Recursive subgroup rendering** — `GeniusPdfGridGroup.subgroups` are now rendered recursively with proper level-based indentation and per-group summaries.
+- **Multiple summaries per group** — Groups now render both `summary` (primary) and `summaries` (additional) rows when `showSummary` is true.
+- **`GeniusDataGridUtils.autoGroup()`** — Automatically groups flat row data by a column value, optionally computing subtotals for each group.
+- **`GeniusDataGridUtils.invoiceTotals()`** — Creates standard invoice footer rows (subtotal, discount, tax, grand total) from a subtotal amount.
+- **`PdfDataGridExtensions.invoice()`** — Factory that builds a complete invoice grid with column definitions and auto-calculated footer rows.
+- **`_allDataRows` getter** — Collects all data rows across groups and subgroups for accurate auto-total calculations.
+
+### Changed
+
+- **Column width algorithm rewritten** — Replaced single-pass distribution with a multi-pass (up to 3 iterations) constraint redistribution algorithm. Columns clamped by min/max constraints return their excess width to the pool, which is then redistributed to unclamped columns.
+- **RTL column ordering bug fixed** — The old algorithm reversed columns during width calculation (`cols.reversed`) but used direct indices in the redistribution pass, causing index mismatches. Width calculation now uses a consistent order; RTL mapping is applied only during cell population.
+- **Percentage-based widths** — Columns with `widthPercent` are resolved in Pass 1 alongside fixed-width columns, before flex distribution.
+- **Final width scaling** — After all passes, if total column widths deviate from available width by > 1px, columns are proportionally scaled to fit exactly, with rounding error absorbed by the last column.
+- **`_clampWidth` uses both column and global constraints** — Applies `col.minWidth` / `col.maxWidth` with fallback to `style.minColumnWidth` / `style.maxColumnWidth`.
+- **Group rendering refactored** — `_addGroupedRows` delegates to `_addGroup` which handles recursive subgroup traversal, header styling, and multiple summary rows.
+
+### Example
+
+```dart
+// Multiple auto-calculated totals
+final grid = GeniusPdfDataGrid(
+  columns: columns,
+  rows: dataRows,
+  config: config,
+  autoTotals: [
+    GeniusPdfAutoTotal.sum(label: 'Total', labelAr: 'الإجمالي', labelColumnId: 'desc'),
+    GeniusPdfAutoTotal.average(label: 'Average', labelAr: 'المتوسط', labelColumnId: 'desc'),
+    GeniusPdfAutoTotal.count(label: 'Count', labelAr: 'العدد', labelColumnId: 'desc'),
+  ],
+  footerRows: [
+    GeniusPdfGridRow.total({'desc': 'Grand Total', 'amount': grandTotal}),
+  ],
+);
+
+// Percentage column widths
+GeniusPdfGridColumn(id: 'name', title: 'Name', widthPercent: 0.40);
+GeniusPdfGridColumn(id: 'price', title: 'Price', widthPercent: 0.25);
+
+// Auto-grouping utility
+final groups = GeniusDataGridUtils.autoGroup(
+  rows: allRows,
+  groupByColumn: 'department',
+  sumColumns: ['salary'],
+  summaryLabelColumnId: 'name',
+);
+
+// Nested subgroups
+GeniusPdfGridGroup(
+  title: 'Electronics',
+  subgroups: [
+    GeniusPdfGridGroup.withSummary(title: 'Computers', rows: computerRows, sumColumns: ['total']),
+    GeniusPdfGridGroup.withSummary(title: 'Accessories', rows: accessoryRows, sumColumns: ['total']),
+  ],
+  summary: GeniusPdfGridRow.total({'desc': 'Electronics Total', 'total': 33000}),
+);
+```
+
+---
+
 ## [2.11.0] - 2026-02-02
 
 ### Added

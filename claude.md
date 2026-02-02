@@ -600,4 +600,64 @@ release/x.x.x     # إعداد إصدار
 
 ---
 
-*آخر تحديث: يناير 2026*
+---
+
+## معايير جدول البيانات (v2.12.0+)
+
+### 1. صفوف الإجمالي المتعددة
+
+استخدم `autoTotals` للإجماليات المحسوبة تلقائياً و `footerRows` للصفوف الصريحة:
+
+```dart
+GeniusPdfDataGrid(
+  columns: columns,
+  rows: dataRows,
+  autoTotals: [
+    GeniusPdfAutoTotal.sum(label: 'Total', labelColumnId: 'desc'),
+    GeniusPdfAutoTotal.average(label: 'Average', labelColumnId: 'desc'),
+  ],
+  footerRows: [
+    GeniusPdfGridRow.total({'desc': 'Grand Total', 'amount': total}),
+  ],
+);
+```
+
+### 2. عرض الأعمدة
+
+أولوية تحديد العرض: `width` (ثابت) > `widthPercent` (نسبة) > `flexFactor` (مرن)
+
+```dart
+GeniusPdfGridColumn(id: 'name', title: 'Name', widthPercent: 0.30);
+GeniusPdfGridColumn(id: 'desc', title: 'Desc', flexFactor: 2);
+GeniusPdfGridColumn(id: 'code', title: 'Code', width: 60);
+```
+
+### 3. المجموعات المتداخلة
+
+استخدم `subgroups` للمجموعات الفرعية مع `summary` و `summaries`:
+
+```dart
+GeniusPdfGridGroup(
+  title: 'Category',
+  subgroups: [
+    GeniusPdfGridGroup.withSummary(title: 'Sub A', rows: rows, sumColumns: ['total']),
+  ],
+  summary: GeniusPdfGridRow.total({'desc': 'Category Total', 'total': total}),
+);
+```
+
+### 4. التجميع التلقائي
+
+استخدم `GeniusDataGridUtils.autoGroup()` لتجميع البيانات المسطحة:
+
+```dart
+final groups = GeniusDataGridUtils.autoGroup(
+  rows: allRows,
+  groupByColumn: 'department',
+  sumColumns: ['salary'],
+);
+```
+
+---
+
+*آخر تحديث: فبراير 2026*

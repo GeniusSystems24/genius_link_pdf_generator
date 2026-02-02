@@ -72,6 +72,11 @@ A comprehensive PDF generation and preview library for Flutter applications with
 📦 **Export Presets** (v2.3.3+5) - Pre-configured export settings for common use cases
 🎨 **Conditional Formatting** (v2.3.3+5) - Excel-like conditional formatting for data grids
 🔢 **Grid Calculations** (v2.3.3+5) - Calculate totals, averages, sort and filter grid data
+📊 **Multi-Total Rows** (v2.12.0) - Multiple auto-calculated total rows per grid (sum, avg, count, min, max)
+📐 **Percentage Columns** (v2.12.0) - Set column widths as percentages with `widthPercent`
+🗂️ **Nested Groups** (v2.12.0) - Recursive subgroups with per-level totals and summaries
+🔄 **Auto-Grouping** (v2.12.0) - `GeniusDataGridUtils.autoGroup()` for automatic data grouping
+⚙️ **Smart Column Widths** (v2.12.0) - Multi-pass constraint redistribution algorithm
 ✏️ **Rich Text Engine** (v2.3.3+6) - Complete rewrite with background, strikethrough, superscript/subscript rendering
 📝 **Italic Font Support** (v2.3.3+6) - Italic and bold-italic font resolution for rich text
 📑 **Bullet Lists** (v2.3.3+6) - Bulleted, numbered (Arabic/Arabic-Indic/alphabetic), and nested lists
