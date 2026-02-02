@@ -579,9 +579,9 @@ class GeniusPdfDataGrid {
     double availableWidth,
   ) {
     final widths = List<double>.filled(cols.length, 0);
-    // Use a consistent column list (not reversed) for width calculation.
-    // RTL reversal is handled during cell population, not here.
-    final orderedCols = cols;
+    // Use a consistent column list, reversed for RTL so width logic
+    // aligns with visual order in RTL layouts.
+    final orderedCols = config.isRTL ? cols.reversed.toList() : cols;
 
     double usedWidth = 0;
     int totalFlex = 0;
