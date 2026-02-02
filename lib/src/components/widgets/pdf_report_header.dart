@@ -1354,9 +1354,9 @@ class GeniusPdfReportHeader {
     double logoWidth,
   ) {
     switch (position) {
-      case GeniusPdfLogoPosition.start:
-        return isRTL ? contentRight - logoWidth : contentLeft;
       case GeniusPdfLogoPosition.end:
+        return isRTL ? contentRight - logoWidth : contentLeft;
+      case GeniusPdfLogoPosition.start:
         return isRTL ? contentLeft : contentRight - logoWidth;
       case GeniusPdfLogoPosition.center:
       case GeniusPdfLogoPosition.centerTop:

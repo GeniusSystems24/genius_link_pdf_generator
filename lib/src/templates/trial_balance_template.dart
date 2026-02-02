@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:flutter/material.dart' as m;
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import 'package:intl/intl.dart';
 
@@ -159,15 +161,8 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     // Summary section
     _drawSummary();
 
-    // Notes section
-    if (showNotes) {
-      _drawNotes();
-    }
-
-    // QR Code section
-    if (showQRCode && reportId != null) {
-      _drawQRCodeSection();
-    }
+    // Footer Section (Notes + QR Code)
+    _drawFooterSection();
 
     // Signatures section
     if (showSignatures) {
@@ -177,17 +172,15 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
-      config: config,
-      title: config.isLTR
-          ? 'Trial Balance As of ${_formatDateLong(data.asOfDate)}'
-          : 'ميزان المراجعة كما في ${_formatDateArabic(data.asOfDate)}',
-      // subtitle: config.isLTR
-      //     ? 'As of ${_formatDateLong(data.asOfDate)}'
-      //     : 'كما في ${_formatDateArabic(data.asOfDate)}',
+      title: 'Trial Balance',
+      titleAr: 'ميزان المراجعة',
+      subtitle: config.isLTR ? 'As of ${_formatDateLong(data.asOfDate)}' : null,
+      subtitleAr:
+          !config.isLTR ? 'كما في ${_formatDateArabic(data.asOfDate)}' : null,
       company: company,
-      // printDate: DateTime.now(),
+      config: config.copyWith(textDirection: m.TextDirection.ltr),
       style: const GeniusPdfReportHeaderStyle.classic(),
-      layout: GeniusPdfReportHeaderLayout.standard,
+      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
     );
 
     final height = header.draw(
@@ -412,7 +405,54 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     addSpace(result.height + 15);
   }
 
-  void _drawNotes() {
+  void _drawFooterSection() {
+    if (!showNotes && (!showQRCode || reportId == null)) {
+      return;
+    }
+
+    addSpace(20);
+
+    // If only one section is shown, draw it normally
+    if (showNotes && (!showQRCode || reportId == null)) {
+      _drawNotes(width: pageWidth);
+      return;
+    }
+
+    if (!showNotes && (showQRCode && reportId != null)) {
+      _drawQRCodeSection(width: pageWidth);
+      return;
+    }
+
+    // Draw side-by-side if both are present
+    // LTR: Notes (2/3) | QR (1/3)
+    addTwoColumns(
+      spacing: 10,
+      leftFlex: config.isLTR ? 2 : 1,
+      rightFlex: config.isLTR ? 1 : 2,
+      leftContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawNotesContent(page, bounds);
+        } else {
+          return _drawQRCodeContent(page, bounds);
+        }
+      },
+      rightContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawQRCodeContent(page, bounds);
+        } else {
+          return _drawNotesContent(page, bounds);
+        }
+      },
+    );
+
+    addSpace(20);
+  }
+
+  void _drawNotes({required double width}) {
+    _drawNotesContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawNotesContent(PdfPage page, Rect bounds) {
     final displayNotes = notes ?? (config.isRTL ? notesAr : notes);
     final defaultNotes = config.isRTL
         ? '''ملاحظات:
@@ -428,14 +468,66 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
 
     final notesText = displayNotes ?? defaultNotes;
 
-    addLine(
-      notesText,
-      font: config.baseFont,
-      topMargin: 5,
-      padding: 10,
+    final font = config.baseFont;
+    final element = PdfTextElement(
+      text: notesText,
+      font: font,
+      format: config.isLTR
+          ? null
+          : PdfStringFormat(
+              textDirection: PdfTextDirection.rightToLeft,
+              alignment: PdfTextAlignment.right),
     );
 
-    addSpace(20);
+    final result = element.draw(
+      page: page,
+      bounds: bounds,
+    );
+
+    return result?.bounds.height ?? 0;
+  }
+
+  void _drawQRCodeSection({required double width}) {
+    _drawQRCodeContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawQRCodeContent(PdfPage page, Rect bounds) {
+    if (reportId == null) return 0;
+
+    final qrUrl = 'https://localhost:443/report/$reportId';
+    final caption = 'ID: $reportId';
+
+    final captionFont = config.baseFont;
+    final captionLayout = PdfTextElement(
+      text: caption,
+      font: captionFont,
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: config.isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    ).draw(
+        page: page,
+        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
+
+    final captionHeight = captionLayout?.bounds.height ?? 0;
+    final qrSize = 80.0; // Reduced size
+    final x = bounds.left + (bounds.width - qrSize) / 2;
+    final y = bounds.top + captionHeight + 5;
+
+    final urlQR = GeniusPdfQRCodeGenerator.url(
+      url: qrUrl,
+      config: config,
+      caption: null,
+    );
+
+    urlQR.draw(
+      page: page,
+      bounds: Rect.fromLTWH(x, y, qrSize, qrSize),
+    );
+
+    return captionHeight + 5 + qrSize;
   }
 
   void _drawSignatures() {
@@ -458,6 +550,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
       title: 'Prepared By',
       titleAr: 'أعده',
       lineWidth: 100,
+      showDate: false,
     );
 
     preparedBy.draw(
@@ -476,6 +569,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
       title: 'Reviewed By',
       titleAr: 'راجعه',
       lineWidth: 100,
+      showDate: false,
     );
 
     reviewedBy.draw(
@@ -494,6 +588,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
       title: 'Approved By',
       titleAr: 'اعتمده',
       lineWidth: 100,
+      showDate: false,
     );
 
     approvedBy.draw(
@@ -507,34 +602,5 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     );
 
     addSpace(70);
-  }
-
-  void _drawQRCodeSection() {
-    // Ensure we have enough space or start new page
-    if (currentY > pageHeight - 150) {
-      newPage();
-    }
-
-    addSectionDivider(
-      title: config.isLTR ? 'Report Verification' : 'التحقق من التقرير',
-      spacing: 10,
-    );
-
-    final qrUrl = 'https://localhost:443/report/$reportId';
-
-    final urlQR = GeniusPdfQRCodeGenerator.url(
-      url: qrUrl,
-      config: config,
-      caption: 'ID: $reportId',
-    );
-
-    addQRCode(
-      urlQR,
-      alignment: GeniusPdfImageAlignment.start,
-      spacing: 10,
-      size: 100,
-    );
-
-    addSpace(20);
   }
 }

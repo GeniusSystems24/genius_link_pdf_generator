@@ -9,13 +9,13 @@ class SampleData {
   // ============================================================
 
   static const companyInfo = GeniusPdfCompanyInfo(
-    name: 'Integrated Solutions Co.',
-    nameAr: 'شركة الحلول المتكاملة',
-    address: 'Riyadh, Kingdom of Saudi Arabia',
-    addressAr: 'الرياض، المملكة العربية السعودية',
+    name: 'Genius Systems Co.',
+    nameAr: 'شركة جينيس سيستمز',
+    address: 'Yemen, Dhamar, Sana\'a Street',
+    addressAr: 'اليمن، ذمار، شارع صنعاء',
     vatNumber: '300012345678903',
-    phone: '+966 11 234 5678',
-    email: 'info@integrated-solutions.com',
+    phone: '+967-774717166',
+    email: 'info@genius-systems.com',
   );
 
   // ============================================================

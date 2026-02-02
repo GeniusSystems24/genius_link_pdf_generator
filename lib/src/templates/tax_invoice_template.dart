@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:flutter/material.dart' as m;
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
@@ -159,27 +161,22 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     // VAT breakdown
     _drawVatBreakdown();
 
-    // QR Code section
-    if (showQRCode) {
-      _drawQRCodeSection();
-    }
+    // Draw Footer Section (Notes + QR Code)
+    _drawFooterSection();
 
     // Signature
-    _drawFooterSection();
+    _drawSignature();
   }
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
-      config: config,
       title: 'Tax Invoice',
       titleAr: 'فاتورة ضريبية',
       company: company,
       printDate: DateTime.now(),
-      style: const GeniusPdfReportHeaderStyle(
-        titleStyle: GeniusPdfTextStyle.title(fontSize: 18),
-        showBorder: false,
-      ),
-      layout: GeniusPdfReportHeaderLayout.standard,
+      config: config.copyWith(textDirection: m.TextDirection.ltr),
+      style: const GeniusPdfReportHeaderStyle.classic(),
+      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
     );
 
     header.draw(
@@ -425,6 +422,162 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
   }
 
   void _drawFooterSection() {
+    if (!showQRCode) {
+      if (invoice.notes != null || invoice.notesAr != null) {
+        _drawNotes(width: pageWidth);
+      }
+      return;
+    }
+
+    addSpace(20);
+
+    // Notes Section check
+    final hasNotes = invoice.notes != null || invoice.notesAr != null;
+
+    if (!hasNotes && showQRCode) {
+      _drawQRCodeSection(width: pageWidth);
+      return;
+    }
+
+    if (hasNotes && !showQRCode) {
+      _drawNotes(width: pageWidth);
+      return;
+    }
+
+    // Draw side-by-side if both are present
+    // LTR: Notes (2/3) | QR (1/3)
+    addTwoColumns(
+      spacing: 10,
+      leftFlex: config.isLTR ? 2 : 1,
+      rightFlex: config.isLTR ? 1 : 2,
+      leftContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawNotesContent(page, bounds);
+        } else {
+          return _drawQRCodeContent(page, bounds);
+        }
+      },
+      rightContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawQRCodeContent(page, bounds);
+        } else {
+          return _drawNotesContent(page, bounds);
+        }
+      },
+    );
+
+    addSpace(20);
+  }
+
+  void _drawNotes({required double width}) {
+    _drawNotesContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawNotesContent(PdfPage page, Rect bounds) {
+    final displayNotes =
+        invoice.notes ?? (config.isRTL ? invoice.notesAr : invoice.notes);
+    final defaultNotes = config.isRTL ? 'ملاحظات:' : 'Notes:';
+
+    final notesText =
+        displayNotes != null ? '$defaultNotes\n$displayNotes' : null;
+
+    if (notesText == null) return 0;
+
+    final font = config.baseFont;
+    final element = PdfTextElement(
+      text: notesText,
+      font: font,
+      format: config.isLTR
+          ? null
+          : PdfStringFormat(
+              textDirection: PdfTextDirection.rightToLeft,
+              alignment: PdfTextAlignment.right),
+    );
+
+    final result = element.draw(
+      page: page,
+      bounds: bounds,
+    );
+
+    return result?.bounds.height ?? 0;
+  }
+
+  void _drawQRCodeSection({required double width}) {
+    _drawQRCodeContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawQRCodeContent(PdfPage page, Rect bounds) {
+    if (qrCode == null && !showQRCode) return 0;
+
+    // Use passed QR code image or generate URL QR if needed, but template takes nullable image
+    // If qrCode is provided as image, we use it.
+    // If not, we generate standard URL QR.
+
+    // For this template, `qrCode` is `GeniusPdfImage?`.
+    // We should prefer that if available, otherwise fallback to URL generation logic
+    // similar to inventory/trial balance if distinct logic is needed.
+    // However, existing `_drawQRCodeSection` used `_drawQRCodeSection` (logic below) which used URL generation
+    // BUT the property `qrCode` exists in class.
+    // OLD code: `final qrUrl = 'https://localhost:443/invoice/${invoice.invoiceNumber}';`
+    // It ignored `this.qrCode` property? Let's check old code again.
+    // Old code generated URL. The property `qrCode` seems unused/optional override.
+    // I will stick to URL generation for consistency with old code, unless `qrCode` image is set.
+
+    if (qrCode != null) {
+      // Draw image
+      // Center it
+      final size = 80.0;
+      final x = bounds.left + (bounds.width - size) / 2;
+      return _drawQRImage(page, x, bounds.top, size);
+    }
+
+    final qrUrl = 'https://localhost:443/invoice/${invoice.invoiceNumber}';
+    final caption = 'ID: ${invoice.invoiceNumber}';
+
+    final captionFont = config.baseFont;
+    final captionLayout = PdfTextElement(
+      text: caption,
+      font: captionFont,
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: config.isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    ).draw(
+        page: page,
+        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
+
+    final captionHeight = captionLayout?.bounds.height ?? 0;
+    final qrSize = 80.0;
+    final x = bounds.left + (bounds.width - qrSize) / 2;
+    final y = bounds.top + captionHeight + 5;
+
+    final urlQR = GeniusPdfQRCodeGenerator.url(
+      url: qrUrl,
+      config: config,
+      caption: null,
+    );
+
+    urlQR.draw(
+      page: page,
+      bounds: Rect.fromLTWH(x, y, qrSize, qrSize),
+    );
+
+    return captionHeight + 5 + qrSize;
+  }
+
+  double _drawQRImage(PdfPage page, double x, double y, double size) {
+    if (qrCode == null) return 0;
+    final image = qrCode!;
+    page.graphics.drawImage(
+      PdfBitmap(image.data),
+      Rect.fromLTWH(x, y, size, size),
+    );
+    return size;
+  }
+
+  void _drawSignature() {
     final bottomY = pageHeight - 80;
 
     // Signature area on the left
@@ -433,6 +586,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
         config: config,
         title: 'Authorized Signature',
         titleAr: 'التوقيع المعتمد',
+        showDate: false,
       );
 
       signature.draw(
@@ -690,34 +844,5 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     }
 
     return convert(number);
-  }
-
-  void _drawQRCodeSection() {
-    // Ensure we have enough space or start new page
-    if (currentY > pageHeight - 150) {
-      newPage();
-    }
-
-    addSectionDivider(
-      title: config.isLTR ? 'Invoice Verification' : 'التحقق من الفاتورة',
-      spacing: 10,
-    );
-
-    final qrUrl = 'https://localhost:443/invoice/${invoice.invoiceNumber}';
-
-    final urlQR = GeniusPdfQRCodeGenerator.url(
-      url: qrUrl,
-      config: config,
-      caption: 'ID: ${invoice.invoiceNumber}',
-    );
-
-    addQRCode(
-      urlQR,
-      alignment: GeniusPdfImageAlignment.start,
-      spacing: 10,
-      size: 100,
-    );
-
-    addSpace(20);
   }
 }
