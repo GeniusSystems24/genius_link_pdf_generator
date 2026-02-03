@@ -1,5 +1,75 @@
 import 'dart:ui';
 
+/// مجموعة بيانات للمخططات
+/// Data group for charts - groups related data points/series together
+class GeniusChartDataGroup {
+  const GeniusChartDataGroup({
+    required this.name,
+    this.nameAr,
+    required this.dataPoints,
+    this.color,
+    this.headerBackgroundColor,
+  });
+
+  /// مجموعة مميزة
+  /// Highlighted group with grey header
+  const GeniusChartDataGroup.highlighted({
+    required this.name,
+    this.nameAr,
+    required this.dataPoints,
+    this.color,
+  }) : headerBackgroundColor = const Color(0xFFE8E8E8);
+
+  /// مجموعة الإيرادات
+  /// Income/revenue group with green tint
+  const GeniusChartDataGroup.income({
+    required this.name,
+    this.nameAr,
+    required this.dataPoints,
+    this.color,
+  }) : headerBackgroundColor = const Color(0xFFE8F5E9);
+
+  /// مجموعة المصروفات
+  /// Expense group with red tint
+  const GeniusChartDataGroup.expense({
+    required this.name,
+    this.nameAr,
+    required this.dataPoints,
+    this.color,
+  }) : headerBackgroundColor = const Color(0xFFFFEBEE);
+
+  /// اسم المجموعة
+  final String name;
+
+  /// اسم المجموعة بالعربية
+  final String? nameAr;
+
+  /// نقاط البيانات في المجموعة
+  final List<GeniusChartDataPoint> dataPoints;
+
+  /// لون المجموعة (اختياري)
+  final Color? color;
+
+  /// لون خلفية العنوان
+  final Color? headerBackgroundColor;
+
+  /// الحصول على الاسم حسب اتجاه النص
+  String getName(bool isRtl) => isRtl ? (nameAr ?? name) : name;
+
+  /// الحصول على أعلى قيمة
+  double get maxValue => dataPoints.isEmpty
+      ? 0
+      : dataPoints.map((p) => p.value).reduce((a, b) => a > b ? a : b);
+
+  /// الحصول على أدنى قيمة
+  double get minValue => dataPoints.isEmpty
+      ? 0
+      : dataPoints.map((p) => p.value).reduce((a, b) => a < b ? a : b);
+
+  /// الحصول على مجموع القيم
+  double get total => dataPoints.fold(0, (sum, p) => sum + p.value);
+}
+
 /// نقطة بيانات في المخطط
 /// Data point in a chart
 class GeniusChartDataPoint {
@@ -451,4 +521,244 @@ class GeniusAreaChartSettings {
 
   /// تكديس المناطق
   final bool stacked;
+}
+
+/// إعدادات تخطيط المخطط — Chart Layout Configuration
+/// Controls spacing, margins, and dimension calculations
+class GeniusChartLayoutConfig {
+  const GeniusChartLayoutConfig({
+    this.titleHeightFactor = 1.8,
+    this.legendHeightFactor = 2.0,
+    this.axisLabelWidthFactor = 4.5,
+    this.axisLabelHeightFactor = 2.5,
+    this.minAxisLabelWidth = 40,
+    this.maxAxisLabelWidth = 80,
+    this.minAxisLabelHeight = 20,
+    this.maxAxisLabelHeight = 40,
+    this.plotPaddingFactor = 0.5,
+    this.valueLabelOffset = 5,
+    this.groupSeparatorWidth = 2,
+    this.groupHeaderHeight = 18,
+  });
+
+  /// Default configuration
+  factory GeniusChartLayoutConfig.standard() =>
+      const GeniusChartLayoutConfig();
+
+  /// Compact layout for smaller charts
+  factory GeniusChartLayoutConfig.compact() => const GeniusChartLayoutConfig(
+        titleHeightFactor: 1.5,
+        legendHeightFactor: 1.5,
+        axisLabelWidthFactor: 3.5,
+        axisLabelHeightFactor: 2.0,
+        minAxisLabelWidth: 30,
+        maxAxisLabelWidth: 60,
+        plotPaddingFactor: 0.3,
+        groupHeaderHeight: 14,
+      );
+
+  /// Spacious layout for larger charts
+  factory GeniusChartLayoutConfig.spacious() => const GeniusChartLayoutConfig(
+        titleHeightFactor: 2.2,
+        legendHeightFactor: 2.5,
+        axisLabelWidthFactor: 5.5,
+        axisLabelHeightFactor: 3.0,
+        minAxisLabelWidth: 50,
+        maxAxisLabelWidth: 100,
+        plotPaddingFactor: 0.7,
+        groupHeaderHeight: 22,
+      );
+
+  /// معامل ارتفاع العنوان (مضروب في حجم الخط)
+  final double titleHeightFactor;
+
+  /// معامل ارتفاع وسيلة الإيضاح
+  final double legendHeightFactor;
+
+  /// معامل عرض تسميات المحور (مضروب في حجم الخط)
+  final double axisLabelWidthFactor;
+
+  /// معامل ارتفاع تسميات المحور
+  final double axisLabelHeightFactor;
+
+  /// الحد الأدنى لعرض تسميات المحور
+  final double minAxisLabelWidth;
+
+  /// الحد الأقصى لعرض تسميات المحور
+  final double maxAxisLabelWidth;
+
+  /// الحد الأدنى لارتفاع تسميات المحور
+  final double minAxisLabelHeight;
+
+  /// الحد الأقصى لارتفاع تسميات المحور
+  final double maxAxisLabelHeight;
+
+  /// معامل هامش منطقة الرسم
+  final double plotPaddingFactor;
+
+  /// إزاحة تسميات القيم
+  final double valueLabelOffset;
+
+  /// عرض خط فاصل المجموعات
+  final double groupSeparatorWidth;
+
+  /// ارتفاع عنوان المجموعة
+  final double groupHeaderHeight;
+
+  /// حساب عرض تسميات المحور بناءً على حجم الخط
+  double calculateAxisLabelWidth(double fontSize) {
+    final calculated = fontSize * axisLabelWidthFactor;
+    return calculated.clamp(minAxisLabelWidth, maxAxisLabelWidth);
+  }
+
+  /// حساب ارتفاع تسميات المحور بناءً على حجم الخط
+  double calculateAxisLabelHeight(double fontSize) {
+    final calculated = fontSize * axisLabelHeightFactor;
+    return calculated.clamp(minAxisLabelHeight, maxAxisLabelHeight);
+  }
+
+  /// حساب ارتفاع العنوان
+  double calculateTitleHeight(double titleFontSize, double padding) {
+    return titleFontSize * titleHeightFactor + padding;
+  }
+
+  /// حساب ارتفاع وسيلة الإيضاح
+  double calculateLegendHeight(double iconSize, double padding) {
+    return iconSize * legendHeightFactor + padding;
+  }
+}
+
+/// حسابات أبعاد المخطط — Chart Dimension Calculator
+/// Utility class for accurate chart dimension calculations
+class GeniusChartDimensionCalculator {
+  GeniusChartDimensionCalculator({
+    required this.bounds,
+    required this.style,
+    required this.layoutConfig,
+    this.hasTitle = false,
+    this.hasLegend = false,
+    this.legendPosition = GeniusChartLegendPosition.bottom,
+    this.legendIconSize = 12,
+  });
+
+  final Rect bounds;
+  final GeniusChartStyle style;
+  final GeniusChartLayoutConfig layoutConfig;
+  final bool hasTitle;
+  final bool hasLegend;
+  final GeniusChartLegendPosition legendPosition;
+  final double legendIconSize;
+
+  /// حساب ارتفاع منطقة العنوان
+  double get titleHeight => hasTitle
+      ? layoutConfig.calculateTitleHeight(style.titleFontSize, style.padding)
+      : 0;
+
+  /// حساب ارتفاع منطقة وسيلة الإيضاح
+  double get legendHeight {
+    if (!hasLegend) return 0;
+    if (legendPosition == GeniusChartLegendPosition.left ||
+        legendPosition == GeniusChartLegendPosition.right) {
+      return 0;
+    }
+    return layoutConfig.calculateLegendHeight(legendIconSize, style.padding);
+  }
+
+  /// حساب عرض منطقة وسيلة الإيضاح
+  double get legendWidth {
+    if (!hasLegend) return 0;
+    if (legendPosition == GeniusChartLegendPosition.left ||
+        legendPosition == GeniusChartLegendPosition.right) {
+      return 100; // Fixed width for side legends
+    }
+    return 0;
+  }
+
+  /// حساب عرض تسميات المحور
+  double get axisLabelWidth =>
+      layoutConfig.calculateAxisLabelWidth(style.labelFontSize);
+
+  /// حساب ارتفاع تسميات المحور
+  double get axisLabelHeight =>
+      layoutConfig.calculateAxisLabelHeight(style.labelFontSize);
+
+  /// منطقة العنوان
+  Rect get titleArea => Rect.fromLTWH(
+        bounds.left,
+        bounds.top,
+        bounds.width,
+        titleHeight,
+      );
+
+  /// منطقة وسيلة الإيضاح
+  Rect get legendArea {
+    switch (legendPosition) {
+      case GeniusChartLegendPosition.top:
+        return Rect.fromLTWH(
+          bounds.left,
+          bounds.top + titleHeight,
+          bounds.width,
+          legendHeight,
+        );
+      case GeniusChartLegendPosition.bottom:
+        return Rect.fromLTWH(
+          bounds.left,
+          bounds.bottom - legendHeight,
+          bounds.width,
+          legendHeight,
+        );
+      case GeniusChartLegendPosition.left:
+        return Rect.fromLTWH(
+          bounds.left,
+          bounds.top + titleHeight,
+          legendWidth,
+          bounds.height - titleHeight,
+        );
+      case GeniusChartLegendPosition.right:
+        return Rect.fromLTWH(
+          bounds.right - legendWidth,
+          bounds.top + titleHeight,
+          legendWidth,
+          bounds.height - titleHeight,
+        );
+    }
+  }
+
+  /// منطقة الرسم الرئيسية
+  Rect get plotArea {
+    double left = bounds.left + axisLabelWidth;
+    double top = bounds.top + titleHeight + style.padding;
+    double width = bounds.width - axisLabelWidth - style.padding;
+    double height = bounds.height -
+        titleHeight -
+        axisLabelHeight -
+        style.padding * 2;
+
+    if (legendPosition == GeniusChartLegendPosition.bottom ||
+        legendPosition == GeniusChartLegendPosition.top) {
+      height -= legendHeight;
+      if (legendPosition == GeniusChartLegendPosition.top) {
+        top += legendHeight;
+      }
+    } else if (legendPosition == GeniusChartLegendPosition.left ||
+        legendPosition == GeniusChartLegendPosition.right) {
+      width -= legendWidth;
+      if (legendPosition == GeniusChartLegendPosition.left) {
+        left += legendWidth;
+      }
+    }
+
+    return Rect.fromLTWH(left, top, width, height);
+  }
+
+  /// حساب الارتفاع الفعلي المطلوب للمخطط
+  double calculateMinimumHeight({
+    double minPlotHeight = 100,
+  }) {
+    return titleHeight +
+        legendHeight +
+        axisLabelHeight +
+        minPlotHeight +
+        style.padding * 2;
+  }
 }

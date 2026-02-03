@@ -5,6 +5,70 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.6] - 2026-02-03
+
+### Added
+
+#### Enhanced Chart Components with Groups and Accurate Dimension Calculations
+
+- **`GeniusChartDataGroup` model** — New class for organizing chart data points into logical groups. Each group can have a bilingual name, custom color, and optional header background color.
+- **`GeniusChartDataGroup.highlighted()` factory** — Creates a group with a grey highlighted header background.
+- **`GeniusChartDataGroup.income()` factory** — Creates a group with a green-tinted header for revenue/income data.
+- **`GeniusChartDataGroup.expense()` factory** — Creates a group with a red-tinted header for expense/cost data.
+- **`groups` parameter on all chart types** — `GeniusPdfBarChart`, `GeniusPdfLineChart`, `GeniusPdfPieChart`, and `GeniusPdfAreaChart` now accept a `groups` parameter for grouped data visualization.
+- **`GeniusChartLayoutConfig` class** — New configuration class for controlling chart layout dimensions with factories:
+  - `.standard()` — Default balanced layout
+  - `.compact()` — Smaller margins for tight spaces
+  - `.spacious()` — Larger margins for detailed charts
+- **`GeniusChartDimensionCalculator` utility** — Helper class for accurate chart dimension calculations based on content and font sizes.
+- **`layoutConfig` parameter on all charts** — All chart types now accept a `GeniusChartLayoutConfig` for precise control over spacing and margins.
+
+### Changed
+
+- **Axis label width calculation improved** — Now calculates width based on actual value string length and font size instead of fixed hardcoded values.
+- **Plot area calculation rewritten** — Uses `GeniusChartLayoutConfig` multipliers and clamp values for adaptive sizing.
+- **Value label positioning improved** — Uses `layoutConfig.valueLabelOffset` for consistent spacing above bars/points.
+- **Group separator rendering** — Draws vertical lines between groups with configurable width via `layoutConfig.groupSeparatorWidth`.
+- **Group header backgrounds** — Groups with `headerBackgroundColor` now render colored rectangles behind group labels.
+
+### Example
+
+```dart
+// Bar chart with grouped data
+GeniusPdfBarChart(
+  title: 'Sales by Quarter',
+  series: const [],
+  groups: [
+    GeniusChartDataGroup.income(
+      name: 'Q1 2026',
+      nameAr: 'ر١ ٢٠٢٦',
+      dataPoints: [
+        GeniusChartDataPoint(label: 'Electronics', value: 125),
+        GeniusChartDataPoint(label: 'Clothing', value: 85),
+      ],
+    ),
+    GeniusChartDataGroup.expense(
+      name: 'Q2 2026',
+      nameAr: 'ر٢ ٢٠٢٦',
+      dataPoints: [
+        GeniusChartDataPoint(label: 'Electronics', value: 145),
+        GeniusChartDataPoint(label: 'Clothing', value: 95),
+      ],
+    ),
+  ],
+  layoutConfig: GeniusChartLayoutConfig.standard(),
+);
+
+// Compact layout for small charts
+GeniusPdfLineChart(
+  title: 'Quick View',
+  series: [...],
+  layoutConfig: GeniusChartLayoutConfig.compact(),
+);
+```
+
+---
+
 ## [2.12.5] - 2026-02-03
 
 ### Added

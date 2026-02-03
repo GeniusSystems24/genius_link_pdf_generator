@@ -1,6 +1,6 @@
 name: genius_link_pdf_generator
 description: A comprehensive PDF generation and preview library for Flutter applications with clean architecture design, RTL/LTR support, charts, plugin system, and seamless integration.
-version: 2.12.5
+version: 2.12.6
 homepage: https://github.com/GeniusSystems24/genius_link_pdf_generator
 
 environment:

@@ -778,6 +778,73 @@ GeniusPdfSummaryStyle.invoice()      // مناسب للفواتير
 GeniusPdfSummaryStyle.fromTheme()    // من الثيم
 ```
 
+## معايير المخططات البيانية (v2.12.6+)
+
+### 1. المجموعات في المخططات
+
+استخدم `GeniusChartDataGroup` لتجميع نقاط البيانات:
+
+```dart
+GeniusPdfBarChart(
+  groups: [
+    GeniusChartDataGroup.income(
+      name: 'Q1',
+      nameAr: 'ر١',
+      dataPoints: revenuePoints,
+    ),
+    GeniusChartDataGroup.expense(
+      name: 'Q2',
+      nameAr: 'ر٢',
+      dataPoints: expensePoints,
+    ),
+  ],
+  series: const [], // فارغ عند استخدام المجموعات
+);
+```
+
+### 2. أنواع مصانع المجموعات
+
+| المصنع | اللون الافتراضي | الاستخدام |
+|--------|----------------|-----------|
+| `GeniusChartDataGroup()` | بدون خلفية | مجموعة عادية |
+| `.highlighted()` | رمادي `#E8E8E8` | مجموعة مميزة |
+| `.income()` | أخضر فاتح `#E8F5E9` | إيرادات/دخل |
+| `.expense()` | أحمر فاتح `#FFEBEE` | مصروفات/خصومات |
+
+### 3. إعدادات التخطيط
+
+```dart
+// تخطيط قياسي
+GeniusPdfBarChart(
+  layoutConfig: GeniusChartLayoutConfig.standard(),
+);
+
+// تخطيط مضغوط للمساحات الصغيرة
+GeniusPdfLineChart(
+  layoutConfig: GeniusChartLayoutConfig.compact(),
+);
+
+// تخطيط واسع للتفاصيل الكثيرة
+GeniusPdfPieChart(
+  layoutConfig: GeniusChartLayoutConfig.spacious(),
+);
+```
+
+### 4. معاملات التخطيط المتاحة
+
+```dart
+GeniusChartLayoutConfig(
+  titleHeightFactor: 1.8,       // ارتفاع العنوان × حجم الخط
+  legendHeightFactor: 2.0,      // ارتفاع وسيلة الإيضاح
+  axisLabelWidthFactor: 4.5,    // عرض تسميات المحور
+  minAxisLabelWidth: 40,        // الحد الأدنى للعرض
+  maxAxisLabelWidth: 80,        // الحد الأقصى للعرض
+  valueLabelOffset: 5,          // إزاحة تسميات القيم
+  groupSeparatorWidth: 2,       // عرض خط فاصل المجموعات
+  groupHeaderHeight: 18,        // ارتفاع عنوان المجموعة
+);
+```
+
 ---
 
 *آخر تحديث: فبراير 2026*

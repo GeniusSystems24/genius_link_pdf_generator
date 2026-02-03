@@ -9,18 +9,20 @@ import '../../../core/pdf_config.dart';
 import '../../../core/pdf_print_theme.dart';
 import '../../models/chart_models.dart';
 
-/// مخطط خطي للـ PDF
-/// Line chart component for PDF documents
+/// مخطط خطي للـ PDF — إصدار محسن
+/// Line chart component for PDF documents — Enhanced version
 class GeniusPdfLineChart {
   GeniusPdfLineChart({
     this.title,
     this.titleAr,
     required this.series,
+    this.groups,
     this.xAxis = const GeniusChartAxis(),
     this.yAxis = const GeniusChartAxis(),
     this.legend = const GeniusChartLegend(),
     required this.config,
     this.settings = const GeniusLineChartSettings(),
+    this.layoutConfig = const GeniusChartLayoutConfig(),
     this.width,
     this.height = 250,
   }) : style = _chartStyleFromTheme(config.printTheme);
@@ -33,6 +35,9 @@ class GeniusPdfLineChart {
 
   /// سلاسل البيانات
   final List<GeniusChartSeries> series;
+
+  /// مجموعات البيانات (اختياري)
+  final List<GeniusChartDataGroup>? groups;
 
   /// إعدادات المحور السيني
   final GeniusChartAxis xAxis;
@@ -51,6 +56,9 @@ class GeniusPdfLineChart {
 
   /// إعدادات المخطط الخطي
   final GeniusLineChartSettings settings;
+
+  /// إعدادات التخطيط
+  final GeniusChartLayoutConfig layoutConfig;
 
   /// العرض
   final double? width;
@@ -78,6 +86,9 @@ class GeniusPdfLineChart {
   /// الحصول على العنوان حسب اتجاه النص
   String? get displayTitle => config.isRTL ? (titleAr ?? title) : title;
 
+  /// التحقق من وجود مجموعات
+  bool get hasGroups => groups != null && groups!.isNotEmpty;
+
   /// رسم المخطط على الصفحة
   PdfLayoutResult draw(PdfPage page, Rect bounds) {
     final graphics = page.graphics;
@@ -89,7 +100,7 @@ class GeniusPdfLineChart {
     _drawBackground(graphics, chartBounds);
 
     // حساب مناطق الرسم
-    final areas = _calculateAreas(chartBounds);
+    final areas = _calculateAreasImproved(chartBounds);
 
     // رسم العنوان
     if (displayTitle != null) {
@@ -103,7 +114,7 @@ class GeniusPdfLineChart {
     _drawLines(graphics, areas.plotArea);
 
     // رسم وسيلة الإيضاح
-    if (legend.show && series.length > 1) {
+    if (legend.show && (series.length > 1 || hasGroups)) {
       _drawLegend(graphics, areas.legendArea);
     }
 
@@ -125,19 +136,23 @@ class GeniusPdfLineChart {
     );
   }
 
-  _ChartAreas _calculateAreas(Rect bounds) {
+  _ChartAreas _calculateAreasImproved(Rect bounds) {
     double titleHeight = 0;
-    double legendHeight = 0;
-    const double axisLabelWidth = 50;
-    const double axisLabelHeight = 30;
-
     if (displayTitle != null) {
-      titleHeight = style.titleFontSize + style.padding * 2;
+      titleHeight = layoutConfig.calculateTitleHeight(
+          style.titleFontSize, style.padding);
     }
 
-    if (legend.show && series.length > 1) {
-      legendHeight = legend.iconSize + style.padding * 2;
+    double legendHeight = 0;
+    if (legend.show && (series.length > 1 || hasGroups)) {
+      legendHeight =
+          layoutConfig.calculateLegendHeight(legend.iconSize, style.padding);
     }
+
+    final axisLabelWidth =
+        layoutConfig.calculateAxisLabelWidth(style.labelFontSize);
+    final axisLabelHeight =
+        layoutConfig.calculateAxisLabelHeight(style.labelFontSize);
 
     final titleArea = Rect.fromLTWH(
       bounds.left,
@@ -172,7 +187,6 @@ class GeniusPdfLineChart {
   }
 
   void _drawTitle(PdfGraphics graphics, Rect area) {
-    // Font - baseFont and boldFont are required for Arabic support, no fallback to Helvetica
     final font = config.boldFont;
     graphics.drawString(
       displayTitle!,
@@ -189,7 +203,6 @@ class GeniusPdfLineChart {
   void _drawAxes(PdfGraphics graphics, Rect plotArea) {
     final axisPen = PdfPen(_colorToPdfColor(style.axisColor), width: 1);
     final gridPen = PdfPen(_colorToPdfColor(xAxis.gridLineColor), width: 0.5);
-    // Font - baseFont is required for Arabic support, no fallback to Helvetica
     final font = config.baseFont;
 
     // حساب القيم القصوى
@@ -216,6 +229,10 @@ class GeniusPdfLineChart {
       Offset(plotArea.right, plotArea.bottom),
     );
 
+    // حساب عرض تسميات المحور
+    final labelWidth =
+        layoutConfig.calculateAxisLabelWidth(style.labelFontSize);
+
     // رسم خطوط الشبكة والتسميات على المحور الصادي
     final divisions = yAxis.divisions;
     for (int i = 0; i <= divisions; i++) {
@@ -232,7 +249,8 @@ class GeniusPdfLineChart {
         valueText,
         font,
         brush: PdfSolidBrush(_colorToPdfColor(style.textColor)),
-        bounds: Rect.fromLTWH(plotArea.left - 45, y - 6, 40, 12),
+        bounds: Rect.fromLTWH(plotArea.left - labelWidth - 5,
+            y - style.labelFontSize / 2, labelWidth, style.labelFontSize * 1.2),
         format: PdfStringFormat(alignment: PdfTextAlignment.right),
       );
     }
@@ -254,11 +272,13 @@ class GeniusPdfLineChart {
           );
         }
 
+        final labelBoundsWidth = spacing * 0.9;
         graphics.drawString(
           dataPoints[i].getLabel(config.isRTL),
           font,
           brush: PdfSolidBrush(_colorToPdfColor(style.textColor)),
-          bounds: Rect.fromLTWH(x - 25, plotArea.bottom + 5, 50, 20),
+          bounds: Rect.fromLTWH(x - labelBoundsWidth / 2, plotArea.bottom + 5,
+              labelBoundsWidth, style.labelFontSize * 1.5),
           format: PdfStringFormat(alignment: PdfTextAlignment.center),
         );
       }
@@ -403,23 +423,24 @@ class GeniusPdfLineChart {
 
   void _drawValues(PdfGraphics graphics, List<GeniusChartDataPoint> dataPoints,
       List<Offset> points) {
-    // Font - baseFont is required for Arabic support, no fallback to Helvetica
     final font = config.baseFont;
     final brush = PdfSolidBrush(_colorToPdfColor(style.textColor));
 
     for (int i = 0; i < points.length && i < dataPoints.length; i++) {
+      final valueY =
+          points[i].dy - layoutConfig.valueLabelOffset - style.valueFontSize;
       graphics.drawString(
         yAxis.formatValue(dataPoints[i].value),
         font,
         brush: brush,
-        bounds: Rect.fromLTWH(points[i].dx - 20, points[i].dy - 15, 40, 12),
+        bounds: Rect.fromLTWH(
+            points[i].dx - 25, valueY, 50, style.valueFontSize * 1.2),
         format: PdfStringFormat(alignment: PdfTextAlignment.center),
       );
     }
   }
 
   void _drawLegend(PdfGraphics graphics, Rect area) {
-    // Font - baseFont is required for Arabic support, no fallback to Helvetica
     final font = config.baseFont;
     const itemWidth = 80.0;
     final totalWidth = series.length * itemWidth;

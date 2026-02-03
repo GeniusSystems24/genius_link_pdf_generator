@@ -17,9 +17,11 @@ class GeniusPdfPieChart {
     this.title,
     this.titleAr,
     required this.dataPoints,
+    this.groups,
     this.legend = const GeniusChartLegend(),
     required this.config,
     this.settings = const GeniusPieChartSettings(),
+    this.layoutConfig = const GeniusChartLayoutConfig(),
     this.width,
     this.height = 250,
     this.colors,
@@ -34,6 +36,9 @@ class GeniusPdfPieChart {
   /// نقاط البيانات
   final List<GeniusChartDataPoint> dataPoints;
 
+  /// مجموعات البيانات (اختياري)
+  final List<GeniusChartDataGroup>? groups;
+
   /// وسيلة الإيضاح
   final GeniusChartLegend legend;
 
@@ -45,6 +50,9 @@ class GeniusPdfPieChart {
 
   /// إعدادات المخطط الدائري
   final GeniusPieChartSettings settings;
+
+  /// إعدادات التخطيط
+  final GeniusChartLayoutConfig layoutConfig;
 
   /// العرض
   final double? width;

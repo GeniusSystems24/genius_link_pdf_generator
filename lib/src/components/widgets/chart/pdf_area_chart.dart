@@ -16,11 +16,13 @@ class GeniusPdfAreaChart {
     this.title,
     this.titleAr,
     required this.series,
+    this.groups,
     this.xAxis = const GeniusChartAxis(),
     this.yAxis = const GeniusChartAxis(),
     this.legend = const GeniusChartLegend(),
     required this.config,
     this.settings = const GeniusAreaChartSettings(),
+    this.layoutConfig = const GeniusChartLayoutConfig(),
     this.width,
     this.height = 250,
   }) : style = _chartStyleFromTheme(config.printTheme);
@@ -33,6 +35,9 @@ class GeniusPdfAreaChart {
 
   /// سلاسل البيانات
   final List<GeniusChartSeries> series;
+
+  /// مجموعات البيانات (اختياري)
+  final List<GeniusChartDataGroup>? groups;
 
   /// إعدادات المحور السيني
   final GeniusChartAxis xAxis;
@@ -51,6 +56,9 @@ class GeniusPdfAreaChart {
 
   /// إعدادات مخطط المساحة
   final GeniusAreaChartSettings settings;
+
+  /// إعدادات التخطيط
+  final GeniusChartLayoutConfig layoutConfig;
 
   /// العرض
   final double? width;
