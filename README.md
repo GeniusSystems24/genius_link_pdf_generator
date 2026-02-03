@@ -1296,6 +1296,49 @@ GeniusPdfSummaryItem(
 )
 ```
 
+**Summary Groups (v2.12.5):**
+
+Organize items into logical groups with optional colored headers:
+
+```dart
+GeniusPdfSummarySection(
+  title: 'Profit & Loss',
+  titleAr: 'الأرباح والخسائر',
+  groups: [
+    GeniusPdfSummaryGroup.income(
+      title: 'Revenue',
+      titleAr: 'الإيرادات',
+      items: [
+        GeniusPdfSummaryItem(label: 'Sales', value: '50,000'),
+        GeniusPdfSummaryItem(label: 'Services', value: '15,000'),
+        GeniusPdfSummaryItem.subtotal(label: 'Total Revenue', value: '65,000'),
+      ],
+    ),
+    GeniusPdfSummaryGroup.expense(
+      title: 'Expenses',
+      titleAr: 'المصروفات',
+      items: [
+        GeniusPdfSummaryItem(label: 'Cost of Goods', value: '25,000'),
+        GeniusPdfSummaryItem(label: 'Operating', value: '10,000'),
+        GeniusPdfSummaryItem.subtotal(label: 'Total Expenses', value: '35,000'),
+      ],
+    ),
+  ],
+  items: [
+    GeniusPdfSummaryItem.total(label: 'Net Profit', value: '30,000'),
+  ],
+);
+```
+
+**Group Factories:**
+
+| Factory | Header Color | Use Case |
+|---------|-------------|----------|
+| `GeniusPdfSummaryGroup()` | None | Default group |
+| `.highlighted()` | Grey (#E8E8E8) | Emphasized section |
+| `.income()` | Green (#E8F5E9) | Revenue/income items |
+| `.expense()` | Red (#FFEBEE) | Expense/deduction items |
+
 ### GeniusPdfSection
 
 Create bordered sections with titles:

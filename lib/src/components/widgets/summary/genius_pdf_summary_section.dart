@@ -1,37 +1,64 @@
 part of '../pdf_summary.dart';
 
-/// A summary section component for displaying totals and calculations.
+/// A summary section component for displaying totals and calculations (v2.12.5).
 ///
 /// [GeniusPdfSummarySection] is commonly used at the bottom of invoices
 /// for subtotals, taxes, and grand totals.
 ///
-/// ## Example
+/// ## Key Improvements (v2.12.5)
+/// - **Accurate row height**: Uses per-item `customHeight`, font sizes, and
+///   title style for precise layout.
+/// - **Group support**: Optional [groups] for sectioned summaries with
+///   group headers and per-group styling.
+/// - **Separator lines**: `showSeparatorLine` actually renders between items.
+/// - **Highlight text color**: `highlightTextColor` applied to total rows.
+/// - **Indent support**: `indent` levels affect label positioning.
+/// - **Label-value gap**: `labelValueGap` respected in layout.
+/// - **Total-specific styles**: `totalLabelStyle` / `totalValueStyle` applied.
+///
+/// ## Example — Simple
 /// ```dart
-/// final summary = PdfSummarySection(
+/// final summary = GeniusPdfSummarySection(
+///   config: config,
 ///   items: [
-///     PdfSummaryItem.subtotal(
-///       label: 'Subtotal',
-///       labelAr: 'المجموع الفرعي',
-///       value: '30,100.00 SAR',
+///     GeniusPdfSummaryItem.subtotal(label: 'Subtotal', value: '30,100'),
+///     GeniusPdfSummaryItem(label: 'VAT (15%)', value: '4,515'),
+///     GeniusPdfSummaryItem.total(label: 'Total', value: '34,615'),
+///   ],
+///   style: GeniusPdfSummaryStyle.invoice(),
+/// );
+/// summary.draw(page: page, bounds: bounds);
+/// ```
+///
+/// ## Example — Grouped
+/// ```dart
+/// final summary = GeniusPdfSummarySection(
+///   config: config,
+///   groups: [
+///     GeniusPdfSummaryGroup(
+///       title: 'Sales', titleAr: 'المبيعات',
+///       items: [
+///         GeniusPdfSummaryItem(label: 'Products', value: '20,000'),
+///         GeniusPdfSummaryItem(label: 'Services', value: '10,000'),
+///       ],
 ///     ),
-///     PdfSummaryItem(
-///       label: 'VAT (15%)',
-///       labelAr: 'ضريبة القيمة المضافة (15%)',
-///       value: '4,515.00 SAR',
-///     ),
-///     PdfSummaryItem.total(
-///       label: 'Total Amount',
-///       labelAr: 'الإجمالي',
-///       value: '34,615.00 SAR',
+///     GeniusPdfSummaryGroup(
+///       title: 'Deductions', titleAr: 'الخصومات',
+///       items: [
+///         GeniusPdfSummaryItem.negative(label: 'Discount', value: '-1,500'),
+///       ],
 ///     ),
 ///   ],
+///   items: [
+///     GeniusPdfSummaryItem.total(label: 'Net Total', value: '28,500'),
+///   ],
+///   style: GeniusPdfSummaryStyle.invoice(),
 /// );
-///
-/// summary.draw(page: page, bounds: bounds);
 /// ```
 class GeniusPdfSummarySection {
   GeniusPdfSummarySection({
-    required this.items,
+    this.items = const [],
+    this.groups,
     this.title,
     this.titleAr,
     required this.config,
@@ -40,8 +67,11 @@ class GeniusPdfSummarySection {
     this.width,
   }) : style = _resolveSummaryStyle(style, config);
 
-  /// Summary items to display.
+  /// Summary items to display (rendered after all groups).
   final List<GeniusPdfSummaryItem> items;
+
+  /// Optional grouped items (v2.12.5). Rendered before [items].
+  final List<GeniusPdfSummaryGroup>? groups;
 
   /// Section title (optional).
   final String? title;
@@ -78,7 +108,36 @@ class GeniusPdfSummarySection {
     return GeniusPdfSummaryStyle.fromTheme(config.printTheme);
   }
 
+  /// Collects all items in order: groups first, then top-level items.
+  List<_RenderableItem> get _allRenderItems {
+    final result = <_RenderableItem>[];
+
+    if (groups != null) {
+      for (int gi = 0; gi < groups!.length; gi++) {
+        final group = groups![gi];
+        // Group header
+        result.add(_RenderableItem.groupHeader(group));
+        // Group items
+        for (final item in group.items) {
+          result.add(_RenderableItem.item(item));
+        }
+        // Group separator (space after group, except the last one before items)
+        if (gi < groups!.length - 1 || items.isNotEmpty) {
+          result.add(_RenderableItem.groupSeparator());
+        }
+      }
+    }
+
+    for (final item in items) {
+      result.add(_RenderableItem.item(item));
+    }
+
+    return result;
+  }
+
   /// Draws the summary section on a PDF page.
+  ///
+  /// Returns the bounding [Rect] of the drawn summary.
   Rect draw({
     required PdfPage page,
     required Rect bounds,
@@ -125,13 +184,13 @@ class GeniusPdfSummarySection {
     if (title != null || titleAr != null) {
       final displayTitle = isRTL && titleAr != null ? titleAr : title;
       if (displayTitle != null) {
-        // Font
         final titleFont = boldFont;
+        final effectiveTitleStyle = style.titleStyle ?? style.labelStyle;
 
         graphics.drawString(
           displayTitle,
           titleFont,
-          brush: style.labelStyle.toBrush(),
+          brush: effectiveTitleStyle.toBrush(),
           bounds: Rect.fromLTWH(
             boxLeft + style.padding.left,
             currentY,
@@ -145,70 +204,226 @@ class GeniusPdfSummarySection {
                 : PdfTextDirection.leftToRight,
           ),
         );
-        currentY += style.labelStyle.fontSize * 1.5 + style.itemSpacing;
+        currentY +=
+            _titleHeight(effectiveTitleStyle) + style.titleSpacing;
       }
     }
 
-    // Draw items
+    // Draw render items (groups + items)
     final contentLeft = boxLeft + style.padding.left;
-    final contentWidth = actualWidth - style.padding.left - style.padding.right;
-    final labelWidth = contentWidth * style.labelWidth;
-    final valueWidth = contentWidth - labelWidth;
+    final contentWidth =
+        actualWidth - style.padding.left - style.padding.right;
 
-    for (final item in items) {
-      // Draw highlight background if needed
-      if (item.isHighlighted) {
-        graphics.drawRectangle(
-          brush: PdfSolidBrush(style.highlightBackgroundColor.toPdfColor()),
-          bounds: Rect.fromLTWH(
-            boxLeft,
-            currentY - 2,
-            actualWidth,
-            style.labelStyle.fontSize * 1.4 + 4,
-          ),
+    final renderItems = _allRenderItems;
+    for (int ri = 0; ri < renderItems.length; ri++) {
+      final rItem = renderItems[ri];
+
+      if (rItem.type == _RenderItemType.groupHeader) {
+        currentY = _drawGroupHeader(
+          graphics,
+          rItem.group!,
+          contentLeft,
+          contentWidth,
+          currentY,
+          boxLeft,
+          actualWidth,
         );
+      } else if (rItem.type == _RenderItemType.groupSeparator) {
+        currentY += style.itemSpacing;
+      } else {
+        final item = rItem.item!;
+        currentY = _drawItem(
+          graphics,
+          item,
+          contentLeft,
+          contentWidth,
+          currentY,
+          boxLeft,
+          actualWidth,
+        );
+
+        // Draw separator line between items
+        if (style.showSeparatorLine &&
+            ri < renderItems.length - 1 &&
+            renderItems[ri + 1].type == _RenderItemType.item) {
+          graphics.drawLine(
+            PdfPen(
+              style.separatorLineColor.toPdfColor(),
+              width: style.separatorLineWidth,
+            ),
+            Offset(contentLeft, currentY - style.itemSpacing / 2),
+            Offset(contentLeft + contentWidth,
+                currentY - style.itemSpacing / 2),
+          );
+        }
       }
-
-      // Determine fonts
-      final labelFont = item.isBold ? boldFont : baseFont;
-      final valueFont = item.isBold ? boldFont : baseFont;
-
-      // Draw label
-      final labelX = isRTL ? contentLeft + valueWidth : contentLeft;
-      graphics.drawString(
-        item.getLabel(isArabic: isRTL),
-        labelFont,
-        brush: style.labelStyle.toBrush(),
-        bounds: Rect.fromLTWH(labelX, currentY, labelWidth, 0),
-        format: PdfStringFormat(
-          alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-          textDirection: isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
-        ),
-      );
-
-      // Draw value
-      final valueX = isRTL ? contentLeft : contentLeft + labelWidth;
-      final valueBrush = item.valueColor != null
-          ? PdfSolidBrush(item.valueColor!.toPdfColor())
-          : style.valueStyle.toBrush();
-
-      graphics.drawString(
-        item.value,
-        valueFont,
-        brush: valueBrush,
-        bounds: Rect.fromLTWH(valueX, currentY, valueWidth, 0),
-        format: PdfStringFormat(
-          alignment: isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-          textDirection: PdfTextDirection.leftToRight,
-        ),
-      );
-
-      currentY += style.labelStyle.fontSize * 1.4 + style.itemSpacing;
     }
 
     return boxBounds;
+  }
+
+  /// Draws a single summary item and returns the new Y position.
+  double _drawItem(
+    PdfGraphics graphics,
+    GeniusPdfSummaryItem item,
+    double contentLeft,
+    double contentWidth,
+    double currentY,
+    double boxLeft,
+    double actualWidth,
+  ) {
+    // Handle separator items
+    if (item.customHeight != null && item.label.isEmpty && item.value.isEmpty) {
+      return currentY + item.customHeight!;
+    }
+
+    final itemH = _itemHeight(item);
+    final indentOffset = item.indent * style.indentWidth;
+
+    // Draw highlight background if needed
+    if (item.isHighlighted) {
+      graphics.drawRectangle(
+        brush: PdfSolidBrush(style.highlightBackgroundColor.toPdfColor()),
+        bounds: Rect.fromLTWH(
+          boxLeft,
+          currentY - 2,
+          actualWidth,
+          itemH + 4,
+        ),
+      );
+    }
+
+    // Determine fonts
+    final labelFont = item.isBold ? boldFont : baseFont;
+    final valueFont = item.isBold ? boldFont : baseFont;
+
+    // Determine brushes — use total styles for highlighted, item colors override
+    PdfBrush labelBrush;
+    PdfBrush valueBrush;
+
+    if (item.isHighlighted && style.highlightTextColor != null) {
+      labelBrush = item.labelColor != null
+          ? PdfSolidBrush(item.labelColor!.toPdfColor())
+          : PdfSolidBrush(style.highlightTextColor!.toPdfColor());
+      valueBrush = item.valueColor != null
+          ? PdfSolidBrush(item.valueColor!.toPdfColor())
+          : PdfSolidBrush(style.highlightTextColor!.toPdfColor());
+    } else if (item.isBold) {
+      final totalLabel = style.totalLabelStyle ?? style.labelStyle;
+      final totalValue = style.totalValueStyle ?? style.valueStyle;
+      labelBrush = item.labelColor != null
+          ? PdfSolidBrush(item.labelColor!.toPdfColor())
+          : totalLabel.toBrush();
+      valueBrush = item.valueColor != null
+          ? PdfSolidBrush(item.valueColor!.toPdfColor())
+          : totalValue.toBrush();
+    } else {
+      labelBrush = item.labelColor != null
+          ? PdfSolidBrush(item.labelColor!.toPdfColor())
+          : style.labelStyle.toBrush();
+      valueBrush = item.valueColor != null
+          ? PdfSolidBrush(item.valueColor!.toPdfColor())
+          : style.valueStyle.toBrush();
+    }
+
+    // Calculate widths with indent and gap
+    final effectiveContentWidth = contentWidth - indentOffset - style.labelValueGap;
+    final labelWidth = effectiveContentWidth * style.labelWidth;
+    final valueWidth = effectiveContentWidth - labelWidth;
+
+    // Draw label
+    final labelX = isRTL
+        ? contentLeft + valueWidth + style.labelValueGap
+        : contentLeft + indentOffset;
+    graphics.drawString(
+      item.getLabel(isArabic: isRTL),
+      labelFont,
+      brush: labelBrush,
+      bounds: Rect.fromLTWH(labelX, currentY, labelWidth, 0),
+      format: PdfStringFormat(
+        alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    );
+
+    // Draw value
+    final valueX = isRTL
+        ? contentLeft
+        : contentLeft + indentOffset + labelWidth + style.labelValueGap;
+    graphics.drawString(
+      item.getFormattedValue(),
+      valueFont,
+      brush: valueBrush,
+      bounds: Rect.fromLTWH(valueX, currentY, valueWidth, 0),
+      format: PdfStringFormat(
+        alignment: isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: PdfTextDirection.leftToRight,
+      ),
+    );
+
+    return currentY + itemH + style.itemSpacing;
+  }
+
+  /// Draws a group header and returns the new Y position.
+  double _drawGroupHeader(
+    PdfGraphics graphics,
+    GeniusPdfSummaryGroup group,
+    double contentLeft,
+    double contentWidth,
+    double currentY,
+    double boxLeft,
+    double actualWidth,
+  ) {
+    final displayTitle =
+        isRTL && group.titleAr != null ? group.titleAr : group.title;
+    if (displayTitle == null) return currentY;
+
+    final groupStyle = group.headerStyle ?? style.titleStyle ?? style.labelStyle;
+    final headerFont = boldFont;
+
+    // Draw group header background if provided
+    if (group.headerBackgroundColor != null) {
+      final hHeight = _groupHeaderHeight(group);
+      graphics.drawRectangle(
+        brush: PdfSolidBrush(group.headerBackgroundColor!.toPdfColor()),
+        bounds: Rect.fromLTWH(
+          boxLeft,
+          currentY - 1,
+          actualWidth,
+          hHeight + 2,
+        ),
+      );
+    }
+
+    graphics.drawString(
+      displayTitle,
+      headerFont,
+      brush: groupStyle.toBrush(),
+      bounds: Rect.fromLTWH(contentLeft, currentY, contentWidth, 0),
+      format: PdfStringFormat(
+        alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    );
+
+    // Draw underline for group header if separatorLine is enabled
+    final hHeight = _groupHeaderHeight(group);
+    if (style.showSeparatorLine) {
+      graphics.drawLine(
+        PdfPen(
+          style.separatorLineColor.toPdfColor(),
+          width: style.separatorLineWidth,
+        ),
+        Offset(contentLeft, currentY + hHeight),
+        Offset(contentLeft + contentWidth, currentY + hHeight),
+      );
+    }
+
+    return currentY + hHeight + style.itemSpacing;
   }
 
   void _drawBorder(PdfGraphics graphics, Rect bounds) {
@@ -243,16 +458,84 @@ class GeniusPdfSummarySection {
     }
   }
 
+  /// Calculates the total content height with per-item accuracy (v2.12.5).
   double _calculateContentHeight() {
     double height = 0;
 
+    // Title height
     if (title != null || titleAr != null) {
-      height += style.labelStyle.fontSize * 1.5 + style.itemSpacing;
+      final effectiveTitleStyle = style.titleStyle ?? style.labelStyle;
+      height += _titleHeight(effectiveTitleStyle) + style.titleSpacing;
     }
 
-    height +=
-        items.length * (style.labelStyle.fontSize * 1.4 + style.itemSpacing);
+    // Group heights
+    if (groups != null) {
+      for (int gi = 0; gi < groups!.length; gi++) {
+        final group = groups![gi];
+        // Group header
+        height += _groupHeaderHeight(group) + style.itemSpacing;
+        // Group items
+        for (final item in group.items) {
+          height += _itemHeight(item) + style.itemSpacing;
+        }
+        // Separator between groups
+        if (gi < groups!.length - 1 || items.isNotEmpty) {
+          height += style.itemSpacing;
+        }
+      }
+    }
+
+    // Top-level items
+    for (final item in items) {
+      height += _itemHeight(item) + style.itemSpacing;
+    }
 
     return height;
   }
+
+  /// Height for the section title.
+  double _titleHeight(GeniusPdfTextStyle titleStyle) {
+    return titleStyle.fontSize * 1.5;
+  }
+
+  /// Height for a group header.
+  double _groupHeaderHeight(GeniusPdfSummaryGroup group) {
+    final headerStyle =
+        group.headerStyle ?? style.titleStyle ?? style.labelStyle;
+    return headerStyle.fontSize * 1.4;
+  }
+
+  /// Height for a single item, respecting customHeight and per-item fontSize.
+  double _itemHeight(GeniusPdfSummaryItem item) {
+    if (item.customHeight != null) return item.customHeight!;
+    // Use the larger of label or value font size
+    final labelSize = item.labelFontSize ?? style.labelStyle.fontSize;
+    final valueSize = item.valueFontSize ?? style.valueStyle.fontSize;
+    final effectiveSize =
+        labelSize > valueSize ? labelSize : valueSize;
+    return effectiveSize * 1.4;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
+enum _RenderItemType { item, groupHeader, groupSeparator }
+
+class _RenderableItem {
+  const _RenderableItem._(this.type, this.item, this.group);
+
+  factory _RenderableItem.item(GeniusPdfSummaryItem item) =>
+      _RenderableItem._(_RenderItemType.item, item, null);
+
+  factory _RenderableItem.groupHeader(GeniusPdfSummaryGroup group) =>
+      _RenderableItem._(_RenderItemType.groupHeader, null, group);
+
+  factory _RenderableItem.groupSeparator() =>
+      _RenderableItem._(_RenderItemType.groupSeparator, null, null);
+
+  final _RenderItemType type;
+  final GeniusPdfSummaryItem? item;
+  final GeniusPdfSummaryGroup? group;
 }

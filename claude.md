@@ -699,6 +699,85 @@ GeniusPdfGridStyle.dark()     // رأس أسود مع نص أبيض
 GeniusPdfGridStyle.striped()  // صفوف zebra بدون حدود
 ```
 
+## معايير أقسام الملخص (v2.12.5+)
+
+### 1. المجموعات في الملخص
+
+استخدم `GeniusPdfSummaryGroup` لتجميع العناصر المتعلقة مع عناوين:
+
+```dart
+GeniusPdfSummarySection(
+  groups: [
+    GeniusPdfSummaryGroup.income(
+      title: 'Revenue',
+      titleAr: 'الإيرادات',
+      items: revenueItems,
+    ),
+    GeniusPdfSummaryGroup.expense(
+      title: 'Expenses',
+      titleAr: 'المصروفات',
+      items: expenseItems,
+    ),
+  ],
+  items: [
+    GeniusPdfSummaryItem.total(label: 'Net', value: net),
+  ],
+);
+```
+
+### 2. أنواع مصانع المجموعات
+
+| المصنع | اللون الافتراضي | الاستخدام |
+|--------|----------------|-----------|
+| `GeniusPdfSummaryGroup()` | بدون خلفية | مجموعة عادية |
+| `.highlighted()` | رمادي `#E8E8E8` | مجموعة مميزة |
+| `.income()` | أخضر فاتح `#E8F5E9` | إيرادات/دخل |
+| `.expense()` | أحمر فاتح `#FFEBEE` | مصروفات/خصومات |
+
+### 3. حساب ارتفاع الصفوف
+
+يتم حساب ارتفاع كل صف تلقائياً بناءً على:
+- `customHeight` إذا كان محدداً (أولوية قصوى)
+- حجم الخط الأكبر بين `labelFontSize` و `valueFontSize`
+- مضروباً في `1.4` لارتفاع السطر
+
+```dart
+// ارتفاع مخصص
+GeniusPdfSummaryItem(
+  label: 'Large Row',
+  value: '100',
+  customHeight: 24, // ارتفاع ثابت
+);
+
+// ارتفاع محسوب من الخط
+GeniusPdfSummaryItem(
+  label: 'Auto Height',
+  value: '100',
+  labelFontSize: 14, // ارتفاع = 14 * 1.4 = 19.6
+);
+```
+
+### 4. الإزاحة (Indent)
+
+استخدم `indent` لإنشاء تسلسل هرمي:
+
+```dart
+GeniusPdfSummaryItem(label: 'Total Assets', value: '1,000,000', indent: 0),
+GeniusPdfSummaryItem(label: 'Current Assets', value: '600,000', indent: 1),
+GeniusPdfSummaryItem(label: 'Cash', value: '200,000', indent: 2),
+```
+
+### 5. أنماط الملخص المتاحة
+
+```dart
+GeniusPdfSummaryStyle()              // افتراضي
+GeniusPdfSummaryStyle.card()         // بطاقة مع خلفية
+GeniusPdfSummaryStyle.bordered()     // حدود مع خطوط فصل
+GeniusPdfSummaryStyle.minimal()      // نظيف بدون حدود
+GeniusPdfSummaryStyle.invoice()      // مناسب للفواتير
+GeniusPdfSummaryStyle.fromTheme()    // من الثيم
+```
+
 ---
 
 *آخر تحديث: فبراير 2026*

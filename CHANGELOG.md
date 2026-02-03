@@ -5,6 +5,82 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.5] - 2026-02-03
+
+### Added
+
+#### Enhanced Summary Sections with Groups and Accurate Layout
+
+- **`GeniusPdfSummaryGroup` model** — New class for organizing summary items into logical groups within a section. Each group can have a bilingual title, custom header styling, and optional background color for the header row.
+- **`GeniusPdfSummaryGroup.highlighted()` factory** — Creates a group with a grey highlighted header background.
+- **`GeniusPdfSummaryGroup.income()` factory** — Creates a group with a green-tinted header for revenue/income items.
+- **`GeniusPdfSummaryGroup.expense()` factory** — Creates a group with a red-tinted header for expense/deduction items.
+- **`groups` parameter on `GeniusPdfSummarySection`** — Accepts a list of `GeniusPdfSummaryGroup` for grouped summary display with group headers rendered between items.
+- **Separator line rendering** — When `style.showSeparatorLine` is true, horizontal lines are now drawn between items using `separatorLineColor` and `separatorLineWidth`.
+- **`highlightTextColor` applied to total rows** — Highlighted/total items now use `style.highlightTextColor` when set.
+- **Indent support** — Items with `indent > 0` now have their label X position shifted by `indent * style.indentWidth`.
+- **`labelValueGap` applied** — The gap between label and value columns is now respected in width calculations.
+- **`customHeight` per item** — Items with `customHeight` set now use that value instead of calculated height.
+- **`totalLabelStyle` / `totalValueStyle`** — Bold/total items now use dedicated total styles when provided in the style configuration.
+
+### Changed
+
+- **Row height calculation rewritten** — `_calculateContentHeight()` now computes accurate heights by:
+  - Using per-item `customHeight` when set
+  - Calculating effective font size from `item.labelFontSize` / `item.valueFontSize` with fallback to style defaults
+  - Applying 1.4x multiplier for line height
+  - Accounting for group headers when groups are present
+  - Including title height with proper style resolution
+- **Group header rendering** — New `_drawGroupHeader()` method renders group titles with optional background color and custom text style.
+- **Unified rendering via `_RenderableItem`** — Internal class consolidates items and group headers into a single render list for consistent spacing and separator handling.
+
+### Example
+
+```dart
+// Summary with income and expense groups
+GeniusPdfSummarySection(
+  title: 'Financial Summary',
+  titleAr: 'الملخص المالي',
+  groups: [
+    GeniusPdfSummaryGroup.income(
+      title: 'Revenue',
+      titleAr: 'الإيرادات',
+      items: [
+        GeniusPdfSummaryItem(label: 'Sales', value: '50,000'),
+        GeniusPdfSummaryItem(label: 'Services', value: '15,000'),
+        GeniusPdfSummaryItem.subtotal(label: 'Total Revenue', value: '65,000'),
+      ],
+    ),
+    GeniusPdfSummaryGroup.expense(
+      title: 'Expenses',
+      titleAr: 'المصروفات',
+      items: [
+        GeniusPdfSummaryItem(label: 'Cost of Goods', value: '25,000'),
+        GeniusPdfSummaryItem(label: 'Operating', value: '10,000'),
+        GeniusPdfSummaryItem.subtotal(label: 'Total Expenses', value: '35,000'),
+      ],
+    ),
+  ],
+  items: [
+    GeniusPdfSummaryItem.total(label: 'Net Profit', value: '30,000'),
+  ],
+  style: GeniusPdfSummaryStyle.invoice(),
+);
+
+// Indented hierarchical summary
+GeniusPdfSummarySection(
+  items: [
+    GeniusPdfSummaryItem(label: 'Total Revenue', value: '100,000'),
+    GeniusPdfSummaryItem(label: 'Product Sales', value: '80,000', indent: 1),
+    GeniusPdfSummaryItem(label: 'Service Revenue', value: '20,000', indent: 1),
+    GeniusPdfSummaryItem.total(label: 'Net Income', value: '100,000'),
+  ],
+  style: GeniusPdfSummaryStyle.bordered(),
+);
+```
+
+---
+
 ## [2.12.2] - 2026-02-02
 
 ### Added

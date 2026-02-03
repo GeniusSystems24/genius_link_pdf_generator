@@ -10,6 +10,7 @@ import '../../models/pdf_image.dart';
 import '../models/pdf_styles.dart';
 
 part 'summary/genius_pdf_summary_item.dart';
+part 'summary/genius_pdf_summary_group.dart';
 part 'summary/genius_pdf_summary_style.dart';
 part 'summary/genius_pdf_total_bar.dart';
 part 'summary/genius_pdf_signature_area.dart';
