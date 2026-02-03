@@ -317,6 +317,364 @@ class GeniusPdfCompanyInfo {
 }
 
 // ---------------------------------------------------------------------------
+// Header Info Group
+// ---------------------------------------------------------------------------
+
+/// A group of related header information items.
+///
+/// Used to organize header content into logical sections like:
+/// - Company registration details (VAT, CR, License)
+/// - Contact information (Phone, Email, Website)
+/// - Address information (Street, City, Country)
+///
+/// ## Example
+/// ```dart
+/// GeniusPdfHeaderInfoGroup.registration(
+///   vatNumber: '300123456789003',
+///   crNumber: '1010123456',
+///   licenseNumber: 'LIC-001',
+/// )
+/// ```
+class GeniusPdfHeaderInfoGroup {
+  const GeniusPdfHeaderInfoGroup({
+    this.title,
+    this.titleAr,
+    required this.items,
+    this.showTitle = false,
+    this.titleStyle,
+    this.itemStyle,
+    this.spacing = 2.0,
+    this.labelValueSeparator = ': ',
+    this.groupColor,
+  });
+
+  /// Creates a registration info group (VAT, CR, License).
+  factory GeniusPdfHeaderInfoGroup.registration({
+    String? vatNumber,
+    String? crNumber,
+    String? licenseNumber,
+    bool showTitle = false,
+  }) {
+    final items = <GeniusPdfHeaderInfoItem>[];
+    if (vatNumber != null && vatNumber.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: 'VAT No',
+        labelAr: 'الرقم الضريبي',
+        value: vatNumber,
+      ));
+    }
+    if (crNumber != null && crNumber.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: 'CR No',
+        labelAr: 'السجل التجاري',
+        value: crNumber,
+      ));
+    }
+    if (licenseNumber != null && licenseNumber.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: 'License No',
+        labelAr: 'رقم الترخيص',
+        value: licenseNumber,
+      ));
+    }
+    return GeniusPdfHeaderInfoGroup(
+      title: 'Registration',
+      titleAr: 'التسجيل',
+      items: items,
+      showTitle: showTitle,
+    );
+  }
+
+  /// Creates a contact info group (Phone, Email, Website).
+  factory GeniusPdfHeaderInfoGroup.contact({
+    String? phone,
+    String? phone2,
+    String? email,
+    String? website,
+    String? fax,
+    bool showTitle = false,
+  }) {
+    final items = <GeniusPdfHeaderInfoItem>[];
+    if (phone != null && phone.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: 'Phone',
+        labelAr: 'الهاتف',
+        value: phone,
+      ));
+    }
+    if (phone2 != null && phone2.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: 'Phone 2',
+        labelAr: 'الهاتف 2',
+        value: phone2,
+      ));
+    }
+    if (fax != null && fax.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: 'Fax',
+        labelAr: 'الفاكس',
+        value: fax,
+      ));
+    }
+    if (email != null && email.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: 'Email',
+        labelAr: 'البريد',
+        value: email,
+      ));
+    }
+    if (website != null && website.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: 'Website',
+        labelAr: 'الموقع',
+        value: website,
+      ));
+    }
+    return GeniusPdfHeaderInfoGroup(
+      title: 'Contact',
+      titleAr: 'التواصل',
+      items: items,
+      showTitle: showTitle,
+    );
+  }
+
+  /// Creates an address info group.
+  factory GeniusPdfHeaderInfoGroup.address({
+    String? address,
+    String? addressAr,
+    String? city,
+    String? cityAr,
+    String? country,
+    String? countryAr,
+    String? postalCode,
+    bool showTitle = false,
+  }) {
+    final items = <GeniusPdfHeaderInfoItem>[];
+    if (address != null && address.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: '',
+        labelAr: '',
+        value: address,
+        valueAr: addressAr,
+        showLabel: false,
+      ));
+    }
+    final locationParts = <String>[];
+    final locationPartsAr = <String>[];
+    if (city != null && city.isNotEmpty) {
+      locationParts.add(city);
+      locationPartsAr.add(cityAr ?? city);
+    }
+    if (country != null && country.isNotEmpty) {
+      locationParts.add(country);
+      locationPartsAr.add(countryAr ?? country);
+    }
+    if (postalCode != null && postalCode.isNotEmpty) {
+      locationParts.add(postalCode);
+      locationPartsAr.add(postalCode);
+    }
+    if (locationParts.isNotEmpty) {
+      items.add(GeniusPdfHeaderInfoItem(
+        label: '',
+        labelAr: '',
+        value: locationParts.join(', '),
+        valueAr: locationPartsAr.join('، '),
+        showLabel: false,
+      ));
+    }
+    return GeniusPdfHeaderInfoGroup(
+      title: 'Address',
+      titleAr: 'العنوان',
+      items: items,
+      showTitle: showTitle,
+    );
+  }
+
+  /// Creates a custom info group with provided items.
+  const GeniusPdfHeaderInfoGroup.custom({
+    required this.title,
+    this.titleAr,
+    required this.items,
+    this.showTitle = true,
+    this.titleStyle,
+    this.itemStyle,
+    this.spacing = 2.0,
+    this.labelValueSeparator = ': ',
+    this.groupColor,
+  });
+
+  /// Group title (English).
+  final String? title;
+
+  /// Group title (Arabic).
+  final String? titleAr;
+
+  /// Items in this group.
+  final List<GeniusPdfHeaderInfoItem> items;
+
+  /// Whether to show the group title.
+  final bool showTitle;
+
+  /// Style for group title.
+  final GeniusPdfTextStyle? titleStyle;
+
+  /// Style for items.
+  final GeniusPdfTextStyle? itemStyle;
+
+  /// Spacing between items.
+  final double spacing;
+
+  /// Separator between label and value.
+  final String labelValueSeparator;
+
+  /// Optional color for this group.
+  final Color? groupColor;
+
+  /// Gets the display title based on locale.
+  String? getTitle({bool isArabic = false}) {
+    if (isArabic && titleAr != null) return titleAr;
+    return title;
+  }
+
+  /// Checks if the group has any items.
+  bool get isEmpty => items.isEmpty;
+
+  /// Checks if the group has items.
+  bool get isNotEmpty => items.isNotEmpty;
+}
+
+/// A single header information item (label-value pair).
+class GeniusPdfHeaderInfoItem {
+  const GeniusPdfHeaderInfoItem({
+    required this.label,
+    this.labelAr,
+    required this.value,
+    this.valueAr,
+    this.showLabel = true,
+    this.icon,
+    this.color,
+  });
+
+  /// Label text (English).
+  final String label;
+
+  /// Label text (Arabic).
+  final String? labelAr;
+
+  /// Value text.
+  final String value;
+
+  /// Value text (Arabic) - if different from English.
+  final String? valueAr;
+
+  /// Whether to show the label.
+  final bool showLabel;
+
+  /// Optional icon identifier.
+  final String? icon;
+
+  /// Optional color for this item.
+  final Color? color;
+
+  /// Gets the display label based on locale.
+  String getLabel({bool isArabic = false}) {
+    if (isArabic && labelAr != null) return labelAr!;
+    return label;
+  }
+
+  /// Gets the display value based on locale.
+  String getValue({bool isArabic = false}) {
+    if (isArabic && valueAr != null) return valueAr!;
+    return value;
+  }
+
+  /// Gets the formatted string (label: value or just value).
+  String getFormatted({bool isArabic = false, String separator = ': '}) {
+    if (!showLabel || label.isEmpty) {
+      return getValue(isArabic: isArabic);
+    }
+    return '${getLabel(isArabic: isArabic)}$separator${getValue(isArabic: isArabic)}';
+  }
+}
+
+/// Layout dimension calculator for header elements.
+///
+/// Provides accurate calculations for header element positioning
+/// based on content size and available space.
+class GeniusPdfHeaderLayoutCalculator {
+  const GeniusPdfHeaderLayoutCalculator({
+    this.minColumnWidth = 100.0,
+    this.maxColumnWidth = 300.0,
+    this.columnSpacing = 10.0,
+    this.rowSpacing = 4.0,
+    this.logoToContentSpacing = 12.0,
+    this.sectionSpacing = 8.0,
+  });
+
+  /// Minimum column width.
+  final double minColumnWidth;
+
+  /// Maximum column width.
+  final double maxColumnWidth;
+
+  /// Spacing between columns.
+  final double columnSpacing;
+
+  /// Spacing between rows.
+  final double rowSpacing;
+
+  /// Spacing between logo and content.
+  final double logoToContentSpacing;
+
+  /// Spacing between sections.
+  final double sectionSpacing;
+
+  /// Calculates optimal column widths for bilingual layout.
+  ({double leftWidth, double centerWidth, double rightWidth}) calculateBilingualColumns({
+    required double totalWidth,
+    double logoWidth = 0,
+    bool hasLogo = false,
+  }) {
+    final logoArea = hasLogo ? logoWidth + logoToContentSpacing * 2 : 0;
+    final availableWidth = totalWidth - logoArea;
+    final sideWidth = (availableWidth / 2).clamp(minColumnWidth, maxColumnWidth);
+
+    return (
+      leftWidth: sideWidth,
+      centerWidth: logoArea,
+      rightWidth: sideWidth,
+    );
+  }
+
+  /// Calculates optimal column widths for standard layout.
+  ({double logoWidth, double contentWidth}) calculateStandardColumns({
+    required double totalWidth,
+    double logoWidth = 0,
+    bool hasLogo = false,
+  }) {
+    if (!hasLogo || logoWidth <= 0) {
+      return (logoWidth: 0, contentWidth: totalWidth);
+    }
+
+    final contentWidth = totalWidth - logoWidth - logoToContentSpacing;
+    return (
+      logoWidth: logoWidth,
+      contentWidth: contentWidth.clamp(minColumnWidth, totalWidth),
+    );
+  }
+
+  /// Estimates height for a text block.
+  double estimateTextHeight({
+    required int lineCount,
+    required double fontSize,
+    double lineSpacing = 2.0,
+  }) {
+    if (lineCount <= 0) return 0;
+    return (fontSize + lineSpacing) * lineCount;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Enums
 // ---------------------------------------------------------------------------
 
@@ -1090,6 +1448,8 @@ class GeniusPdfReportHeader {
     this.showPageNumber = false,
     this.customFields,
     this.tag,
+    this.infoGroups,
+    this.layoutCalculator = const GeniusPdfHeaderLayoutCalculator(),
   }) : style = _resolveHeaderStyle(style, config);
 
   /// Creates a report header for invoices/receipts.
@@ -1287,6 +1647,12 @@ class GeniusPdfReportHeader {
 
   /// Custom tag for identification.
   final String? tag;
+
+  /// Information groups for structured header content.
+  final List<GeniusPdfHeaderInfoGroup>? infoGroups;
+
+  /// Layout calculator for precise positioning.
+  final GeniusPdfHeaderLayoutCalculator layoutCalculator;
 
   static GeniusPdfReportHeaderStyle _resolveHeaderStyle(
     GeniusPdfReportHeaderStyle? style,
@@ -1531,10 +1897,31 @@ class GeniusPdfReportHeader {
   }) {
     if (company == null) return 0;
 
-    double infoY = y;
     final nameAlignment = alignment.toPdfTextAlignment(isRTL);
     final dir =
         isArabic ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
+
+    return _drawCompanyInfoBlockExplicit(
+      graphics, x, y, width, nameAlignment, dir,
+      isArabic: isArabic,
+    );
+  }
+
+  /// Draws company info block with explicit alignment and direction.
+  /// This method is used for bilingual layouts where we need precise control
+  /// over text alignment regardless of global RTL setting.
+  double _drawCompanyInfoBlockExplicit(
+    PdfGraphics graphics,
+    double x,
+    double y,
+    double width,
+    PdfTextAlignment nameAlignment,
+    PdfTextDirection dir, {
+    bool isArabic = false,
+  }) {
+    if (company == null) return 0;
+
+    double infoY = y;
 
     // Company name
     graphics.drawString(
@@ -1837,6 +2224,143 @@ class GeniusPdfReportHeader {
     }
 
     return docY - y;
+  }
+
+  /// Draws info groups, returns height consumed.
+  double _drawInfoGroups(
+    PdfGraphics graphics,
+    double y,
+    double contentLeft,
+    double contentWidth, {
+    bool isArabic = false,
+  }) {
+    if (infoGroups == null || infoGroups!.isEmpty) return 0;
+
+    double groupY = y;
+
+    for (final group in infoGroups!) {
+      if (group.isEmpty) continue;
+
+      groupY += _drawInfoGroup(
+        graphics,
+        groupY,
+        contentLeft,
+        contentWidth,
+        group,
+        isArabic: isArabic,
+      );
+    }
+
+    return groupY - y;
+  }
+
+  /// Draws a single info group, returns height consumed.
+  double _drawInfoGroup(
+    PdfGraphics graphics,
+    double y,
+    double x,
+    double width,
+    GeniusPdfHeaderInfoGroup group, {
+    bool isArabic = false,
+  }) {
+    double itemY = y;
+    final alignment = style.companyInfoAlignment.toPdfTextAlignment(isRTL);
+    final dir = isArabic ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
+    final itemBrush = group.itemStyle?.toBrush() ?? style.companyInfoStyle.toBrush();
+    final fontSize = group.itemStyle?.fontSize ?? style.companyInfoStyle.fontSize;
+
+    // Draw group title if enabled
+    if (group.showTitle && group.title != null) {
+      final titleBrush = group.titleStyle?.toBrush() ?? style.companyNameStyle.toBrush();
+      final titleFontSize = group.titleStyle?.fontSize ?? style.companyNameStyle.fontSize;
+
+      graphics.drawString(
+        group.getTitle(isArabic: isArabic) ?? '',
+        boldFont,
+        brush: titleBrush,
+        bounds: Rect.fromLTWH(x, itemY, width, 0),
+        format: _textFormatDir(alignment, dir),
+      );
+      itemY += titleFontSize + group.spacing;
+    }
+
+    // Draw items
+    for (final item in group.items) {
+      final text = item.getFormatted(
+        isArabic: isArabic,
+        separator: group.labelValueSeparator,
+      );
+
+      graphics.drawString(
+        text,
+        baseFont,
+        brush: item.color != null
+            ? PdfSolidBrush(item.color!.toPdfColor())
+            : itemBrush,
+        bounds: Rect.fromLTWH(x, itemY, width, 0),
+        format: _textFormatDir(alignment, dir),
+      );
+      itemY += fontSize + group.spacing;
+    }
+
+    return itemY - y;
+  }
+
+  /// Draws info groups with explicit alignment and direction for bilingual layouts.
+  double _drawInfoGroupsExplicit(
+    PdfGraphics graphics,
+    double y,
+    double x,
+    double width,
+    PdfTextAlignment alignment,
+    PdfTextDirection dir, {
+    bool isArabic = false,
+  }) {
+    if (infoGroups == null || infoGroups!.isEmpty) return 0;
+
+    double groupY = y;
+    final itemBrush = style.companyInfoStyle.toBrush();
+    final fontSize = style.companyInfoStyle.fontSize;
+
+    for (final group in infoGroups!) {
+      if (group.isEmpty) continue;
+
+      // Draw group title if enabled
+      if (group.showTitle && group.title != null) {
+        final titleBrush = group.titleStyle?.toBrush() ?? style.companyNameStyle.toBrush();
+        final titleFontSize = group.titleStyle?.fontSize ?? style.companyNameStyle.fontSize;
+
+        graphics.drawString(
+          group.getTitle(isArabic: isArabic) ?? '',
+          boldFont,
+          brush: titleBrush,
+          bounds: Rect.fromLTWH(x, groupY, width, 0),
+          format: _textFormatDir(alignment, dir),
+        );
+        groupY += titleFontSize + group.spacing;
+      }
+
+      // Draw items
+      for (final item in group.items) {
+        final text = item.getFormatted(
+          isArabic: isArabic,
+          separator: group.labelValueSeparator,
+        );
+
+        graphics.drawString(
+          text,
+          baseFont,
+          brush: item.color != null
+              ? PdfSolidBrush(item.color!.toPdfColor())
+              : itemBrush,
+          bounds: Rect.fromLTWH(x, groupY, width, 0),
+          format: _textFormatDir(alignment, dir),
+        );
+        groupY += fontSize + group.spacing;
+      }
+    }
+
+    return groupY - y;
   }
 
   // -------------------------------------------------------------------------
@@ -2370,15 +2894,17 @@ class GeniusPdfReportHeader {
     final logoAreaWidth = logoWidth > 0 ? logoWidth + style.logoSpacing * 2 : 0;
     final sideWidth = (contentWidth - logoAreaWidth) / 2;
 
-    // English company info on the LEFT
+    // English company info on the LEFT - ALWAYS left-aligned with LTR direction
+    // regardless of global RTL setting
     double enHeight = 0;
     if (showCompanyInfo && company != null) {
-      enHeight = _drawCompanyInfoBlock(
+      enHeight = _drawCompanyInfoBlockExplicit(
         graphics,
         contentLeft,
         currentY,
         sideWidth,
-        GeniusPdfTitleAlignment.start,
+        PdfTextAlignment.left,  // Always left for English side
+        PdfTextDirection.leftToRight,  // Always LTR for English
         isArabic: false,
       );
     }
@@ -2392,16 +2918,18 @@ class GeniusPdfReportHeader {
       );
     }
 
-    // Arabic company info on the RIGHT
+    // Arabic company info on the RIGHT - ALWAYS right-aligned with RTL direction
+    // regardless of global RTL setting
     double arHeight = 0;
     if (showCompanyInfo && company != null) {
       final arX = contentLeft + sideWidth + logoAreaWidth;
-      arHeight = _drawCompanyInfoBlock(
+      arHeight = _drawCompanyInfoBlockExplicit(
         graphics,
         arX,
         currentY,
         sideWidth,
-        GeniusPdfTitleAlignment.end,
+        PdfTextAlignment.right,  // Always right for Arabic side
+        PdfTextDirection.rightToLeft,  // Always RTL for Arabic
         isArabic: true,
       );
     }
