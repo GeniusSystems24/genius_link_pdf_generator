@@ -630,18 +630,20 @@ class GeniusPdfHeaderLayoutCalculator {
   final double sectionSpacing;
 
   /// Calculates optimal column widths for bilingual layout.
-  ({double leftWidth, double centerWidth, double rightWidth}) calculateBilingualColumns({
+  ({double leftWidth, double centerWidth, double rightWidth})
+      calculateBilingualColumns({
     required double totalWidth,
     double logoWidth = 0,
     bool hasLogo = false,
   }) {
     final logoArea = hasLogo ? logoWidth + logoToContentSpacing * 2 : 0;
     final availableWidth = totalWidth - logoArea;
-    final sideWidth = (availableWidth / 2).clamp(minColumnWidth, maxColumnWidth);
+    final sideWidth =
+        (availableWidth / 2).clamp(minColumnWidth, maxColumnWidth);
 
     return (
       leftWidth: sideWidth,
-      centerWidth: logoArea,
+      centerWidth: logoArea.toDouble(),
       rightWidth: sideWidth,
     );
   }
@@ -1902,7 +1904,12 @@ class GeniusPdfReportHeader {
         isArabic ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
 
     return _drawCompanyInfoBlockExplicit(
-      graphics, x, y, width, nameAlignment, dir,
+      graphics,
+      x,
+      y,
+      width,
+      nameAlignment,
+      dir,
       isArabic: isArabic,
     );
   }
@@ -2265,14 +2272,19 @@ class GeniusPdfReportHeader {
   }) {
     double itemY = y;
     final alignment = style.companyInfoAlignment.toPdfTextAlignment(isRTL);
-    final dir = isArabic ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
-    final itemBrush = group.itemStyle?.toBrush() ?? style.companyInfoStyle.toBrush();
-    final fontSize = group.itemStyle?.fontSize ?? style.companyInfoStyle.fontSize;
+    final dir =
+        isArabic ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
+    final itemBrush =
+        group.itemStyle?.toBrush() ?? style.companyInfoStyle.toBrush();
+    final fontSize =
+        group.itemStyle?.fontSize ?? style.companyInfoStyle.fontSize;
 
     // Draw group title if enabled
     if (group.showTitle && group.title != null) {
-      final titleBrush = group.titleStyle?.toBrush() ?? style.companyNameStyle.toBrush();
-      final titleFontSize = group.titleStyle?.fontSize ?? style.companyNameStyle.fontSize;
+      final titleBrush =
+          group.titleStyle?.toBrush() ?? style.companyNameStyle.toBrush();
+      final titleFontSize =
+          group.titleStyle?.fontSize ?? style.companyNameStyle.fontSize;
 
       graphics.drawString(
         group.getTitle(isArabic: isArabic) ?? '',
@@ -2327,8 +2339,10 @@ class GeniusPdfReportHeader {
 
       // Draw group title if enabled
       if (group.showTitle && group.title != null) {
-        final titleBrush = group.titleStyle?.toBrush() ?? style.companyNameStyle.toBrush();
-        final titleFontSize = group.titleStyle?.fontSize ?? style.companyNameStyle.fontSize;
+        final titleBrush =
+            group.titleStyle?.toBrush() ?? style.companyNameStyle.toBrush();
+        final titleFontSize =
+            group.titleStyle?.fontSize ?? style.companyNameStyle.fontSize;
 
         graphics.drawString(
           group.getTitle(isArabic: isArabic) ?? '',
@@ -2903,8 +2917,8 @@ class GeniusPdfReportHeader {
         contentLeft,
         currentY,
         sideWidth,
-        PdfTextAlignment.left,  // Always left for English side
-        PdfTextDirection.leftToRight,  // Always LTR for English
+        PdfTextAlignment.left, // Always left for English side
+        PdfTextDirection.leftToRight, // Always LTR for English
         isArabic: false,
       );
     }
@@ -2928,8 +2942,8 @@ class GeniusPdfReportHeader {
         arX,
         currentY,
         sideWidth,
-        PdfTextAlignment.right,  // Always right for Arabic side
-        PdfTextDirection.rightToLeft,  // Always RTL for Arabic
+        PdfTextAlignment.right, // Always right for Arabic side
+        PdfTextDirection.rightToLeft, // Always RTL for Arabic
         isArabic: true,
       );
     }

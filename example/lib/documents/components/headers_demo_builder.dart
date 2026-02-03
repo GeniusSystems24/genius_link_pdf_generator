@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
 /// Builds a Headers demo PDF document with extended details covering all scenarios.
