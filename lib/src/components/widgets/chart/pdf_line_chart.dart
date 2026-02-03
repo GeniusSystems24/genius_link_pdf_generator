@@ -295,6 +295,9 @@ class GeniusPdfLineChart {
     }
     maxValue = _roundUpToNice(maxValue);
 
+    // تجنب القسمة على صفر
+    if (maxValue <= 0) return;
+
     for (final s in series) {
       if (s.dataPoints.length < 2) continue;
 

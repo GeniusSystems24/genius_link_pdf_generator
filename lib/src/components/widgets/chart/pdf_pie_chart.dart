@@ -433,6 +433,9 @@ class GeniusPdfPieChart {
   }
 
   void _drawLegend(PdfGraphics graphics, Rect area) {
+    // تجنب القسمة على صفر
+    if (dataPoints.isEmpty || total <= 0) return;
+
     // Font - baseFont is required for Arabic support, no fallback to Helvetica
     final font = config.baseFont;
     final itemHeight = legend.iconSize + 4;

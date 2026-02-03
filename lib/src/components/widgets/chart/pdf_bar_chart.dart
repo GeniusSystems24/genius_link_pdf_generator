@@ -235,7 +235,7 @@ class GeniusPdfBarChart {
 
   /// حساب القيمة القصوى بحسب نوع المخطط
   double _calculateMaxValue() {
-    if (hasGroups) {
+    if (hasGroups && groups!.isNotEmpty) {
       if (settings.type == GeniusBarChartType.stacked) {
         // حساب المجموع التراكمي لكل نقطة في المجموعات
         double maxStacked = 0;
@@ -243,15 +243,21 @@ class GeniusPdfBarChart {
           double groupTotal = group.total;
           if (groupTotal > maxStacked) maxStacked = groupTotal;
         }
-        return maxStacked;
+        return maxStacked > 0 ? maxStacked : 10;
       } else {
-        return groups!.map((g) => g.maxValue).reduce((a, b) => a > b ? a : b);
+        final maxValues = groups!.map((g) => g.maxValue).toList();
+        if (maxValues.isEmpty) return 10;
+        final max = maxValues.reduce((a, b) => a > b ? a : b);
+        return max > 0 ? max : 10;
       }
     }
 
+    if (series.isEmpty) return 10;
+
     if (settings.type == GeniusBarChartType.stacked) {
-      if (series.isEmpty) return 0;
       final pointCount = series.first.dataPoints.length;
+      if (pointCount == 0) return 10;
+
       double maxStacked = 0;
       for (int i = 0; i < pointCount; i++) {
         double stackedValue = 0;
@@ -262,13 +268,13 @@ class GeniusPdfBarChart {
         }
         if (stackedValue > maxStacked) maxStacked = stackedValue;
       }
-      return maxStacked;
+      return maxStacked > 0 ? maxStacked : 10;
     } else {
       double maxValue = 0;
       for (final s in series) {
         if (s.maxValue > maxValue) maxValue = s.maxValue;
       }
-      return maxValue;
+      return maxValue > 0 ? maxValue : 10;
     }
   }
 
@@ -363,10 +369,11 @@ class GeniusPdfBarChart {
   }
 
   void _drawBars(PdfGraphics graphics, Rect plotArea) {
-    if (hasGroups) {
+    if (hasGroups && groups!.isNotEmpty) {
       _drawGroupedDataBars(graphics, plotArea);
-    } else if (series.isNotEmpty) {
+    } else if (series.isNotEmpty && series.first.dataPoints.isNotEmpty) {
       double maxValue = _calculateMaxValue();
+      if (maxValue <= 0) return;
       maxValue = _roundUpToNice(maxValue);
 
       final dataPoints = series.first.dataPoints;
@@ -395,12 +402,15 @@ class GeniusPdfBarChart {
 
   /// رسم أعمدة المجموعات
   void _drawGroupedDataBars(PdfGraphics graphics, Rect plotArea) {
-    if (!hasGroups) return;
+    if (!hasGroups || groups!.isEmpty) return;
 
     double maxValue = _calculateMaxValue();
+    if (maxValue <= 0) return; // تجنب القسمة على صفر
     maxValue = _roundUpToNice(maxValue);
 
     final groupCount = groups!.length;
+    if (groupCount == 0) return;
+
     final groupWidth = plotArea.width / groupCount;
     final valueFont = config.baseFont;
 
@@ -409,17 +419,27 @@ class GeniusPdfBarChart {
       final groupX = plotArea.left + groupWidth * gi;
       final pointCount = group.dataPoints.length;
 
+      // تخطي المجموعات الفارغة
+      if (pointCount == 0) continue;
+
       // حساب عرض العمود داخل المجموعة
       final availableWidth = groupWidth - settings.groupSpacing * 2;
-      final barWidth = (availableWidth - settings.barSpacing * (pointCount - 1)) / pointCount;
-      final actualBarWidth = math.min(barWidth, settings.barWidth);
-      final totalBarsWidth =
-          actualBarWidth * pointCount + settings.barSpacing * (pointCount - 1);
+      final barWidth = pointCount > 1
+          ? (availableWidth - settings.barSpacing * (pointCount - 1)) / pointCount
+          : availableWidth;
+      final actualBarWidth = math.min(barWidth.abs(), settings.barWidth);
+      if (actualBarWidth <= 0) continue;
+
+      final totalBarsWidth = pointCount > 1
+          ? actualBarWidth * pointCount + settings.barSpacing * (pointCount - 1)
+          : actualBarWidth;
       final startX = groupX + (groupWidth - totalBarsWidth) / 2;
 
       for (int pi = 0; pi < pointCount; pi++) {
         final point = group.dataPoints[pi];
         final value = point.value;
+        if (value <= 0) continue; // تخطي القيم السالبة أو الصفرية
+
         final barHeight = (value / maxValue) * plotArea.height;
         final barX = startX + pi * (actualBarWidth + settings.barSpacing);
         final barY = plotArea.bottom - barHeight;
@@ -427,10 +447,10 @@ class GeniusPdfBarChart {
         final color = point.color ?? group.color ?? GeniusChartColors.getColor(pi);
 
         // رسم العمود
-        if (settings.cornerRadius > 0) {
+        if (settings.cornerRadius > 0 && barHeight > 0) {
           _drawRoundedBar(
               graphics, barX, barY, actualBarWidth, barHeight, color);
-        } else {
+        } else if (barHeight > 0) {
           graphics.drawRectangle(
             brush: PdfSolidBrush(_colorToPdfColor(color)),
             bounds: Rect.fromLTWH(barX, barY, actualBarWidth, barHeight),
@@ -501,12 +521,17 @@ class GeniusPdfBarChart {
     double barTotalWidth,
     PdfFont valueFont,
   ) {
+    if (series.isEmpty || series.first.dataPoints.isEmpty) return;
+    if (maxValue <= 0) return;
+
     final dataPoints = series.first.dataPoints;
     final seriesCount = series.length;
     final singleBarWidth = seriesCount > 1
         ? (settings.barWidth - settings.barSpacing * (seriesCount - 1)) /
             seriesCount
         : settings.barWidth;
+
+    if (singleBarWidth <= 0) return;
 
     for (int i = 0; i < dataPoints.length; i++) {
       final groupX =
@@ -516,7 +541,11 @@ class GeniusPdfBarChart {
         if (i >= series[s].dataPoints.length) continue;
 
         final value = series[s].dataPoints[i].value;
+        if (value <= 0) continue;
+
         final barHeight = (value / maxValue) * plotArea.height;
+        if (barHeight <= 0) continue;
+
         final barX = groupX + s * (singleBarWidth + settings.barSpacing);
         final barY = plotArea.bottom - barHeight;
 
@@ -557,6 +586,9 @@ class GeniusPdfBarChart {
     double barTotalWidth,
     PdfFont valueFont,
   ) {
+    if (series.isEmpty || series.first.dataPoints.isEmpty) return;
+    if (maxValue <= 0) return;
+
     final dataPoints = series.first.dataPoints;
 
     for (int i = 0; i < dataPoints.length; i++) {
@@ -568,7 +600,11 @@ class GeniusPdfBarChart {
         if (i >= series[s].dataPoints.length) continue;
 
         final value = series[s].dataPoints[i].value;
+        if (value <= 0) continue;
+
         final barHeight = (value / maxValue) * plotArea.height;
+        if (barHeight <= 0) continue;
+
         currentY -= barHeight;
 
         final color = series[s].color;
@@ -587,19 +623,31 @@ class GeniusPdfBarChart {
     double maxValue,
     PdfFont valueFont,
   ) {
-    if (series.isEmpty) return;
+    if (series.isEmpty || series.first.dataPoints.isEmpty) return;
+    if (maxValue <= 0) return;
 
     final dataPoints = series.first.dataPoints;
-    final barHeight =
-        (plotArea.height - settings.barSpacing * (dataPoints.length - 1)) /
-            dataPoints.length;
-    final actualBarHeight = math.min(barHeight, settings.barWidth);
-    final barSpacing = (plotArea.height - actualBarHeight * dataPoints.length) /
-        (dataPoints.length + 1);
+    if (dataPoints.isEmpty) return;
+
+    final barHeight = dataPoints.length > 1
+        ? (plotArea.height - settings.barSpacing * (dataPoints.length - 1)) /
+            dataPoints.length
+        : plotArea.height;
+    final actualBarHeight = math.min(barHeight.abs(), settings.barWidth);
+    if (actualBarHeight <= 0) return;
+
+    final barSpacing = dataPoints.length > 1
+        ? (plotArea.height - actualBarHeight * dataPoints.length) /
+            (dataPoints.length + 1)
+        : 0.0;
 
     for (int i = 0; i < dataPoints.length; i++) {
       final value = dataPoints[i].value;
+      if (value <= 0) continue;
+
       final barWidth = (value / maxValue) * plotArea.width;
+      if (barWidth <= 0) continue;
+
       final barY =
           plotArea.top + barSpacing + i * (actualBarHeight + barSpacing);
 

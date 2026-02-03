@@ -270,7 +270,9 @@ class GeniusPdfAreaChart {
   double _calculateMaxValue() {
     if (settings.stacked) {
       // حساب المجموع الأقصى للقيم المكدسة
-      if (series.isEmpty) return 0;
+      if (series.isEmpty) return 10;
+      if (series.first.dataPoints.isEmpty) return 10;
+
       final pointCount = series.first.dataPoints.length;
       double maxStacked = 0;
 
@@ -283,13 +285,15 @@ class GeniusPdfAreaChart {
         }
         if (stackedValue > maxStacked) maxStacked = stackedValue;
       }
-      return maxStacked;
+      return maxStacked > 0 ? maxStacked : 10;
     } else {
+      if (series.isEmpty) return 10;
+
       double maxValue = 0;
       for (final s in series) {
         if (s.maxValue > maxValue) maxValue = s.maxValue;
       }
-      return maxValue;
+      return maxValue > 0 ? maxValue : 10;
     }
   }
 
@@ -308,6 +312,9 @@ class GeniusPdfAreaChart {
 
   void _drawOverlappingAreas(
       PdfGraphics graphics, Rect plotArea, double maxValue) {
+    if (series.isEmpty) return;
+    if (maxValue <= 0) return;
+
     // رسم المناطق من الخلف للأمام
     for (int seriesIndex = series.length - 1; seriesIndex >= 0; seriesIndex--) {
       final s = series[seriesIndex];
@@ -339,6 +346,8 @@ class GeniusPdfAreaChart {
 
   void _drawStackedAreas(PdfGraphics graphics, Rect plotArea, double maxValue) {
     if (series.isEmpty) return;
+    if (series.first.dataPoints.isEmpty) return;
+    if (maxValue <= 0) return;
 
     final pointCount = series.first.dataPoints.length;
     final spacing = plotArea.width / (pointCount - 1).clamp(1, double.infinity);
