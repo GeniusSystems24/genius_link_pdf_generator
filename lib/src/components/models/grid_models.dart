@@ -40,6 +40,7 @@ class GeniusPdfGridColumn {
     this.headerAlignment,
     this.headerStyle,
     this.cellStyle,
+    this.cellStyleBuilder,
     this.valueFormatter,
     this.isNumeric = false,
     this.isVisible = true,
@@ -108,6 +109,7 @@ class GeniusPdfGridColumn {
     bool isNumeric = true,
     GeniusPdfCellStyle? headerStyle,
     GeniusPdfCellStyle? cellStyle,
+    GeniusPdfCellStyle? Function(dynamic value)? cellStyleBuilder,
     GeniusPdfTextAlign alignment = GeniusPdfTextAlign.end,
   }) {
     return GeniusPdfGridColumn(
@@ -120,6 +122,7 @@ class GeniusPdfGridColumn {
       alignment: alignment,
       headerStyle: headerStyle,
       cellStyle: cellStyle,
+      cellStyleBuilder: cellStyleBuilder,
       isNumeric: isNumeric,
       valueFormatter: (value) {
         if (value == null) return '';
@@ -273,6 +276,9 @@ class GeniusPdfGridColumn {
   /// Custom cell style for data rows.
   final GeniusPdfCellStyle? cellStyle;
 
+  /// Function to dynamically determine cell style based on value.
+  final GeniusPdfCellStyle? Function(dynamic value)? cellStyleBuilder;
+
   /// Function to format cell values.
   final String Function(dynamic value)? valueFormatter;
 
@@ -335,6 +341,7 @@ class GeniusPdfGridColumn {
     GeniusPdfTextAlign? headerAlignment,
     GeniusPdfCellStyle? headerStyle,
     GeniusPdfCellStyle? cellStyle,
+    GeniusPdfCellStyle? Function(dynamic value)? cellStyleBuilder,
     String Function(dynamic value)? valueFormatter,
     bool? isNumeric,
     bool? isVisible,
@@ -362,6 +369,7 @@ class GeniusPdfGridColumn {
       headerAlignment: headerAlignment ?? this.headerAlignment,
       headerStyle: headerStyle ?? this.headerStyle,
       cellStyle: cellStyle ?? this.cellStyle,
+      cellStyleBuilder: cellStyleBuilder ?? this.cellStyleBuilder,
       valueFormatter: valueFormatter ?? this.valueFormatter,
       isNumeric: isNumeric ?? this.isNumeric,
       isVisible: isVisible ?? this.isVisible,
@@ -821,44 +829,50 @@ class GeniusPdfGridStyle {
     );
   }
 
-  /// Creates a classic bordered grid style with customizable primary color.
-  factory GeniusPdfGridStyle.classic({
+  /// Creates a classic bordered grid style.
+  const GeniusPdfGridStyle.classic({
     Color primaryColor = const Color(0xFF333333),
-  }) {
-    return GeniusPdfGridStyle(
-      headerStyle: GeniusPdfCellStyle(
-        textStyle: GeniusPdfTextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          color: primaryColor,
-          alignment: GeniusPdfTextAlign.center,
-        ),
-        backgroundColor: primaryColor.withValues(alpha: 0.1),
-        border: const GeniusPdfBorderStyle.all(),
-        padding:
-            const GeniusPdfCellPadding.symmetric(horizontal: 6, vertical: 5),
-      ),
-      alternateRowStyle: GeniusPdfCellStyle(
-        textStyle: const GeniusPdfTextStyle.body(),
-        backgroundColor: primaryColor.withValues(alpha: 0.03),
-        padding:
-            const GeniusPdfCellPadding.symmetric(horizontal: 6, vertical: 4),
-      ),
-      totalRowStyle: GeniusPdfCellStyle(
-        textStyle: GeniusPdfTextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          color: primaryColor,
-        ),
-        backgroundColor: primaryColor.withValues(alpha: 0.12),
-        border: const GeniusPdfBorderStyle.all(),
-        padding:
-            const GeniusPdfCellPadding.symmetric(horizontal: 6, vertical: 5),
-      ),
-      borderStyle: const GeniusPdfBorderStyle.all(),
-      showGridLines: true,
-    );
-  }
+  })  : headerStyle = const GeniusPdfCellStyle.header(),
+        cellStyle = const GeniusPdfCellStyle(),
+        alternateRowStyle = const GeniusPdfCellStyle.alternateEven(),
+        totalRowStyle = const GeniusPdfCellStyle.total(),
+        subtotalRowStyle = null,
+        groupHeaderStyle = null,
+        selectedRowStyle = null,
+        highlightedRowStyle = null,
+        borderStyle = const GeniusPdfBorderStyle.all(),
+        outerBorderStyle = null,
+        showHeader = true,
+        repeatHeaderOnPages = true,
+        alternateRowColors = true,
+        alternateStartIndex = 1,
+        cellSpacing = 0,
+        rowSpacing = 0,
+        defaultColumnWidth = 100,
+        minColumnWidth = 30,
+        maxColumnWidth = 300,
+        rowHeight = null,
+        minRowHeight = 16,
+        maxRowHeight = null,
+        headerHeight = null,
+        groupHeaderHeight = null,
+        horizontalPadding = 0,
+        verticalPadding = 0,
+        groupIndentPerLevel = 12,
+        showGridLines = true,
+        gridLineColor = null,
+        gridLineWidth = 0.5,
+        showVerticalLines = true,
+        showHorizontalLines = true,
+        roundedCorners = false,
+        cornerRadius = 4,
+        shadowEnabled = false,
+        shadowColor = null,
+        shadowOffset = 2,
+        shadowBlur = 4,
+        clipContent = true,
+        fitToPage = false,
+        breakRowsAcrossPages = true;
 
   /// Creates a corporate/professional grid style.
   factory GeniusPdfGridStyle.corporate({
@@ -1063,8 +1077,8 @@ class GeniusPdfGridStyle {
           fontWeight: FontWeight.bold,
         ),
         backgroundColor: primaryColor.withValues(alpha: 0.12),
-        border:
-            GeniusPdfBorderStyle.all(color: primaryColor.withValues(alpha: 0.3)),
+        border: GeniusPdfBorderStyle.all(
+            color: primaryColor.withValues(alpha: 0.3)),
         padding:
             const GeniusPdfCellPadding.symmetric(horizontal: 6, vertical: 6),
       ),
@@ -1219,8 +1233,8 @@ class GeniusPdfGridStyle {
         padding:
             const GeniusPdfCellPadding.symmetric(horizontal: 8, vertical: 6),
       ),
-      borderStyle: GeniusPdfBorderStyle.all(
-          color: primaryColor.withValues(alpha: 0.2)),
+      borderStyle:
+          GeniusPdfBorderStyle.all(color: primaryColor.withValues(alpha: 0.2)),
       alternateRowColors: true,
       showGridLines: true,
       gridLineColor: primaryColor.withValues(alpha: 0.15),
@@ -1361,8 +1375,8 @@ class GeniusPdfGridStyle {
         padding:
             const GeniusPdfCellPadding.symmetric(horizontal: 8, vertical: 6),
       ),
-      borderStyle: GeniusPdfBorderStyle.all(
-          color: primaryColor.withValues(alpha: 0.12)),
+      borderStyle:
+          GeniusPdfBorderStyle.all(color: primaryColor.withValues(alpha: 0.12)),
       alternateRowColors: true,
       showGridLines: true,
       gridLineColor: primaryColor.withValues(alpha: 0.12),
@@ -1385,7 +1399,8 @@ class GeniusPdfGridStyle {
           color: Color(0xFFFFFFFF),
         ),
         backgroundColor: primaryColor,
-        border: GeniusPdfBorderStyle.all(width: borderWidth, color: primaryColor),
+        border:
+            GeniusPdfBorderStyle.all(width: borderWidth, color: primaryColor),
         padding:
             const GeniusPdfCellPadding.symmetric(horizontal: 8, vertical: 6),
       ),
@@ -1411,7 +1426,8 @@ class GeniusPdfGridStyle {
           color: primaryColor,
         ),
         backgroundColor: primaryColor.withValues(alpha: 0.1),
-        border: GeniusPdfBorderStyle.all(width: borderWidth, color: primaryColor),
+        border:
+            GeniusPdfBorderStyle.all(width: borderWidth, color: primaryColor),
         padding:
             const GeniusPdfCellPadding.symmetric(horizontal: 8, vertical: 6),
       ),
@@ -1433,14 +1449,15 @@ class GeniusPdfGridStyle {
           color: primaryColor,
         ),
         backgroundColor: primaryColor.withValues(alpha: 0.08),
-        border: GeniusPdfBorderStyle.all(width: borderWidth, color: primaryColor),
+        border:
+            GeniusPdfBorderStyle.all(width: borderWidth, color: primaryColor),
         padding:
             const GeniusPdfCellPadding.symmetric(horizontal: 8, vertical: 6),
       ),
       borderStyle: GeniusPdfBorderStyle.all(
           width: borderWidth, color: primaryColor.withValues(alpha: 0.4)),
-      outerBorderStyle:
-          GeniusPdfBorderStyle.all(width: borderWidth * 1.5, color: primaryColor),
+      outerBorderStyle: GeniusPdfBorderStyle.all(
+          width: borderWidth * 1.5, color: primaryColor),
       alternateRowColors: true,
       showGridLines: true,
       gridLineColor: primaryColor.withValues(alpha: 0.4),

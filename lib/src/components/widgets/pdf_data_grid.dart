@@ -385,9 +385,10 @@ class GeniusPdfDataGrid {
       // Additional summaries (v2.12.0)
       if (group.summaries != null) {
         for (final summaryRow in group.summaries!) {
-          final styledRow = group.summaryStyle != null && summaryRow.style == null
-              ? summaryRow.copyWith(style: group.summaryStyle)
-              : summaryRow;
+          final styledRow =
+              group.summaryStyle != null && summaryRow.style == null
+                  ? summaryRow.copyWith(style: group.summaryStyle)
+                  : summaryRow;
           _addSingleRow(grid, cols, styledRow, grid.rows.count);
         }
       }
@@ -454,9 +455,7 @@ class GeniusPdfDataGrid {
     if (rowData.isTotal) {
       rowStyle = rowData.style ?? style.totalRowStyle;
     } else if (rowData.isSubtotal) {
-      rowStyle = rowData.style ??
-          style.subtotalRowStyle ??
-          style.totalRowStyle;
+      rowStyle = rowData.style ?? style.subtotalRowStyle ?? style.totalRowStyle;
     } else if (rowData.isGroupHeader) {
       rowStyle = rowData.style ??
           style.groupHeaderStyle ??
@@ -506,10 +505,19 @@ class GeniusPdfDataGrid {
       cell.value = rowData.getFormattedValue(column);
 
       // Apply cell style
-      final cellStyle = column.cellStyle ?? rowStyle;
+      var effectiveCellStyle = column.cellStyle ?? rowStyle;
+
+      if (column.cellStyleBuilder != null) {
+        final rawValue = rowData.getValue(column.id);
+        final builtStyle = column.cellStyleBuilder!(rawValue);
+        if (builtStyle != null) {
+          effectiveCellStyle = builtStyle;
+        }
+      }
+
       _applyCellStyle(
         cell,
-        cellStyle,
+        effectiveCellStyle,
         column,
         isTotal: rowData.isTotal || rowData.isSubtotal,
       );
@@ -1288,11 +1296,12 @@ extension GeniusConditionalFormattingExtension on GeniusPdfDataGrid {
     required List<GeniusPdfGridRow> rows,
     required List<GeniusConditionalFormatRule> rules,
     required GeniusPdfConfig config,
-    GeniusPdfGridStyle style = GeniusPdfGridStyle.classic(),
+    GeniusPdfGridStyle? style,
     List<GeniusPdfGridGroup>? groups,
     List<GeniusPdfGridRow>? footerRows,
     List<GeniusPdfAutoTotal>? autoTotals,
   }) {
+    style ??= GeniusPdfGridStyle.classic();
     // Apply formatting to rows
     final formatManager = GeniusConditionalFormatManager(rules: rules);
     final formattedRows = rows.map((row) {
