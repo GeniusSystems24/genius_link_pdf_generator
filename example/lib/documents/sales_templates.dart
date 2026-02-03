@@ -8,18 +8,19 @@ NewTemplatesDemoBuild buildQuotationDemo({required bool isRtl}) {
   final customer = const QuotationCustomer(
     name: 'ABC Trading Company',
     nameAr: 'شركة ABC للتجارة',
-    company: 'ABC Trading Co. Ltd',
+    // company removed
     address: '456 Commercial Street, Jeddah',
     phone: '+966 12 345 6789',
     email: 'purchasing@abctrading.com',
   );
 
   final quotation = QuotationData(
+    customer: customer,
     quotationNumber: 'QT-2026-0001',
     quotationDate: DateTime.now(),
     validUntil: DateTime.now().add(const Duration(days: 30)),
-    paymentTerms: 'Net 30',
-    paymentTermsAr: 'صافي 30 يوم',
+    terms: 'Net 30',
+    termsAr: 'صافي 30 يوم',
     items: const [
       QuotationItem(
         itemNumber: 1,
@@ -36,15 +37,12 @@ NewTemplatesDemoBuild buildQuotationDemo({required bool isRtl}) {
         unitPrice: 1800,
       ),
     ],
-    taxes: const [
-      (name: 'VAT', nameAr: 'ضريبة القيمة المضافة', rate: 15.0),
-    ],
+    // taxes removed
   );
 
   final template = QuotationTemplate(
     config: createNewTemplatesDemoConfig(isRtl: isRtl),
     company: SampleData.companyInfo,
-    customer: customer,
     quotation: quotation,
   );
 

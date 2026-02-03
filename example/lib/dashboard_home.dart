@@ -270,11 +270,13 @@ class DashboardHome extends StatelessWidget {
         final crossAxisCount = isWide ? 4 : (isMedium ? 2 : 1);
         final childAspectRatio = isWide ? 1.4 : (isMedium ? 1.6 : 2.5);
 
-        return GridView.count(
-          crossAxisCount: crossAxisCount,
-          mainAxisSpacing: 24,
-          crossAxisSpacing: 24,
-          childAspectRatio: childAspectRatio,
+        return GridView(
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 300,
+            mainAxisSpacing: 24,
+            crossAxisSpacing: 24,
+            childAspectRatio: childAspectRatio,
+          ),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           children: [

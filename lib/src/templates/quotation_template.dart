@@ -1,8 +1,5 @@
 import 'dart:ui';
 
-
-
-
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
@@ -10,17 +7,17 @@ import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
 import '../core/pdf_config.dart';
 
-/// Quotation line item.
+/// Quotation item model.
 class QuotationItem {
   const QuotationItem({
     required this.itemNumber,
     required this.description,
     required this.quantity,
     required this.unitPrice,
-    this.descriptionAr,
     this.unit,
+    this.descriptionAr,
     this.discount = 0,
-    this.notes,
+    this.tax = 0,
   });
 
   final int itemNumber;
@@ -30,34 +27,32 @@ class QuotationItem {
   final String? unit;
   final double unitPrice;
   final double discount;
-  final String? notes;
+  final double tax;
 
-  double get lineTotal => (quantity * unitPrice) - discount;
+  double get subtotal => quantity * unitPrice;
+  double get total => subtotal - discount + tax;
+  String get lineTotal => total.toStringAsFixed(2);
 }
 
-/// Quotation customer info.
+/// Customer information for quotation.
 class QuotationCustomer {
   const QuotationCustomer({
     required this.name,
     this.nameAr,
-    this.company,
-    this.companyAr,
     this.address,
     this.addressAr,
     this.phone,
     this.email,
-    this.contactPerson,
+    this.vatNumber,
   });
 
   final String name;
   final String? nameAr;
-  final String? company;
-  final String? companyAr;
   final String? address;
   final String? addressAr;
   final String? phone;
   final String? email;
-  final String? contactPerson;
+  final String? vatNumber;
 }
 
 /// Quotation data model.
@@ -65,102 +60,116 @@ class QuotationData {
   const QuotationData({
     required this.quotationNumber,
     required this.quotationDate,
+    required this.validUntil,
+    required this.customer,
     required this.items,
-    this.validUntil,
-    this.reference,
-    this.paymentTerms,
-    this.paymentTermsAr,
-    this.deliveryTerms,
-    this.deliveryTermsAr,
-    this.taxes = const [],
+    this.status = 'Draft',
+    this.statusAr = 'مسودة',
+    this.currency = 'SAR',
     this.notes,
     this.notesAr,
-    this.termsAndConditions,
-    this.termsAndConditionsAr,
-    this.currency = 'SAR',
+    this.terms,
+    this.termsAr,
   });
 
   final String quotationNumber;
   final DateTime quotationDate;
-  final DateTime? validUntil;
-  final String? reference;
-  final String? paymentTerms;
-  final String? paymentTermsAr;
-  final String? deliveryTerms;
-  final String? deliveryTermsAr;
+  final DateTime validUntil;
+  final QuotationCustomer customer;
   final List<QuotationItem> items;
-  final List<({String name, String? nameAr, double rate})> taxes;
+  final String status;
+  final String statusAr;
+  final String currency;
   final String? notes;
   final String? notesAr;
-  final String? termsAndConditions;
-  final String? termsAndConditionsAr;
-  final String currency;
+  final String? terms;
+  final String? termsAr;
 
-  double get subtotal => items.fold(0, (sum, item) => sum + item.lineTotal);
-  double get totalTax =>
-      taxes.fold(0.0, (sum, tax) => sum + (subtotal * tax.rate / 100));
-  double get grandTotal => subtotal + totalTax;
+  double get subTotal => items.fold(0, (sum, item) => sum + item.subtotal);
+  double get totalDiscount => items.fold(0, (sum, item) => sum + item.discount);
+  double get totalTax => items.fold(0, (sum, item) => sum + item.tax);
+  double get grandTotal => subTotal - totalDiscount + totalTax;
 }
 
-/// A professional quotation/price quote template.
+/// A professional quotation template.
 ///
-/// Creates quotations with itemized pricing, terms,
-/// and validity period.
+/// Creates detailed quotations with customer info, itemized list,
+/// taxes, and terms & conditions.
 ///
 /// ## Example
 /// ```dart
-/// final quotation = QuotationTemplate(
+/// final quote = QuotationTemplate(
 ///   config: pdfConfig,
 ///   company: companyInfo,
-///   customer: customerInfo,
-///   quotation: quotationData,
+///   data: quotationData,
 /// );
 ///
-/// final bytes = quotation.generate();
+/// final bytes = quote.generate();
 /// ```
 class QuotationTemplate extends GeniusPdfDocumentBuilder {
   QuotationTemplate({
     required GeniusPdfConfig config,
     required this.company,
-    required this.customer,
     required this.quotation,
     this.boldFont,
-    this.showTerms = true,
+    this.reportId,
+    this.printedBy,
+    this.showQRCode = true,
+    this.showSignatures = true,
+    this.showNotes = true,
+    this.notes,
+    this.notesAr,
   }) : super(config);
 
   final GeniusPdfCompanyInfo company;
-  final QuotationCustomer customer;
   final QuotationData quotation;
   final PdfFont? boldFont;
-  final bool showTerms;
 
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
+  /// Report ID for QR code URL
+  final String? reportId;
+
+  /// User who printed the report
+  final String? printedBy;
+
+  /// Whether to show QR code with report link
+  final bool showQRCode;
+
+  /// Whether to show signature areas
+  final bool showSignatures;
+
+  /// Whether to show notes section
+  final bool showNotes;
+
+  /// Custom notes to display
+  final String? notes;
+  final String?
+      notesAr; // Added logic to use constructor notes if provided or fallback to data notes
 
   @override
   void build() {
+    // Add repeating footer with user info on all pages
+    if (printedBy != null || showQRCode) {
+      addFooter(
+        userName: printedBy,
+        printTime: _formatDate(DateTime.now()),
+        showPageNumber: true,
+      );
+    }
+
     newPage();
 
     _drawHeader();
-    _drawInfoSection();
+    _drawCustomerInfo();
     _drawItemsTable();
-    _drawSummary();
+    _drawTotals();
 
-    if (quotation.notes != null || quotation.notesAr != null) {
-      _drawNotes();
+    // Draw Footer Section (Notes/Terms + QR Code)
+    _drawFooterSection();
+
+    // Signatures section
+    if (showSignatures) {
+      _drawSignatureSection();
     }
-
-    if (showTerms &&
-        (quotation.termsAndConditions != null ||
-            quotation.termsAndConditionsAr != null)) {
-      _drawTermsAndConditions();
-    }
-
-    _drawSignatureSection();
   }
 
   void _drawHeader() {
@@ -168,128 +177,108 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       title: 'Quotation',
       titleAr: 'عرض سعر',
+      subtitle: '#${quotation.quotationNumber}',
+      subtitleAr: '#${quotation.quotationNumber}',
       company: company,
-      printDate: DateTime.now(),
-      style: const GeniusPdfReportHeaderStyle(
-        titleStyle: GeniusPdfTextStyle.title(fontSize: 20),
-        showBorder: false,
-      ),
-      layout: GeniusPdfReportHeaderLayout.standard,
+      printDate: quotation.quotationDate,
+      style: const GeniusPdfReportHeaderStyle.modern(),
+      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
     );
 
-    header.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, 0, pageWidth, 100),
-    );
-
-    addSpace(105);
+    addReportHeader(header, height: 110);
   }
 
-  void _drawInfoSection() {
-    final customerBox = GeniusPdfInfoBox(
-      config: config,
-      title: 'To',
-      titleAr: 'إلى',
-      items: [
+  void _drawCustomerInfo() {
+    final customer = quotation.customer;
+
+    // Left side: Customer details
+    final customerItems = [
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Customer',
+        labelAr: 'العميل',
+        value:
+            config.isRTL ? (customer.nameAr ?? customer.name) : customer.name,
+      ),
+      if (customer.address != null || customer.addressAr != null)
         GeniusPdfLabeledValue(
           config: config,
-          label: 'Name',
-          labelAr: 'الاسم',
-          value:
-              config.isRTL ? (customer.nameAr ?? customer.name) : customer.name,
+          label: 'Address',
+          labelAr: 'العنوان',
+          value: config.isRTL
+              ? (customer.addressAr ?? customer.address ?? '-')
+              : (customer.address ?? '-'),
         ),
-        if (customer.company != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Company',
-            labelAr: 'الشركة',
-            value: config.isRTL
-                ? (customer.companyAr ?? customer.company!)
-                : customer.company!,
-          ),
-        if (customer.address != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Address',
-            labelAr: 'العنوان',
-            value: config.isRTL
-                ? (customer.addressAr ?? customer.address!)
-                : customer.address!,
-          ),
-        if (customer.phone != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Phone',
-            labelAr: 'الهاتف',
-            value: customer.phone!,
-          ),
-        if (customer.email != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Email',
-            labelAr: 'البريد',
-            value: customer.email!,
-          ),
-      ],
-      style: const GeniusPdfInfoBoxStyle.headerContent(),
-    );
-
-    final quotationBox = GeniusPdfInfoBox(
-      config: config,
-      title: 'Quotation Details',
-      titleAr: 'تفاصيل العرض',
-      items: [
+      if (customer.vatNumber != null)
         GeniusPdfLabeledValue(
           config: config,
-          label: 'Quotation No',
-          labelAr: 'رقم العرض',
-          value: quotation.quotationNumber,
+          label: 'VAT No',
+          labelAr: 'الرقم الضريبي',
+          value: customer.vatNumber!,
         ),
+      if (customer.phone != null)
         GeniusPdfLabeledValue(
           config: config,
-          label: 'Date',
-          labelAr: 'التاريخ',
-          value: _formatDate(quotation.quotationDate),
+          label: 'Phone',
+          labelAr: 'الهاتف',
+          value: customer.phone!,
         ),
-        if (quotation.validUntil != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Valid Until',
-            labelAr: 'صالح حتى',
-            value: _formatDate(quotation.validUntil!),
-          ),
-        if (quotation.reference != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Reference',
-            labelAr: 'المرجع',
-            value: quotation.reference!,
-          ),
-        if (quotation.paymentTerms != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Payment Terms',
-            labelAr: 'شروط الدفع',
-            value: config.isRTL
-                ? (quotation.paymentTermsAr ?? quotation.paymentTerms!)
-                : quotation.paymentTerms!,
-          ),
-      ],
-      style: const GeniusPdfInfoBoxStyle.headerContent(),
-    );
+    ];
 
-    final dualBox = GeniusPdfDualInfoBox(
-      leftBox: config.isRTL ? quotationBox : customerBox,
-      rightBox: config.isRTL ? customerBox : quotationBox,
-      spacing: 20,
-    );
+    // Right side: Quotation details
+    final quoteItems = [
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Date',
+        labelAr: 'التاريخ',
+        value: _formatDate(quotation.quotationDate),
+      ),
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Valid Until',
+        labelAr: 'صالح حتى',
+        value: _formatDate(quotation.validUntil),
+      ),
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Status',
+        labelAr: 'الحالة',
+        value: config.isRTL ? quotation.statusAr : quotation.status,
+      ),
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Currency',
+        labelAr: 'العملة',
+        value: quotation.currency,
+      ),
+    ];
 
-    final result = dualBox.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 150),
-    );
+    addTwoColumns(
+        spacing: 10,
+        leftContent: (page, bounds) {
+          final infoBox = GeniusPdfInfoBox(
+            config: config,
+            title: 'Bill To',
+            titleAr: 'فاتورة إلى',
+            columns: 1,
+            items: customerItems,
+            style: const GeniusPdfInfoBoxStyle.headerContent(),
+          );
+          return infoBox.draw(page: page, bounds: bounds).height;
+        },
+        rightContent: (page, bounds) {
+          final infoBox = GeniusPdfInfoBox(
+            config: config,
+            title: 'Details',
+            titleAr: 'التفاصيل',
+            columns: 1,
+            items: quoteItems,
+            style: const GeniusPdfInfoBoxStyle.headerContent(),
+          );
+          return infoBox.draw(page: page, bounds: bounds).height;
+        });
 
-    addSpace(result.height + 20);
+    addSpace(10);
   }
 
   void _drawItemsTable() {
@@ -316,19 +305,19 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           width: 50,
           alignment: GeniusPdfTextAlign.center,
         ),
-        GeniusPdfGridColumn.currency(
+        const GeniusPdfGridColumn(
           id: 'price',
           title: 'Unit Price',
-          titleAr: 'سعر الوحدة',
-          width: 90,
-          currencySymbol: '',
+          titleAr: 'السعر',
+          width: 70,
+          alignment: GeniusPdfTextAlign.center,
         ),
-        GeniusPdfGridColumn.currency(
+        const GeniusPdfGridColumn(
           id: 'total',
           title: 'Total',
           titleAr: 'الإجمالي',
-          width: 100,
-          currencySymbol: '',
+          width: 80,
+          alignment: GeniusPdfTextAlign.center,
         ),
       ],
       rows: quotation.items
@@ -339,148 +328,245 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
                     : item.description,
                 'qty':
                     '${item.quantity}${item.unit != null ? ' ${item.unit}' : ''}',
-                'price': item.unitPrice,
+                'price': _formatNumber(item.unitPrice),
                 'total': item.lineTotal,
               }))
           .toList(),
       style: GeniusPdfGridStyle.modern(),
     );
 
-    final result = grid.drawAt(
-      page: currentPage,
-      x: 0,
-      y: currentY,
-      width: pageWidth,
-    );
-
-    if (result != null) {
-      addSpace(result.bounds.height + 15);
-    }
+    addGrid(grid, spacing: 6);
+    addSpace(8);
   }
 
-  void _drawSummary() {
-    final items = <GeniusPdfSummaryItem>[
-      GeniusPdfSummaryItem.subtotal(
-        label: 'Subtotal',
-        labelAr: 'المجموع الفرعي',
-        value: _formatCurrency(quotation.subtotal),
-      ),
-    ];
-
-    for (final tax in quotation.taxes) {
-      items.add(GeniusPdfSummaryItem(
-        label: '${tax.name} (${tax.rate}%)',
-        labelAr: '${tax.nameAr ?? tax.name} (${tax.rate}%)',
-        value: _formatCurrency(quotation.subtotal * tax.rate / 100),
-      ));
-    }
-
-    items.add(GeniusPdfSummaryItem.total(
-      label: 'Grand Total',
-      labelAr: 'الإجمالي الكلي',
-      value: _formatCurrency(quotation.grandTotal),
-    ));
-
+  void _drawTotals() {
     final summary = GeniusPdfSummarySection(
       config: config,
-      items: items,
+      items: [
+        GeniusPdfSummaryItem.subtotal(
+          label: 'Subtotal',
+          labelAr: 'المجموع الفرعي',
+          value: _formatCurrency(quotation.subTotal),
+        ),
+        if (quotation.totalDiscount > 0)
+          GeniusPdfSummaryItem.subtotal(
+            label: 'Discount',
+            labelAr: 'الخصم',
+            value: '-${_formatCurrency(quotation.totalDiscount)}',
+          ),
+        if (quotation.totalTax > 0)
+          GeniusPdfSummaryItem.subtotal(
+            label: 'Tax (VAT)',
+            labelAr: 'الضريبة',
+            value: _formatCurrency(quotation.totalTax),
+          ),
+        GeniusPdfSummaryItem.total(
+          label: 'Grand Total',
+          labelAr: 'الإجمالي النهائي',
+          value: _formatCurrency(quotation.grandTotal),
+        ),
+      ],
       style: const GeniusPdfSummaryStyle.bordered(),
       alignment: GeniusPdfSummaryAlignment.right,
-      width: pageWidth * 0.4,
+      width: pageWidth * 0.5,
     );
 
-    final result = summary.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 150),
-    );
-
-    addSpace(result.height + 15);
+    addSummary(summary, spacing: 10);
   }
 
-  void _drawNotes() {
-    final notesLabel = config.isRTL ? 'ملاحظات:' : 'Notes:';
-    final notesText = config.isRTL
-        ? (quotation.notesAr ?? quotation.notes!)
-        : quotation.notes!;
+  void _drawFooterSection() {
+    final effectiveNotes = notes ??
+        quotation.notes ??
+        (config.isRTL
+            ? notesAr ?? quotation.notesAr
+            : notes ?? quotation.notes);
+    final effectiveTerms =
+        config.isRTL ? quotation.termsAr ?? quotation.terms : quotation.terms;
 
-    currentPage.graphics.drawString(
-      '$notesLabel\n$notesText',
-      baseFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 50),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
-    );
+    final hasNotesOrTerms =
+        (effectiveNotes != null && effectiveNotes.isNotEmpty) ||
+            (effectiveTerms != null && effectiveTerms.isNotEmpty);
 
-    addSpace(55);
-  }
-
-  void _drawTermsAndConditions() {
-    final termsLabel =
-        config.isRTL ? 'الشروط والأحكام:' : 'Terms & Conditions:';
-    final termsText = config.isRTL
-        ? (quotation.termsAndConditionsAr ?? quotation.termsAndConditions!)
-        : quotation.termsAndConditions!;
-
-    currentPage.graphics.drawString(
-      termsLabel,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
-    );
+    if (!showNotes && (!showQRCode || reportId == null) && !hasNotesOrTerms) {
+      return;
+    }
 
     addSpace(20);
 
-    currentPage.graphics.drawString(
-      termsText,
-      baseFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 60),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
+    // If only one section is shown, draw it normally
+    if (showNotes && (!showQRCode || reportId == null)) {
+      _drawNotes(width: pageWidth);
+      return;
+    }
+
+    if (!showNotes && (showQRCode && reportId != null) && !hasNotesOrTerms) {
+      _drawQRCodeSection(width: pageWidth);
+      return;
+    }
+
+    // Draw side-by-side if both are present
+    addTwoColumns(
+      spacing: 10,
+      leftFlex: config.isLTR ? 2 : 1,
+      rightFlex: config.isLTR ? 1 : 2,
+      leftContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawNotesContent(page, bounds);
+        } else {
+          return _drawQRCodeContent(page, bounds);
+        }
+      },
+      rightContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawQRCodeContent(page, bounds);
+        } else {
+          return _drawNotesContent(page, bounds);
+        }
+      },
     );
 
-    addSpace(65);
+    addSpace(20);
+  }
+
+  void _drawNotes({required double width}) {
+    _drawNotesContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawNotesContent(PdfPage page, Rect bounds) {
+    final effectiveNotes = notes ??
+        quotation.notes ??
+        (config.isRTL
+            ? notesAr ?? quotation.notesAr
+            : notes ?? quotation.notes);
+    final effectiveTerms =
+        config.isRTL ? quotation.termsAr ?? quotation.terms : quotation.terms;
+
+    var text = '';
+
+    if (effectiveNotes != null && effectiveNotes.isNotEmpty) {
+      text += config.isRTL
+          ? 'ملاحظات:\n$effectiveNotes\n\n'
+          : 'Notes:\n$effectiveNotes\n\n';
+    }
+
+    if (effectiveTerms != null && effectiveTerms.isNotEmpty) {
+      text += config.isRTL
+          ? 'الشروط والأحكام:\n$effectiveTerms'
+          : 'Terms & Conditions:\n$effectiveTerms';
+    }
+
+    if (text.isEmpty) return 0;
+
+    final font = config.baseFont;
+    final element = PdfTextElement(
+      text: text,
+      font: font,
+      format: config.isLTR
+          ? null
+          : PdfStringFormat(
+              textDirection: PdfTextDirection.rightToLeft,
+              alignment: PdfTextAlignment.right),
+    );
+
+    final result = element.draw(
+      page: page,
+      bounds: bounds,
+    );
+
+    return result?.bounds.height ?? 0;
+  }
+
+  void _drawQRCodeSection({required double width}) {
+    _drawQRCodeContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawQRCodeContent(PdfPage page, Rect bounds) {
+    if (reportId == null) return 0;
+
+    final qrUrl = 'https://localhost:443/report/$reportId';
+    final caption = 'ID: $reportId';
+
+    final captionFont = config.baseFont;
+    final captionLayout = PdfTextElement(
+      text: caption,
+      font: captionFont,
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: config.isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    ).draw(
+        page: page,
+        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
+
+    final captionHeight = captionLayout?.bounds.height ?? 0;
+    final qrSize = 80.0;
+    final x = bounds.left + (bounds.width - qrSize) / 2;
+    final y = bounds.top + captionHeight + 5;
+
+    final urlQR = GeniusPdfQRCodeGenerator.url(
+      url: qrUrl,
+      config: config,
+      caption: null,
+    );
+
+    urlQR.draw(
+      page: page,
+      bounds: Rect.fromLTWH(x, y, qrSize, qrSize),
+    );
+
+    return captionHeight + 5 + qrSize;
   }
 
   void _drawSignatureSection() {
-    final bottomY = pageHeight - 80;
+    if (currentY > pageHeight - 120) {
+      newPage();
+    }
 
-    final signature = GeniusPdfSignatureArea(config: config,
+    addSpace(20);
+    addSectionDivider(
+        title: config.isRTL ? 'الموافقة' : 'Acceptance', spacing: 15);
+
+    final signatureY = currentY;
+
+    // Company Signature
+    final companySig = GeniusPdfSignatureArea(
+      config: config,
       title: 'Authorized Signature',
       titleAr: 'التوقيع المعتمد',
+      lineWidth: 110,
     );
 
-    signature.draw(
+    companySig.draw(
       page: currentPage,
       bounds: Rect.fromLTWH(
-        config.isRTL ? pageWidth - 200 : 0,
-        bottomY,
-        200,
+        config.isRTL ? pageWidth - 120 : 0,
+        signatureY,
+        120,
         60,
       ),
     );
 
-    // Customer acceptance
-    final acceptance = GeniusPdfSignatureArea(config: config,
+    // Customer Signature
+    final customerSig = GeniusPdfSignatureArea(
+      config: config,
       title: 'Customer Acceptance',
       titleAr: 'موافقة العميل',
+      lineWidth: 110,
     );
 
-    acceptance.draw(
+    customerSig.draw(
       page: currentPage,
       bounds: Rect.fromLTWH(
-        config.isRTL ? 0 : pageWidth - 200,
-        bottomY,
-        200,
+        config.isRTL ? 0 : pageWidth - 120,
+        signatureY,
+        120,
         60,
       ),
     );
+
+    addSpace(80);
   }
 
   String _formatDate(DateTime date) {
@@ -493,5 +579,13 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
           (Match m) => '${m[1]},',
         );
     return '$formatted ${quotation.currency}';
+  }
+
+  String _formatNumber(double number) {
+    final formatted = number.toStringAsFixed(2).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
+    return formatted;
   }
 }

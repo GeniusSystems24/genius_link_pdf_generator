@@ -7,8 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
-
-
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -977,12 +975,12 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
                 config: geniusPdfConfig,
                 label: 'Name',
                 labelAr: 'الاسم',
-              value: 'Ahmed Mohammed'),
+                value: 'Ahmed Mohammed'),
             GeniusPdfLabeledValue(
                 config: geniusPdfConfig,
                 label: 'Phone',
                 labelAr: 'الهاتف',
-              value: '+966 12 345 6789'),
+                value: '+966 12 345 6789'),
           ],
           style: const GeniusPdfInfoBoxStyle.headerContent(),
         );
@@ -1167,8 +1165,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildTaxInvoiceTest() {
     return TaxInvoiceTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       customer: SampleData.invoiceCustomer,
       invoice: SampleData.invoiceData,
@@ -1178,8 +1176,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildTrialBalanceTest() {
     return TrialBalanceTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: SampleData.trialBalanceData,
     );
@@ -1187,8 +1185,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildCustomerStatementTest() {
     return CustomerStatementTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       customer: SampleData.statementCustomer,
       data: SampleData.statementData,
@@ -1197,8 +1195,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
 
   GeniusPdfDocumentBuilder? _buildInventoryReportTest() {
     return InventoryReportTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: SampleData.inventoryData,
     );
@@ -1242,8 +1240,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       ),
     );
     return BalanceSheetTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: data,
     );
@@ -1289,8 +1287,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       taxExpense: 15000,
     );
     return IncomeStatementTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: data,
     );
@@ -1330,8 +1328,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       beginningCashBalance: 100000,
     );
     return CashFlowTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: data,
     );
@@ -1354,8 +1352,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       ],
     );
     return BudgetReportTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       data: data,
     );
@@ -1365,11 +1363,12 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     final customer = const QuotationCustomer(
       name: 'Test Customer',
       nameAr: 'عميل تجريبي',
-      company: 'Test Co.',
+      // company removed
       address: 'Riyadh',
       phone: '+966 12 345 6789',
     );
     final quotation = QuotationData(
+      customer: customer,
       quotationNumber: 'QT-2026-001',
       quotationDate: DateTime.now(),
       validUntil: DateTime.now().add(const Duration(days: 30)),
@@ -1381,13 +1380,13 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
             quantity: 5,
             unitPrice: 1000),
       ],
-      taxes: [(name: 'VAT', nameAr: 'ضريبة', rate: 15.0)],
+      // taxes removed
     );
     return QuotationTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
-      customer: customer,
+      // customer removed
       quotation: quotation,
     );
   }
@@ -1416,8 +1415,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       taxes: [(name: 'VAT', nameAr: 'ضريبة', rate: 15.0)],
     );
     return PurchaseOrderTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       vendor: vendor,
       purchaseOrder: po,
@@ -1448,8 +1447,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       ],
     );
     return DeliveryNoteTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       recipient: recipient,
       delivery: delivery,
@@ -1484,8 +1483,8 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       ],
     );
     return PayslipTemplate(
-      config:
-          GeniusPdfConfig(baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
+      config: GeniusPdfConfig(
+          baseFontBytes: _fontBytes!, textDirection: TextDirection.rtl),
       company: SampleData.companyInfo,
       employee: employee,
       payslip: payslip,

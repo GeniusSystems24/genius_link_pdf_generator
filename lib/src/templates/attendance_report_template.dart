@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
@@ -170,29 +169,66 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
     required this.company,
     required this.data,
     this.boldFont,
+    this.reportId,
+    this.printedBy,
+    this.showQRCode = true,
+    this.showSignatures = true,
+    this.showNotes = true,
+    this.notes,
+    this.notesAr,
   }) : super(config);
 
   final GeniusPdfCompanyInfo company;
   final AttendanceReportData data;
   final PdfFont? boldFont;
 
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
+  /// Report ID for QR code URL
+  final String? reportId;
+
+  /// User who printed the report
+  final String? printedBy;
+
+  /// Whether to show QR code with report link
+  final bool showQRCode;
+
+  /// Whether to show signature areas
+  final bool showSignatures;
+
+  /// Whether to show notes section
+  final bool showNotes;
+
+  /// Custom notes to display
+  final String? notes;
+  final String? notesAr;
 
   @override
   void build() {
+    // Add repeating footer with user info on all pages
+    if (printedBy != null || showQRCode) {
+      addFooter(
+        userName: printedBy,
+        printTime: _formatDate(DateTime.now()),
+        showPageNumber: true,
+      );
+    }
+
     newPage();
 
     _drawHeader();
+    _drawReportInfo();
     _drawOverallSummary();
     _drawEmployeeSummaryTable();
 
     if (data.showDailyDetails && data.employees.length <= 5) {
       _drawDailyDetails();
+    }
+
+    // Draw Footer Section (Notes + QR Code)
+    _drawFooterSection();
+
+    // Signatures section
+    if (showSignatures) {
+      _drawSignatures();
     }
   }
 
@@ -217,86 +253,102 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
-    header.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, 0, pageWidth, 100),
+    addReportHeader(header, height: 100);
+  }
+
+  void _drawReportInfo() {
+    final infoBox = GeniusPdfInfoBox(
+      config: config,
+      title: 'Report Details',
+      titleAr: 'تفاصيل التقرير',
+      columns: 3,
+      showEmptyItems: true,
+      items: [
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Period Start',
+          labelAr: 'بداية الفترة',
+          value: _formatDate(data.periodStart),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Period End',
+          labelAr: 'نهاية الفترة',
+          value: _formatDate(data.periodEnd),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Employees',
+          labelAr: 'الموظفون',
+          value: '${data.totalEmployees}',
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Daily Details',
+          labelAr: 'تفاصيل يومية',
+          value: data.showDailyDetails
+              ? (config.isRTL ? 'نعم' : 'Yes')
+              : (config.isRTL ? 'لا' : 'No'),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Overtime',
+          labelAr: 'عمل إضافي',
+          value: data.showOvertime
+              ? (config.isRTL ? 'نعم' : 'Yes')
+              : (config.isRTL ? 'لا' : 'No'),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Avg Rate',
+          labelAr: 'متوسط النسبة',
+          value: '${data.averageAttendanceRate.toStringAsFixed(1)}%',
+        ),
+      ],
+      style: const GeniusPdfInfoBoxStyle.headerContent(),
     );
 
-    addSpace(105);
+    addInfoBox(infoBox, spacing: 6);
   }
 
   void _drawOverallSummary() {
-    final title = config.isRTL ? 'الملخص العام' : 'Overall Summary';
-
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(70, 130, 180)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 22),
-    );
-
-    currentPage.graphics.drawString(
-      title,
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-              style: PdfFontStyle.bold),
-      brush: PdfBrushes.white,
-      bounds: Rect.fromLTWH(10, currentY + 4, pageWidth - 20, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
-    );
-
-    addSpace(28);
-
-    // Summary stats
-    final stats = [
-      (
-        config.isRTL ? 'عدد الموظفين' : 'Total Employees',
-        '${data.totalEmployees}'
-      ),
-      (
-        config.isRTL ? 'متوسط نسبة الحضور' : 'Avg Attendance Rate',
-        '${data.averageAttendanceRate.toStringAsFixed(1)}%'
-      ),
-    ];
-
-    final font = baseFont;
-    final itemWidth = pageWidth / stats.length;
-
-    for (var i = 0; i < stats.length; i++) {
-      final stat = stats[i];
-      final x = i * itemWidth;
-
-      currentPage.graphics.drawString(
-        '${stat.$1}: ${stat.$2}',
-        font,
-        bounds: Rect.fromLTWH(x + 10, currentY, itemWidth - 20, 18),
-        format: PdfStringFormat(
-          alignment:
-              config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+    final summary = GeniusPdfSummarySection(
+      config: config,
+      items: [
+        GeniusPdfSummaryItem(
+          label: 'Total Employees',
+          labelAr: 'عدد الموظفين',
+          value: '${data.totalEmployees}',
         ),
-      );
-    }
+        GeniusPdfSummaryItem(
+          label: 'Avg Attendance Rate',
+          labelAr: 'متوسط نسبة الحضور',
+          value: '${data.averageAttendanceRate.toStringAsFixed(1)}%',
+        ),
+      ],
+      style: const GeniusPdfSummaryStyle.minimal(),
+      alignment: config.isRTL
+          ? GeniusPdfSummaryAlignment.right
+          : GeniusPdfSummaryAlignment.left,
+    );
 
-    addSpace(30);
+    addReportSummary(
+      summary: summary,
+      title: 'Overall Summary',
+      titleAr: 'الملخص العام',
+      spacing: 8,
+    );
   }
 
   void _drawEmployeeSummaryTable() {
-    final title =
-        config.isRTL ? 'ملخص حضور الموظفين' : 'Employee Attendance Summary';
-
-    currentPage.graphics.drawString(
-      title,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
+    addSectionDivider(
+      title:
+          config.isRTL ? 'ملخص حضور الموظفين' : 'Employee Attendance Summary',
+      spacing: 10,
     );
 
-    addSpace(22);
+    final hasDepartment = data.employees
+        .any((e) => e.department != null && e.department!.trim().isNotEmpty);
 
     final columns = <GeniusPdfGridColumn>[
       const GeniusPdfGridColumn(
@@ -309,8 +361,15 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
         id: 'name',
         title: 'Employee',
         titleAr: 'الموظف',
-        flexFactor: 2,
+        flexFactor: 20,
       ),
+      if (hasDepartment)
+        const GeniusPdfGridColumn(
+          id: 'department',
+          title: 'Department',
+          titleAr: 'القسم',
+          flexFactor: 12,
+        ),
       const GeniusPdfGridColumn(
         id: 'present',
         title: 'Present',
@@ -372,6 +431,10 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
         'name': config.isRTL
             ? (emp.employeeNameAr ?? emp.employeeName)
             : emp.employeeName,
+        if (hasDepartment)
+          'department': config.isRTL
+              ? (emp.departmentAr ?? emp.department ?? '-')
+              : (emp.department ?? '-'),
         'present': emp.presentDays,
         'absent': emp.absentDays,
         'late': emp.lateDays,
@@ -394,44 +457,20 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
       style: GeniusPdfGridStyle.modern(),
     );
 
-    final result = grid.drawAt(
-      page: currentPage,
-      x: 0,
-      y: currentY,
-      width: pageWidth,
-    );
-
-    if (result != null) {
-      addSpace(result.bounds.height + 20);
-    }
+    addGrid(grid, spacing: 6);
+    addSpace(8);
   }
 
   void _drawDailyDetails() {
     for (final emp in data.employees) {
-      if (currentY > pageHeight - 150) {
-        newPage();
-      }
-
       final empName = config.isRTL
           ? (emp.employeeNameAr ?? emp.employeeName)
           : emp.employeeName;
 
-      currentPage.graphics.drawRectangle(
-        brush: PdfSolidBrush(PdfColor(200, 200, 220)),
-        bounds: Rect.fromLTWH(0, currentY, pageWidth, 20),
+      addSectionDivider(
+        title: '$empName (${emp.employeeId})',
+        spacing: 8,
       );
-
-      currentPage.graphics.drawString(
-        '$empName (${emp.employeeId})',
-        _boldFont,
-        bounds: Rect.fromLTWH(5, currentY + 3, pageWidth - 10, 16),
-        format: PdfStringFormat(
-          alignment:
-              config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        ),
-      );
-
-      addSpace(25);
 
       // Daily attendance grid
       final grid = GeniusPdfDataGrid(
@@ -493,20 +532,185 @@ class AttendanceReportTemplate extends GeniusPdfDocumentBuilder {
                 ))
             .toList(),
         style: GeniusPdfGridStyle.modern(),
-
       );
 
-      final result = grid.drawAt(
-        page: currentPage,
-        x: 0,
-        y: currentY,
-        width: pageWidth,
-      );
-
-      if (result != null) {
-        addSpace(result.bounds.height + 15);
-      }
+      addGrid(grid, spacing: 4);
+      addSpace(10);
     }
+  }
+
+  void _drawFooterSection() {
+    if (!showNotes && (!showQRCode || reportId == null)) {
+      return;
+    }
+
+    addSpace(20);
+
+    // If only one section is shown, draw it normally
+    if (showNotes && (!showQRCode || reportId == null)) {
+      _drawNotes(width: pageWidth);
+      return;
+    }
+
+    if (!showNotes && (showQRCode && reportId != null)) {
+      _drawQRCodeSection(width: pageWidth);
+      return;
+    }
+
+    // Draw side-by-side if both are present
+    addTwoColumns(
+      spacing: 10,
+      leftFlex: config.isLTR ? 2 : 1,
+      rightFlex: config.isLTR ? 1 : 2,
+      leftContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawNotesContent(page, bounds);
+        } else {
+          return _drawQRCodeContent(page, bounds);
+        }
+      },
+      rightContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawQRCodeContent(page, bounds);
+        } else {
+          return _drawNotesContent(page, bounds);
+        }
+      },
+    );
+
+    addSpace(20);
+  }
+
+  void _drawNotes({required double width}) {
+    _drawNotesContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawNotesContent(PdfPage page, Rect bounds) {
+    final displayNotes = notes ?? (config.isRTL ? notesAr : notes);
+    final defaultNotes = config.isRTL
+        ? '''ملاحظات:
+• يرجى مراجعة سجل الحضور بدقة للتأكد من عدم وجود أخطاء.
+• في حال وجود استفسارات، يرجى التواصل مع إدارة الموارد البشرية.
+'''
+        : '''Notes:
+• Please review the attendance record carefully for any discrepancies.
+• For inquiries, please contact the HR Department.
+''';
+
+    final notesText = displayNotes ?? defaultNotes;
+
+    final font = config.baseFont;
+    final element = PdfTextElement(
+      text: notesText,
+      font: font,
+      format: config.isLTR
+          ? null
+          : PdfStringFormat(
+              textDirection: PdfTextDirection.rightToLeft,
+              alignment: PdfTextAlignment.right),
+    );
+
+    final result = element.draw(
+      page: page,
+      bounds: bounds,
+    );
+
+    return result?.bounds.height ?? 0;
+  }
+
+  void _drawQRCodeSection({required double width}) {
+    _drawQRCodeContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawQRCodeContent(PdfPage page, Rect bounds) {
+    if (reportId == null) return 0;
+
+    final qrUrl = 'https://localhost:443/report/$reportId';
+    final caption = 'ID: $reportId';
+
+    final captionFont = config.baseFont;
+    final captionLayout = PdfTextElement(
+      text: caption,
+      font: captionFont,
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: config.isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    ).draw(
+        page: page,
+        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
+
+    final captionHeight = captionLayout?.bounds.height ?? 0;
+    final qrSize = 80.0;
+    final x = bounds.left + (bounds.width - qrSize) / 2;
+    final y = bounds.top + captionHeight + 5;
+
+    final urlQR = GeniusPdfQRCodeGenerator.url(
+      url: qrUrl,
+      config: config,
+      caption: null,
+    );
+
+    urlQR.draw(
+      page: page,
+      bounds: Rect.fromLTWH(x, y, qrSize, qrSize),
+    );
+
+    return captionHeight + 5 + qrSize;
+  }
+
+  void _drawSignatures() {
+    // Ensure enough space for signatures
+    if (currentY > pageHeight - 100) {
+      newPage();
+    }
+
+    addSpace(20);
+    addHorizontalLine(spacing: 10);
+
+    final signatureY = currentY;
+
+    // Prepared By
+    final preparedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'Prepared By',
+      titleAr: 'أعده',
+      lineWidth: 110,
+      showDate: false,
+    );
+
+    preparedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? pageWidth - 120 : 0,
+        signatureY,
+        120,
+        60,
+      ),
+    );
+
+    // HR Manager
+    final approvedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'HR Manager',
+      titleAr: 'مدير الموارد البشرية',
+      lineWidth: 110,
+      showDate: false,
+    );
+
+    approvedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? 0 : pageWidth - 120,
+        signatureY,
+        120,
+        60,
+      ),
+    );
+
+    addSpace(70);
   }
 
   String _formatDate(DateTime date) {

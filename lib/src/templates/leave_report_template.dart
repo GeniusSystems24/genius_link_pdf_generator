@@ -229,24 +229,53 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
     required this.company,
     required this.data,
     this.boldFont,
+    this.reportId,
+    this.printedBy,
+    this.showQRCode = true,
+    this.showSignatures = true,
+    this.showNotes = true,
+    this.notes,
+    this.notesAr,
   }) : super(config);
 
   final GeniusPdfCompanyInfo company;
   final LeaveReportData data;
   final PdfFont? boldFont;
 
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
+  /// Report ID for QR code URL
+  final String? reportId;
+
+  /// User who printed the report
+  final String? printedBy;
+
+  /// Whether to show QR code with report link
+  final bool showQRCode;
+
+  /// Whether to show signature areas
+  final bool showSignatures;
+
+  /// Whether to show notes section
+  final bool showNotes;
+
+  /// Custom notes to display
+  final String? notes;
+  final String? notesAr;
 
   @override
   void build() {
+    // Add repeating footer with user info on all pages
+    if (printedBy != null || showQRCode) {
+      addFooter(
+        userName: printedBy,
+        printTime: _formatDate(DateTime.now()),
+        showPageNumber: true,
+      );
+    }
+
     newPage();
 
     _drawHeader();
+    _drawReportInfo();
     _drawOverallSummary();
 
     if (data.showBalances && data.leaveBalances.isNotEmpty) {
@@ -258,6 +287,14 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
     }
 
     _drawLeaveTypeBreakdown();
+
+    // Draw Footer Section (Notes + QR Code)
+    _drawFooterSection();
+
+    // Signatures section
+    if (showSignatures) {
+      _drawSignatures();
+    }
   }
 
   void _drawHeader() {
@@ -281,112 +318,111 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
-    header.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, 0, pageWidth, 100),
+    addReportHeader(header, height: 100);
+  }
+
+  void _drawReportInfo() {
+    final infoBox = GeniusPdfInfoBox(
+      config: config,
+      title: 'Report Details',
+      titleAr: 'تفاصيل التقرير',
+      columns: 3,
+      showEmptyItems: true,
+      items: [
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Period Start',
+          labelAr: 'بداية الفترة',
+          value: _formatDate(data.periodStart),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Period End',
+          labelAr: 'نهاية الفترة',
+          value: _formatDate(data.periodEnd),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Show Balances',
+          labelAr: 'إظهار الأرصدة',
+          value: data.showBalances
+              ? (config.isRTL ? 'نعم' : 'Yes')
+              : (config.isRTL ? 'لا' : 'No'),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Show Requests',
+          labelAr: 'إظهار الطلبات',
+          value: data.showRequests
+              ? (config.isRTL ? 'نعم' : 'Yes')
+              : (config.isRTL ? 'لا' : 'No'),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Total Requests',
+          labelAr: 'إجمالي الطلبات',
+          value: '${data.totalRequests}',
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Total Days',
+          labelAr: 'إجمالي الأيام',
+          value: '${data.totalLeaveDays}',
+        ),
+      ],
+      style: const GeniusPdfInfoBoxStyle.headerContent(),
     );
 
-    addSpace(105);
+    addInfoBox(infoBox, spacing: 6);
   }
 
   void _drawOverallSummary() {
-    final title = config.isRTL ? 'الملخص العام' : 'Overview';
-
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(70, 130, 180)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 22),
+    final summary = GeniusPdfSummarySection(
+      config: config,
+      items: [
+        GeniusPdfSummaryItem(
+          label: 'Total Requests',
+          labelAr: 'إجمالي الطلبات',
+          value: '${data.totalRequests}',
+        ),
+        GeniusPdfSummaryItem(
+          label: 'Pending',
+          labelAr: 'قيد الانتظار',
+          value: '${data.pendingRequests}',
+        ),
+        GeniusPdfSummaryItem(
+          label: 'Approved',
+          labelAr: 'معتمد',
+          value: '${data.approvedRequests}',
+        ),
+        GeniusPdfSummaryItem(
+          label: 'Total Days',
+          labelAr: 'إجمالي الأيام',
+          value: '${data.totalLeaveDays}',
+        ),
+      ],
+      style: const GeniusPdfSummaryStyle.minimal(),
+      alignment: config.isRTL
+          ? GeniusPdfSummaryAlignment.right
+          : GeniusPdfSummaryAlignment.left,
     );
 
-    currentPage.graphics.drawString(
-      title,
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-              style: PdfFontStyle.bold),
-      brush: PdfBrushes.white,
-      bounds: Rect.fromLTWH(10, currentY + 4, pageWidth - 20, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
+    addReportSummary(
+      summary: summary,
+      title: 'Overview',
+      titleAr: 'الملخص العام',
+      spacing: 8,
     );
-
-    addSpace(28);
-
-    // Stats boxes
-    final stats = [
-      (
-        config.isRTL ? 'إجمالي الطلبات' : 'Total Requests',
-        data.totalRequests,
-        PdfColor(70, 130, 180)
-      ),
-      (
-        config.isRTL ? 'قيد الانتظار' : 'Pending',
-        data.pendingRequests,
-        PdfColor(255, 165, 0)
-      ),
-      (
-        config.isRTL ? 'معتمد' : 'Approved',
-        data.approvedRequests,
-        PdfColor(46, 139, 87)
-      ),
-      (
-        config.isRTL ? 'إجمالي الأيام' : 'Total Days',
-        data.totalLeaveDays,
-        PdfColor(138, 43, 226)
-      ),
-    ];
-
-    final boxWidth = (pageWidth - 60) / stats.length;
-    for (var i = 0; i < stats.length; i++) {
-      final stat = stats[i];
-      final x = i * (boxWidth + 20);
-
-      currentPage.graphics.drawRectangle(
-        brush: PdfSolidBrush(stat.$3),
-        bounds: Rect.fromLTWH(x, currentY, boxWidth, 50),
-      );
-
-      currentPage.graphics.drawString(
-        '${stat.$2}',
-        config.configAssets == null
-            ? config.baseFont
-            : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 18,
-                style: PdfFontStyle.bold),
-        brush: PdfBrushes.white,
-        bounds: Rect.fromLTWH(x, currentY + 8, boxWidth, 22),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
-      );
-
-      currentPage.graphics.drawString(
-        stat.$1,
-        config.configAssets == null
-            ? config.baseFont
-            : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 8,
-                style: PdfFontStyle.regular),
-        brush: PdfBrushes.white,
-        bounds: Rect.fromLTWH(x, currentY + 32, boxWidth, 14),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
-      );
-    }
-
-    addSpace(60);
   }
 
   void _drawLeaveBalances() {
-    final title = config.isRTL ? 'رصيد الإجازات' : 'Leave Balances';
-
-    currentPage.graphics.drawString(
-      title,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
+    addSectionDivider(
+      title: config.isRTL ? 'رصيد الإجازات' : 'Leave Balances',
+      spacing: 10,
     );
 
-    addSpace(22);
+    final hasDepartment = data.leaveBalances
+        .any((e) => e.department != null && e.department!.trim().isNotEmpty);
 
     final grid = GeniusPdfDataGrid(
       config: config,
@@ -401,8 +437,15 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
           id: 'name',
           title: 'Employee',
           titleAr: 'الموظف',
-          flexFactor: 2,
+          flexFactor: 20,
         ),
+        if (hasDepartment)
+          const GeniusPdfGridColumn(
+            id: 'department',
+            title: 'Department',
+            titleAr: 'القسم',
+            flexFactor: 12,
+          ),
         const GeniusPdfGridColumn(
           id: 'entitled',
           title: 'Entitled',
@@ -453,6 +496,10 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
                   'name': config.isRTL
                       ? (bal.employeeNameAr ?? bal.employeeName)
                       : bal.employeeName,
+                  if (hasDepartment)
+                    'department': config.isRTL
+                        ? (bal.departmentAr ?? bal.department ?? '-')
+                        : (bal.department ?? '-'),
                   'entitled': bal.annualEntitlement,
                   'carry': bal.carryForward,
                   'annual': bal.annualUsed,
@@ -465,36 +512,20 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
       style: GeniusPdfGridStyle.modern(),
     );
 
-    final result = grid.drawAt(
-      page: currentPage,
-      x: 0,
-      y: currentY,
-      width: pageWidth,
-    );
-
-    if (result != null) {
-      addSpace(result.bounds.height + 20);
-    }
+    addGrid(grid, spacing: 6);
+    addSpace(8);
   }
 
   void _drawLeaveRequests() {
-    if (currentY > pageHeight - 150) {
-      newPage();
-    }
-
-    final title = config.isRTL ? 'طلبات الإجازة' : 'Leave Requests';
-
-    currentPage.graphics.drawString(
-      title,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
+    addSectionDivider(
+      title: config.isRTL ? 'طلبات الإجازة' : 'Leave Requests',
+      spacing: 10,
     );
 
-    addSpace(22);
+    final hasDepartment = data.leaveRequests
+        .any((e) => e.department != null && e.department!.trim().isNotEmpty);
+    final hasApprovedBy = data.leaveRequests
+        .any((e) => e.approvedBy != null && e.approvedBy!.trim().isNotEmpty);
 
     final grid = GeniusPdfDataGrid(
       config: config,
@@ -509,8 +540,15 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
           id: 'employee',
           title: 'Employee',
           titleAr: 'الموظف',
-          flexFactor: 2,
+          flexFactor: 20,
         ),
+        if (hasDepartment)
+          const GeniusPdfGridColumn(
+            id: 'department',
+            title: 'Department',
+            titleAr: 'القسم',
+            flexFactor: 12,
+          ),
         const GeniusPdfGridColumn(
           id: 'type',
           title: 'Type',
@@ -543,6 +581,13 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
           width: 65,
           alignment: GeniusPdfTextAlign.center,
         ),
+        if (hasApprovedBy)
+          const GeniusPdfGridColumn(
+            id: 'approvedBy',
+            title: 'Approved By',
+            titleAr: 'المعتمد',
+            width: 75,
+          ),
       ],
       rows: data.leaveRequests
           .map((leave) => GeniusPdfGridRow(
@@ -551,6 +596,10 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
                   'employee': config.isRTL
                       ? (leave.employeeNameAr ?? leave.employeeName)
                       : leave.employeeName,
+                  if (hasDepartment)
+                    'department': config.isRTL
+                        ? (leave.departmentAr ?? leave.department ?? '-')
+                        : (leave.department ?? '-'),
                   'type': config.isRTL
                       ? leave.leaveTypeTextAr
                       : leave.leaveTypeText,
@@ -559,22 +608,18 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
                   'days': leave.days,
                   'status':
                       config.isRTL ? leave.statusTextAr : leave.statusText,
+                  if (hasApprovedBy)
+                    'approvedBy': config.isRTL
+                        ? (leave.approvedByAr ?? leave.approvedBy ?? '-')
+                        : (leave.approvedBy ?? '-'),
                 },
               ))
           .toList(),
       style: GeniusPdfGridStyle.modern(),
     );
 
-    final result = grid.drawAt(
-      page: currentPage,
-      x: 0,
-      y: currentY,
-      width: pageWidth,
-    );
-
-    if (result != null) {
-      addSpace(result.bounds.height + 20);
-    }
+    addGrid(grid, spacing: 6);
+    addSpace(8);
   }
 
   void _drawLeaveTypeBreakdown() {
@@ -584,20 +629,10 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
       newPage();
     }
 
-    final title =
-        config.isRTL ? 'توزيع أنواع الإجازات' : 'Leave Type Breakdown';
-
-    currentPage.graphics.drawString(
-      title,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
+    addSectionDivider(
+      title: config.isRTL ? 'توزيع أنواع الإجازات' : 'Leave Type Breakdown',
+      spacing: 10,
     );
-
-    addSpace(22);
 
     final breakdown = data.leaveTypeBreakdown;
     final colors = [
@@ -619,11 +654,14 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
       final days = entry.value;
       final barWidth = (pageWidth - 100) *
           (days / (data.totalLeaveDays > 0 ? data.totalLeaveDays : 1));
+      final labelX = config.isRTL ? pageWidth - 80 : 0.0;
+      final barX = config.isRTL ? pageWidth - 85 - barWidth : 85.0;
+      final valueX = config.isRTL ? barX - 55 : 90 + barWidth;
 
       currentPage.graphics.drawString(
         typeText,
         baseFont,
-        bounds: Rect.fromLTWH(0, currentY, 80, barHeight),
+        bounds: Rect.fromLTWH(labelX, currentY, 80, barHeight),
         format: PdfStringFormat(
           alignment:
               config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
@@ -633,7 +671,7 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
 
       currentPage.graphics.drawRectangle(
         brush: PdfSolidBrush(colors[colorIndex % colors.length]),
-        bounds: Rect.fromLTWH(85, currentY + 3, barWidth, barHeight - 6),
+        bounds: Rect.fromLTWH(barX, currentY + 3, barWidth, barHeight - 6),
       );
 
       currentPage.graphics.drawString(
@@ -642,9 +680,10 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
             ? config.baseFont
             : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 8,
                 style: PdfFontStyle.regular),
-        bounds: Rect.fromLTWH(90 + barWidth, currentY, 50, barHeight),
+        bounds: Rect.fromLTWH(valueX, currentY, 50, barHeight),
         format: PdfStringFormat(
-          alignment: PdfTextAlignment.left,
+          alignment:
+              config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
           lineAlignment: PdfVerticalAlignment.middle,
         ),
       );
@@ -652,6 +691,180 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
     }
 
     addSpace(15);
+  }
+
+  void _drawFooterSection() {
+    if (!showNotes && (!showQRCode || reportId == null)) {
+      return;
+    }
+
+    addSpace(20);
+
+    // If only one section is shown, draw it normally
+    if (showNotes && (!showQRCode || reportId == null)) {
+      _drawNotes(width: pageWidth);
+      return;
+    }
+
+    if (!showNotes && (showQRCode && reportId != null)) {
+      _drawQRCodeSection(width: pageWidth);
+      return;
+    }
+
+    // Draw side-by-side if both are present
+    addTwoColumns(
+      spacing: 10,
+      leftFlex: config.isLTR ? 2 : 1,
+      rightFlex: config.isLTR ? 1 : 2,
+      leftContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawNotesContent(page, bounds);
+        } else {
+          return _drawQRCodeContent(page, bounds);
+        }
+      },
+      rightContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawQRCodeContent(page, bounds);
+        } else {
+          return _drawNotesContent(page, bounds);
+        }
+      },
+    );
+
+    addSpace(20);
+  }
+
+  void _drawNotes({required double width}) {
+    _drawNotesContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawNotesContent(PdfPage page, Rect bounds) {
+    final displayNotes = notes ?? (config.isRTL ? notesAr : notes);
+    final defaultNotes = config.isRTL
+        ? '''ملاحظات:
+• يمثل هذا التقرير طلبات وأرصدة الإجازات المسجلة في النظام.
+• يرجى مراجعة الرصيد المتبقي قبل تقديم طلب جديد.
+'''
+        : '''Notes:
+• This report represents leave requests and balances recorded in the system.
+• Please checks remaining balance before submitting a new request.
+''';
+
+    final notesText = displayNotes ?? defaultNotes;
+
+    final font = config.baseFont;
+    final element = PdfTextElement(
+      text: notesText,
+      font: font,
+      format: config.isLTR
+          ? null
+          : PdfStringFormat(
+              textDirection: PdfTextDirection.rightToLeft,
+              alignment: PdfTextAlignment.right),
+    );
+
+    final result = element.draw(
+      page: page,
+      bounds: bounds,
+    );
+
+    return result?.bounds.height ?? 0;
+  }
+
+  void _drawQRCodeSection({required double width}) {
+    _drawQRCodeContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawQRCodeContent(PdfPage page, Rect bounds) {
+    if (reportId == null) return 0;
+
+    final qrUrl = 'https://localhost:443/report/$reportId';
+    final caption = 'ID: $reportId';
+
+    final captionFont = config.baseFont;
+    final captionLayout = PdfTextElement(
+      text: caption,
+      font: captionFont,
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: config.isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    ).draw(
+        page: page,
+        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
+
+    final captionHeight = captionLayout?.bounds.height ?? 0;
+    final qrSize = 80.0;
+    final x = bounds.left + (bounds.width - qrSize) / 2;
+    final y = bounds.top + captionHeight + 5;
+
+    final urlQR = GeniusPdfQRCodeGenerator.url(
+      url: qrUrl,
+      config: config,
+      caption: null,
+    );
+
+    urlQR.draw(
+      page: page,
+      bounds: Rect.fromLTWH(x, y, qrSize, qrSize),
+    );
+
+    return captionHeight + 5 + qrSize;
+  }
+
+  void _drawSignatures() {
+    // Ensure enough space for signatures
+    if (currentY > pageHeight - 100) {
+      newPage();
+    }
+
+    addSpace(20);
+    addHorizontalLine(spacing: 10);
+
+    final signatureY = currentY;
+
+    // Prepared By
+    final preparedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'Prepared By',
+      titleAr: 'أعده',
+      lineWidth: 110,
+      showDate: false,
+    );
+
+    preparedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? pageWidth - 120 : 0,
+        signatureY,
+        120,
+        60,
+      ),
+    );
+
+    // HR Manager
+    final approvedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'HR Manager',
+      titleAr: 'مدير الموارد البشرية',
+      lineWidth: 110,
+      showDate: false,
+    );
+
+    approvedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? 0 : pageWidth - 120,
+        signatureY,
+        120,
+        60,
+      ),
+    );
+
+    addSpace(70);
   }
 
   String _getLeaveTypeText(LeaveType type) {

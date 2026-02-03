@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
@@ -170,6 +169,13 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
     required this.data,
     this.boldFont,
     this.showDepartmentSummary = true,
+    this.reportId,
+    this.printedBy,
+    this.showQRCode = true,
+    this.showSignatures = true,
+    this.showNotes = true,
+    this.notes,
+    this.notesAr,
   }) : super(config);
 
   final GeniusPdfCompanyInfo company;
@@ -177,18 +183,40 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
   final PdfFont? boldFont;
   final bool showDepartmentSummary;
 
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
+  /// Report ID for QR code URL
+  final String? reportId;
+
+  /// User who printed the report
+  final String? printedBy;
+
+  /// Whether to show QR code with report link
+  final bool showQRCode;
+
+  /// Whether to show signature areas
+  final bool showSignatures;
+
+  /// Whether to show notes section
+  final bool showNotes;
+
+  /// Custom notes to display
+  final String? notes;
+  final String? notesAr;
 
   @override
   void build() {
+    // Add repeating footer with user info on all pages
+    if (printedBy != null || showQRCode) {
+      addFooter(
+        userName: printedBy,
+        printTime: _formatDateDate(DateTime.now()),
+        showPageNumber: true,
+      );
+    }
+
     newPage();
 
     _drawHeader();
+    _drawReportInfo();
     _drawSummaryStats();
 
     if (showDepartmentSummary) {
@@ -196,6 +224,14 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
     }
 
     _drawEmployeeTable();
+
+    // Draw Footer Section (Notes + QR Code)
+    _drawFooterSection();
+
+    // Signatures section
+    if (showSignatures) {
+      _drawSignatures();
+    }
   }
 
   void _drawHeader() {
@@ -217,107 +253,103 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
       layout: GeniusPdfReportHeaderLayout.standard,
     );
 
-    header.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, 0, pageWidth, 100),
+    addReportHeader(header, height: 100);
+  }
+
+  void _drawReportInfo() {
+    final infoBox = GeniusPdfInfoBox(
+      config: config,
+      title: 'Report Details',
+      titleAr: 'تفاصيل التقرير',
+      columns: 2,
+      showEmptyItems: true,
+      items: [
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Report Date',
+          labelAr: 'تاريخ التقرير',
+          value: _formatDate(data.reportDate),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Department',
+          labelAr: 'القسم',
+          value: data.departmentFilter ?? (config.isRTL ? 'الكل' : 'All'),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Status',
+          labelAr: 'الحالة',
+          value: config.isRTL
+              ? _getStatusFilterTextAr(data.statusFilter)
+              : _getStatusFilterText(data.statusFilter),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Show Salary',
+          labelAr: 'إظهار الراتب',
+          value: data.showSalary
+              ? (config.isRTL ? 'نعم' : 'Yes')
+              : (config.isRTL ? 'لا' : 'No'),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Contact Info',
+          labelAr: 'بيانات التواصل',
+          value: data.showContactInfo
+              ? (config.isRTL ? 'نعم' : 'Yes')
+              : (config.isRTL ? 'لا' : 'No'),
+        ),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Currency',
+          labelAr: 'العملة',
+          value: data.currency,
+        ),
+      ],
+      style: const GeniusPdfInfoBoxStyle.headerContent(),
     );
 
-    addSpace(105);
+    addInfoBox(infoBox, spacing: 6);
   }
 
   void _drawSummaryStats() {
-    final title = config.isRTL ? 'ملخص' : 'Summary';
-
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(70, 130, 180)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 22),
+    final summary = GeniusPdfSummarySection(
+      config: config,
+      items: [
+        GeniusPdfSummaryItem(
+          label: 'Total Employees',
+          labelAr: 'إجمالي الموظفين',
+          value: '${data.totalEmployees}',
+        ),
+        GeniusPdfSummaryItem(
+          label: 'Active',
+          labelAr: 'نشط',
+          value: '${data.activeEmployees}',
+        ),
+        GeniusPdfSummaryItem(
+          label: 'On Leave',
+          labelAr: 'في إجازة',
+          value: '${data.onLeaveEmployees}',
+        ),
+      ],
+      style: const GeniusPdfSummaryStyle.minimal(),
+      alignment: GeniusPdfSummaryAlignment.left,
     );
 
-    currentPage.graphics.drawString(
-      title,
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-              style: PdfFontStyle.bold),
-      brush: PdfBrushes.white,
-      bounds: Rect.fromLTWH(10, currentY + 4, pageWidth - 20, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
+    addReportSummary(
+      summary: summary,
+      title: 'Summary',
+      titleAr: 'ملخص',
+      spacing: 8,
     );
-
-    addSpace(28);
-
-    // Stats boxes
-    final stats = [
-      (
-        config.isRTL ? 'إجمالي الموظفين' : 'Total Employees',
-        data.totalEmployees,
-        PdfColor(70, 130, 180)
-      ),
-      (
-        config.isRTL ? 'نشط' : 'Active',
-        data.activeEmployees,
-        PdfColor(46, 139, 87)
-      ),
-      (
-        config.isRTL ? 'في إجازة' : 'On Leave',
-        data.onLeaveEmployees,
-        PdfColor(255, 165, 0)
-      ),
-    ];
-
-    final boxWidth = (pageWidth - 40) / stats.length;
-    for (var i = 0; i < stats.length; i++) {
-      final stat = stats[i];
-      final x = i * (boxWidth + 20);
-
-      currentPage.graphics.drawRectangle(
-        brush: PdfSolidBrush(stat.$3),
-        bounds: Rect.fromLTWH(x, currentY, boxWidth, 50),
-      );
-
-      currentPage.graphics.drawString(
-        '${stat.$2}',
-        config.configAssets == null
-            ? config.baseFont
-            : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 20,
-                style: PdfFontStyle.bold),
-        brush: PdfBrushes.white,
-        bounds: Rect.fromLTWH(x, currentY + 8, boxWidth, 25),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
-      );
-
-      currentPage.graphics.drawString(
-        stat.$1,
-        config.configAssets == null
-            ? config.baseFont
-            : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 9,
-                style: PdfFontStyle.regular),
-        brush: PdfBrushes.white,
-        bounds: Rect.fromLTWH(x, currentY + 32, boxWidth, 16),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
-      );
-    }
-
-    addSpace(60);
   }
 
   void _drawDepartmentSummary() {
-    final title = config.isRTL ? 'ملخص الأقسام' : 'Department Summary';
-
-    currentPage.graphics.drawString(
-      title,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
+    addSectionDivider(
+      title: config.isRTL ? 'ملخص الأقسام' : 'Department Summary',
+      spacing: 10,
     );
-
-    addSpace(22);
 
     final summaries = data.departmentSummaries;
     final grid = GeniusPdfDataGrid(
@@ -350,6 +382,20 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
           width: 70,
           alignment: GeniusPdfTextAlign.center,
         ),
+        const GeniusPdfGridColumn(
+          id: 'activeRate',
+          title: 'Active %',
+          titleAr: 'نسبة النشط',
+          width: 60,
+          alignment: GeniusPdfTextAlign.center,
+        ),
+        const GeniusPdfGridColumn(
+          id: 'leaveRate',
+          title: 'Leave %',
+          titleAr: 'نسبة الإجازة',
+          width: 60,
+          alignment: GeniusPdfTextAlign.center,
+        ),
       ],
       rows: summaries
           .map((s) => GeniusPdfGridRow(cells: {
@@ -359,38 +405,31 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
                 'total': s.employeeCount,
                 'active': s.activeCount,
                 'onLeave': s.onLeaveCount,
+                'activeRate': s.employeeCount == 0
+                    ? '0%'
+                    : '${((s.activeCount / s.employeeCount) * 100).toStringAsFixed(0)}%',
+                'leaveRate': s.employeeCount == 0
+                    ? '0%'
+                    : '${((s.onLeaveCount / s.employeeCount) * 100).toStringAsFixed(0)}%',
               }))
           .toList(),
-      style: const GeniusPdfGridStyle(showHeader: false),
-      
+      style: GeniusPdfGridStyle.modern(),
     );
 
-    final result = grid.drawAt(
-      page: currentPage,
-      x: 0,
-      y: currentY,
-      width: pageWidth,
-    );
-
-    if (result != null) {
-      addSpace(result.bounds.height + 20);
-    }
+    addGrid(grid, spacing: 6);
+    addSpace(10);
   }
 
   void _drawEmployeeTable() {
-    final title = config.isRTL ? 'قائمة الموظفين' : 'Employee List';
-
-    currentPage.graphics.drawString(
-      title,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-      ),
+    addSectionDivider(
+      title: config.isRTL ? 'قائمة الموظفين' : 'Employee List',
+      spacing: 10,
     );
 
-    addSpace(22);
+    final hasEmail = data.employees
+        .any((e) => e.email != null && e.email!.trim().isNotEmpty);
+    final hasManager = data.employees
+        .any((e) => e.manager != null && e.manager!.trim().isNotEmpty);
 
     final columns = <GeniusPdfGridColumn>[
       const GeniusPdfGridColumn(
@@ -403,20 +442,27 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
         id: 'name',
         title: 'Name',
         titleAr: 'الاسم',
-        flexFactor: 2,
+        flexFactor: 20,
       ),
       const GeniusPdfGridColumn(
         id: 'department',
         title: 'Department',
         titleAr: 'القسم',
-        flexFactor: 1,
+        flexFactor: 10,
       ),
       const GeniusPdfGridColumn(
         id: 'designation',
         title: 'Designation',
         titleAr: 'المسمى',
-        flexFactor: 1,
+        flexFactor: 12,
       ),
+      if (hasManager)
+        const GeniusPdfGridColumn(
+          id: 'manager',
+          title: 'Manager',
+          titleAr: 'المدير',
+          flexFactor: 12,
+        ),
       const GeniusPdfGridColumn(
         id: 'joinDate',
         title: 'Join Date',
@@ -440,8 +486,19 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
             id: 'phone',
             title: 'Phone',
             titleAr: 'الهاتف',
-            width: 90,
+            width: 80,
           ));
+      if (hasEmail) {
+        columns.insert(
+          columns.length - 1,
+          const GeniusPdfGridColumn(
+            id: 'email',
+            title: 'Email',
+            titleAr: 'البريد',
+            flexFactor: 2,
+          ),
+        );
+      }
     }
 
     if (data.showSalary) {
@@ -464,12 +521,19 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
         'designation': config.isRTL
             ? (emp.designationAr ?? emp.designation)
             : emp.designation,
+        if (hasManager)
+          'manager': config.isRTL
+              ? (emp.managerAr ?? emp.manager ?? '-')
+              : (emp.manager ?? '-'),
         'joinDate': _formatDate(emp.joiningDate),
         'status': config.isRTL ? emp.statusTextAr : emp.statusText,
       };
 
       if (data.showContactInfo) {
         cells['phone'] = emp.phone ?? '-';
+        if (hasEmail) {
+          cells['email'] = emp.email ?? '-';
+        }
       }
 
       if (data.showSalary) {
@@ -484,22 +548,223 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
       columns: columns,
       rows: rows,
       style: GeniusPdfGridStyle.modern(),
-      
     );
 
-    final result = grid.drawAt(
+    addGrid(grid, spacing: 6);
+    addSpace(8);
+  }
+
+  void _drawFooterSection() {
+    if (!showNotes && (!showQRCode || reportId == null)) {
+      return;
+    }
+
+    addSpace(20);
+
+    // If only one section is shown, draw it normally
+    if (showNotes && (!showQRCode || reportId == null)) {
+      _drawNotes(width: pageWidth);
+      return;
+    }
+
+    if (!showNotes && (showQRCode && reportId != null)) {
+      _drawQRCodeSection(width: pageWidth);
+      return;
+    }
+
+    // Draw side-by-side if both are present
+    addTwoColumns(
+      spacing: 10,
+      leftFlex: config.isLTR ? 2 : 1,
+      rightFlex: config.isLTR ? 1 : 2,
+      leftContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawNotesContent(page, bounds);
+        } else {
+          return _drawQRCodeContent(page, bounds);
+        }
+      },
+      rightContent: (page, bounds) {
+        if (config.isLTR) {
+          return _drawQRCodeContent(page, bounds);
+        } else {
+          return _drawNotesContent(page, bounds);
+        }
+      },
+    );
+
+    addSpace(20);
+  }
+
+  void _drawNotes({required double width}) {
+    _drawNotesContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawNotesContent(PdfPage page, Rect bounds) {
+    final displayNotes = notes ?? (config.isRTL ? notesAr : notes);
+    final defaultNotes = config.isRTL
+        ? '''ملاحظات:
+• هذا التقرير سري وخاص بالموظفين المصرح لهم فقط.
+• يرجى إبلاغ إدارة الموارد البشرية عن أي اختلافات.
+'''
+        : '''Notes:
+• This report is confidential and for authorized personnel only.
+• Please report any discrepancies to the HR Department.
+''';
+
+    final notesText = displayNotes ?? defaultNotes;
+
+    final font = config.baseFont;
+    final element = PdfTextElement(
+      text: notesText,
+      font: font,
+      format: config.isLTR
+          ? null
+          : PdfStringFormat(
+              textDirection: PdfTextDirection.rightToLeft,
+              alignment: PdfTextAlignment.right),
+    );
+
+    final result = element.draw(
+      page: page,
+      bounds: bounds,
+    );
+
+    return result?.bounds.height ?? 0;
+  }
+
+  void _drawQRCodeSection({required double width}) {
+    _drawQRCodeContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
+  }
+
+  double _drawQRCodeContent(PdfPage page, Rect bounds) {
+    if (reportId == null) return 0;
+
+    final qrUrl = 'https://localhost:443/report/$reportId';
+    final caption = 'ID: $reportId';
+
+    final captionFont = config.baseFont;
+    final captionLayout = PdfTextElement(
+      text: caption,
+      font: captionFont,
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: config.isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
+      ),
+    ).draw(
+        page: page,
+        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
+
+    final captionHeight = captionLayout?.bounds.height ?? 0;
+    final qrSize = 80.0;
+    final x = bounds.left + (bounds.width - qrSize) / 2;
+    final y = bounds.top + captionHeight + 5;
+
+    final urlQR = GeniusPdfQRCodeGenerator.url(
+      url: qrUrl,
+      config: config,
+      caption: null,
+    );
+
+    urlQR.draw(
+      page: page,
+      bounds: Rect.fromLTWH(x, y, qrSize, qrSize),
+    );
+
+    return captionHeight + 5 + qrSize;
+  }
+
+  void _drawSignatures() {
+    // Ensure enough space for signatures
+    if (currentY > pageHeight - 100) {
+      newPage();
+    }
+
+    addSpace(20);
+    addHorizontalLine(spacing: 10);
+
+    final signatureY = currentY;
+
+    // Prepared By
+    final preparedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'Prepared By',
+      titleAr: 'أعده',
+      lineWidth: 110,
+      showDate: false,
+    );
+
+    preparedBy.draw(
       page: currentPage,
-      x: 0,
-      y: currentY,
-      width: pageWidth,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? pageWidth - 120 : 0,
+        signatureY,
+        120,
+        60,
+      ),
     );
 
-    if (result != null) {
-      addSpace(result.bounds.height + 15);
+    // HR Manager
+    final approvedBy = GeniusPdfSignatureArea(
+      config: config,
+      title: 'HR Manager',
+      titleAr: 'مدير الموارد البشرية',
+      lineWidth: 110,
+      showDate: false,
+    );
+
+    approvedBy.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(
+        config.isRTL ? 0 : pageWidth - 120,
+        signatureY,
+        120,
+        60,
+      ),
+    );
+
+    addSpace(70);
+  }
+
+  String _getStatusFilterText(EmployeeStatus? status) {
+    if (status == null) return 'All';
+    switch (status) {
+      case EmployeeStatus.active:
+        return 'Active';
+      case EmployeeStatus.inactive:
+        return 'Inactive';
+      case EmployeeStatus.onLeave:
+        return 'On Leave';
+      case EmployeeStatus.terminated:
+        return 'Terminated';
+      case EmployeeStatus.probation:
+        return 'Probation';
+    }
+  }
+
+  String _getStatusFilterTextAr(EmployeeStatus? status) {
+    if (status == null) return 'الكل';
+    switch (status) {
+      case EmployeeStatus.active:
+        return 'نشط';
+      case EmployeeStatus.inactive:
+        return 'غير نشط';
+      case EmployeeStatus.onLeave:
+        return 'في إجازة';
+      case EmployeeStatus.terminated:
+        return 'منتهي الخدمة';
+      case EmployeeStatus.probation:
+        return 'تحت التجربة';
     }
   }
 
   String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  String _formatDateDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 }
