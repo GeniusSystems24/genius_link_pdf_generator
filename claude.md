@@ -847,4 +847,94 @@ GeniusChartLayoutConfig(
 
 ---
 
+## معايير رأس التقرير (v2.12.7+)
+
+### 1. مجموعات المعلومات في الرأس
+
+استخدم `GeniusPdfHeaderInfoGroup` لتنظيم معلومات الرأس:
+
+```dart
+GeniusPdfReportHeader(
+  config: config,
+  title: 'Annual Report',
+  titleAr: 'التقرير السنوي',
+  company: companyInfo,
+  infoGroups: [
+    GeniusPdfHeaderInfoGroup.registration(
+      vatNumber: '300123456789003',
+      crNumber: '1010123456',
+      licenseNumber: 'LIC-001',
+    ),
+    GeniusPdfHeaderInfoGroup.contact(
+      phone: '+966 11 123 4567',
+      email: 'info@company.com',
+      website: 'www.company.com',
+    ),
+  ],
+);
+```
+
+### 2. أنواع مصانع المجموعات
+
+| المصنع | العناصر | الاستخدام |
+|--------|---------|-----------|
+| `.registration()` | VAT, CR, License | بيانات التسجيل |
+| `.contact()` | Phone, Email, Website, Fax | بيانات التواصل |
+| `.address()` | Street, City, Country, Postal | بيانات العنوان |
+| `.custom()` | أي عناصر | مجموعة مخصصة |
+
+### 3. عناصر المعلومات
+
+```dart
+GeniusPdfHeaderInfoItem(
+  label: 'VAT No',
+  labelAr: 'الرقم الضريبي',
+  value: '300123456789003',
+  valueAr: null,        // اختياري إذا كانت القيمة مختلفة
+  showLabel: true,      // إظهار/إخفاء التسمية
+  color: Colors.green,  // لون مخصص اختياري
+);
+```
+
+### 4. التخطيط ثنائي اللغة
+
+**مهم:** في `bilingualSplit` التخطيط:
+- العمود الإنجليزي دائماً محاذى لليسار مع اتجاه LTR
+- العمود العربي دائماً محاذى لليمين مع اتجاه RTL
+- هذا السلوك ثابت بغض النظر عن إعداد `isRTL` العام
+
+```dart
+// يعمل بشكل صحيح في كلا الوضعين RTL و LTR
+GeniusPdfReportHeader.bilingualSplit(
+  config: config,  // يمكن أن يكون RTL أو LTR
+  title: 'Trial Balance',
+  titleAr: 'ميزان المراجعة',
+  company: companyInfo,
+  date: DateTime.now(),
+);
+```
+
+### 5. حاسب أبعاد التخطيط
+
+```dart
+final calculator = GeniusPdfHeaderLayoutCalculator(
+  minColumnWidth: 100.0,
+  maxColumnWidth: 300.0,
+  columnSpacing: 10.0,
+  rowSpacing: 4.0,
+  logoToContentSpacing: 12.0,
+  sectionSpacing: 8.0,
+);
+
+// حساب أعمدة التخطيط ثنائي اللغة
+final columns = calculator.calculateBilingualColumns(
+  totalWidth: pageWidth,
+  logoWidth: 80,
+  hasLogo: true,
+);
+// columns.leftWidth, columns.centerWidth, columns.rightWidth
+```
+
+---
+
 *آخر تحديث: فبراير 2026*

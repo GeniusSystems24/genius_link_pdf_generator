@@ -5,6 +5,95 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.7] - 2026-02-03
+
+### Fixed
+
+#### Report Header RTL Bilingual Layout Bug
+
+- **Bilingual split layout RTL fix** — Fixed critical bug where bilingual split headers displayed merged/overlapping text when `isRTL = true`. The issue was caused by alignment calculations using the global RTL flag instead of explicit directional alignment for each language column.
+- **`_drawCompanyInfoBlockExplicit()` method added** — New internal method that accepts explicit `PdfTextAlignment` and `PdfTextDirection` parameters for precise control over text positioning in bilingual layouts.
+- **English column now always left-aligned with LTR direction** — Regardless of global RTL setting.
+- **Arabic column now always right-aligned with RTL direction** — Regardless of global RTL setting.
+
+### Added
+
+#### Header Info Groups for Structured Content
+
+- **`GeniusPdfHeaderInfoGroup` class** — New model for organizing header information into logical groups (registration, contact, address, etc.).
+- **`GeniusPdfHeaderInfoGroup.registration()` factory** — Creates a group with VAT, CR, and license number items.
+- **`GeniusPdfHeaderInfoGroup.contact()` factory** — Creates a group with phone, email, website, and fax items.
+- **`GeniusPdfHeaderInfoGroup.address()` factory** — Creates a group with street, city, country, and postal code.
+- **`GeniusPdfHeaderInfoGroup.custom()` constructor** — Creates a custom group with any items and optional title.
+- **`GeniusPdfHeaderInfoItem` class** — Label-value pair with bilingual support and optional color/icon.
+- **`infoGroups` parameter on `GeniusPdfReportHeader`** — Accepts a list of info groups for structured display.
+- **`_drawInfoGroups()` and `_drawInfoGroupsExplicit()` methods** — Renders info groups with proper alignment.
+
+#### Layout Dimension Calculator
+
+- **`GeniusPdfHeaderLayoutCalculator` class** — Utility for calculating optimal column widths and element heights.
+- **`calculateBilingualColumns()` method** — Returns left, center, right widths for bilingual layouts.
+- **`calculateStandardColumns()` method** — Returns logo and content widths for standard layouts.
+- **`estimateTextHeight()` method** — Estimates height based on line count and font size.
+- **`layoutCalculator` parameter on `GeniusPdfReportHeader`** — For advanced positioning control.
+
+### Changed
+
+- **`_drawBilingualSplitLayout()` rewritten** — Now uses `_drawCompanyInfoBlockExplicit()` with explicit alignment parameters to ensure correct column positioning regardless of global RTL setting.
+
+### Example
+
+```dart
+// Bilingual split header (now works correctly in both RTL and LTR modes)
+GeniusPdfReportHeader.bilingualSplit(
+  config: config,  // Can be RTL or LTR
+  title: 'Trial Balance',
+  titleAr: 'ميزان المراجعة',
+  company: companyInfo,
+  date: DateTime.now(),
+);
+
+// Header with info groups
+GeniusPdfReportHeader(
+  config: config,
+  title: 'Annual Report',
+  titleAr: 'التقرير السنوي',
+  company: companyInfo,
+  infoGroups: [
+    GeniusPdfHeaderInfoGroup.registration(
+      vatNumber: '300123456789003',
+      crNumber: '1010123456',
+    ),
+    GeniusPdfHeaderInfoGroup.contact(
+      phone: '+966 11 123 4567',
+      email: 'info@company.com',
+    ),
+  ],
+  style: GeniusPdfReportHeaderStyle.corporate(),
+);
+
+// Custom info group with title
+GeniusPdfHeaderInfoGroup.custom(
+  title: 'Bank Details',
+  titleAr: 'تفاصيل البنك',
+  showTitle: true,
+  items: [
+    GeniusPdfHeaderInfoItem(
+      label: 'Bank',
+      labelAr: 'البنك',
+      value: 'Al Rajhi Bank',
+    ),
+    GeniusPdfHeaderInfoItem(
+      label: 'IBAN',
+      labelAr: 'الآيبان',
+      value: 'SA0380000000608010167519',
+    ),
+  ],
+);
+```
+
+---
+
 ## [2.12.6] - 2026-02-03
 
 ### Added
