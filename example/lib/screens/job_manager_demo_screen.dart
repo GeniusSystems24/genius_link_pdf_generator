@@ -84,33 +84,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
         ],
       ),
       _FeatureCategory(
-        name: 'Charts',
-        icon: Icons.bar_chart_rounded,
-        gradient: AppColors.successGradient,
-        features: [
-          _Feature(
-            name: 'BarChart',
-            description: 'Bar chart generation',
-            builder: _buildBarChartTest,
-          ),
-          _Feature(
-            name: 'LineChart',
-            description: 'Line chart generation',
-            builder: _buildLineChartTest,
-          ),
-          _Feature(
-            name: 'PieChart',
-            description: 'Pie/Donut charts',
-            builder: _buildPieChartTest,
-          ),
-          _Feature(
-            name: 'AreaChart',
-            description: 'Area chart generation',
-            builder: _buildAreaChartTest,
-          ),
-        ],
-      ),
-      _FeatureCategory(
         name: 'Templates',
         icon: Icons.description_rounded,
         gradient: AppColors.purpleGradient,
@@ -1053,116 +1026,6 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     );
   }
 
-  GeniusPdfDocumentBuilder? _buildBarChartTest() {
-    return _ChartTestBuilder(
-      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
-      testName: 'BarChart Test',
-      buildChart: (page, bounds) {
-        final chart = GeniusPdfBarChart(
-          config: geniusPdfConfig,
-          title: 'Monthly Sales',
-          titleAr: 'المبيعات الشهرية',
-          series: [
-            GeniusChartSeries(
-              name: 'Sales',
-              color: const Color(0xFF2196F3),
-              dataPoints: [
-                const GeniusChartDataPoint(label: 'Jan', value: 12000),
-                const GeniusChartDataPoint(label: 'Feb', value: 15000),
-                const GeniusChartDataPoint(label: 'Mar', value: 18000),
-              ],
-            ),
-          ],
-          settings: const GeniusBarChartSettings(
-              type: GeniusBarChartType.vertical, showValues: true),
-          height: 250,
-        );
-        chart.draw(page, bounds);
-      },
-    );
-  }
-
-  GeniusPdfDocumentBuilder? _buildLineChartTest() {
-    return _ChartTestBuilder(
-      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
-      testName: 'LineChart Test',
-      buildChart: (page, bounds) {
-        final chart = GeniusPdfLineChart(
-          config: geniusPdfConfig,
-          title: 'Revenue Trend',
-          titleAr: 'اتجاه الإيرادات',
-          series: [
-            GeniusChartSeries(
-              name: '2024',
-              color: const Color(0xFF2196F3),
-              dataPoints: [
-                const GeniusChartDataPoint(label: 'Q1', value: 50000),
-                const GeniusChartDataPoint(label: 'Q2', value: 65000),
-                const GeniusChartDataPoint(label: 'Q3', value: 72000),
-                const GeniusChartDataPoint(label: 'Q4', value: 85000),
-              ],
-            ),
-          ],
-          settings: const GeniusLineChartSettings(
-              type: GeniusLineChartType.curved, showPoints: true),
-          height: 250,
-        );
-        chart.draw(page, bounds);
-      },
-    );
-  }
-
-  GeniusPdfDocumentBuilder? _buildPieChartTest() {
-    return _ChartTestBuilder(
-      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
-      testName: 'PieChart Test',
-      buildChart: (page, bounds) {
-        final chart = GeniusPdfPieChart(
-          config: geniusPdfConfig,
-          title: 'Expense Distribution',
-          titleAr: 'توزيع المصروفات',
-          dataPoints: [
-            const GeniusChartDataPoint(label: 'Salaries', value: 45000),
-            const GeniusChartDataPoint(label: 'Rent', value: 15000),
-            const GeniusChartDataPoint(label: 'Marketing', value: 12000),
-          ],
-          settings: GeniusPieChartSettings.donut(),
-          height: 300,
-        );
-        chart.draw(page, bounds);
-      },
-    );
-  }
-
-  GeniusPdfDocumentBuilder? _buildAreaChartTest() {
-    return _ChartTestBuilder(
-      config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
-      testName: 'AreaChart Test',
-      buildChart: (page, bounds) {
-        final chart = GeniusPdfAreaChart(
-          config: geniusPdfConfig,
-          title: 'Website Traffic',
-          titleAr: 'حركة الموقع',
-          series: [
-            GeniusChartSeries(
-              name: 'Desktop',
-              color: const Color(0xFF2196F3),
-              dataPoints: [
-                const GeniusChartDataPoint(label: 'Mon', value: 1200),
-                const GeniusChartDataPoint(label: 'Tue', value: 1400),
-                const GeniusChartDataPoint(label: 'Wed', value: 1100),
-              ],
-            ),
-          ],
-          settings:
-              const GeniusAreaChartSettings(stacked: false, fillOpacity: 0.4),
-          height: 250,
-        );
-        chart.draw(page, bounds);
-      },
-    );
-  }
-
   GeniusPdfDocumentBuilder? _buildTaxInvoiceTest() {
     return TaxInvoiceTemplate(
       config: GeniusPdfConfig(
@@ -1875,27 +1738,6 @@ class _ComponentTestBuilder extends GeniusPdfDocumentBuilder {
     addLine(testName, font: titleFont ?? baseFont, topMargin: 20);
     addSpace(30);
     buildContent(this);
-  }
-}
-
-class _ChartTestBuilder extends GeniusPdfDocumentBuilder {
-  _ChartTestBuilder({
-    required GeniusPdfConfig config,
-    required this.testName,
-    required this.buildChart,
-    this.titleFont,
-  }) : super(config);
-
-  final String testName;
-  final void Function(PdfPage page, Rect bounds) buildChart;
-  final PdfFont? titleFont;
-
-  @override
-  void build() {
-    newPage();
-    addLine(testName, font: titleFont ?? baseFont, topMargin: 20);
-    addSpace(30);
-    buildChart(currentPage, Rect.fromLTWH(20, currentY, pageWidth - 40, 300));
   }
 }
 

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
@@ -89,30 +87,6 @@ List<int> buildComposerDemoReport({
     width: 220,
   );
 
-  // ── Bar Chart ───────────────────────────────────────────
-
-  final barChart = GeniusPdfBarChart(
-    config: config,
-    title: isRTL ? 'المبيعات حسب الفئة' : 'Sales by Category',
-    titleAr: 'المبيعات حسب الفئة',
-    series: [
-      GeniusChartSeries(
-        name: 'Revenue',
-        nameAr: 'الإيرادات',
-        color: const Color(0xFF4CAF50),
-        dataPoints: [
-          const GeniusChartDataPoint(
-              label: 'Consulting', labelAr: 'استشارات', value: 25000),
-          const GeniusChartDataPoint(
-              label: 'Software', labelAr: 'برمجيات', value: 18000),
-          const GeniusChartDataPoint(
-              label: 'Support', labelAr: 'دعم', value: 7500),
-        ],
-      ),
-    ],
-    height: 180,
-  );
-
   // ── Compose the Report ──────────────────────────────────
 
   final composer = GeniusPdfReportComposer(config: config);
@@ -139,12 +113,6 @@ List<int> buildComposerDemoReport({
         gridSpacing: 5,
         summarySpacing: 10,
       )
-      .space(15)
-      .section(
-        isRTL ? 'مخطط المبيعات' : 'Sales Chart',
-        sectionAr: 'مخطط المبيعات',
-      )
-      .barChart(barChart, spacing: 5, height: 180)
       .space(15)
       .section(
         isRTL ? 'ملاحظات' : 'Notes',

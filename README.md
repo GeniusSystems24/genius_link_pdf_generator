@@ -42,10 +42,6 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
   Data grids, rich text, info boxes, headers, summaries
 
-### 📈 **Charts & Graphs**
-
-  Bar, line, pie, and area charts with RTL support
-
 ### 💧 **Watermarks**
 
   Text, image, diagonal, and tiled watermarks
@@ -394,22 +390,6 @@ Configurable `userLabel`, `pageNumberFormat`, dynamic positioning
 
 `addSectionDivider()` visual divider with optional centered title
 
-### 📊 **Builder Bar Chart** (v2.6.0)
-
-`addBarChart()` draws bar charts at current position with auto page-break
-
-### 📈 **Builder Line Chart** (v2.6.0)
-
-`addLineChart()` draws line charts with auto Y-advancement
-
-### 🥧 **Builder Pie Chart** (v2.6.0)
-
-`addPieChart()` draws pie charts at current position
-
-### 📉 **Builder Area Chart** (v2.6.0)
-
-`addAreaChart()` draws area charts with auto page-break
-
 ### 📱 **Builder QR Code** (v2.7.0)
 
 `addQRCode()` draws QR codes with alignment at current position
@@ -733,8 +713,6 @@ final bytes = composer
     .section('Q1 Sales')
     .text('Revenue summary for Q1 2026.')
     .gridWithSummary(dataGrid: grid, summarySection: summary)
-    .section('Charts')
-    .barChart(salesChart, height: 200)
     .page()
     .section('Attachments')
     .qrCode(invoiceQR, alignment: GeniusPdfImageAlignment.center)
@@ -768,8 +746,8 @@ class SmartReport extends GeniusPdfDocumentBuilder {
     addGrid(grid, spacing: 10);
 
     // remainingHeight accounts for footer space:
-    if (canFit(200)) {
-      addBarChart(chart, height: 200);
+    if (canFit(100)) {
+      addInfoBox(additionalInfoBox, spacing: 10);
     }
 
     // Reserve space for custom-drawn headers/footers:
@@ -847,7 +825,7 @@ There is **no global singleton** for `GeniusPdfConfig`. Each document builder re
 
 ### Component Configuration
 
-All components (charts, barcodes, info boxes, headers, summaries, watermarks, etc.) **use the config’s fonts and RTL settings**. Per-component overrides for `baseFont`, `boldFont`, and `isRTL` were removed.
+All components (barcodes, info boxes, headers, summaries, watermarks, etc.) **use the config's fonts and RTL settings**. Per-component overrides for `baseFont`, `boldFont`, and `isRTL` were removed.
 
 ---
 
@@ -1381,219 +1359,6 @@ GeniusPdfSectionStyle(
   Signature line with date
 - **GeniusPdfQRCode**
   QR code display for invoices
-
----
-
-## Charts & Graphs
-
-### GeniusPdfBarChart
-
-Create bar charts with multiple types and styles:
-
-```dart
-final barChart = GeniusPdfBarChart(
-  title: 'Monthly Sales',
-  titleAr: 'المبيعات الشهرية',
-  series: [
-    GeniusChartSeries(
-      name: 'Sales',
-      nameAr: 'المبيعات',
-      color: Colors.blue,
-      dataPoints: [
-        GeniusChartDataPoint(label: 'Jan', labelAr: 'يناير', value: 12000),
-        GeniusChartDataPoint(label: 'Feb', labelAr: 'فبراير', value: 15000),
-        GeniusChartDataPoint(label: 'Mar', labelAr: 'مارس', value: 18000),
-        GeniusChartDataPoint(label: 'Apr', labelAr: 'أبريل', value: 14000),
-      ],
-    ),
-  ],
-  settings: GeniusBarChartSettings(
-    type: GeniusBarChartType.vertical,
-    barWidth: 30,
-    showValues: true,
-    cornerRadius: 4,
-  ),
-  style: GeniusChartStyle.modern(),
-  height: 250,
-);
-
-barChart.draw(page, bounds);
-```
-
-**Bar Chart Types:**
-
-- `GeniusBarChartType.vertical` - Standard vertical bars
-- `GeniusBarChartType.horizontal` - Horizontal bars
-- `GeniusBarChartType.stacked` - Stacked bars
-- `GeniusBarChartType.grouped` - Grouped bars for multiple series
-
-### GeniusPdfLineChart
-
-Create line charts with different line styles:
-
-```dart
-final lineChart = GeniusPdfLineChart(
-  title: 'Revenue Trend',
-  titleAr: 'اتجاه الإيرادات',
-  series: [
-    GeniusChartSeries(
-      name: '2024',
-      nameAr: '2024',
-      color: Colors.blue,
-      dataPoints: [
-        GeniusChartDataPoint(label: 'Q1', value: 50000),
-        GeniusChartDataPoint(label: 'Q2', value: 65000),
-        GeniusChartDataPoint(label: 'Q3', value: 72000),
-        GeniusChartDataPoint(label: 'Q4', value: 85000),
-      ],
-    ),
-    GeniusChartSeries(
-      name: '2025',
-      nameAr: '2025',
-      color: Colors.green,
-      dataPoints: [
-        GeniusChartDataPoint(label: 'Q1', value: 60000),
-        GeniusChartDataPoint(label: 'Q2', value: 78000),
-        GeniusChartDataPoint(label: 'Q3', value: 90000),
-        GeniusChartDataPoint(label: 'Q4', value: 105000),
-      ],
-    ),
-  ],
-  settings: GeniusLineChartSettings(
-    type: GeniusLineChartType.curved,
-    showPoints: true,
-    fillArea: true,
-    fillOpacity: 0.2,
-  ),
-  height: 250,
-);
-
-lineChart.draw(page, bounds);
-```
-
-**Line Chart Types:**
-
-- `GeniusLineChartType.straight` - Straight line segments
-- `GeniusLineChartType.curved` - Smooth curved lines
-- `GeniusLineChartType.stepped` - Stepped/staircase lines
-
-### GeniusPdfPieChart
-
-Create pie and donut charts:
-
-```dart
-final pieChart = GeniusPdfPieChart(
-  title: 'Expense Distribution',
-  titleAr: 'توزيع المصروفات',
-  dataPoints: [
-    GeniusChartDataPoint(label: 'Salaries', labelAr: 'الرواتب', value: 45000),
-    GeniusChartDataPoint(label: 'Rent', labelAr: 'الإيجار', value: 15000),
-    GeniusChartDataPoint(label: 'Utilities', labelAr: 'المرافق', value: 5000),
-    GeniusChartDataPoint(label: 'Marketing', labelAr: 'التسويق', value: 12000),
-    GeniusChartDataPoint(label: 'Other', labelAr: 'أخرى', value: 8000),
-  ],
-  settings: GeniusPieChartSettings(
-    showLabels: true,
-    showPercentages: true,
-    labelPosition: GeniusPieLabelPosition.outside,
-  ),
-  colors: GeniusChartColors.defaultPalette,
-  legend: GeniusChartLegend(
-    show: true,
-    position: GeniusChartLegendPosition.right,
-  ),
-  height: 250,
-);
-
-pieChart.draw(page, bounds);
-```
-
-**Donut Chart:**
-
-```dart
-final donutChart = GeniusPdfPieChart(
-  // ... same as above
-  settings: GeniusPieChartSettings.donut(), // Creates a donut chart
-);
-```
-
-### GeniusPdfAreaChart
-
-Create area charts (overlapping or stacked):
-
-```dart
-final areaChart = GeniusPdfAreaChart(
-  title: 'Website Traffic',
-  titleAr: 'حركة الموقع',
-  series: [
-    GeniusChartSeries(
-      name: 'Desktop',
-      nameAr: 'سطح المكتب',
-      color: Colors.blue,
-      dataPoints: [
-        GeniusChartDataPoint(label: 'Mon', value: 1200),
-        GeniusChartDataPoint(label: 'Tue', value: 1400),
-        GeniusChartDataPoint(label: 'Wed', value: 1100),
-        GeniusChartDataPoint(label: 'Thu', value: 1600),
-        GeniusChartDataPoint(label: 'Fri', value: 1800),
-      ],
-    ),
-    GeniusChartSeries(
-      name: 'Mobile',
-      nameAr: 'الجوال',
-      color: Colors.green,
-      dataPoints: [
-        GeniusChartDataPoint(label: 'Mon', value: 800),
-        GeniusChartDataPoint(label: 'Tue', value: 950),
-        GeniusChartDataPoint(label: 'Wed', value: 700),
-        GeniusChartDataPoint(label: 'Thu', value: 1100),
-        GeniusChartDataPoint(label: 'Fri', value: 1300),
-      ],
-    ),
-  ],
-  settings: GeniusAreaChartSettings(
-    stacked: false,
-    fillOpacity: 0.4,
-    showPoints: true,
-  ),
-  height: 250,
-);
-
-areaChart.draw(page, bounds);
-```
-
-### Chart Styling
-
-**Pre-defined Styles:**
-
-```dart
-GeniusChartStyle.classic()  // White background, standard colors
-GeniusChartStyle.modern()   // Light gray background, modern look
-GeniusChartStyle.dark()     // Dark background for contrast
-```
-
-**Color Palettes:**
-
-```dart
-GeniusChartColors.defaultPalette  // Standard colorful palette
-GeniusChartColors.bluePalette     // Shades of blue
-GeniusChartColors.greenPalette    // Shades of green
-GeniusChartColors.warmPalette     // Warm colors (red, orange, yellow)
-```
-
-**Axis Configuration:**
-
-```dart
-GeniusChartAxis(
-  title: 'Revenue (SAR)',
-  titleAr: 'الإيرادات (ريال)',
-  min: 0,
-  max: 100000,
-  divisions: 5,
-  showGridLines: true,
-  valueFormatter: (value) => '${(value / 1000).toStringAsFixed(0)}K',
-)
-```
 
 ---
 
@@ -2879,12 +2644,12 @@ Create custom plugins to extend the library:
 
 ```dart
 // Create a custom plugin
-class MyChartPlugin extends GeniusPdfPlugin {
+class MyCustomPlugin extends GeniusPdfPlugin {
   @override
-  String get id => 'my-chart-plugin';
+  String get id => 'my-custom-plugin';
 
   @override
-  String get name => 'Custom Charts';
+  String get name => 'Custom Components';
 
   @override
   String get version => '1.0.0';
@@ -2898,7 +2663,7 @@ class MyChartPlugin extends GeniusPdfPlugin {
   @override
   Future<void> initialize() async {
     // Register custom components, templates, etc.
-    print('MyChartPlugin initialized');
+    print('MyCustomPlugin initialized');
   }
 
   @override
@@ -2909,11 +2674,11 @@ class MyChartPlugin extends GeniusPdfPlugin {
 
 // Register and use plugins
 final manager = GeniusPluginManager.instance;
-await manager.register(MyChartPlugin());
+await manager.register(MyCustomPlugin());
 await manager.initializeAll();
 
 // Get plugin
-final plugin = manager.get<MyChartPlugin>('my-chart-plugin');
+final plugin = manager.get<MyCustomPlugin>('my-custom-plugin');
 
 // Listen to plugin events
 manager.events.listen((event) {
@@ -3362,7 +3127,6 @@ lib/
     │   ├── models/
     │   │   ├── pdf_styles.dart
     │   │   ├── grid_models.dart
-    │   │   ├── chart_models.dart
     │   │   └── security_models.dart
     │   └── widgets/
     │       ├── pdf_data_grid.dart
@@ -3370,10 +3134,6 @@ lib/
     │       ├── pdf_info_box.dart
     │       ├── pdf_report_header.dart
     │       ├── pdf_summary.dart
-    │       ├── pdf_bar_chart.dart
-    │       ├── pdf_line_chart.dart
-    │       ├── pdf_pie_chart.dart
-    │       ├── pdf_area_chart.dart
     │       ├── pdf_watermark.dart
     │       └── pdf_digital_signature.dart
     └── templates/

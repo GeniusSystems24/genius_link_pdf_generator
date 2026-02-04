@@ -134,7 +134,7 @@ class DashboardHome extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'The most powerful Flutter PDF generation library. Create invoices, reports, and charts with RTL support.',
+                      'The most powerful Flutter PDF generation library. Create invoices, reports, and documents with RTL support.',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.9),
@@ -299,13 +299,13 @@ class DashboardHome extends StatelessWidget {
               onTap: () => onNavigate('templates'),
             ),
             StatCard(
-              title: 'Charts',
-              value: '4 Types',
-              subtitle: 'Data Viz',
-              icon: Icons.bar_chart_rounded,
+              title: 'Barcodes',
+              value: '10+',
+              subtitle: 'QR & More',
+              icon: Icons.qr_code_rounded,
               gradient: AppColors.warningGradient,
-              change: 'Animated',
-              onTap: () => onNavigate('charts'),
+              change: 'ZATCA',
+              onTap: () => onNavigate('barcodes'),
             ),
             StatCard(
               title: 'Formats',
@@ -601,10 +601,10 @@ class DashboardHome extends StatelessWidget {
                     color: AppColors.success,
                   ),
                   ActivityItem(
-                    title: 'New Charts',
-                    description: 'Added Area and Pie charts',
+                    title: 'Report Headers',
+                    description: 'Fixed bilingual RTL layout',
                     time: '3 days ago',
-                    icon: Icons.pie_chart_rounded,
+                    icon: Icons.article_rounded,
                     color: AppColors.warning,
                   ),
                   ActivityItem(

@@ -7,7 +7,6 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../documents/advanced_layout_demo_document.dart';
-import '../documents/charts_in_builder_demo_document.dart';
 import '../documents/multi_grid_summary_demo_document.dart';
 import '../documents/position_tracking_demo_document.dart';
 import '../documents/qr_attachments_demo_document.dart';
@@ -60,17 +59,6 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
           icon: Icons.table_chart_rounded,
           gradient: AppColors.purpleGradient,
           onGenerate: _generateMultiGridSummary,
-        ),
-        _ExampleItem(
-          id: 'charts_in_builder',
-          title: 'Charts in Builder',
-          titleAr: 'المخططات في البناء',
-          description:
-              'Bar, line, pie, and area charts rendered inside the builder.',
-          descriptionAr: 'مخططات أعمدة وخطية ودائرية ومساحية داخل البناء.',
-          icon: Icons.insert_chart_rounded,
-          gradient: AppColors.orangeGradient,
-          onGenerate: _generateChartsInBuilder,
         ),
         _ExampleItem(
           id: 'qr_attachments',
@@ -416,15 +404,6 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
       _isRTL
           ? 'تم إنشاء مثال الملخص متعدد الجداول.'
           : 'Multi-grid summary generated.',
-    );
-  }
-
-  Future<void> _generateChartsInBuilder() async {
-    final builder = ChartsInBuilderDemoBuilder(config: _createConfig());
-    await _generateWithBuilder(
-      builder,
-      'charts_in_builder_demo',
-      _isRTL ? 'تم إنشاء مثال المخططات.' : 'Charts demo generated.',
     );
   }
 

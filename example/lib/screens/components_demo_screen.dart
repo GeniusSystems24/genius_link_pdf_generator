@@ -57,12 +57,6 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
       gradient: AppColors.warningGradient,
     ),
     CustomTabItem(
-      id: 'grid_charts',
-      title: 'Grid+Charts',
-      icon: Icons.bar_chart_rounded,
-      gradient: AppColors.primaryGradient,
-    ),
-    CustomTabItem(
       id: 'grid_qrcode',
       title: 'Grid+QR',
       icon: Icons.qr_code_rounded,
@@ -126,7 +120,6 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
                 _buildInfoBoxTab(isDark),
                 _buildHeadersTab(isDark),
                 _buildSummaryTab(isDark),
-                _buildGridChartsTab(isDark),
                 _buildGridQrcodeTab(isDark),
                 _buildGridInfoboxTab(isDark),
                 _buildGridWatermarkTab(isDark),
@@ -865,36 +858,6 @@ final summary = GeniusPdfSummarySection(
   // ─────────────────────────────────────────────────────────────────────────
   // Grid Combination Demo Tabs
   // ─────────────────────────────────────────────────────────────────────────
-
-  Widget _buildGridChartsTab(bool isDark) {
-    return _ComponentPage(
-      title: 'Grid + Charts',
-      description:
-          'Combines data grids with Bar, Line, and Pie charts for visual data reporting.',
-      icon: Icons.bar_chart_rounded,
-      gradient: AppColors.primaryGradient,
-      isDark: isDark,
-      isRTL: _isRTL,
-      onRTLChanged: (v) => setState(() => _isRTL = v),
-      isGenerating: _isGenerating,
-      onGenerate: () => _generatePdf('grid_charts'),
-      codeExample: '''
-// Grid + Bar Chart combo
-addGrid(GeniusPdfDataGrid(...));
-
-final chart = GeniusPdfBarChart(
-  config: config,
-  title: 'Regional Sales',
-  series: [...],
-  settings: GeniusBarChartSettings(
-    type: GeniusBarChartType.grouped,
-  ),
-);
-addChart(chart);''',
-      preview: _buildGenericPreview(
-          isDark, Icons.bar_chart_rounded, 'Grid + Charts'),
-    );
-  }
 
   Widget _buildGridQrcodeTab(bool isDark) {
     return _ComponentPage(

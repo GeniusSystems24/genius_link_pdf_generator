@@ -96,34 +96,6 @@ class _DashboardSidebarState extends State<DashboardSidebar>
       ],
     ),
     NavItem(
-      id: 'charts',
-      title: 'Charts',
-      icon: Icons.bar_chart_rounded,
-      gradient: AppColors.successGradient,
-      children: [
-        const NavItem(
-          id: 'bar_chart',
-          title: 'Bar Chart',
-          icon: Icons.bar_chart_rounded,
-        ),
-        const NavItem(
-          id: 'line_chart',
-          title: 'Line Chart',
-          icon: Icons.show_chart_rounded,
-        ),
-        const NavItem(
-          id: 'pie_chart',
-          title: 'Pie Chart',
-          icon: Icons.pie_chart_rounded,
-        ),
-        const NavItem(
-          id: 'area_chart',
-          title: 'Area Chart',
-          icon: Icons.area_chart_rounded,
-        ),
-      ],
-    ),
-    NavItem(
       id: 'templates',
       title: 'Templates',
       icon: Icons.description_rounded,

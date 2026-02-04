@@ -5,6 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.8] - 2026-02-04
+
+### Removed
+
+#### Chart Components Removed
+
+All chart components have been removed from the library. The charts functionality was causing system freezes and instability issues. Users who need chart functionality should use external charting libraries and render them to images before embedding in PDFs.
+
+**Removed Components:**
+- `GeniusPdfBarChart` — Bar chart component
+- `GeniusPdfLineChart` — Line chart component
+- `GeniusPdfPieChart` — Pie chart component
+- `GeniusPdfAreaChart` — Area chart component
+- `chart_models.dart` — All chart data models (`GeniusChartDataPoint`, `GeniusChartSeries`, `GeniusChartAxis`, `GeniusChartLegend`, `GeniusChartStyle`, `GeniusChartColors`, `GeniusChartDataGroup`, `GeniusChartLayoutConfig`, `GeniusChartDimensionCalculator`)
+- Chart settings classes (`GeniusBarChartSettings`, `GeniusLineChartSettings`, `GeniusPieChartSettings`, `GeniusAreaChartSettings`)
+- Chart type enums (`GeniusBarChartType`, `GeniusLineChartType`, `GeniusChartLegendPosition`, `GeniusChartLegendOrientation`)
+
+**Removed Builder Methods:**
+- `addBarChart()` — Removed from `GeniusPdfDocumentBuilder`
+- `addLineChart()` — Removed from `GeniusPdfDocumentBuilder`
+- `addPieChart()` — Removed from `GeniusPdfDocumentBuilder`
+- `addAreaChart()` — Removed from `GeniusPdfDocumentBuilder`
+
+**Removed Composer Methods:**
+- `barChart()` — Removed from `GeniusPdfReportComposer`
+- `lineChart()` — Removed from `GeniusPdfReportComposer`
+- `pieChart()` — Removed from `GeniusPdfReportComposer`
+- `areaChart()` — Removed from `GeniusPdfReportComposer`
+
+**Removed from Smart Layout Engine:**
+- `chart` element type removed from `GeniusLayoutElementType` enum
+
+**Migration Guide:**
+
+If you need charts in your PDFs, consider these alternatives:
+1. Use Flutter's `fl_chart` or `syncfusion_flutter_charts` to render charts as widgets
+2. Convert the chart widget to an image using `RepaintBoundary`
+3. Embed the image in your PDF using `addImage()` or `addImageFromBytes()`
+
+Example migration:
+```dart
+// Before (removed)
+// builder.addBarChart(myChart, height: 200);
+
+// After (use image instead)
+final chartImage = await chartWidgetToImage(myChartWidget);
+builder.addImageFromBytes(chartImage, height: 200);
+```
+
+---
+
 ## [2.12.7] - 2026-02-03
 
 ### Fixed
