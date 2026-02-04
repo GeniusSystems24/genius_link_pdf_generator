@@ -5,7 +5,6 @@ import 'theme/app_theme.dart';
 import 'widgets/dashboard_sidebar.dart';
 import 'dashboard_home.dart';
 import 'screens/components_demo_screen.dart';
-import 'screens/charts_demo_screen.dart';
 import 'screens/templates_demo_screen.dart';
 import 'screens/new_templates_demo_screen.dart';
 import 'screens/template_engine_demo_screen.dart';
@@ -227,12 +226,10 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     final items = [
       _DrawerItem('dashboard', 'Dashboard', Icons.dashboard_rounded),
       _DrawerItem('components', 'Components', Icons.widgets_rounded),
-      _DrawerItem('grid_charts', 'Grid+Charts', Icons.bar_chart_rounded),
       _DrawerItem('grid_qrcode', 'Grid+QR', Icons.qr_code_rounded),
       _DrawerItem('grid_infobox', 'Grid+Info', Icons.view_agenda_rounded),
       _DrawerItem('grid_watermark', 'Grid+Watermark', Icons.water_drop_rounded),
       _DrawerItem('grid_richtext', 'Grid+RichText', Icons.format_quote_rounded),
-      _DrawerItem('charts', 'Charts', Icons.show_chart_rounded),
       _DrawerItem('templates', 'Templates', Icons.description_rounded),
       _DrawerItem('templates_demo', 'Templates Demo', Icons.view_quilt_rounded),
       _DrawerItem(
@@ -579,18 +576,11 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       case 'info_box':
       case 'headers':
       case 'summary':
-      case 'grid_charts':
       case 'grid_qrcode':
       case 'grid_infobox':
       case 'grid_watermark':
       case 'grid_richtext':
         return 'Components';
-      case 'charts':
-      case 'bar_chart':
-      case 'line_chart':
-      case 'pie_chart':
-      case 'area_chart':
-        return 'Charts';
       case 'templates':
       case 'templates_demo':
       case 'invoices':
@@ -642,27 +632,14 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         return const ComponentsDemoScreen(initialTab: 3);
       case 'summary':
         return const ComponentsDemoScreen(initialTab: 4);
-      case 'grid_charts':
-        return const ComponentsDemoScreen(initialTab: 5);
       case 'grid_qrcode':
-        return const ComponentsDemoScreen(initialTab: 6);
+        return const ComponentsDemoScreen(initialTab: 5);
       case 'grid_infobox':
-        return const ComponentsDemoScreen(initialTab: 7);
+        return const ComponentsDemoScreen(initialTab: 6);
       case 'grid_watermark':
-        return const ComponentsDemoScreen(initialTab: 8);
+        return const ComponentsDemoScreen(initialTab: 7);
       case 'grid_richtext':
-        return const ComponentsDemoScreen(initialTab: 9);
-
-      // Charts
-      case 'charts':
-      case 'bar_chart':
-        return const ChartsDemoScreen(initialTab: 0);
-      case 'line_chart':
-        return const ChartsDemoScreen(initialTab: 1);
-      case 'pie_chart':
-        return const ChartsDemoScreen(initialTab: 2);
-      case 'area_chart':
-        return const ChartsDemoScreen(initialTab: 3);
+        return const ComponentsDemoScreen(initialTab: 8);
 
       // Templates
       case 'templates':

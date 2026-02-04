@@ -4,7 +4,6 @@ import 'dart:ui' show Rect;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 import 'package:genius_pdf_example/documents/components/data_grid_demo_builder.dart';
-import 'package:genius_pdf_example/documents/components/grid_charts_demo_builder.dart';
 import 'package:genius_pdf_example/documents/components/grid_infobox_demo_builder.dart';
 import 'package:genius_pdf_example/documents/components/grid_qrcode_demo_builder.dart';
 import 'package:genius_pdf_example/documents/components/grid_richtext_demo_builder.dart';
@@ -34,9 +33,6 @@ Future<Uint8List> buildComponentDemoBytes({
       break;
     case 'summary':
       builder = SummaryDemoBuilder(config);
-      break;
-    case 'grid_charts':
-      builder = GridChartsDemoBuilder(config);
       break;
     case 'grid_qrcode':
       builder = GridQrcodeDemoBuilder(config);

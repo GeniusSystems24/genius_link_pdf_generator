@@ -5,13 +5,9 @@ import 'package:barcode/barcode.dart' as bc;
 import 'package:image/image.dart' as img;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../components/widgets/chart/pdf_area_chart.dart';
-import '../components/widgets/chart/pdf_bar_chart.dart';
 import '../components/widgets/pdf_barcode.dart';
 import '../components/widgets/pdf_data_grid.dart';
 import '../components/widgets/pdf_info_box.dart';
-import '../components/widgets/chart/pdf_line_chart.dart';
-import '../components/widgets/chart/pdf_pie_chart.dart';
 import '../components/widgets/pdf_report_header.dart';
 import '../components/widgets/pdf_rich_text.dart';
 import '../components/widgets/pdf_summary.dart';
@@ -1068,104 +1064,6 @@ abstract class GeniusPdfDocumentBuilder {
   }
 
   // ============================================================
-  // CHART METHODS (v2.6.0)
-  // ============================================================
-
-  /// Draws a [GeniusPdfBarChart] at the current Y position.
-  ///
-  /// The chart is drawn at [currentY] + [spacing] with the specified [height].
-  /// After drawing, [currentY] advances to the bottom of the chart.
-  ///
-  /// ## Example
-  /// ```dart
-  /// addBarChart(myBarChart, spacing: 10, height: 200);
-  /// ```
-  PdfLayoutResult addBarChart(
-    GeniusPdfBarChart chart, {
-    double spacing = 0,
-    double height = 250,
-  }) {
-    return _addChart(chart.draw,
-        spacing: spacing, height: height, tag: 'BarChart');
-  }
-
-  /// Draws a [GeniusPdfLineChart] at the current Y position.
-  ///
-  /// ## Example
-  /// ```dart
-  /// addLineChart(myLineChart, spacing: 10, height: 200);
-  /// ```
-  PdfLayoutResult addLineChart(
-    GeniusPdfLineChart chart, {
-    double spacing = 0,
-    double height = 250,
-  }) {
-    return _addChart(chart.draw,
-        spacing: spacing, height: height, tag: 'LineChart');
-  }
-
-  /// Draws a [GeniusPdfPieChart] at the current Y position.
-  ///
-  /// ## Example
-  /// ```dart
-  /// addPieChart(myPieChart, spacing: 10, height: 200);
-  /// ```
-  PdfLayoutResult addPieChart(
-    GeniusPdfPieChart chart, {
-    double spacing = 0,
-    double height = 250,
-  }) {
-    return _addChart(chart.draw,
-        spacing: spacing, height: height, tag: 'PieChart');
-  }
-
-  /// Draws a [GeniusPdfAreaChart] at the current Y position.
-  ///
-  /// ## Example
-  /// ```dart
-  /// addAreaChart(myAreaChart, spacing: 10, height: 200);
-  /// ```
-  PdfLayoutResult addAreaChart(
-    GeniusPdfAreaChart chart, {
-    double spacing = 0,
-    double height = 250,
-  }) {
-    return _addChart(chart.draw,
-        spacing: spacing, height: height, tag: 'AreaChart');
-  }
-
-  /// Internal helper that draws any chart using its draw function.
-  PdfLayoutResult _addChart(
-    PdfLayoutResult Function(PdfPage, Rect) drawFn, {
-    required double spacing,
-    required double height,
-    required String tag,
-  }) {
-    final drawY = _currentY + spacing;
-    final totalNeeded = height + spacing;
-
-    // Auto page-break if chart doesn't fit.
-    final page = _ensureSpace(totalNeeded);
-    final actualY = page == currentPage ? drawY : _currentY;
-
-    GeniusPdfLogger.debug(
-      'Drawing $tag at Y=${actualY.toStringAsFixed(1)} (height=$height)',
-      tag: 'Builder',
-    );
-
-    final bounds = Rect.fromLTWH(0, actualY, pageWidth, height);
-    final result = drawFn(page, bounds);
-
-    _currentY = result.bounds.bottom;
-    GeniusPdfLogger.debug(
-      '$tag drawn → Y=${_currentY.toStringAsFixed(1)}',
-      tag: 'Builder',
-    );
-
-    return result;
-  }
-
-  // ============================================================
   // QR CODE & IMAGE ATTACHMENTS (v2.7.0)
   // ============================================================
 
@@ -1746,8 +1644,6 @@ abstract class GeniusPdfDocumentBuilder {
 ///     .space(10)
 ///     .grid(salesGrid)
 ///     .summary(salesSummary)
-///     .section('Charts', sectionAr: 'المخططات')
-///     .barChart(barChart)
 ///     .page()
 ///     .section('Attachments')
 ///     .qrCode(qr)
@@ -2027,50 +1923,6 @@ class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
           spacing: spacing,
           gap: gap,
         ));
-    return this;
-  }
-
-  // ────────────────────────────────────────────────────────
-  // Charts
-  // ────────────────────────────────────────────────────────
-
-  /// Adds a bar chart.
-  GeniusPdfReportComposer barChart(
-    GeniusPdfBarChart chart, {
-    double spacing = 0,
-    double height = 250,
-  }) {
-    _actions.add(() => addBarChart(chart, spacing: spacing, height: height));
-    return this;
-  }
-
-  /// Adds a line chart.
-  GeniusPdfReportComposer lineChart(
-    GeniusPdfLineChart chart, {
-    double spacing = 0,
-    double height = 250,
-  }) {
-    _actions.add(() => addLineChart(chart, spacing: spacing, height: height));
-    return this;
-  }
-
-  /// Adds a pie chart.
-  GeniusPdfReportComposer pieChart(
-    GeniusPdfPieChart chart, {
-    double spacing = 0,
-    double height = 250,
-  }) {
-    _actions.add(() => addPieChart(chart, spacing: spacing, height: height));
-    return this;
-  }
-
-  /// Adds an area chart.
-  GeniusPdfReportComposer areaChart(
-    GeniusPdfAreaChart chart, {
-    double spacing = 0,
-    double height = 250,
-  }) {
-    _actions.add(() => addAreaChart(chart, spacing: spacing, height: height));
     return this;
   }
 

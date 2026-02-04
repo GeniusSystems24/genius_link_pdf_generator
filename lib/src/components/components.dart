@@ -10,10 +10,6 @@
 /// - [GeniusPdfSummarySection] - Totals and calculations display
 /// - [GeniusPdfSignatureArea] - Signature areas for documents
 /// - [GeniusPdfQRCode] - QR code display component
-/// - [GeniusPdfBarChart] - Bar charts (vertical, horizontal, stacked, grouped)
-/// - [GeniusPdfLineChart] - Line charts (straight, curved, stepped)
-/// - [GeniusPdfPieChart] - Pie and donut charts
-/// - [GeniusPdfAreaChart] - Area charts (overlapping, stacked)
 /// - [GeniusPdfWatermark] - Watermarks (text, image, diagonal, tiled)
 /// - [GeniusPdfDigitalSignature] - Digital signatures
 /// - [GeniusPdfBarcode] - Barcodes (EAN-13, Code128, etc.)
@@ -23,7 +19,6 @@ library;
 // Models
 export 'models/pdf_styles.dart';
 export 'models/grid_models.dart';
-export 'models/chart_models.dart';
 export 'models/security_models.dart';
 export 'models/barcode_models.dart';
 
@@ -33,12 +28,6 @@ export 'widgets/pdf_rich_text.dart';
 export 'widgets/pdf_info_box.dart';
 export 'widgets/pdf_report_header.dart';
 export 'widgets/pdf_summary.dart';
-
-// Charts
-export 'widgets/chart/pdf_bar_chart.dart';
-export 'widgets/chart/pdf_line_chart.dart';
-export 'widgets/chart/pdf_pie_chart.dart';
-export 'widgets/chart/pdf_area_chart.dart';
 
 // Barcodes & QR Codes
 export 'widgets/pdf_barcode.dart';

@@ -7,16 +7,16 @@ import 'dart:async';
 ///
 /// ## Example
 /// ```dart
-/// class MyChartPlugin extends PdfPlugin {
+/// class MyCustomPlugin extends GeniusPdfPlugin {
 ///   @override
-///   String get id => 'my-chart-plugin';
+///   String get id => 'my-custom-plugin';
 ///
 ///   @override
-///   String get name => 'Custom Charts';
+///   String get name => 'Custom Components';
 ///
 ///   @override
 ///   Future<void> initialize() async {
-///     // Register custom chart components
+///     // Register custom components
 ///   }
 /// }
 /// ```
@@ -59,17 +59,17 @@ abstract class GeniusPdfPlugin {
 ///
 /// ## Example
 /// ```dart
-/// final manager = PluginManager.instance;
+/// final manager = GeniusPluginManager.instance;
 ///
 /// // Register plugins
-/// await manager.register(MyChartPlugin());
+/// await manager.register(MyCustomPlugin());
 /// await manager.register(MyTemplatePlugin());
 ///
 /// // Initialize all plugins
 /// await manager.initializeAll();
 ///
 /// // Get a specific plugin
-/// final plugin = manager.get<MyChartPlugin>('my-chart-plugin');
+/// final plugin = manager.get<MyCustomPlugin>('my-custom-plugin');
 /// ```
 class GeniusPluginManager {
   GeniusPluginManager._();

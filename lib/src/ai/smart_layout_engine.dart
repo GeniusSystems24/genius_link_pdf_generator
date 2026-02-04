@@ -119,9 +119,6 @@ enum GeniusLayoutElementType {
   /// Data table.
   table,
 
-  /// Chart or graph.
-  chart,
-
   /// Image.
   image,
 
@@ -325,15 +322,14 @@ class GeniusSmartLayoutEngine {
     required List<GeniusLayoutElement> elements,
     required Size pageSize,
   }) {
-    // Check for tables or charts that need more space
+    // Check for tables that need more space
     final hasTables = elements.any((e) => e.type == GeniusLayoutElementType.table);
-    final hasCharts = elements.any((e) => e.type == GeniusLayoutElementType.chart);
 
     GeniusLayoutMargins margins;
     String description;
     String descriptionAr;
 
-    if (hasTables || hasCharts) {
+    if (hasTables) {
       // Smaller margins for data-heavy documents
       margins = const GeniusLayoutMargins(
         left: 30,
@@ -341,8 +337,8 @@ class GeniusSmartLayoutEngine {
         right: 30,
         bottom: 35,
       );
-      description = 'Reduced margins to accommodate tables/charts';
-      descriptionAr = 'هوامش مخفضة لاستيعاب الجداول/المخططات';
+      description = 'Reduced margins to accommodate tables';
+      descriptionAr = 'هوامش مخفضة لاستيعاب الجداول';
     } else if (optimizeForPrint) {
       // Standard print margins
       margins = const GeniusLayoutMargins(
@@ -421,12 +417,6 @@ class GeniusSmartLayoutEngine {
         suggestedSpacing = 20;
         reason = 'Add spacing after table';
         reasonAr = 'أضف مسافة بعد الجدول';
-      }
-      // Before chart
-      else if (next.type == GeniusLayoutElementType.chart) {
-        suggestedSpacing = 15;
-        reason = 'Add spacing before chart';
-        reasonAr = 'أضف مسافة قبل المخطط';
       }
       // Paragraph to paragraph
       else if (current.type == GeniusLayoutElementType.paragraph &&
