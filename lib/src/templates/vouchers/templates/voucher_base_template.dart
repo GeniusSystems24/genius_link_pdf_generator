@@ -398,11 +398,28 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
         }),
       ],
       style: GeniusPdfGridStyle(
-        headerBackgroundColor: style.tableHeaderColor,
-        headerTextColor: style.tableHeaderTextColor,
-        alternateRowColor: style.tableAltRowColor,
-        borderColor: style.borderColor,
-        fontSize: style.tableFontSize,
+        headerStyle: GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: style.tableFontSize,
+            fontWeight: FontWeight.bold,
+            color: style.tableHeaderTextColor,
+          ),
+          backgroundColor: style.tableHeaderColor,
+          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
+          padding: GeniusPdfCellPadding.all(style.cellPadding),
+        ),
+        cellStyle: GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(fontSize: style.tableFontSize),
+          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
+          padding: GeniusPdfCellPadding.all(style.cellPadding),
+        ),
+        alternateRowStyle: GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(fontSize: style.tableFontSize),
+          backgroundColor: style.tableAltRowColor,
+          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
+          padding: GeniusPdfCellPadding.all(style.cellPadding),
+        ),
+        borderStyle: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
       ),
     );
 
@@ -507,8 +524,8 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
   /// Draws the signature blocks at the bottom of the voucher.
   void drawSignatureBlock() {
     final signatories = data.signatories.isNotEmpty
-        ? data.signatories
-        : _defaultSignatories();
+      ? data.signatories
+      : defaultSignatories();
 
     if (signatories.isEmpty) return;
 
@@ -750,11 +767,28 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       columns: columns,
       rows: rows,
       style: GeniusPdfGridStyle(
-        headerBackgroundColor: style.tableHeaderColor,
-        headerTextColor: style.tableHeaderTextColor,
-        alternateRowColor: style.tableAltRowColor,
-        borderColor: style.borderColor,
-        fontSize: style.tableFontSize,
+        headerStyle: GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: style.tableFontSize,
+            fontWeight: FontWeight.bold,
+            color: style.tableHeaderTextColor,
+          ),
+          backgroundColor: style.tableHeaderColor,
+          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
+          padding: GeniusPdfCellPadding.all(style.cellPadding),
+        ),
+        cellStyle: GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(fontSize: style.tableFontSize),
+          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
+          padding: GeniusPdfCellPadding.all(style.cellPadding),
+        ),
+        alternateRowStyle: GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(fontSize: style.tableFontSize),
+          backgroundColor: style.tableAltRowColor,
+          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
+          padding: GeniusPdfCellPadding.all(style.cellPadding),
+        ),
+        borderStyle: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
       ),
     );
 
@@ -764,7 +798,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
   }
 
   /// Default signatories when none are provided.
-  List<VoucherSignatory> _defaultSignatories() => [
+  List<VoucherSignatory> defaultSignatories() => [
         VoucherSignatory.preparedBy(),
         VoucherSignatory.reviewedBy(),
         VoucherSignatory.approvedBy(),

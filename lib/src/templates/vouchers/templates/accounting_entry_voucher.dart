@@ -7,14 +7,9 @@
 /// - **00004** Adjusting Entry — end-of-period corrections
 library;
 
-import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:flutter/painting.dart' show Rect;
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
-import '../../../components/components.dart';
-import '../../../core/pdf_config.dart';
-import '../models/voucher_enums.dart';
-import '../models/voucher_models.dart';
-import '../models/voucher_style.dart';
-import 'voucher_base_template.dart';
 
 /// Generates an accounting entry voucher PDF page.
 ///
@@ -98,20 +93,20 @@ class AccountingEntryVoucher extends GeniusPdfVoucherTemplate {
   void _drawSectionLabelLocal(double y, String labelAr, String labelEn) {
     final g = currentPage.graphics;
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(0, y, 3, 13),
     );
     g.drawString(
       '$labelAr  |  $labelEn',
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
     );
   }
 
   @override
-  List<VoucherSignatory> _defaultSignatories() => [
+  List<VoucherSignatory> defaultSignatories() => [
         VoucherSignatory.preparedBy(),
         VoucherSignatory.reviewedBy(),
         VoucherSignatory.approvedBy(),

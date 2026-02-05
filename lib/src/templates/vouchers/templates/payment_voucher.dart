@@ -7,11 +7,12 @@
 /// - **00203** Electronic Payment — paid via electronic method
 library;
 
+import 'package:flutter/painting.dart' show Rect, Offset;
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../components/components.dart';
 import '../../../core/pdf_config.dart';
-import '../models/voucher_enums.dart';
 import '../models/voucher_models.dart';
 import '../models/voucher_style.dart';
 import 'voucher_base_template.dart';
@@ -76,7 +77,9 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
 
     _drawLabel(y, 'وذلك عن', 'Purpose');
 
-    final text = isRTL ? (data.descriptionAr ?? data.description ?? '') : (data.description ?? '');
+    final text = isRTL
+        ? (data.descriptionAr ?? data.description ?? '')
+        : (data.description ?? '');
     g.drawString(
       text,
       bodyFont,
@@ -107,10 +110,11 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
         format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
       );
       g.drawString(
-        _formatNumber(ded.amount),
+        ded.amount.toString(),
         bodyFont,
-        brush: PdfSolidBrush(_pdfColor(style.debitColor)),
-        bounds: Rect.fromLTWH(contentWidth * 0.6, rowY, contentWidth * 0.4 - 8, 12),
+        brush: PdfSolidBrush((style.debitColor.toPdfColor())),
+        bounds:
+            Rect.fromLTWH(contentWidth * 0.6, rowY, contentWidth * 0.4 - 8, 12),
         format: PdfStringFormat(alignment: endAlign),
       );
       totalDeductions += ded.amount;
@@ -120,7 +124,7 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
     // Net amount
     final netAmount = data.amount - totalDeductions;
     g.drawLine(
-      PdfPen(_pdfColor(style.borderColor), width: 0.5),
+      PdfPen((style.borderColor.toPdfColor()), width: 0.5),
       Offset(contentWidth * 0.5, rowY),
       Offset(contentWidth, rowY),
     );
@@ -130,15 +134,16 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
     g.drawString(
       netLabel,
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(8, rowY, contentWidth * 0.6, 12),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
     );
     g.drawString(
-      '${_formatNumber(netAmount)} ${data.currency}',
+      '${(netAmount)} ${data.currency}',
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
-      bounds: Rect.fromLTWH(contentWidth * 0.6, rowY, contentWidth * 0.4 - 8, 12),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
+      bounds:
+          Rect.fromLTWH(contentWidth * 0.6, rowY, contentWidth * 0.4 - 8, 12),
       format: PdfStringFormat(alignment: endAlign),
     );
 
@@ -148,20 +153,20 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
   void _drawLabel(double y, String labelAr, String labelEn) {
     final g = currentPage.graphics;
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(0, y, 3, 13),
     );
     g.drawString(
       '$labelAr  |  $labelEn',
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
     );
   }
 
   @override
-  List<VoucherSignatory> _defaultSignatories() => [
+  List<VoucherSignatory> defaultSignatories() => [
         VoucherSignatory.preparedBy(),
         VoucherSignatory.accountant(),
         VoucherSignatory.manager(),

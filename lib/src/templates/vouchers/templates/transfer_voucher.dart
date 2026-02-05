@@ -7,10 +7,12 @@
 /// - **10203** Currency Exchange — foreign exchange transaction
 library;
 
+import 'package:flutter/painting.dart' show Rect;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../components/components.dart';
 import '../../../core/pdf_config.dart';
+import '../../../extensions/color_extensions.dart';
 import '../models/voucher_enums.dart';
 import '../models/voucher_models.dart';
 import '../models/voucher_style.dart';
@@ -204,14 +206,14 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
       final netText = '${_fmtNum(transferData.netAmount!)} ${data.currency}';
 
       g.drawRectangle(
-        brush: PdfSolidBrush(_pdfColor(style.amountHighlightColor)),
-        pen: PdfPen(_pdfColor(style.primaryColor), width: 0.5),
+        brush: PdfSolidBrush(style.amountHighlightColor.toPdfColor()),
+        pen: PdfPen(style.primaryColor.toPdfColor(), width: 0.5),
         bounds: Rect.fromLTWH(0, infoY, contentWidth, 18),
       );
       g.drawString(
         '$netLabel:  $netText',
         boldBodyFont,
-        brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+        brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
         bounds: Rect.fromLTWH(4, infoY + 3, contentWidth - 8, 14),
         format: PdfStringFormat(alignment: PdfTextAlignment.center, textDirection: textDir),
       );
@@ -241,13 +243,13 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
   void _drawLabel(double y, String labelAr, String labelEn) {
     final g = currentPage.graphics;
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
       bounds: Rect.fromLTWH(0, y, 3, 13),
     );
     g.drawString(
       '$labelAr  |  $labelEn',
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
       bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
     );
@@ -259,7 +261,7 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
 
     final label1 = isRTL ? pair1.labelAr : pair1.labelEn;
     g.drawString('$label1: ', boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.accentColor)),
+      brush: PdfSolidBrush(style.accentColor.toPdfColor()),
       bounds: Rect.fromLTWH(4, y, halfWidth * 0.4 - 4, 12),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
     g.drawString(pair1.value, bodyFont,
@@ -270,7 +272,7 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
     if (pair2 != null) {
       final label2 = isRTL ? pair2.labelAr : pair2.labelEn;
       g.drawString('$label2: ', boldBodyFont,
-        brush: PdfSolidBrush(_pdfColor(style.accentColor)),
+        brush: PdfSolidBrush(style.accentColor.toPdfColor()),
         bounds: Rect.fromLTWH(halfWidth + 4, y, halfWidth * 0.4 - 4, 12),
         format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
       g.drawString(pair2.value, bodyFont,
@@ -288,7 +290,7 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
   }
 
   @override
-  List<VoucherSignatory> _defaultSignatories() => [
+  List<VoucherSignatory> defaultSignatories() => [
         BankingSignatories.requester(),
         BankingSignatories.treasury(),
         VoucherSignatory.manager(),

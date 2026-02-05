@@ -267,7 +267,6 @@ class DashboardHome extends StatelessWidget {
   Widget _buildStatsGrid(bool isDark, bool isWide, bool isMedium) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossAxisCount = isWide ? 4 : (isMedium ? 2 : 1);
         final childAspectRatio = isWide ? 1.4 : (isMedium ? 1.6 : 2.5);
 
         return GridView(

@@ -5,11 +5,11 @@
 library;
 
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../core/pdf_config.dart';
-import '../models/voucher_models.dart';
 import '../models/voucher_style.dart';
 import 'voucher_base_template.dart';
 

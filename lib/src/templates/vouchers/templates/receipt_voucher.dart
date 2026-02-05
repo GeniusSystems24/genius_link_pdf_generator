@@ -7,14 +7,9 @@
 /// - **00103** Electronic Receipt — received via electronic payment
 library;
 
-import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:flutter/painting.dart' show Rect;
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
-import '../../../components/components.dart';
-import '../../../core/pdf_config.dart';
-import '../models/voucher_enums.dart';
-import '../models/voucher_models.dart';
-import '../models/voucher_style.dart';
-import 'voucher_base_template.dart';
 
 /// Generates a receipt voucher PDF page.
 ///
@@ -33,11 +28,11 @@ import 'voucher_base_template.dart';
 /// ```
 class ReceiptVoucher extends GeniusPdfVoucherTemplate {
   ReceiptVoucher({
-    required GeniusPdfConfig config,
-    required GeniusPdfCompanyInfo company,
-    required VoucherData data,
-    GeniusPdfVoucherStyle style = const GeniusPdfVoucherStyle(),
-  }) : super(config: config, company: company, data: data, style: style);
+    required super.config,
+    required super.company,
+    required super.data,
+    super.style,
+  });
 
   @override
   void buildVoucherContent() {
@@ -82,20 +77,20 @@ class ReceiptVoucher extends GeniusPdfVoucherTemplate {
   void _drawLabel(double y, String labelAr, String labelEn) {
     final g = currentPage.graphics;
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(0, y, 3, 13),
     );
     g.drawString(
       '$labelAr  |  $labelEn',
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
     );
   }
 
   @override
-  List<VoucherSignatory> _defaultSignatories() => [
+  List<VoucherSignatory> defaultSignatories() => [
         VoucherSignatory.cashier(),
         VoucherSignatory.accountant(),
         VoucherSignatory.manager(),

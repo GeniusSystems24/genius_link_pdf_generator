@@ -7,11 +7,13 @@
 /// - **10551** International Commercial Incoming — commercial remittance from abroad
 library;
 
+import 'package:flutter/material.dart' show Color;
+import 'package:flutter/painting.dart' show Rect;
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../components/components.dart';
 import '../../../core/pdf_config.dart';
-import '../models/voucher_enums.dart';
 import '../models/voucher_models.dart';
 import '../models/voucher_style.dart';
 import 'voucher_base_template.dart';
@@ -98,13 +100,13 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
     final badgeX = (contentWidth - badgeWidth) / 2;
 
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(badgeColor)),
+      brush: PdfSolidBrush((badgeColor.toPdfColor())),
       bounds: Rect.fromLTWH(badgeX, y, badgeWidth, badgeHeight),
     );
     g.drawString(
       badgeText,
       smallFont,
-      brush: PdfSolidBrush(const PdfColor(255, 255, 255)),
+      brush: PdfSolidBrush(PdfColor(255, 255, 255)),
       bounds: Rect.fromLTWH(badgeX, y + 3, badgeWidth, badgeHeight),
       format: PdfStringFormat(alignment: PdfTextAlignment.center),
     );
@@ -118,20 +120,35 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
     var infoY = y + 16;
 
     final fields = <_RPair>[
-      _RPair('الاسم', 'Name',
-          isRTL ? (remittanceData.senderNameAr ?? remittanceData.senderName) : remittanceData.senderName),
+      _RPair(
+          'الاسم',
+          'Name',
+          isRTL
+              ? (remittanceData.senderNameAr ?? remittanceData.senderName)
+              : remittanceData.senderName),
       if (remittanceData.senderCountry != null)
-        _RPair('الدولة', 'Country',
-            isRTL ? (remittanceData.senderCountryAr ?? remittanceData.senderCountry!) : remittanceData.senderCountry!),
+        _RPair(
+            'الدولة',
+            'Country',
+            isRTL
+                ? (remittanceData.senderCountryAr ??
+                    remittanceData.senderCountry!)
+                : remittanceData.senderCountry!),
       if (remittanceData.senderPhone != null)
         _RPair('الهاتف', 'Phone', remittanceData.senderPhone!),
       if (_isInternational && remittanceData.beneficiaryBankName != null)
-        _RPair('بنك المصدر', 'Source Bank',
-            isRTL ? (remittanceData.beneficiaryBankNameAr ?? remittanceData.beneficiaryBankName!) : remittanceData.beneficiaryBankName!),
+        _RPair(
+            'بنك المصدر',
+            'Source Bank',
+            isRTL
+                ? (remittanceData.beneficiaryBankNameAr ??
+                    remittanceData.beneficiaryBankName!)
+                : remittanceData.beneficiaryBankName!),
     ];
 
     for (var i = 0; i < fields.length; i += 2) {
-      _drawFieldPair(infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
+      _drawFieldPair(
+          infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
       infoY += 14;
     }
 
@@ -144,20 +161,27 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
     var infoY = y + 16;
 
     final fields = <_RPair>[
-      _RPair('الاسم', 'Name',
-          isRTL ? (remittanceData.beneficiaryNameAr ?? remittanceData.beneficiaryName) : remittanceData.beneficiaryName),
+      _RPair(
+          'الاسم',
+          'Name',
+          isRTL
+              ? (remittanceData.beneficiaryNameAr ??
+                  remittanceData.beneficiaryName)
+              : remittanceData.beneficiaryName),
       if (remittanceData.beneficiaryIdNumber != null)
         _RPair('رقم الهوية', 'ID No', remittanceData.beneficiaryIdNumber!),
       if (remittanceData.beneficiaryPhone != null)
         _RPair('الهاتف', 'Phone', remittanceData.beneficiaryPhone!),
       if (remittanceData.beneficiaryAccountNumber != null)
-        _RPair('رقم الحساب', 'Account No', remittanceData.beneficiaryAccountNumber!),
+        _RPair('رقم الحساب', 'Account No',
+            remittanceData.beneficiaryAccountNumber!),
       if (remittanceData.beneficiaryIban != null)
         _RPair('الآيبان', 'IBAN', remittanceData.beneficiaryIban!),
     ];
 
     for (var i = 0; i < fields.length; i += 2) {
-      _drawFieldPair(infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
+      _drawFieldPair(
+          infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
       infoY += 14;
     }
 
@@ -171,22 +195,33 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
 
     final fields = <_RPair>[
       if (remittanceData.sourceCurrency != null)
-        _RPair('العملة الأصلية', 'Original Currency', remittanceData.sourceCurrency!),
+        _RPair('العملة الأصلية', 'Original Currency',
+            remittanceData.sourceCurrency!),
       if (remittanceData.targetCurrency != null)
-        _RPair('العملة المحوّلة', 'Converted Currency', remittanceData.targetCurrency!),
+        _RPair('العملة المحوّلة', 'Converted Currency',
+            remittanceData.targetCurrency!),
       if (remittanceData.exchangeRate != null)
-        _RPair('سعر الصرف', 'Exchange Rate', remittanceData.exchangeRate!.toStringAsFixed(4)),
+        _RPair('سعر الصرف', 'Exchange Rate',
+            remittanceData.exchangeRate!.toStringAsFixed(4)),
       if (remittanceData.sourceAmount != null)
-        _RPair('المبلغ الأصلي', 'Original Amount', _fmtNum(remittanceData.sourceAmount!)),
+        _RPair('المبلغ الأصلي', 'Original Amount',
+            _fmtNum(remittanceData.sourceAmount!)),
       if (remittanceData.targetAmount != null)
-        _RPair('المبلغ المحوّل', 'Converted Amount', _fmtNum(remittanceData.targetAmount!)),
+        _RPair('المبلغ المحوّل', 'Converted Amount',
+            _fmtNum(remittanceData.targetAmount!)),
       if (remittanceData.correspondentBank != null)
-        _RPair('سويفت المرجعي', 'SWIFT Ref',
-            isRTL ? (remittanceData.correspondentBankAr ?? remittanceData.correspondentBank!) : remittanceData.correspondentBank!),
+        _RPair(
+            'سويفت المرجعي',
+            'SWIFT Ref',
+            isRTL
+                ? (remittanceData.correspondentBankAr ??
+                    remittanceData.correspondentBank!)
+                : remittanceData.correspondentBank!),
     ];
 
     for (var i = 0; i < fields.length; i += 2) {
-      _drawFieldPair(infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
+      _drawFieldPair(
+          infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
       infoY += 14;
     }
 
@@ -203,13 +238,16 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
 
     final fields = <_RPair>[
       if (remittanceData.transferFee != null)
-        _RPair('رسوم الاستلام', 'Receiving Fee', '${_fmtNum(remittanceData.transferFee!)} ${data.currency}'),
+        _RPair('رسوم الاستلام', 'Receiving Fee',
+            '${_fmtNum(remittanceData.transferFee!)} ${data.currency}'),
       if (remittanceData.exchangeMargin != null)
-        _RPair('فرق الصرف', 'Exchange Difference', '${_fmtNum(remittanceData.exchangeMargin!)} ${data.currency}'),
+        _RPair('فرق الصرف', 'Exchange Difference',
+            '${_fmtNum(remittanceData.exchangeMargin!)} ${data.currency}'),
     ];
 
     for (var i = 0; i < fields.length; i += 2) {
-      _drawFieldPair(infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
+      _drawFieldPair(
+          infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
       infoY += 14;
     }
 
@@ -223,20 +261,22 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
     _drawLabel(y, 'طريقة الصرف', 'Disbursement Method');
 
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.amountHighlightColor)),
-      pen: PdfPen(_pdfColor(style.primaryColor), width: 0.5),
+      brush: PdfSolidBrush((style.amountHighlightColor.toPdfColor())),
+      pen: PdfPen((style.primaryColor.toPdfColor()), width: 0.5),
       bounds: Rect.fromLTWH(0, y + 16, contentWidth, 18),
     );
 
     final text = isRTL
-        ? (remittanceData.disbursementMethodAr ?? remittanceData.disbursementMethod!)
+        ? (remittanceData.disbursementMethodAr ??
+            remittanceData.disbursementMethod!)
         : remittanceData.disbursementMethod!;
     g.drawString(
       text,
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(4, y + 19, contentWidth - 8, 14),
-      format: PdfStringFormat(alignment: PdfTextAlignment.center, textDirection: textDir),
+      format: PdfStringFormat(
+          alignment: PdfTextAlignment.center, textDirection: textDir),
     );
 
     resetY(y + 38 + style.sectionSpacing);
@@ -247,13 +287,13 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
   void _drawLabel(double y, String labelAr, String labelEn) {
     final g = currentPage.graphics;
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(0, y, 3, 13),
     );
     g.drawString(
       '$labelAr  |  $labelEn',
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
       bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
     );
@@ -265,7 +305,7 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
 
     final label1 = isRTL ? pair1.labelAr : pair1.labelEn;
     g.drawString('$label1: ', boldBodyFont,
-        brush: PdfSolidBrush(_pdfColor(style.accentColor)),
+        brush: PdfSolidBrush((style.accentColor.toPdfColor())),
         bounds: Rect.fromLTWH(4, y, halfWidth * 0.4 - 4, 12),
         format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
     g.drawString(pair1.value, bodyFont,
@@ -276,13 +316,16 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
     if (pair2 != null) {
       final label2 = isRTL ? pair2.labelAr : pair2.labelEn;
       g.drawString('$label2: ', boldBodyFont,
-          brush: PdfSolidBrush(_pdfColor(style.accentColor)),
+          brush: PdfSolidBrush((style.accentColor.toPdfColor())),
           bounds: Rect.fromLTWH(halfWidth + 4, y, halfWidth * 0.4 - 4, 12),
-          format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
+          format:
+              PdfStringFormat(alignment: startAlign, textDirection: textDir));
       g.drawString(pair2.value, bodyFont,
           brush: PdfBrushes.black,
-          bounds: Rect.fromLTWH(halfWidth + halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
-          format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
+          bounds: Rect.fromLTWH(
+              halfWidth + halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
+          format:
+              PdfStringFormat(alignment: startAlign, textDirection: textDir));
     }
   }
 
@@ -291,12 +334,13 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
       return n.truncate().toString().replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     }
-    return n.toStringAsFixed(2).replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
 
   @override
-  List<VoucherSignatory> _defaultSignatories() => [
+  List<VoucherSignatory> defaultSignatories() => [
         RemittanceSignatories.beneficiary(),
         BankingSignatories.operator(),
         VoucherSignatory.manager(),

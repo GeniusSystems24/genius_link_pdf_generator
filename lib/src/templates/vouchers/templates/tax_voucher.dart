@@ -14,6 +14,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../components/components.dart';
 import '../../../core/pdf_config.dart';
+import '../../../extensions/color_extensions.dart';
 import '../models/voucher_enums.dart';
 import '../models/voucher_models.dart';
 import '../models/voucher_style.dart';
@@ -201,7 +202,7 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
     }
 
     g.drawLine(
-      PdfPen(_pdfColor(style.borderColor), width: 0.3),
+      PdfPen(style.borderColor.toPdfColor(), width: 0.3),
       Offset(0, rowY + 2),
       Offset(contentWidth, rowY + 2),
     );
@@ -240,14 +241,14 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
       final label = isRTL ? row.labelAr : row.labelEn;
       final font = row.isTotal ? boldBodyFont : bodyFont;
       final valueColor = row.isDeduction
-          ? _pdfColor(style.debitColor)
+          ? style.debitColor.toPdfColor()
           : row.isTotal
-              ? _pdfColor(style.primaryColor)
+            ? style.primaryColor.toPdfColor()
               : PdfColor(0, 0, 0);
 
       if (row.isTotal) {
         g.drawLine(
-          PdfPen(_pdfColor(style.borderColor), width: 0.5),
+          PdfPen(style.borderColor.toPdfColor(), width: 0.5),
           Offset(contentWidth * 0.5, rowY - 1),
           Offset(contentWidth, rowY - 1),
         );
@@ -300,13 +301,13 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
   void _drawLabel(double y, String labelAr, String labelEn) {
     final g = currentPage.graphics;
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
       bounds: Rect.fromLTWH(0, y, 3, 13),
     );
     g.drawString(
       '$labelAr  |  $labelEn',
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
       bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
     );
@@ -317,8 +318,8 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
     final colWidth = contentWidth / pairs.length;
 
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.tableHeaderColor)),
-      pen: PdfPen(_pdfColor(style.borderColor), width: 0.5),
+      brush: PdfSolidBrush(style.tableHeaderColor.toPdfColor()),
+      pen: PdfPen(style.borderColor.toPdfColor(), width: 0.5),
       bounds: Rect.fromLTWH(0, y, contentWidth, 26),
     );
 
@@ -328,7 +329,7 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
 
       final label = isRTL ? pair.labelAr : pair.labelEn;
       g.drawString(label, smallFont,
-          brush: PdfSolidBrush(_pdfColor(style.accentColor)),
+          brush: PdfSolidBrush(style.accentColor.toPdfColor()),
           bounds: Rect.fromLTWH(x + 4, y + 2, colWidth - 8, 10),
           format: PdfStringFormat(alignment: PdfTextAlignment.center));
 
@@ -339,7 +340,7 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
 
       if (i < pairs.length - 1) {
         g.drawLine(
-          PdfPen(_pdfColor(style.borderColor), width: 0.3),
+          PdfPen(style.borderColor.toPdfColor(), width: 0.3),
           Offset(x + colWidth, y + 3),
           Offset(x + colWidth, y + 23),
         );
@@ -347,8 +348,20 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
     }
   }
 
+  String _formatDate(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  String _formatNumber(double n) {
+    if (n == n.truncateToDouble()) {
+      return n.truncate().toString().replaceAllMapped(
+          RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    }
+    return n.toStringAsFixed(2).replaceAllMapped(
+        RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+  }
+
   @override
-  List<VoucherSignatory> _defaultSignatories() => [
+  List<VoucherSignatory> defaultSignatories() => [
         VoucherSignatory(role: 'Tax Accountant', roleAr: 'محاسب الضرائب'),
         VoucherSignatory.manager(),
         VoucherSignatory(role: 'Authorized Signatory', roleAr: 'المفوض بالتوقيع'),

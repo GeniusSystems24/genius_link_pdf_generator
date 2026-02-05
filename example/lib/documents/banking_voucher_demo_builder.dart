@@ -44,18 +44,18 @@ List<int> buildBankingVoucherDemoReport({
           creditAmount: 75000,
         ),
       ],
-      paymentDetails: const VoucherPaymentDetails(
+      paymentDetails: VoucherPaymentDetails(
         method: VoucherPaymentMethod.cash,
         denominations: {
-          500: 100,
-          200: 50,
-          100: 100,
-          50: 50,
-          10: 250,
+          500.0: 100,
+          200.0: 50,
+          100.0: 100,
+          50.0: 50,
+          10.0: 250,
         },
       ),
     ),
-    bankInfo: const VoucherBankInfo(
+    bankInfo: VoucherBankInfo(
       bankName: 'Al Rajhi Bank',
       bankNameAr: 'مصرف الراجحي',
       branchName: 'King Fahd Road Branch',

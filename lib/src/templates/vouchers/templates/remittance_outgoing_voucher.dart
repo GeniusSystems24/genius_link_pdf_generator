@@ -7,11 +7,13 @@
 /// - **10501** International Commercial Outgoing — commercial remittance abroad
 library;
 
+import 'package:flutter/material.dart' show Color;
+import 'package:flutter/painting.dart' show Rect;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../components/components.dart';
 import '../../../core/pdf_config.dart';
-import '../models/voucher_enums.dart';
+import '../../../extensions/color_extensions.dart';
 import '../models/voucher_models.dart';
 import '../models/voucher_style.dart';
 import 'voucher_base_template.dart';
@@ -101,13 +103,13 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
     final badgeX = (contentWidth - badgeWidth) / 2;
 
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(badgeColor)),
+      brush: PdfSolidBrush(badgeColor.toPdfColor()),
       bounds: Rect.fromLTWH(badgeX, y, badgeWidth, badgeHeight),
     );
     g.drawString(
       badgeText,
       smallFont,
-      brush: PdfSolidBrush(const PdfColor(255, 255, 255)),
+      brush: PdfSolidBrush(PdfColor(255, 255, 255)),
       bounds: Rect.fromLTWH(badgeX, y + 3, badgeWidth, badgeHeight),
       format: PdfStringFormat(alignment: PdfTextAlignment.center),
     );
@@ -267,8 +269,8 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
     _drawLabel(y, 'التتبع', 'Tracking');
 
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.amountHighlightColor)),
-      pen: PdfPen(_pdfColor(style.primaryColor), width: 0.5),
+      brush: PdfSolidBrush(style.amountHighlightColor.toPdfColor()),
+      pen: PdfPen(style.primaryColor.toPdfColor(), width: 0.5),
       bounds: Rect.fromLTWH(0, y + 16, contentWidth, 28),
     );
 
@@ -277,7 +279,7 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
     g.drawString(
       trackingText,
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
       bounds: Rect.fromLTWH(8, y + 19, contentWidth / 2 - 8, 14),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
     );
@@ -302,13 +304,13 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
   void _drawLabel(double y, String labelAr, String labelEn) {
     final g = currentPage.graphics;
     g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
       bounds: Rect.fromLTWH(0, y, 3, 13),
     );
     g.drawString(
       '$labelAr  |  $labelEn',
       boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
+      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
       bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
       format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
     );
@@ -320,7 +322,7 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
 
     final label1 = isRTL ? pair1.labelAr : pair1.labelEn;
     g.drawString('$label1: ', boldBodyFont,
-        brush: PdfSolidBrush(_pdfColor(style.accentColor)),
+      brush: PdfSolidBrush(style.accentColor.toPdfColor()),
         bounds: Rect.fromLTWH(4, y, halfWidth * 0.4 - 4, 12),
         format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
     g.drawString(pair1.value, bodyFont,
@@ -331,7 +333,7 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
     if (pair2 != null) {
       final label2 = isRTL ? pair2.labelAr : pair2.labelEn;
       g.drawString('$label2: ', boldBodyFont,
-          brush: PdfSolidBrush(_pdfColor(style.accentColor)),
+          brush: PdfSolidBrush(style.accentColor.toPdfColor()),
           bounds: Rect.fromLTWH(halfWidth + 4, y, halfWidth * 0.4 - 4, 12),
           format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
       g.drawString(pair2.value, bodyFont,
@@ -354,7 +356,7 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   @override
-  List<VoucherSignatory> _defaultSignatories() => [
+  List<VoucherSignatory> defaultSignatories() => [
         RemittanceSignatories.sender(),
         BankingSignatories.operator(),
         RemittanceSignatories.complianceOfficer(),
