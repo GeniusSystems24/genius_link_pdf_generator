@@ -29,5 +29,11 @@ export 'templates/bill_payment_voucher.dart';
 export 'templates/remittance_outgoing_voucher.dart';
 export 'templates/remittance_incoming_voucher.dart';
 
+// Trade voucher templates (v3.3.0)
+export 'templates/purchase_voucher.dart';
+export 'templates/sales_voucher.dart';
+export 'templates/purchase_return_voucher.dart';
+export 'templates/sales_return_voucher.dart';
+
 // Batch generation
 export 'templates/voucher_batch.dart';
