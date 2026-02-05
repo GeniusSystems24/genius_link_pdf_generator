@@ -1030,7 +1030,8 @@ abstract class GeniusPdfDocumentBuilder {
     final dividerBrush = brush ?? PdfSolidBrush(PdfColor(120, 120, 120));
 
     // Ensure space for divider line + text + spacing.
-    final neededHeight = (title != null ? dividerFont.height : 1.0) + spacing * 2;
+    final neededHeight =
+        (title != null ? dividerFont.height : 1.0) + spacing * 2;
     _ensureSpace(neededHeight);
 
     _advanceY(spacing);
@@ -1056,7 +1057,9 @@ abstract class GeniusPdfDocumentBuilder {
         dividerFont,
         brush: dividerBrush,
         bounds: Rect.fromLTWH(textX, _currentY, textSize.width, 0),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
+        format: PdfStringFormat(
+            alignment: PdfTextAlignment.center,
+            textDirection: config.pdfTextDirection),
       );
 
       // Right line.

@@ -109,14 +109,16 @@ class GeniusPdfConfig {
               breakType: PdfLayoutBreakType.fitPage,
             ),
         printTheme = printTheme ?? GeniusPdfPrintTheme.defaults(),
-        baseFontSize =
-            baseFontSize ?? (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.bodySize,
-        boldFontSize =
-            boldFontSize ?? (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.bodySize,
-        headerFontSize =
-            headerFontSize ?? (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.headingSize,
-        smallFontSize =
-            smallFontSize ?? (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.smallSize;
+        baseFontSize = baseFontSize ??
+            (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.bodySize,
+        boldFontSize = boldFontSize ??
+            (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.bodySize,
+        headerFontSize = headerFontSize ??
+            (printTheme ?? GeniusPdfPrintTheme.defaults())
+                .typography
+                .headingSize,
+        smallFontSize = smallFontSize ??
+            (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.smallSize;
 
   // ==================== Assets Access ====================
 
@@ -328,61 +330,66 @@ class GeniusPdfConfig {
   ///
   /// Returns a font built from bytes or assets.
   PdfFont fontBuild({double fontSize = 18, Uint8List? fontBytes}) {
-    final resolvedBytes = fontBytes ?? configAssets?.primaryFont ?? baseFontBytes;
+    final resolvedBytes =
+        fontBytes ?? configAssets?.primaryFont ?? baseFontBytes;
     return PdfTrueTypeFont(resolvedBytes, fontSize);
   }
 
-    /// The base font bytes used throughout the PDF document.
-    /// This font must support all characters used in the document (including Arabic if needed).
-    final Uint8List baseFontBytes;
+  /// The base font bytes used throughout the PDF document.
+  /// This font must support all characters used in the document (including Arabic if needed).
+  final Uint8List baseFontBytes;
 
-    /// Bold font bytes (optional).
-    final Uint8List? boldFontBytes;
+  /// Bold font bytes (optional).
+  final Uint8List? boldFontBytes;
 
-    /// Header font bytes (optional).
-    final Uint8List? headerFontBytes;
+  /// Header font bytes (optional).
+  final Uint8List? headerFontBytes;
 
-    /// Smaller font bytes (optional).
-    final Uint8List? smallFontBytes;
+  /// Smaller font bytes (optional).
+  final Uint8List? smallFontBytes;
 
-    /// Base font override.
-    final PdfFont? baseFontOverride;
+  /// Base font override.
+  final PdfFont? baseFontOverride;
 
-    /// Bold font override.
-    final PdfFont? boldFontOverride;
+  /// Bold font override.
+  final PdfFont? boldFontOverride;
 
-    /// Header font override.
-    final PdfFont? headerFontOverride;
+  /// Header font override.
+  final PdfFont? headerFontOverride;
 
-    /// Small font override.
-    final PdfFont? smallFontOverride;
+  /// Small font override.
+  final PdfFont? smallFontOverride;
 
-    /// Default base font size.
-    final double baseFontSize;
+  /// Default base font size.
+  final double baseFontSize;
 
-    /// Default bold font size.
-    final double boldFontSize;
+  /// Default bold font size.
+  final double boldFontSize;
 
-    /// Default header font size.
-    final double headerFontSize;
+  /// Default header font size.
+  final double headerFontSize;
 
-    /// Default small font size.
-    final double smallFontSize;
+  /// Default small font size.
+  final double smallFontSize;
 
-    /// The base font used throughout the PDF document.
-    PdfFont get baseFont =>
+  /// The base font used throughout the PDF document.
+  PdfFont get baseFont =>
       baseFontOverride ?? PdfTrueTypeFont(baseFontBytes, baseFontSize);
 
-    /// Bold version of the base font.
-    PdfFont get boldFont => boldFontOverride ??
+  /// Bold version of the base font.
+  PdfFont get boldFont =>
+      boldFontOverride ??
       PdfTrueTypeFont(boldFontBytes ?? baseFontBytes, boldFontSize);
 
-    /// Font for headers and titles.
-    PdfFont get headerFont => headerFontOverride ?? PdfTrueTypeFont(
-      headerFontBytes ?? boldFontBytes ?? baseFontBytes, headerFontSize);
+  /// Font for headers and titles.
+  PdfFont get headerFont =>
+      headerFontOverride ??
+      PdfTrueTypeFont(
+          headerFontBytes ?? boldFontBytes ?? baseFontBytes, headerFontSize);
 
-    /// Smaller font for captions and footnotes.
-    PdfFont get smallFont => smallFontOverride ??
+  /// Smaller font for captions and footnotes.
+  PdfFont get smallFont =>
+      smallFontOverride ??
       PdfTrueTypeFont(smallFontBytes ?? baseFontBytes, smallFontSize);
 
   /// Page size for the PDF document.
@@ -399,6 +406,10 @@ class GeniusPdfConfig {
   ///
   /// Use [TextDirection.rtl] for Arabic/Hebrew text.
   final TextDirection textDirection;
+
+  PdfTextDirection get pdfTextDirection => textDirection == TextDirection.rtl
+      ? PdfTextDirection.rightToLeft
+      : PdfTextDirection.leftToRight;
 
   /// Page margins for the PDF document.
   final PdfMargins margins;
