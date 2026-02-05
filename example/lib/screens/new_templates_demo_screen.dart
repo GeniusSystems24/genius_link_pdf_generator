@@ -7,7 +7,7 @@ import '../documents/hr_templates.dart';
 import '../documents/sales_templates.dart';
 import '../documents/shared_build.dart';
 import '../theme/app_theme.dart';
-import '../widgets/custom_tab_bar.dart';
+// import '../widgets/custom_tab_bar.dart';
 
 /// Demo screen showcasing the new report templates added in v1.3.0.
 /// Redesigned with professional dashboard styling.
@@ -27,20 +27,20 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
   bool _isRTL = true;
   String? _generatingTemplate;
 
-  final List<CustomTabItem> _tabs = [
-    CustomTabItem(
+  final List<_NewTemplateTab> _tabs = [
+    _NewTemplateTab(
       id: 'financial',
       title: 'Financial',
       icon: Icons.account_balance_rounded,
       gradient: AppColors.primaryGradient,
     ),
-    CustomTabItem(
+    _NewTemplateTab(
       id: 'sales',
       title: 'Sales',
       icon: Icons.shopping_cart_rounded,
       gradient: AppColors.successGradient,
     ),
-    CustomTabItem(
+    _NewTemplateTab(
       id: 'hr',
       title: 'HR',
       icon: Icons.people_rounded,
@@ -73,11 +73,7 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
       child: Column(
         children: [
           _buildHeader(),
-          CustomTabBar(
-            controller: _tabController,
-            tabs: _tabs,
-            isDark: _isDark,
-          ),
+          _buildTabBar(_isDark),
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -89,6 +85,50 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTabBar(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: TabBar(
+        controller: _tabController,
+        padding: const EdgeInsets.all(6),
+        indicator: BoxDecoration(
+          gradient: const LinearGradient(colors: AppColors.primaryGradient),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: Colors.white,
+        unselectedLabelColor:
+            isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        unselectedLabelStyle:
+            const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+        tabs: _tabs.map((tab) {
+          return Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(tab.icon, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  tab.title,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -361,7 +401,7 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: gradient.first.withOpacity(0.3),
+                  color: gradient.first.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -475,13 +515,13 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            template.gradient.first.withOpacity(0.2),
-                            template.gradient.last.withOpacity(0.1),
+                            template.gradient.first.withValues(alpha: 0.2),
+                            template.gradient.last.withValues(alpha: 0.1),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: template.gradient.first.withOpacity(0.3),
+                          color: template.gradient.first.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Icon(
@@ -564,7 +604,7 @@ class _NewTemplatesDemoScreenState extends State<NewTemplatesDemoScreen>
             ? null
             : [
                 BoxShadow(
-                  color: template.gradient.first.withOpacity(0.3),
+                  color: template.gradient.first.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -766,5 +806,19 @@ class _TemplateInfo {
     required this.icon,
     required this.gradient,
     required this.onGenerate,
+  });
+}
+
+class _NewTemplateTab {
+  final String id;
+  final String title;
+  final IconData icon;
+  final List<Color> gradient;
+
+  _NewTemplateTab({
+    required this.id,
+    required this.title,
+    required this.icon,
+    required this.gradient,
   });
 }

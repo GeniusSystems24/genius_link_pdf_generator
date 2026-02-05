@@ -11,6 +11,15 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../data/sample_data.dart';
+import '../documents/advanced_layout_demo_document.dart';
+import '../documents/banking_voucher_demo_builder.dart';
+import '../documents/multi_grid_summary_demo_document.dart';
+import '../documents/position_tracking_demo_document.dart';
+import '../documents/qr_attachments_demo_document.dart';
+import '../documents/remittance_voucher_demo_builder.dart';
+import '../documents/report_composer_demo_document.dart';
+import '../documents/smart_space_demo_document.dart';
+import '../documents/voucher_demo_builder.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 
@@ -187,6 +196,78 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
         ],
       ),
     ]);
+    _featureCategories.addAll([
+      _FeatureCategory(
+        name: 'Vouchers',
+        icon: Icons.receipt_rounded,
+        gradient: AppColors.successGradient,
+        features: [
+          // _Feature(
+          //   name: 'Service Vouchers',
+          //   description: 'Accounting & receipts',
+          //   builder: _buildServiceVouchersTest,
+          // ),
+          // _Feature(
+          //   name: 'Banking Vouchers',
+          //   description: 'Deposit, withdrawal, transfer',
+          //   builder: _buildBankingVouchersTest,
+          // ),
+          // _Feature(
+          //   name: 'Remittance Vouchers',
+          //   description: 'Domestic & international',
+          //   builder: _buildRemittanceVouchersTest,
+          // ),
+        ],
+      ),
+      _FeatureCategory(
+        name: 'Advanced Features',
+        icon: Icons.auto_awesome_rounded,
+        gradient: AppColors.pinkGradient,
+        features: [
+          _Feature(
+            name: 'Advanced Layout',
+            description: 'Columns & headers',
+            builder: _buildAdvancedLayoutTest,
+          ),
+          _Feature(
+            name: 'Position Tracking',
+            description: 'Precise layout control',
+            builder: _buildPositionTrackingTest,
+          ),
+          // _Feature(
+          //   name: 'Smart Space',
+          //   description: 'Auto page breaks',
+          //   builder: _buildSmartSpaceTest,
+          // ),
+          // _Feature(
+          //   name: 'Report Composer',
+          //   description: 'Fluent API demo',
+          //   builder: _buildReportComposerTest,
+          // ),
+        ],
+      ),
+    ]);
+    // Add new component features to existing Components category if possible, or just append helpers
+    // Since we can't easily modify the existing list in-place with this tool, I'll add a separate category for "More Components"
+    _featureCategories.add(
+      _FeatureCategory(
+        name: 'More Components',
+        icon: Icons.extension_rounded,
+        gradient: AppColors.infoGradient,
+        features: [
+          _Feature(
+            name: 'Multi-Grid',
+            description: 'Multiple grids & summaries',
+            builder: _buildMultiGridSummaryTest,
+          ),
+          _Feature(
+            name: 'QR & Attachments',
+            description: 'Barcodes & images',
+            builder: _buildQRAttachmentsTest,
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _loadFont() async {
@@ -1389,6 +1470,25 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
       config: GeniusPdfConfig(baseFontBytes: _fontBytes!),
       testName: 'DigitalSignature Test',
     );
+  }
+  // ──────────────────────────────────────────────────────────
+  // New Test Builders (Added for Completeness)
+  // ──────────────────────────────────────────────────────────
+
+  GeniusPdfDocumentBuilder? _buildAdvancedLayoutTest() {
+    return AdvancedLayoutDemoBuilder(config: geniusPdfConfig);
+  }
+
+  GeniusPdfDocumentBuilder? _buildPositionTrackingTest() {
+    return PositionTrackingDemoBuilder(config: geniusPdfConfig);
+  }
+
+  GeniusPdfDocumentBuilder? _buildMultiGridSummaryTest() {
+    return MultiGridSummaryDemoBuilder(config: geniusPdfConfig);
+  }
+
+  GeniusPdfDocumentBuilder? _buildQRAttachmentsTest() {
+    return QRAttachmentsDemoBuilder(config: geniusPdfConfig);
   }
 
   // === Utility Methods ===

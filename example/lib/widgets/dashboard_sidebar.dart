@@ -157,6 +157,18 @@ class _DashboardSidebarState extends State<DashboardSidebar>
       gradient: AppColors.infoGradient,
     ),
     const NavItem(
+      id: 'job_manager',
+      title: 'Job Manager',
+      icon: Icons.work_history_rounded,
+      gradient: AppColors.primaryGradient,
+    ),
+    const NavItem(
+      id: 'custom_report',
+      title: 'Custom Report',
+      icon: Icons.post_add_rounded,
+      gradient: AppColors.successGradient,
+    ),
+    const NavItem(
       id: 'export',
       title: 'Export',
       icon: Icons.file_download_rounded,
@@ -373,13 +385,13 @@ class _DashboardSidebarState extends State<DashboardSidebar>
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   color: isSelected
-                      ? AppColors.primary.withOpacity(0.15)
+                      ? AppColors.primary.withValues(alpha: 0.15)
                       : Colors.transparent,
                   gradient: isSelected && item.gradient != null
                       ? LinearGradient(
                           colors: [
-                            item.gradient!.first.withOpacity(0.15),
-                            item.gradient!.last.withOpacity(0.05),
+                            item.gradient!.first.withValues(alpha: 0.15),
+                            item.gradient!.last.withValues(alpha: 0.05),
                           ],
                         )
                       : null,
@@ -452,7 +464,7 @@ class _DashboardSidebarState extends State<DashboardSidebar>
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: isSelected
-                  ? AppColors.primary.withOpacity(0.1)
+                  ? AppColors.primary.withValues(alpha: 0.1)
                   : Colors.transparent,
             ),
             child: Row(
@@ -497,7 +509,7 @@ class _DashboardSidebarState extends State<DashboardSidebar>
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: item.gradient!.first.withOpacity(0.3),
+              color: item.gradient!.first.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -557,8 +569,9 @@ class _DashboardSidebarState extends State<DashboardSidebar>
             vertical: 10,
           ),
           child: Row(
-            mainAxisAlignment:
-                isCollapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
+            mainAxisAlignment: isCollapsed
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
             children: [
               Icon(
                 isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
@@ -600,8 +613,9 @@ class _DashboardSidebarState extends State<DashboardSidebar>
             vertical: 10,
           ),
           child: Row(
-            mainAxisAlignment:
-                isCollapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
+            mainAxisAlignment: isCollapsed
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
             children: [
               AnimatedRotation(
                 turns: isCollapsed ? 0.5 : 0,

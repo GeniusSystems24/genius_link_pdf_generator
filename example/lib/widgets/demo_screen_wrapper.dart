@@ -86,13 +86,13 @@ class DemoPage extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primary.withOpacity(isDark ? 0.15 : 0.08),
-            AppColors.secondary.withOpacity(isDark ? 0.08 : 0.04),
+            AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08),
+            AppColors.secondary.withValues(alpha: isDark ? 0.08 : 0.04),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.2),
+          color: AppColors.primary.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -305,7 +305,7 @@ class StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

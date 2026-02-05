@@ -5,12 +5,14 @@ class CustomTabBar extends StatelessWidget {
   final TabController controller;
   final List<CustomTabItem> tabs;
   final bool isDark;
+  final bool isScrollable;
 
   const CustomTabBar({
     super.key,
     required this.controller,
     required this.tabs,
     required this.isDark,
+    this.isScrollable = false,
   });
 
   @override
@@ -25,7 +27,7 @@ class CustomTabBar extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -33,13 +35,13 @@ class CustomTabBar extends StatelessWidget {
       ),
       child: TabBar(
         controller: controller,
-        isScrollable: true,
+        isScrollable: isScrollable,
         labelColor: AppColors.primary,
         unselectedLabelColor:
             isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
         indicatorSize: TabBarIndicatorSize.tab,
         indicator: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         dividerColor: Colors.transparent,

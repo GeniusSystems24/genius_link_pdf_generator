@@ -44,7 +44,7 @@ class StatCard extends StatelessWidget {
             boxShadow: [
               if (!isDark)
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -64,7 +64,7 @@ class StatCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: gradient.first.withOpacity(0.3),
+                          color: gradient.first.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -79,10 +79,9 @@ class StatCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: (isPositive
-                                ? AppColors.success
-                                : AppColors.error)
-                            .withOpacity(0.15),
+                        color:
+                            (isPositive ? AppColors.success : AppColors.error)
+                                .withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Row(
@@ -141,8 +140,8 @@ class StatCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark
-                        ? AppColors.darkTextSecondary.withOpacity(0.7)
-                        : AppColors.lightTextSecondary.withOpacity(0.7),
+                        ? AppColors.darkTextSecondary.withValues(alpha: 0.7)
+                        : AppColors.lightTextSecondary.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -193,8 +192,7 @@ class _FeatureCardState extends State<FeatureCard> {
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        transform: Matrix4.identity()
-          ..translate(0.0, _isHovered ? -4.0 : 0.0),
+        transform: Matrix4.identity()..translate(0.0, _isHovered ? -4.0 : 0.0),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -207,15 +205,15 @@ class _FeatureCardState extends State<FeatureCard> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: _isHovered
-                      ? widget.gradient.first.withOpacity(0.5)
+                      ? widget.gradient.first.withValues(alpha: 0.5)
                       : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
                   width: _isHovered ? 2 : 1,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: _isHovered
-                        ? widget.gradient.first.withOpacity(0.15)
-                        : Colors.black.withOpacity(isDark ? 0 : 0.04),
+                        ? widget.gradient.first.withValues(alpha: 0.15)
+                        : Colors.black.withValues(alpha: isDark ? 0 : 0.04),
                     blurRadius: _isHovered ? 20 : 10,
                     offset: Offset(0, _isHovered ? 8 : 4),
                   ),
@@ -234,7 +232,8 @@ class _FeatureCardState extends State<FeatureCard> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: widget.gradient.first.withOpacity(0.3),
+                              color:
+                                  widget.gradient.first.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -318,7 +317,7 @@ class _FeatureCardState extends State<FeatureCard> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColors.darkBg.withOpacity(0.5)
+            ? AppColors.darkBg.withValues(alpha: 0.5)
             : AppColors.lightBg,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
@@ -378,7 +377,7 @@ class _QuickActionButtonState extends State<QuickActionButton> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: widget.gradient.first.withOpacity(0.3),
+                color: widget.gradient.first.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -432,7 +431,7 @@ class SectionHeader extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.15),
+                color: AppColors.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, size: 18, color: AppColors.primary),
@@ -500,7 +499,7 @@ class ActivityItem extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, size: 18, color: color),
@@ -577,13 +576,13 @@ class EmptyState extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(
                 icon,
                 size: 40,
-                color: AppColors.primary.withOpacity(0.5),
+                color: AppColors.primary.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 24),

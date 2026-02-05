@@ -4,7 +4,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 
 import '../documents/templates_demo_documents.dart';
 import '../theme/app_theme.dart';
-import '../widgets/custom_tab_bar.dart';
+// import '../widgets/custom_tab_bar.dart';
 
 class TemplatesDemoScreen extends StatefulWidget {
   const TemplatesDemoScreen({super.key, this.initialTab = 0});
@@ -21,26 +21,26 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
   bool _isGenerating = false;
   bool _isRTL = true;
 
-  final List<CustomTabItem> _tabs = [
-    CustomTabItem(
+  final List<_TemplateTab> _tabs = [
+    _TemplateTab(
       id: 'invoice',
       title: 'Tax Invoice',
       icon: Icons.receipt_long_rounded,
       gradient: AppColors.primaryGradient,
     ),
-    CustomTabItem(
+    _TemplateTab(
       id: 'trial_balance',
       title: 'Trial Balance',
       icon: Icons.balance_rounded,
       gradient: AppColors.successGradient,
     ),
-    CustomTabItem(
+    _TemplateTab(
       id: 'statement',
       title: 'Statement',
       icon: Icons.description_rounded,
       gradient: AppColors.purpleGradient,
     ),
-    CustomTabItem(
+    _TemplateTab(
       id: 'inventory',
       title: 'Inventory',
       icon: Icons.inventory_2_rounded,
@@ -251,12 +251,53 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
           ),
           const SizedBox(height: 8),
           // Custom Tab Bar
-          CustomTabBar(
-            controller: _tabController,
-            tabs: _tabs,
-            isDark: isDark,
-          ),
+          _buildTabBar(isDark),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTabBar(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: TabBar(
+        controller: _tabController,
+        padding: const EdgeInsets.all(6),
+        isScrollable: true,
+        indicator: BoxDecoration(
+          gradient: const LinearGradient(colors: AppColors.primaryGradient),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: Colors.white,
+        unselectedLabelColor:
+            isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        unselectedLabelStyle:
+            const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+        tabs: _tabs.map((tab) {
+          return Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(tab.icon, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  tab.title,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -354,7 +395,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: gradient.first.withOpacity(0.3),
+                  color: gradient.first.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -390,7 +431,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: gradient.first.withOpacity(0.15),
+                        color: gradient.first.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -443,7 +484,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.15),
+                    color: AppColors.success.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -486,7 +527,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: AppColors.success.withOpacity(0.15),
+                          color: AppColors.success.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -546,7 +587,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.info.withOpacity(0.15),
+                    color: AppColors.info.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -677,7 +718,7 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
             ? null
             : [
                 BoxShadow(
-                  color: gradient.first.withOpacity(0.3),
+                  color: gradient.first.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -847,4 +888,18 @@ class _TemplatesDemoScreenState extends State<TemplatesDemoScreen>
       ),
     );
   }
+}
+
+class _TemplateTab {
+  final String id;
+  final String title;
+  final IconData icon;
+  final List<Color> gradient;
+
+  _TemplateTab({
+    required this.id,
+    required this.title,
+    required this.icon,
+    required this.gradient,
+  });
 }

@@ -173,11 +173,11 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: [
-          gradient.first.withOpacity(isDark ? 0.2 : 0.1),
-          gradient.last.withOpacity(isDark ? 0.1 : 0.05),
+          gradient.first.withValues(alpha: isDark ? 0.2 : 0.1),
+          gradient.last.withValues(alpha: isDark ? 0.1 : 0.05),
         ]),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gradient.first.withOpacity(0.3)),
+        border: Border.all(color: gradient.first.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -188,7 +188,7 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: gradient.first.withOpacity(0.3),
+                  color: gradient.first.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -220,7 +220,7 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: gradient.first.withOpacity(0.15),
+                        color: gradient.first.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -273,7 +273,7 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
             ? null
             : [
                 BoxShadow(
-                  color: gradient.first.withOpacity(0.3),
+                  color: gradient.first.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -305,7 +305,7 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
                       Text(
                         labelAr,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
                         ),
                         textDirection: TextDirection.rtl,
@@ -351,7 +351,7 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: AppColors.info.withOpacity(0.15),
+                  color: AppColors.info.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Icon(
@@ -611,7 +611,7 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.15),
+                  color: AppColors.warning.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Icon(
@@ -632,7 +632,7 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.15),
+                  color: AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -718,9 +718,9 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
 
       setState(() {
         _status = 'Document built successfully!\n'
-        'Document ID: simple-doc\n'
-        'Saved to: $filePath\n'
-        'Opened in default viewer.';
+            'Document ID: simple-doc\n'
+            'Saved to: $filePath\n'
+            'Opened in default viewer.';
       });
     } catch (e) {
       setState(() {
@@ -746,8 +746,8 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
       setState(() {
         _status = 'Invoice built successfully!\n'
             'Document ID: invoice-001\n'
-        'Saved to: $filePath\n'
-        'Opened in default viewer.';
+            'Saved to: $filePath\n'
+            'Opened in default viewer.';
       });
     } catch (e) {
       setState(() {
@@ -773,8 +773,8 @@ class _V2ArchitectureDemoScreenState extends State<V2ArchitectureDemoScreen>
       setState(() {
         _status = 'Multi-page report built successfully!\n'
             'Document ID: monthly-report\n'
-        'Saved to: $filePath\n'
-        'Opened in default viewer.';
+            'Saved to: $filePath\n'
+            'Opened in default viewer.';
       });
     } catch (e) {
       setState(() {

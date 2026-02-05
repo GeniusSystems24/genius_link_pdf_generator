@@ -7,529 +7,431 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../documents/advanced_layout_demo_document.dart';
+import '../documents/banking_voucher_demo_builder.dart';
 import '../documents/multi_grid_summary_demo_document.dart';
 import '../documents/position_tracking_demo_document.dart';
 import '../documents/qr_attachments_demo_document.dart';
+import '../documents/remittance_voucher_demo_builder.dart';
 import '../documents/report_composer_demo_document.dart';
 import '../documents/voucher_demo_builder.dart';
-import '../documents/banking_voucher_demo_builder.dart';
-import '../documents/remittance_voucher_demo_builder.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
+import '../widgets/component_page.dart';
+// import '../widgets/custom_tab_bar.dart';
 
 /// Showcase screen for selected demo examples.
 class ExamplesShowcaseScreen extends StatefulWidget {
-  const ExamplesShowcaseScreen({super.key});
+  const ExamplesShowcaseScreen({super.key, this.initialTab = 0});
+
+  final int initialTab;
 
   @override
   State<ExamplesShowcaseScreen> createState() => _ExamplesShowcaseScreenState();
 }
 
-class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
+class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   bool _isGenerating = false;
   bool _isRTL = true;
 
-  List<_ExampleItem> get _examples => [
-        _ExampleItem(
-          id: 'advanced_layout',
-          title: 'Advanced Layout',
-          titleAr: 'تخطيط متقدم',
-          description:
-              'Rich text, info boxes, report headers, and flexible columns.',
-          descriptionAr: 'نص منسق، صناديق معلومات، رؤوس وتقسيمات مرنة.',
-          icon: Icons.dashboard_customize_rounded,
-          gradient: AppColors.primaryGradient,
-          onGenerate: _generateAdvancedLayout,
-        ),
-        _ExampleItem(
-          id: 'position_tracking',
-          title: 'Position Tracking',
-          titleAr: 'تتبع المواقع',
-          description:
-              'Precise Y tracking, auto page breaks, and image alignment.',
-          descriptionAr: 'تتبع عمودي دقيق، كسر تلقائي، ومحاذاة صور.',
-          icon: Icons.track_changes_rounded,
-          gradient: AppColors.successGradient,
-          onGenerate: _generatePositionTracking,
-        ),
-        _ExampleItem(
-          id: 'multi_grid_summary',
-          title: 'Multi-Grid Summary',
-          titleAr: 'ملخص متعدد الجداول',
-          description:
-              'Multiple grids with per-section summaries and report totals.',
-          descriptionAr: 'جداول متعددة مع ملخصات لكل قسم وإجمالي التقرير.',
-          icon: Icons.table_chart_rounded,
-          gradient: AppColors.purpleGradient,
-          onGenerate: _generateMultiGridSummary,
-        ),
-        _ExampleItem(
-          id: 'qr_attachments',
-          title: 'QR & Attachments',
-          titleAr: 'رموز QR والمرفقات',
-          description:
-              'QR codes, inline attachments, and image pages in PDF.',
-          descriptionAr: 'رموز QR ومرفقات مضمنة وصفحات صور.',
-          icon: Icons.qr_code_rounded,
-          gradient: AppColors.cyanGradient,
-          onGenerate: _generateQrAttachments,
-        ),
-        _ExampleItem(
-          id: 'report_composer',
-          title: 'Report Composer',
-          titleAr: 'مُركّب التقارير',
-          description:
-              'Fluent API for composing a full report without subclassing.',
-          descriptionAr: 'واجهة سلسة لبناء تقرير كامل بدون وراثة.',
-          icon: Icons.auto_awesome_rounded,
-          gradient: AppColors.tealGradient,
-          onGenerate: _generateReportComposer,
-        ),
-        _ExampleItem(
-          id: 'service_vouchers',
-          title: 'Service Vouchers',
-          titleAr: 'سندات الخدمات',
-          description:
-              'Accounting entries, receipts, payments, and tax vouchers in one PDF.',
-          descriptionAr: 'قيود محاسبية وسندات قبض وصرف وضريبية في ملف واحد.',
-          icon: Icons.receipt_long_rounded,
-          gradient: AppColors.warningGradient,
-          onGenerate: _generateVoucherDemo,
-        ),
-        _ExampleItem(
-          id: 'banking_vouchers',
-          title: 'Banking Vouchers',
-          titleAr: 'السندات البنكية',
-          description:
-              'Bank deposits, withdrawals, transfers, and bill payments in one PDF.',
-          descriptionAr: 'إيداعات وسحوبات بنكية وتحويلات ودفع فواتير في ملف واحد.',
-          icon: Icons.account_balance_rounded,
-          gradient: AppColors.cyanGradient,
-          onGenerate: _generateBankingVoucherDemo,
-        ),
-        _ExampleItem(
-          id: 'remittance_vouchers',
-          title: 'Remittance Vouchers',
-          titleAr: 'سندات الحوالات',
-          description:
-              'Domestic and international outgoing/incoming remittance vouchers.',
-          descriptionAr: 'حوالات محلية ودولية صادرة وواردة في ملف واحد.',
-          icon: Icons.send_rounded,
-          gradient: AppColors.purpleGradient,
-          onGenerate: _generateRemittanceVoucherDemo,
-        ),
-      ];
+  final List<_ExampleTab> _tabs = [
+    _ExampleTab(
+      id: 'advanced_layout',
+      title: 'Advanced Layout',
+      icon: Icons.dashboard_customize_rounded,
+      gradient: AppColors.primaryGradient,
+    ),
+    _ExampleTab(
+      id: 'position_tracking',
+      title: 'Position Tracking',
+      icon: Icons.track_changes_rounded,
+      gradient: AppColors.successGradient,
+    ),
+    _ExampleTab(
+      id: 'multi_grid_summary',
+      title: 'Multi-Grid Summary',
+      icon: Icons.table_chart_rounded,
+      gradient: AppColors.purpleGradient,
+    ),
+    _ExampleTab(
+      id: 'qr_attachments',
+      title: 'QR & Attachments',
+      icon: Icons.qr_code_rounded,
+      gradient: AppColors.cyanGradient,
+    ),
+    _ExampleTab(
+      id: 'report_composer',
+      title: 'Report Composer',
+      icon: Icons.auto_awesome_rounded,
+      gradient: AppColors.tealGradient,
+    ),
+    _ExampleTab(
+      id: 'service_vouchers',
+      title: 'Service Vouchers',
+      icon: Icons.receipt_long_rounded,
+      gradient: AppColors.warningGradient,
+    ),
+    _ExampleTab(
+      id: 'banking_vouchers',
+      title: 'Banking Vouchers',
+      icon: Icons.account_balance_rounded,
+      gradient: AppColors.cyanGradient,
+    ),
+    _ExampleTab(
+      id: 'remittance_vouchers',
+      title: 'Remittance Vouchers',
+      icon: Icons.send_rounded,
+      gradient: AppColors.purpleGradient,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: _tabs.length,
+      vsync: this,
+      initialIndex: widget.initialTab.clamp(0, _tabs.length - 1),
+    );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isWide = screenWidth > 1200;
-    final isMedium = screenWidth > 800;
 
     return Container(
       color: isDark ? AppColors.darkBg : AppColors.lightBg,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeaderCard(isDark),
-            const SizedBox(height: 24),
-            _buildExamplesGrid(isDark, isWide, isMedium),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderCard(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
         children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: AppColors.primaryGradient,
-              ),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.auto_awesome_mosaic_rounded,
-              color: Colors.white,
-              size: 28,
-            ),
-          ),
-          const SizedBox(width: 16),
+          _buildTabBar(isDark),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: TabBarView(
+              controller: _tabController,
               children: [
-                Text(
-                  _isRTL ? 'أمثلة محددة' : 'Selected Examples',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? AppColors.darkText : AppColors.lightText,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _isRTL
-                      ? 'استعرض أمثلة توضيحية للخصائص الحديثة مباشرة.'
-                      : 'Preview key feature demos and generate PDFs instantly.',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildRtlToggle(isDark),
+                _buildAdvancedLayoutTab(isDark),
+                _buildPositionTrackingTab(isDark),
+                _buildMultiGridSummaryTab(isDark),
+                _buildQrAttachmentsTab(isDark),
+                _buildReportComposerTab(isDark),
+                _buildServiceVouchersTab(isDark),
+                _buildBankingVouchersTab(isDark),
+                _buildRemittanceVouchersTab(isDark),
               ],
             ),
           ),
-          if (_isGenerating)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _isRTL ? 'جارٍ التوليد...' : 'Generating...',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );
   }
 
-  Widget _buildRtlToggle(bool isDark) {
-    return Row(
-      children: [
-        Text(
-          _isRTL ? 'العربية' : 'English',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.darkText : AppColors.lightText,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Switch.adaptive(
-          value: _isRTL,
-          onChanged: (value) => setState(() => _isRTL = value),
-          activeColor: AppColors.primary,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          _isRTL ? 'RTL' : 'LTR',
-          style: TextStyle(
-            fontSize: 12,
-            color: isDark
-                ? AppColors.darkTextSecondary
-                : AppColors.lightTextSecondary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildExamplesGrid(bool isDark, bool isWide, bool isMedium) {
-    final crossAxisCount = isWide ? 2 : 1;
-    final childAspectRatio = isWide ? 2.6 : (isMedium ? 2.2 : 1.6);
-
-    return GridView.count(
-      crossAxisCount: crossAxisCount,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: childAspectRatio,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: _examples
-          .map((example) => _buildExampleCard(isDark, example))
-          .toList(),
-    );
-  }
-
-  Widget _buildExampleCard(bool isDark, _ExampleItem example) {
+  Widget _buildTabBar(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: example.gradient),
-                  borderRadius: BorderRadius.circular(12),
+      child: TabBar(
+        controller: _tabController,
+        isScrollable: true,
+        padding: const EdgeInsets.all(6),
+        indicator: BoxDecoration(
+          gradient: const LinearGradient(colors: AppColors.primaryGradient),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: Colors.white,
+        unselectedLabelColor:
+            isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        unselectedLabelStyle:
+            const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+        tabs: _tabs.map((tab) {
+          return Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(tab.icon, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  tab.title,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                child: Icon(example.icon, color: Colors.white, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _isRTL ? example.titleAr : example.title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.darkText : AppColors.lightText,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _isRTL ? example.descriptionAr : example.description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.lightTextSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          _buildGenerateButton(isDark, example),
-        ],
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 
-  Widget _buildGenerateButton(bool isDark, _ExampleItem example) {
-    final label = _isGenerating
-        ? (_isRTL ? 'جارٍ التوليد...' : 'Generating...')
-        : (_isRTL ? 'إنشاء ملف PDF' : 'Generate PDF');
+  Widget _buildAdvancedLayoutTab(bool isDark) {
+    return ComponentPage(
+      title: 'Advanced Layout',
+      description:
+          'Rich text, info boxes, report headers, and flexible columns.',
+      icon: Icons.dashboard_customize_rounded,
+      gradient: AppColors.primaryGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generateAdvancedLayout,
+      codeExample: '''
+final builder = AdvancedLayoutDemoBuilder(config: config);
+await builder.build();
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.dashboard_customize_rounded,
+        'Advanced Layout',
+        _isRTL ? 'تخطيط متقدم' : null,
+      ),
+    );
+  }
 
-    return InkWell(
-      onTap: _isGenerating ? null : () => _runExample(example),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: _isGenerating
-                ? [
-                    (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-                    (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-                  ]
-                : example.gradient,
-          ),
-          borderRadius: BorderRadius.circular(12),
+  Widget _buildPositionTrackingTab(bool isDark) {
+    return ComponentPage(
+      title: 'Position Tracking',
+      description: 'Precise Y tracking, auto page breaks, and image alignment.',
+      icon: Icons.track_changes_rounded,
+      gradient: AppColors.successGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generatePositionTracking,
+      codeExample: '''
+final builder = PositionTrackingDemoBuilder(config: config);
+await builder.build();
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.track_changes_rounded,
+        'Position Tracking',
+        _isRTL ? 'تتبع المواقع' : null,
+      ),
+    );
+  }
+
+  Widget _buildMultiGridSummaryTab(bool isDark) {
+    return ComponentPage(
+      title: 'Multi-Grid Summary',
+      description:
+          'Multiple grids with per-section summaries and report totals.',
+      icon: Icons.table_chart_rounded,
+      gradient: AppColors.purpleGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generateMultiGridSummary,
+      codeExample: '''
+final builder = MultiGridSummaryDemoBuilder(config: config);
+await builder.build();
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.table_chart_rounded,
+        'Multi-Grid Summary',
+        _isRTL ? 'ملخص متعدد الجداول' : null,
+      ),
+    );
+  }
+
+  Widget _buildQrAttachmentsTab(bool isDark) {
+    return ComponentPage(
+      title: 'QR & Attachments',
+      description: 'QR codes, inline attachments, and image pages in PDF.',
+      icon: Icons.qr_code_rounded,
+      gradient: AppColors.cyanGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generateQrAttachments,
+      codeExample: '''
+final builder = QRAttachmentsDemoBuilder(config: config);
+await builder.build();
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.qr_code_rounded,
+        'QR & Attachments',
+        _isRTL ? 'رموز QR والمرفقات' : null,
+      ),
+    );
+  }
+
+  Widget _buildReportComposerTab(bool isDark) {
+    return ComponentPage(
+      title: 'Report Composer',
+      description:
+          'Fluent API for composing a full report without subclassing.',
+      icon: Icons.auto_awesome_rounded,
+      gradient: AppColors.tealGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generateReportComposer,
+      codeExample: '''
+final bytes = buildComposerDemoReport(config: config);
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.auto_awesome_rounded,
+        'Report Composer',
+        _isRTL ? 'مُركّب التقارير' : null,
+      ),
+    );
+  }
+
+  Widget _buildServiceVouchersTab(bool isDark) {
+    return ComponentPage(
+      title: 'Service Vouchers',
+      description:
+          'Accounting entries, receipts, payments, and tax vouchers in one PDF.',
+      icon: Icons.receipt_long_rounded,
+      gradient: AppColors.warningGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generateVoucherDemo,
+      codeExample: '''
+final bytes = buildVoucherDemoReport(config: config);
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.receipt_long_rounded,
+        'Service Vouchers',
+        _isRTL ? 'سندات الخدمات' : null,
+      ),
+    );
+  }
+
+  Widget _buildBankingVouchersTab(bool isDark) {
+    return ComponentPage(
+      title: 'Banking Vouchers',
+      description:
+          'Bank deposits, withdrawals, transfers, and bill payments in one PDF.',
+      icon: Icons.account_balance_rounded,
+      gradient: AppColors.cyanGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generateBankingVoucherDemo,
+      codeExample: '''
+final bytes = buildBankingVoucherDemoReport(config: config);
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.account_balance_rounded,
+        'Banking Vouchers',
+        _isRTL ? 'السندات البنكية' : null,
+      ),
+    );
+  }
+
+  Widget _buildRemittanceVouchersTab(bool isDark) {
+    return ComponentPage(
+      title: 'Remittance Vouchers',
+      description:
+          'Domestic and international outgoing/incoming remittance vouchers.',
+      icon: Icons.send_rounded,
+      gradient: AppColors.purpleGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generateRemittanceVoucherDemo,
+      codeExample: '''
+final bytes = buildRemittanceVoucherDemoReport(config: config);
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.send_rounded,
+        'Remittance Vouchers',
+        _isRTL ? 'سندات الحوالات' : null,
+      ),
+    );
+  }
+
+  Widget _buildGenericPreview(
+      bool isDark, IconData icon, String label, String? subLabel) {
+    return Container(
+      height: 200,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primary.withValues(alpha: 0.1),
+            AppColors.secondary.withValues(alpha: 0.05),
+          ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            if (_isGenerating)
-              const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            else
-              const Icon(Icons.picture_as_pdf_rounded,
-                  color: Colors.white, size: 18),
-            const SizedBox(width: 8),
+            Icon(icon, size: 48, color: AppColors.primary),
+            const SizedBox(height: 12),
             Text(
               label,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: _isGenerating
-                    ? (isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary)
-                    : Colors.white,
+                color: isDark ? AppColors.darkText : AppColors.lightText,
+              ),
+            ),
+            if (subLabel != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                subLabel,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+            Text(
+              'Click "Generate PDF" to preview',
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _runExample(_ExampleItem example) async {
-    if (_isGenerating) return;
-
-    setState(() => _isGenerating = true);
-    try {
-      await example.onGenerate();
-    } finally {
-      if (mounted) {
-        setState(() => _isGenerating = false);
-      }
-    }
   }
 
   GeniusPdfConfig _createConfig() {
     return geniusPdfConfig.copyWith(
       textDirection: _isRTL ? TextDirection.rtl : TextDirection.ltr,
     );
-  }
-
-  Future<void> _generateAdvancedLayout() async {
-    final builder = AdvancedLayoutDemoBuilder(config: _createConfig());
-    await _generateWithBuilder(
-      builder,
-      'advanced_layout_demo',
-      _isRTL ? 'تم إنشاء مثال التخطيط المتقدم.' : 'Advanced layout generated.',
-    );
-  }
-
-  Future<void> _generatePositionTracking() async {
-    final builder = PositionTrackingDemoBuilder(config: _createConfig());
-    await _generateWithBuilder(
-      builder,
-      'position_tracking_demo',
-      _isRTL ? 'تم إنشاء مثال تتبع المواقع.' : 'Position tracking generated.',
-    );
-  }
-
-  Future<void> _generateMultiGridSummary() async {
-    final builder = MultiGridSummaryDemoBuilder(config: _createConfig());
-    await _generateWithBuilder(
-      builder,
-      'multi_grid_summary_demo',
-      _isRTL
-          ? 'تم إنشاء مثال الملخص متعدد الجداول.'
-          : 'Multi-grid summary generated.',
-    );
-  }
-
-  Future<void> _generateQrAttachments() async {
-    final builder = QRAttachmentsDemoBuilder(config: _createConfig());
-    await _generateWithBuilder(
-      builder,
-      'qr_attachments_demo',
-      _isRTL ? 'تم إنشاء مثال QR والمرفقات.' : 'QR & attachments generated.',
-    );
-  }
-
-  Future<void> _generateReportComposer() async {
-    try {
-      final bytes = buildComposerDemoReport(config: _createConfig());
-      final dir = await getApplicationDocumentsDirectory();
-      final filePath = '${dir.path}/report_composer_demo.pdf';
-      await GeniusPdfService().saveToPath(
-        bytes: Uint8List.fromList(bytes),
-        path: filePath,
-      );
-      await OpenFile.open(filePath);
-      _showSuccess(_isRTL
-          ? 'تم إنشاء مثال مُركّب التقارير.'
-          : 'Report composer generated.');
-    } catch (_) {
-      _showError(_isRTL
-          ? 'تعذر إنشاء مثال مُركّب التقارير.'
-          : 'Failed to generate report composer.');
-    }
-  }
-
-  Future<void> _generateVoucherDemo() async {
-    try {
-      final bytes = buildVoucherDemoReport(config: _createConfig());
-      final dir = await getApplicationDocumentsDirectory();
-      final filePath = '${dir.path}/voucher_demo.pdf';
-      await GeniusPdfService().saveToPath(
-        bytes: Uint8List.fromList(bytes),
-        path: filePath,
-      );
-      await OpenFile.open(filePath);
-      _showSuccess(_isRTL
-          ? 'تم إنشاء عرض سندات الخدمات.'
-          : 'Service vouchers demo generated.');
-    } catch (_) {
-      _showError(_isRTL
-          ? 'تعذر إنشاء عرض سندات الخدمات.'
-          : 'Failed to generate vouchers demo.');
-    }
-  }
-
-  Future<void> _generateBankingVoucherDemo() async {
-    try {
-      final bytes = buildBankingVoucherDemoReport(config: _createConfig());
-      final dir = await getApplicationDocumentsDirectory();
-      final filePath = '${dir.path}/banking_voucher_demo.pdf';
-      await GeniusPdfService().saveToPath(
-        bytes: Uint8List.fromList(bytes),
-        path: filePath,
-      );
-      await OpenFile.open(filePath);
-      _showSuccess(_isRTL
-          ? 'تم إنشاء عرض السندات البنكية.'
-          : 'Banking vouchers demo generated.');
-    } catch (_) {
-      _showError(_isRTL
-          ? 'تعذر إنشاء عرض السندات البنكية.'
-          : 'Failed to generate banking vouchers demo.');
-    }
-  }
-
-  Future<void> _generateRemittanceVoucherDemo() async {
-    try {
-      final bytes = buildRemittanceVoucherDemoReport(config: _createConfig());
-      final dir = await getApplicationDocumentsDirectory();
-      final filePath = '${dir.path}/remittance_voucher_demo.pdf';
-      await GeniusPdfService().saveToPath(
-        bytes: Uint8List.fromList(bytes),
-        path: filePath,
-      );
-      await OpenFile.open(filePath);
-      _showSuccess(_isRTL
-          ? 'تم إنشاء عرض سندات الحوالات.'
-          : 'Remittance vouchers demo generated.');
-    } catch (_) {
-      _showError(_isRTL
-          ? 'تعذر إنشاء عرض سندات الحوالات.'
-          : 'Failed to generate remittance vouchers demo.');
-    }
   }
 
   Future<void> _generateWithBuilder(
@@ -553,6 +455,144 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
     }
   }
 
+  Future<void> _generateAdvancedLayout() async {
+    setState(() => _isGenerating = true);
+    await _generateWithBuilder(
+      AdvancedLayoutDemoBuilder(config: _createConfig()),
+      'advanced_layout_demo',
+      _isRTL ? 'تم إنشاء مثال التخطيط المتقدم.' : 'Advanced layout generated.',
+    ).whenComplete(() {
+      if (mounted) setState(() => _isGenerating = false);
+    });
+  }
+
+  Future<void> _generatePositionTracking() async {
+    setState(() => _isGenerating = true);
+    await _generateWithBuilder(
+      PositionTrackingDemoBuilder(config: _createConfig()),
+      'position_tracking_demo',
+      _isRTL ? 'تم إنشاء مثال تتبع المواقع.' : 'Position tracking generated.',
+    ).whenComplete(() {
+      if (mounted) setState(() => _isGenerating = false);
+    });
+  }
+
+  Future<void> _generateMultiGridSummary() async {
+    setState(() => _isGenerating = true);
+    await _generateWithBuilder(
+      MultiGridSummaryDemoBuilder(config: _createConfig()),
+      'multi_grid_summary_demo',
+      _isRTL
+          ? 'تم إنشاء مثال الملخص متعدد الجداول.'
+          : 'Multi-grid summary generated.',
+    ).whenComplete(() {
+      if (mounted) setState(() => _isGenerating = false);
+    });
+  }
+
+  Future<void> _generateQrAttachments() async {
+    setState(() => _isGenerating = true);
+    await _generateWithBuilder(
+      QRAttachmentsDemoBuilder(config: _createConfig()),
+      'qr_attachments_demo',
+      _isRTL ? 'تم إنشاء مثال QR والمرفقات.' : 'QR & attachments generated.',
+    ).whenComplete(() {
+      if (mounted) setState(() => _isGenerating = false);
+    });
+  }
+
+  Future<void> _generateReportComposer() async {
+    setState(() => _isGenerating = true);
+    try {
+      final bytes = buildComposerDemoReport(config: _createConfig());
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/report_composer_demo.pdf';
+      await GeniusPdfService().saveToPath(
+        bytes: Uint8List.fromList(bytes),
+        path: filePath,
+      );
+      await OpenFile.open(filePath);
+      _showSuccess(_isRTL
+          ? 'تم إنشاء مثال مُركّب التقارير.'
+          : 'Report composer generated.');
+    } catch (_) {
+      _showError(_isRTL
+          ? 'تعذر إنشاء مثال مُركّب التقارير.'
+          : 'Failed to generate report composer.');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
+    }
+  }
+
+  Future<void> _generateVoucherDemo() async {
+    setState(() => _isGenerating = true);
+    try {
+      final bytes = buildVoucherDemoReport(config: _createConfig());
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/voucher_demo.pdf';
+      await GeniusPdfService().saveToPath(
+        bytes: Uint8List.fromList(bytes),
+        path: filePath,
+      );
+      await OpenFile.open(filePath);
+      _showSuccess(_isRTL
+          ? 'تم إنشاء عرض سندات الخدمات.'
+          : 'Service vouchers demo generated.');
+    } catch (_) {
+      _showError(_isRTL
+          ? 'تعذر إنشاء عرض سندات الخدمات.'
+          : 'Failed to generate vouchers demo.');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
+    }
+  }
+
+  Future<void> _generateBankingVoucherDemo() async {
+    setState(() => _isGenerating = true);
+    try {
+      final bytes = buildBankingVoucherDemoReport(config: _createConfig());
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/banking_voucher_demo.pdf';
+      await GeniusPdfService().saveToPath(
+        bytes: Uint8List.fromList(bytes),
+        path: filePath,
+      );
+      await OpenFile.open(filePath);
+      _showSuccess(_isRTL
+          ? 'تم إنشاء عرض السندات البنكية.'
+          : 'Banking vouchers demo generated.');
+    } catch (_) {
+      _showError(_isRTL
+          ? 'تعذر إنشاء عرض السندات البنكية.'
+          : 'Failed to generate banking vouchers demo.');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
+    }
+  }
+
+  Future<void> _generateRemittanceVoucherDemo() async {
+    setState(() => _isGenerating = true);
+    try {
+      final bytes = buildRemittanceVoucherDemoReport(config: _createConfig());
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/remittance_voucher_demo.pdf';
+      await GeniusPdfService().saveToPath(
+        bytes: Uint8List.fromList(bytes),
+        path: filePath,
+      );
+      await OpenFile.open(filePath);
+      _showSuccess(_isRTL
+          ? 'تم إنشاء عرض سندات الحوالات.'
+          : 'Remittance vouchers demo generated.');
+    } catch (_) {
+      _showError(_isRTL
+          ? 'تعذر إنشاء عرض سندات الحوالات.'
+          : 'Failed to generate remittance vouchers demo.');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
+    }
+  }
+
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -572,24 +612,16 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
   }
 }
 
-class _ExampleItem {
+class _ExampleTab {
   final String id;
   final String title;
-  final String titleAr;
-  final String description;
-  final String descriptionAr;
   final IconData icon;
   final List<Color> gradient;
-  final Future<void> Function() onGenerate;
 
-  const _ExampleItem({
+  _ExampleTab({
     required this.id,
     required this.title,
-    required this.titleAr,
-    required this.description,
-    required this.descriptionAr,
     required this.icon,
     required this.gradient,
-    required this.onGenerate,
   });
 }

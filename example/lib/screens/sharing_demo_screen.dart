@@ -96,8 +96,8 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
       final page = document.pages.add();
       final graphics = page.graphics;
       final font = PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 12);
-      final titleFont =
-          PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 18, style: PdfFontStyle.bold);
+      final titleFont = PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 18,
+          style: PdfFontStyle.bold);
 
       graphics.drawString(
         'Genius Link PDF Generator',
@@ -411,13 +411,22 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
           runSpacing: 12,
           children: [
             _buildAppCard(
-                isDark, 'WhatsApp', Icons.message_rounded, AppColors.successGradient,
+                isDark,
+                'WhatsApp',
+                Icons.message_rounded,
+                AppColors.successGradient,
                 () => _shareToApp(GeniusSharableApp.whatsApp())),
             _buildAppCard(
-                isDark, 'Telegram', Icons.send_rounded, AppColors.infoGradient,
+                isDark,
+                'Telegram',
+                Icons.send_rounded,
+                AppColors.infoGradient,
                 () => _shareToApp(GeniusSharableApp.telegram())),
             _buildAppCard(
-                isDark, 'Signal', Icons.shield_rounded, AppColors.purpleGradient,
+                isDark,
+                'Signal',
+                Icons.shield_rounded,
+                AppColors.purpleGradient,
                 () => _shareToApp(GeniusSharableApp.signal())),
           ],
         ),
@@ -429,13 +438,22 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
           runSpacing: 12,
           children: [
             _buildAppCard(
-                isDark, 'Google Drive', Icons.cloud_rounded, AppColors.warningGradient,
+                isDark,
+                'Google Drive',
+                Icons.cloud_rounded,
+                AppColors.warningGradient,
                 () => _shareToApp(GeniusSharableApp.googleDrive())),
             _buildAppCard(
-                isDark, 'Dropbox', Icons.folder_rounded, AppColors.infoGradient,
+                isDark,
+                'Dropbox',
+                Icons.folder_rounded,
+                AppColors.infoGradient,
                 () => _shareToApp(GeniusSharableApp.dropbox())),
             _buildAppCard(
-                isDark, 'OneDrive', Icons.cloud_queue_rounded, AppColors.primaryGradient,
+                isDark,
+                'OneDrive',
+                Icons.cloud_queue_rounded,
+                AppColors.primaryGradient,
                 () => _shareToApp(GeniusSharableApp.oneDrive())),
           ],
         ),
@@ -545,12 +563,15 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [gradient[0].withOpacity(0.15), gradient[1].withOpacity(0.05)],
+          colors: [
+            gradient[0].withValues(alpha: 0.15),
+            gradient[1].withValues(alpha: 0.05)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gradient[0].withOpacity(0.3)),
+        border: Border.all(color: gradient[0].withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -600,7 +621,8 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
     required List<Color> gradient,
     VoidCallback? onPressed,
   }) {
-    final isEnabled = !_isLoading && _samplePdfBytes != null && onPressed != null;
+    final isEnabled =
+        !_isLoading && _samplePdfBytes != null && onPressed != null;
     return Container(
       decoration: BoxDecoration(
         gradient: isEnabled ? LinearGradient(colors: gradient) : null,
@@ -684,8 +706,8 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        gradient[0].withOpacity(0.2),
-                        gradient[1].withOpacity(0.1),
+                        gradient[0].withValues(alpha: 0.2),
+                        gradient[1].withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(10),
@@ -730,7 +752,7 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: AppColors.primary.withOpacity(0.1),
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                   child: Text(
                     contact.name[0].toUpperCase(),
                     style: const TextStyle(
@@ -769,8 +791,9 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
                     contact.isFavorite
                         ? Icons.star_rounded
                         : Icons.star_border_rounded,
-                    color:
-                        contact.isFavorite ? AppColors.warning : AppColors.darkTextSecondary,
+                    color: contact.isFavorite
+                        ? AppColors.warning
+                        : AppColors.darkTextSecondary,
                   ),
                   onPressed: () => _toggleFavorite(contact.id),
                 ),
@@ -804,7 +827,7 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
@@ -871,7 +894,7 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -934,7 +957,7 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: _getStatusColor(item.status).withOpacity(0.1),
+                color: _getStatusColor(item.status).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -1149,8 +1172,9 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
 
     setState(() {
       _isLoading = false;
-      _status =
-          result.isSuccess ? 'Saved: ${result.filePath}' : 'Error: ${result.error}';
+      _status = result.isSuccess
+          ? 'Saved: ${result.filePath}'
+          : 'Error: ${result.error}';
       _history = _shareService.history;
     });
   }
@@ -1288,8 +1312,9 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
 
     setState(() {
       _isLoading = false;
-      _status =
-          result.success ? 'Saved: ${result.filePath}' : 'Error: ${result.error}';
+      _status = result.success
+          ? 'Saved: ${result.filePath}'
+          : 'Error: ${result.error}';
     });
   }
 

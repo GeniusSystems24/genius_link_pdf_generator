@@ -16,7 +16,7 @@ part of '../pdf_summary.dart';
 ///   backgroundColor: Colors.white,
 ///   borderStyle: GeniusPdfBorderStyle.all(color: Colors.grey),
 ///   padding: GeniusPdfCellPadding.all(12),
-///   highlightBackgroundColor: Colors.blue.withOpacity(0.1),
+///   highlightBackgroundColor: Colors.blue.withValues(alpha:0.1),
 ///   showSeparatorLine: true,
 /// )
 /// ```

@@ -50,7 +50,7 @@ GeniusPdfTextStyle _resolveRichTextDefaultStyle(
 ///   text: 'Important',
 ///   color: Colors.red,
 ///   isBold: true,
-///   backgroundColor: Colors.yellow.withOpacity(0.3),
+///   backgroundColor: Colors.yellow.withValues(alpha:0.3),
 /// )
 /// ```
 class GeniusPdfTextSpan {

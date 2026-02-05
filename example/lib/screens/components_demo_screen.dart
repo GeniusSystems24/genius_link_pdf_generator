@@ -7,8 +7,8 @@ import 'package:path_provider/path_provider.dart';
 import '../documents/components_demo_documents.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
-import '../widgets/code_viewer.dart';
-import '../widgets/custom_tab_bar.dart';
+import '../widgets/component_page.dart';
+// import '../widgets/custom_tab_bar.dart';
 
 class ComponentsDemoScreen extends StatefulWidget {
   const ComponentsDemoScreen({super.key, this.initialTab = 0});
@@ -25,56 +25,56 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
   bool _isGenerating = false;
   bool _isRTL = true;
 
-  final List<CustomTabItem> _tabs = [
-    CustomTabItem(
+  final List<_ComponentTab> _tabs = [
+    _ComponentTab(
       id: 'data_grid',
       title: 'Data Grid',
       icon: Icons.table_chart_rounded,
       gradient: AppColors.primaryGradient,
     ),
-    CustomTabItem(
+    _ComponentTab(
       id: 'rich_text',
       title: 'Rich Text',
       icon: Icons.text_fields_rounded,
       gradient: AppColors.purpleGradient,
     ),
-    CustomTabItem(
+    _ComponentTab(
       id: 'info_box',
       title: 'Info Box',
       icon: Icons.info_rounded,
       gradient: AppColors.cyanGradient,
     ),
-    CustomTabItem(
+    _ComponentTab(
       id: 'headers',
       title: 'Headers',
       icon: Icons.article_rounded,
       gradient: AppColors.successGradient,
     ),
-    CustomTabItem(
+    _ComponentTab(
       id: 'summary',
       title: 'Summary',
       icon: Icons.calculate_rounded,
       gradient: AppColors.warningGradient,
     ),
-    CustomTabItem(
+    _ComponentTab(
       id: 'grid_qrcode',
       title: 'Grid+QR',
       icon: Icons.qr_code_rounded,
       gradient: AppColors.purpleGradient,
     ),
-    CustomTabItem(
+    _ComponentTab(
       id: 'grid_infobox',
       title: 'Grid+Info',
       icon: Icons.view_agenda_rounded,
       gradient: AppColors.cyanGradient,
     ),
-    CustomTabItem(
+    _ComponentTab(
       id: 'grid_watermark',
       title: 'Grid+Watermark',
       icon: Icons.water_drop_rounded,
       gradient: AppColors.successGradient,
     ),
-    CustomTabItem(
+    _ComponentTab(
       id: 'grid_richtext',
       title: 'Grid+RichText',
       icon: Icons.format_quote_rounded,
@@ -106,11 +106,7 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
       color: isDark ? AppColors.darkBg : AppColors.lightBg,
       child: Column(
         children: [
-          CustomTabBar(
-            controller: _tabController,
-            tabs: _tabs,
-            isDark: isDark,
-          ),
+          _buildTabBar(isDark),
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -132,8 +128,53 @@ class _ComponentsDemoScreenState extends State<ComponentsDemoScreen>
     );
   }
 
+  Widget _buildTabBar(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: TabBar(
+        controller: _tabController,
+        padding: const EdgeInsets.all(6),
+        isScrollable: true,
+        indicator: BoxDecoration(
+          gradient: const LinearGradient(colors: AppColors.primaryGradient),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: Colors.white,
+        unselectedLabelColor:
+            isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        unselectedLabelStyle:
+            const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+        tabs: _tabs.map((tab) {
+          return Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(tab.icon, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  tab.title,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Widget _buildDataGridTab(bool isDark) {
-    return _ComponentPage(
+    return ComponentPage(
       title: 'GeniusPdfDataGrid',
       description:
           'Professional data tables with RTL support, styling, borders, and cell alignment.',
@@ -252,7 +293,7 @@ final grid = GeniusPdfDataGrid(
   }
 
   Widget _buildRichTextTab(bool isDark) {
-    return _ComponentPage(
+    return ComponentPage(
       title: 'GeniusPdfRichText',
       description:
           'Styled text with multiple colors, fonts, sizes, and inline formatting.',
@@ -325,12 +366,8 @@ final list = GeniusPdfBulletList(
   style: GeniusPdfBulletStyle.disc,
   baseFont: config.baseFont,
   boldFont: config.boldFont,
+  isRTL: true,
 );
-
-// ─── String Extensions ─────────────────────────
-final span = 'مهم'.toBoldSpan(color: Colors.red);
-final linkSpan = 'click'.toLinkSpan('https://x.com',
-    color: Color(0xFFE65100));
 ''',
       preview: _buildRichTextPreview(isDark),
     );
@@ -350,7 +387,6 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Heading + badge
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -375,7 +411,6 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
             ],
           ),
           const SizedBox(height: 16),
-          // Label + bold value
           RichText(
             textDirection: TextDirection.rtl,
             text: TextSpan(
@@ -393,7 +428,6 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
             ),
           ),
           const SizedBox(height: 8),
-          // Currency value
           RichText(
             textDirection: TextDirection.rtl,
             text: TextSpan(
@@ -410,7 +444,6 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
             ),
           ),
           const SizedBox(height: 8),
-          // Strikethrough + positive
           RichText(
             textDirection: TextDirection.rtl,
             text: TextSpan(
@@ -433,7 +466,6 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
             ),
           ),
           const Divider(height: 24),
-          // Bullet list preview
           Text('عناصر البند:',
               textDirection: TextDirection.rtl,
               style: TextStyle(
@@ -458,7 +490,6 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
               ),
             ),
           const SizedBox(height: 12),
-          // Highlighted text + superscript preview
           RichText(
             textDirection: TextDirection.rtl,
             text: TextSpan(
@@ -488,7 +519,7 @@ final linkSpan = 'click'.toLinkSpan('https://x.com',
   }
 
   Widget _buildInfoBoxTab(bool isDark) {
-    return _ComponentPage(
+    return ComponentPage(
       title: 'GeniusPdfInfoBox',
       description:
           'Information boxes for notices, warnings, tips, and important messages.',
@@ -559,9 +590,9 @@ final dualBox = GeniusPdfDualInfoBox(
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         textDirection: TextDirection.rtl,
@@ -569,7 +600,7 @@ final dualBox = GeniusPdfDualInfoBox(
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -600,7 +631,7 @@ final dualBox = GeniusPdfDualInfoBox(
   }
 
   Widget _buildHeadersTab(bool isDark) {
-    return _ComponentPage(
+    return ComponentPage(
       title: 'GeniusPdfHeader',
       description:
           'Professional document headers with logo, company info, and document details.',
@@ -651,8 +682,8 @@ final bilingualHeader = GeniusPdfReportHeader.bilingualSplit(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(colors: [
-                AppColors.primary.withOpacity(0.1),
-                AppColors.secondary.withOpacity(0.05),
+                AppColors.primary.withValues(alpha: 0.1),
+                AppColors.secondary.withValues(alpha: 0.05),
               ]),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(11)),
@@ -703,7 +734,7 @@ final bilingualHeader = GeniusPdfReportHeader.bilingualSplit(
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
@@ -767,7 +798,7 @@ final bilingualHeader = GeniusPdfReportHeader.bilingualSplit(
   }
 
   Widget _buildSummaryTab(bool isDark) {
-    return _ComponentPage(
+    return ComponentPage(
       title: 'GeniusPdfSummary',
       description:
           'Totals and summary sections with calculations, discounts, and VAT.',
@@ -806,64 +837,59 @@ final summary = GeniusPdfSummarySection(
 
   Widget _buildSummaryPreview(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.white,
+        color: isDark ? AppColors.darkBg : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
             color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
       ),
       child: Column(
         children: [
-          _summaryRow('المجموع الفرعي', '30,100.00 ر.س', isDark),
-          _summaryRow('الخصم (3.3%)', '- 1,000.00 ر.س', isDark,
-              valueColor: AppColors.error),
-          const Divider(height: 24),
-          _summaryRow('المبلغ الخاضع للضريبة', '29,100.00 ر.س', isDark),
-          _summaryRow('ضريبة القيمة المضافة (15%)', '4,365.00 ر.س', isDark),
-          const Divider(height: 24),
-          _summaryRow('الإجمالي', '33,465.00 ر.س', isDark,
-              isTotal: true, valueColor: AppColors.success),
+          _summaryRow('المجموع الفرعي', '30,100.00', false, isDark),
+          _summaryRow('الخصم', '- 500.00', false, isDark, isDiscount: true),
+          _summaryRow('ضريبة القيمة المضافة (15%)', '4,440.00', false, isDark),
+          const Divider(height: 1),
+          _summaryRow('الإجمالي النهائي', '34,040.00', true, isDark),
         ],
       ),
     );
   }
 
-  Widget _summaryRow(String label, String value, bool isDark,
-      {bool isTotal = false, Color? valueColor}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+  Widget _summaryRow(String label, String value, bool isTotal, bool isDark,
+      {bool isDiscount = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: isTotal
+          ? AppColors.primary.withValues(alpha: 0.1)
+          : Colors.transparent,
       child: Row(
         textDirection: TextDirection.rtl,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
               style: TextStyle(
-                fontSize: isTotal ? 16 : 14,
-                fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-                color: isDark ? AppColors.darkText : AppColors.lightText,
-              )),
+                  fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
+                  fontSize: isTotal ? 16 : 14,
+                  color: isDark ? AppColors.darkText : AppColors.lightText)),
           Text(value,
               style: TextStyle(
-                fontSize: isTotal ? 18 : 14,
-                fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-                color: valueColor ??
-                    (isDark ? AppColors.darkText : AppColors.lightText),
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
+                fontSize: isTotal ? 16 : 14,
+                color: isDiscount
+                    ? AppColors.error
+                    : (isTotal
+                        ? AppColors.primary
+                        : (isDark ? AppColors.darkText : AppColors.lightText)),
               )),
         ],
       ),
     );
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Grid Combination Demo Tabs
-  // ─────────────────────────────────────────────────────────────────────────
-
   Widget _buildGridQrcodeTab(bool isDark) {
-    return _ComponentPage(
-      title: 'Grid + QR Code',
-      description:
-          'Invoice grids with ZATCA-compliant QR codes for e-invoicing.',
+    return ComponentPage(
+      title: 'Grid with QR Code',
+      description: 'Display a QR code below or above the data grid.',
       icon: Icons.qr_code_rounded,
       gradient: AppColors.purpleGradient,
       isDark: isDark,
@@ -872,29 +898,42 @@ final summary = GeniusPdfSummarySection(
       isGenerating: _isGenerating,
       onGenerate: () => _generatePdf('grid_qrcode'),
       codeExample: '''
-addGrid(GeniusPdfDataGrid(...));
+final builder = GeniusPdfDocumentBuilder(config);
+builder.addDataGrid(
+  columns: [...],
+  rows: [...],
+);
 
-addQRCode(
-  GeniusPdfQRCodeGenerator.zatca(
-    sellerName: 'Company',
-    vatNumber: '300123456789003',
-    timestamp: DateTime.now(),
-    total: 14058.75,
-    vatAmount: 1833.75,
-    config: config,
-  ),
-  size: 120,
+// Add QR Code
+builder.addQRCode(
+  data: 'https://example.com/invoice/12345',
+  size: 100,
+  label: 'Scan to Verify',
+  align: PdfTextAlignment.center,
+  padding: const EdgeInsets.only(top: 20),
 );''',
-      preview:
-          _buildGenericPreview(isDark, Icons.qr_code_rounded, 'Grid + QR Code'),
+      preview: Column(
+        children: [
+          _buildDataGridPreview(isDark),
+          const SizedBox(height: 20),
+          Icon(Icons.qr_code_2,
+              size: 80, color: isDark ? Colors.white : Colors.black87),
+          const SizedBox(height: 8),
+          Text('Scan to Verify',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary)),
+        ],
+      ),
     );
   }
 
   Widget _buildGridInfoboxTab(bool isDark) {
-    return _ComponentPage(
-      title: 'Grid + Info Boxes',
-      description:
-          'Data grids with styled info boxes for notices and summaries.',
+    return ComponentPage(
+      title: 'Grid with Info Box',
+      description: 'Combine data grids with informational boxes.',
       icon: Icons.view_agenda_rounded,
       gradient: AppColors.cyanGradient,
       isDark: isDark,
@@ -903,24 +942,41 @@ addQRCode(
       isGenerating: _isGenerating,
       onGenerate: () => _generatePdf('grid_infobox'),
       codeExample: '''
-addDualInfoBox(
-  leftBox: customerBox,
-  rightBox: companyBox,
-  equalHeight: true,
+final builder = GeniusPdfDocumentBuilder(config);
+builder.addDataGrid(
+  columns: [...],
+  rows: [...],
 );
 
-addGrid(GeniusPdfDataGrid(...));
-
-addInfoBox(GeniusPdfInfoBox(...));''',
-      preview: _buildGenericPreview(
-          isDark, Icons.view_agenda_rounded, 'Grid + Info Boxes'),
+// Add Info Box
+builder.addInfoBox(
+  title: 'Payment Terms',
+  style: GeniusPdfInfoBoxStyle.info(),
+  baseFont: config.baseFont,
+  boldFont: config.boldFont,
+  items: [
+    GeniusPdfLabeledValue(
+      config: config,
+      label: 'Due Date',
+      value: '30 days from invoice date',
+    ),
+  ],
+);''',
+      preview: Column(
+        children: [
+          _buildDataGridPreview(isDark),
+          const SizedBox(height: 20),
+          _infoBox('Payment Terms', 'Due in 30 days', Icons.info_outline,
+              AppColors.info, isDark),
+        ],
+      ),
     );
   }
 
   Widget _buildGridWatermarkTab(bool isDark) {
-    return _ComponentPage(
-      title: 'Grid + Watermarks',
-      description: 'Secure reports with watermarks for confidential documents.',
+    return ComponentPage(
+      title: 'Grid with Watermark',
+      description: 'Apply textual or image watermarks to grid pages.',
       icon: Icons.water_drop_rounded,
       gradient: AppColors.successGradient,
       isDark: isDark,
@@ -929,23 +985,44 @@ addInfoBox(GeniusPdfInfoBox(...));''',
       isGenerating: _isGenerating,
       onGenerate: () => _generatePdf('grid_watermark'),
       codeExample: '''
-addGrid(GeniusPdfDataGrid(...));
+final builder = GeniusPdfDocumentBuilder(config);
 
-// Apply watermark at document level
-final watermark = GeniusPdfWatermark.diagonal(
-  GeniusDiagonalWatermarkSettings(text: 'CONFIDENTIAL'),
-  config: config,
-);
-watermark.applyToDocument(doc);''',
-      preview: _buildGenericPreview(
-          isDark, Icons.water_drop_rounded, 'Grid + Watermarks'),
+// Add content...
+
+// Apply Watermark
+builder.applyWatermark(
+  text: 'CONFIDENTIAL',
+  color: PdfColor(0.9, 0, 0),
+  opacity: 0.1,
+  rotation: 45,
+);''',
+      preview: Stack(
+        children: [
+          _buildDataGridPreview(isDark),
+          Positioned.fill(
+            child: Center(
+              child: Transform.rotate(
+                angle: -0.5,
+                child: Text(
+                  'CONFIDENTIAL',
+                  style: TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red.withOpacity(0.1),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildGridRichtextTab(bool isDark) {
-    return _ComponentPage(
-      title: 'Grid + Rich Text',
-      description: 'Financial analysis reports with styled text commentary.',
+    return ComponentPage(
+      title: 'Grid with Rich Text',
+      description: 'Add rich text descriptions or notes around the grid.',
       icon: Icons.format_quote_rounded,
       gradient: AppColors.warningGradient,
       isDark: isDark,
@@ -954,337 +1031,74 @@ watermark.applyToDocument(doc);''',
       isGenerating: _isGenerating,
       onGenerate: () => _generatePdf('grid_richtext'),
       codeExample: '''
-addGrid(GeniusPdfDataGrid(...));
+final builder = GeniusPdfDocumentBuilder(config);
 
-addRichText(
+// Add Rich Text Header
+builder.addRichText(
   GeniusPdfRichTextBuilder(config: config)
-    .text('Revenue shows ')
-    .positive('+15.6%')
-    .text(' growth.')
+    .heading('Sales Report')
+    .newLine()
+    .text('Overview of quarterly performance.')
     .build(),
-);''',
-      preview: _buildGenericPreview(
-          isDark, Icons.format_quote_rounded, 'Grid + Rich Text'),
-    );
-  }
+);
 
-  Widget _buildGenericPreview(bool isDark, IconData icon, String label) {
-    return Container(
-      height: 200,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary.withOpacity(0.1),
-            AppColors.secondary.withOpacity(0.05),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 48, color: AppColors.primary),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.darkText : AppColors.lightText,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Click "Generate PDF" to preview',
-              style: TextStyle(
-                fontSize: 12,
-                color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary,
-              ),
-            ),
-          ],
-        ),
+builder.addDataGrid(...);''',
+      preview: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          const Text('Sales Report',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text('Overview of quarterly performance.',
+              style: TextStyle(color: Colors.grey)),
+          const SizedBox(height: 10),
+          _buildDataGridPreview(isDark),
+        ],
       ),
     );
   }
 
-  Future<void> _generatePdf(String component) async {
+  Future<void> _generatePdf(String type) async {
     setState(() => _isGenerating = true);
     try {
-      final effectiveConfig = geniusPdfConfig.copyWith(
+      // Update config based on RTL selection
+      final updatedConfig = geniusPdfConfig.copyWith(
         textDirection: _isRTL ? TextDirection.rtl : TextDirection.ltr,
       );
 
-      final Uint8List bytes = await buildComponentDemoBytes(
-        component: component,
-        config: effectiveConfig,
-      );
+      final Uint8List bytes =
+          await buildComponentDemoBytes(component: type, config: updatedConfig);
 
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/component_$component.pdf');
+      final output = await getApplicationDocumentsDirectory();
+      final file = File('${output.path}/demo_$type.pdf');
       await file.writeAsBytes(bytes);
       await OpenFile.open(file.path);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: const Text('تم إنشاء PDF بنجاح'),
-              backgroundColor: AppColors.success,
-              behavior: SnackBarBehavior.floating),
-        );
-      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('خطأ: $e'),
-              backgroundColor: AppColors.error,
-              behavior: SnackBarBehavior.floating),
+            content: Text('Error generating PDF: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     } finally {
-      if (mounted) setState(() => _isGenerating = false);
+      if (mounted) {
+        setState(() => _isGenerating = false);
+      }
     }
   }
 }
 
-// ---------------------------------------------------------------------------
-// UI Support Classes
-// ---------------------------------------------------------------------------
-
-class _ComponentPage extends StatelessWidget {
+class _ComponentTab {
+  final String id;
   final String title;
-  final String description;
   final IconData icon;
   final List<Color> gradient;
-  final bool isDark;
-  final bool isRTL;
-  final ValueChanged<bool> onRTLChanged;
-  final bool isGenerating;
-  final VoidCallback onGenerate;
-  final String codeExample;
-  final Widget preview;
 
-  const _ComponentPage({
+  _ComponentTab({
+    required this.id,
     required this.title,
-    required this.description,
     required this.icon,
     required this.gradient,
-    required this.isDark,
-    required this.isRTL,
-    required this.onRTLChanged,
-    required this.isGenerating,
-    required this.onGenerate,
-    required this.codeExample,
-    required this.preview,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 16),
-          _buildOptions(),
-          const SizedBox(height: 16),
-          _buildPreview(),
-          const SizedBox(height: 16),
-          _buildCode(),
-          const SizedBox(height: 16),
-          _buildGenerateButton(),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [
-          gradient.first.withOpacity(isDark ? 0.2 : 0.1),
-          gradient.last.withOpacity(isDark ? 0.1 : 0.05),
-        ]),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gradient.first.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: gradient),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                    color: gradient.first.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4))
-              ],
-            ),
-            child: Icon(icon, color: Colors.white, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            isDark ? AppColors.darkText : AppColors.lightText)),
-                const SizedBox(height: 4),
-                Text(description,
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.lightTextSecondary)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOptions() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.tune_rounded,
-              size: 18,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary),
-          const SizedBox(width: 8),
-          Text('Options',
-              style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkText : AppColors.lightText)),
-          const Spacer(),
-          Text('LTR',
-              style: TextStyle(
-                  fontSize: 12,
-                  color:
-                      !isRTL ? AppColors.primary : AppColors.darkTextSecondary,
-                  fontWeight: !isRTL ? FontWeight.w600 : FontWeight.normal)),
-          Switch(
-              value: isRTL,
-              onChanged: onRTLChanged,
-              activeThumbColor: AppColors.primary),
-          Text('RTL',
-              style: TextStyle(
-                  fontSize: 12,
-                  color:
-                      isRTL ? AppColors.primary : AppColors.darkTextSecondary,
-                  fontWeight: isRTL ? FontWeight.w600 : FontWeight.normal)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPreview() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Icon(Icons.preview_rounded,
-                size: 18,
-                color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary),
-            const SizedBox(width: 8),
-            Text('Preview',
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkText : AppColors.lightText)),
-          ]),
-          const SizedBox(height: 16),
-          preview,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCode() {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(children: [
-              Icon(Icons.code_rounded,
-                  size: 18,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary),
-              const SizedBox(width: 8),
-              Text('Code Example',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color:
-                          isDark ? AppColors.darkText : AppColors.lightText)),
-            ]),
-          ),
-          CodeViewer(code: codeExample, height: 200),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGenerateButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: isGenerating ? null : onGenerate,
-        icon: isGenerating
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.white))
-            : const Icon(Icons.picture_as_pdf_rounded),
-        label: Text(isGenerating ? 'جاري الإنشاء...' : 'إنشاء PDF'),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: gradient.first,
-          foregroundColor: Colors.white,
-        ),
-      ),
-    );
-  }
 }

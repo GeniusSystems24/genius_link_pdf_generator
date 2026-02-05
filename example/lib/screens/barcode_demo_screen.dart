@@ -82,7 +82,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
             isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
         indicatorSize: TabBarIndicatorSize.tab,
         indicator: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         dividerColor: Colors.transparent,
@@ -173,7 +173,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(Icons.view_week_rounded,
@@ -208,7 +208,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -285,7 +285,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.secondary.withOpacity(0.1),
+              color: AppColors.secondary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: AppColors.secondary, size: 24),
@@ -413,11 +413,11 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: [
-          gradient.first.withOpacity(isDark ? 0.2 : 0.1),
-          gradient.last.withOpacity(isDark ? 0.1 : 0.05),
+          gradient.first.withValues(alpha: isDark ? 0.2 : 0.1),
+          gradient.last.withValues(alpha: isDark ? 0.1 : 0.05),
         ]),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gradient.first.withOpacity(0.3)),
+        border: Border.all(color: gradient.first.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -509,7 +509,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
             ? null
             : [
                 BoxShadow(
-                  color: gradient.first.withOpacity(0.3),
+                  color: gradient.first.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -519,7 +519,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         onPressed: _isGenerating ? null : onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
-          disabledBackgroundColor: AppColors.darkBorder.withOpacity(0.5),
+          disabledBackgroundColor: AppColors.darkBorder.withValues(alpha: 0.5),
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),

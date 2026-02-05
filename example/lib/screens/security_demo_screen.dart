@@ -560,7 +560,8 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
         ),
       ).applyToPage(page2);
 
-      final signature = GeniusPdfDigitalSignature(config: geniusPdfConfig,
+      final signature = GeniusPdfDigitalSignature(
+        config: geniusPdfConfig,
         settings: GeniusDigitalSignatureSettings(
           signerName: 'Document Admin',
           reason: 'Comprehensive Demo',
@@ -785,15 +786,15 @@ class _SecurityTabContent extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                gradient[0].withOpacity(0.15),
-                gradient[1].withOpacity(0.05)
+                gradient[0].withValues(alpha: 0.15),
+                gradient[1].withValues(alpha: 0.05)
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: gradient[0].withOpacity(0.3),
+              color: gradient[0].withValues(alpha: 0.3),
             ),
           ),
           child: Row(
@@ -857,7 +858,7 @@ class _SecurityTabContent extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.3),
+                color: AppColors.primary.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -940,8 +941,8 @@ class _SecurityOptionCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        option.gradient[0].withOpacity(0.2),
-                        option.gradient[1].withOpacity(0.1),
+                        option.gradient[0].withValues(alpha: 0.2),
+                        option.gradient[1].withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(10),
@@ -992,7 +993,7 @@ class _SecurityOptionCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: option.gradient[0].withOpacity(0.1),
+                      color: option.gradient[0].withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(

@@ -78,12 +78,12 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
       PdfFont titleFont;
       try {
         font = geniusPdfConfig.baseFont;
-        titleFont =
-            PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 18, style: PdfFontStyle.bold);
+        titleFont = PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 18,
+            style: PdfFontStyle.bold);
       } catch (_) {
         font = PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 12);
-        titleFont =
-            PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 18, style: PdfFontStyle.bold);
+        titleFont = PdfTrueTypeFont(geniusPdfConfig.baseFontBytes, 18,
+            style: PdfFontStyle.bold);
       }
 
       // Page 1: Title page
@@ -217,7 +217,8 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
 
       setState(() {
         _isLoading = false;
-        _status = 'Sample PDF ready (3 pages, ${_samplePdfBytes!.length} bytes)';
+        _status =
+            'Sample PDF ready (3 pages, ${_samplePdfBytes!.length} bytes)';
       });
     } catch (e) {
       setState(() {
@@ -385,7 +386,8 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
             onChanged: (value) {
               if (value != null) {
                 setState(() {
-                  _currentSettings = _currentSettings.copyWith(paperSize: value);
+                  _currentSettings =
+                      _currentSettings.copyWith(paperSize: value);
                 });
               }
             },
@@ -439,7 +441,8 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
               return DropdownMenuItem(
                 value: mode,
                 child: Text(
-                  mode.name.substring(0, 1).toUpperCase() + mode.name.substring(1),
+                  mode.name.substring(0, 1).toUpperCase() +
+                      mode.name.substring(1),
                   style: TextStyle(
                     color: isDark ? AppColors.darkText : AppColors.lightText,
                   ),
@@ -449,7 +452,8 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
             onChanged: (value) {
               if (value != null) {
                 setState(() {
-                  _currentSettings = _currentSettings.copyWith(colorMode: value);
+                  _currentSettings =
+                      _currentSettings.copyWith(colorMode: value);
                 });
               }
             },
@@ -569,10 +573,14 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
                 ),
               ),
               const SizedBox(height: 12),
-              _buildSettingRow(isDark, 'Paper', _currentSettings.paperSize.displayName),
-              _buildSettingRow(isDark, 'Orientation', _currentSettings.orientation.name),
-              _buildSettingRow(isDark, 'Color', _currentSettings.colorMode.name),
-              _buildSettingRow(isDark, 'Quality', _currentSettings.quality.name),
+              _buildSettingRow(
+                  isDark, 'Paper', _currentSettings.paperSize.displayName),
+              _buildSettingRow(
+                  isDark, 'Orientation', _currentSettings.orientation.name),
+              _buildSettingRow(
+                  isDark, 'Color', _currentSettings.colorMode.name),
+              _buildSettingRow(
+                  isDark, 'Quality', _currentSettings.quality.name),
               _buildSettingRow(isDark, 'Copies', '${_currentSettings.copies}'),
             ],
           ),
@@ -620,13 +628,11 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
           gradient: AppColors.purpleGradient,
         ),
         const SizedBox(height: 16),
-
         _buildSectionTitle(isDark, 'System Presets'),
         const SizedBox(height: 8),
         ..._profiles
             .where((p) => p.isSystemPreset)
             .map((profile) => _buildProfileCard(isDark, profile)),
-
         const SizedBox(height: 16),
         _buildSectionTitle(isDark, 'Your Profiles'),
         const SizedBox(height: 8),
@@ -655,7 +661,6 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
           ..._profiles
               .where((p) => !p.isSystemPreset)
               .map((profile) => _buildProfileCard(isDark, profile)),
-
         const SizedBox(height: 16),
         _buildActionButton(
           isDark: isDark,
@@ -681,12 +686,15 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [gradient[0].withOpacity(0.15), gradient[1].withOpacity(0.05)],
+          colors: [
+            gradient[0].withValues(alpha: 0.15),
+            gradient[1].withValues(alpha: 0.05)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gradient[0].withOpacity(0.3)),
+        border: Border.all(color: gradient[0].withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -738,9 +746,7 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
   }) {
     return Container(
       decoration: BoxDecoration(
-        gradient: onPressed != null
-            ? LinearGradient(colors: gradient)
-            : null,
+        gradient: onPressed != null ? LinearGradient(colors: gradient) : null,
         color: onPressed == null
             ? (isDark ? AppColors.darkCard : AppColors.lightBorder)
             : null,
@@ -896,8 +902,8 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: printer.isAvailable
-                  ? AppColors.success.withOpacity(0.1)
-                  : AppColors.error.withOpacity(0.1),
+                  ? AppColors.success.withValues(alpha: 0.1)
+                  : AppColors.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -933,7 +939,7 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Text(
@@ -974,14 +980,15 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     profile.isSystemPreset
                         ? Icons.settings_rounded
                         : Icons.person_rounded,
-                    color: isDefault ? AppColors.primary : AppColors.primaryLight,
+                    color:
+                        isDefault ? AppColors.primary : AppColors.primaryLight,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -993,7 +1000,8 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
                         profile.name,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.darkText : AppColors.lightText,
+                          color:
+                              isDark ? AppColors.darkText : AppColors.lightText,
                         ),
                       ),
                       Text(
@@ -1013,7 +1021,7 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.success.withOpacity(0.1),
+                      color: AppColors.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Text(

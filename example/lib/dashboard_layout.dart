@@ -16,6 +16,8 @@ import 'screens/ai_features_demo_screen.dart';
 import 'screens/v2_architecture_demo_screen.dart';
 import 'screens/barcode_demo_screen.dart';
 import 'screens/examples_showcase_screen.dart';
+import 'screens/job_manager_demo_screen.dart';
+import 'screens/custom_report_screen.dart';
 import 'dart:ui'; // For ImageFilter
 
 /// Modern Dashboard Layout with Glassmorphism and Smooth Navigation
@@ -66,11 +68,11 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                 width: 400,
                 height: 400,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.05),
+                  color: AppColors.primary.withValues(alpha: 0.05),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       blurRadius: 100,
                       spreadRadius: 20,
                     ),
@@ -85,11 +87,11 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                 width: 300,
                 height: 300,
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withOpacity(0.05),
+                  color: AppColors.secondary.withValues(alpha: 0.05),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.secondary.withOpacity(0.1),
+                      color: AppColors.secondary.withValues(alpha: 0.1),
                       blurRadius: 80,
                       spreadRadius: 20,
                     ),
@@ -157,8 +159,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       appBar: AppBar(
         titleSpacing: 0,
         backgroundColor: isDark
-            ? AppColors.darkSurface.withOpacity(0.8)
-            : AppColors.lightSurface.withOpacity(0.8),
+            ? AppColors.darkSurface.withValues(alpha: 0.8)
+            : AppColors.lightSurface.withValues(alpha: 0.8),
         flexibleSpace: ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -245,6 +247,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       _DrawerItem('advanced', 'Advanced', Icons.auto_awesome_rounded),
       _DrawerItem(
           'v2_architecture', 'V2 Architecture', Icons.account_tree_rounded),
+      _DrawerItem('job_manager', 'Job Manager', Icons.work_history_rounded),
+      _DrawerItem('custom_report', 'Custom Report', Icons.post_add_rounded),
     ];
 
     return SafeArea(
@@ -271,7 +275,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -345,7 +349,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                       ),
                     ),
                     selected: isSelected,
-                    selectedTileColor: AppColors.primary.withOpacity(0.1),
+                    selectedTileColor: AppColors.primary.withValues(alpha: 0.1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -369,8 +373,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       padding: const EdgeInsets.symmetric(horizontal: 32),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColors.darkSurface.withOpacity(0.5)
-            : AppColors.lightSurface.withOpacity(0.8),
+            ? AppColors.darkSurface.withValues(alpha: 0.5)
+            : AppColors.lightSurface.withValues(alpha: 0.8),
         border: Border(
           bottom: BorderSide(
             color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
@@ -433,7 +437,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -547,7 +551,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -610,6 +614,10 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         return 'Advanced Features';
       case 'examples':
         return 'Examples';
+      case 'job_manager':
+        return 'Job Manager';
+      case 'custom_report':
+        return 'Custom Report';
       default:
         return 'Genius PDF';
     }
@@ -677,6 +685,10 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         return const V2ArchitectureDemoScreen();
       case 'examples':
         return const ExamplesShowcaseScreen();
+      case 'job_manager':
+        return const JobManagerDemoScreen();
+      case 'custom_report':
+        return const CustomReportScreen();
 
       default:
         return DashboardHome(onNavigate: _onItemSelected);
