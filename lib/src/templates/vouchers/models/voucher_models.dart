@@ -161,6 +161,12 @@ class VoucherPaymentDetails {
     this.cardType,
     this.cardLastFour,
     this.denominations,
+    this.sourceCurrency,
+    this.targetCurrency,
+    this.exchangeRate,
+    this.sourceAmount,
+    this.targetAmount,
+    this.exchangeFee,
   });
 
   final VoucherPaymentMethod method;
@@ -188,6 +194,14 @@ class VoucherPaymentDetails {
 
   // Cash denomination breakdown {denomination: count}
   final Map<double, int>? denominations;
+
+  // Currency exchange
+  final String? sourceCurrency;
+  final String? targetCurrency;
+  final double? exchangeRate;
+  final double? sourceAmount;
+  final double? targetAmount;
+  final double? exchangeFee;
 }
 
 /// Signatory block for voucher approvals.
@@ -320,4 +334,145 @@ class VoucherTaxData {
   final String? goodsDescriptionAr;
   final double? customsValue;
   final double? dutyRate;
+}
+
+/// Bank account information used by banking vouchers.
+class VoucherBankInfo {
+  const VoucherBankInfo({
+    required this.bankName,
+    this.bankNameAr,
+    this.branchName,
+    this.branchNameAr,
+    this.accountNumber,
+    this.iban,
+    this.swiftCode,
+    this.currency = 'SAR',
+    this.balanceBefore,
+  });
+
+  final String bankName;
+  final String? bankNameAr;
+  final String? branchName;
+  final String? branchNameAr;
+  final String? accountNumber;
+  final String? iban;
+  final String? swiftCode;
+  final String currency;
+  final double? balanceBefore;
+
+  String displayBankName({bool isRTL = true}) =>
+      isRTL ? (bankNameAr ?? bankName) : bankName;
+}
+
+/// Transfer-specific data for transfer vouchers.
+class VoucherTransferData {
+  const VoucherTransferData({
+    required this.sourceAccount,
+    required this.destinationAccount,
+    this.beneficiaryName,
+    this.beneficiaryNameAr,
+    this.transferFee,
+    this.commission,
+    this.netAmount,
+    this.processingTime,
+    this.platform,
+  });
+
+  final VoucherBankInfo sourceAccount;
+  final VoucherBankInfo destinationAccount;
+  final String? beneficiaryName;
+  final String? beneficiaryNameAr;
+  final double? transferFee;
+  final double? commission;
+  final double? netAmount;
+  final String? processingTime;
+  final String? platform;
+}
+
+/// Bill payment details for bill payment vouchers.
+class VoucherBillData {
+  const VoucherBillData({
+    required this.providerName,
+    this.providerNameAr,
+    this.subscriberNumber,
+    this.billNumber,
+    this.billingPeriod,
+    this.billingPeriodAr,
+    this.dueDate,
+    this.serviceType,
+    this.serviceTypeAr,
+    this.meterNumber,
+    this.consumption,
+    this.consumptionUnit,
+    this.rate,
+    this.planName,
+    this.planNameAr,
+    this.mobileNumber,
+    this.validity,
+    this.validityAr,
+    this.confirmationNumber,
+  });
+
+  final String providerName;
+  final String? providerNameAr;
+  final String? subscriberNumber;
+  final String? billNumber;
+  final String? billingPeriod;
+  final String? billingPeriodAr;
+  final DateTime? dueDate;
+  final String? serviceType;
+  final String? serviceTypeAr;
+  final String? meterNumber;
+  final double? consumption;
+  final String? consumptionUnit;
+  final double? rate;
+  final String? planName;
+  final String? planNameAr;
+  final String? mobileNumber;
+  final String? validity;
+  final String? validityAr;
+  final String? confirmationNumber;
+
+  String displayProvider({bool isRTL = true}) =>
+      isRTL ? (providerNameAr ?? providerName) : providerName;
+}
+
+/// Signatory factory for banking-specific roles.
+extension BankingSignatories on VoucherSignatory {
+  static VoucherSignatory depositor({String? name}) => VoucherSignatory(
+        role: 'Depositor',
+        roleAr: 'المودع',
+        name: name,
+      );
+
+  static VoucherSignatory bankTeller({String? name}) => VoucherSignatory(
+        role: 'Bank Teller',
+        roleAr: 'موظف البنك',
+        name: name,
+      );
+
+  static VoucherSignatory requester({String? name}) => VoucherSignatory(
+        role: 'Requester',
+        roleAr: 'مقدم الطلب',
+        name: name,
+      );
+
+  static VoucherSignatory treasury({String? name}) => VoucherSignatory(
+        role: 'Treasury',
+        roleAr: 'الخزينة',
+        name: name,
+      );
+
+  static VoucherSignatory authorizedSignatory({String? name}) =>
+      VoucherSignatory(
+        role: 'Authorized Signatory',
+        roleAr: 'المفوض بالتوقيع',
+        name: name,
+      );
+
+  static VoucherSignatory operator({String? name}) => VoucherSignatory(
+        role: 'Operator',
+        roleAr: 'المشغّل',
+        name: name,
+      );
 }

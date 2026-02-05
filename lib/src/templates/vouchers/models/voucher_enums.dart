@@ -29,7 +29,31 @@ enum VoucherServiceId {
   vatVoucher('00301', 'سند ضريبة قيمة مضافة', 'VAT Voucher', VoucherCategory.tax),
   governmentFees('00302', 'سند رسوم حكومية', 'Government Fees Voucher', VoucherCategory.tax),
   customsDuty('00303', 'سند رسوم جمركية', 'Customs Duty Voucher', VoucherCategory.tax),
-  taxSettlement('00304', 'سند تسوية ضريبية', 'Tax Settlement Voucher', VoucherCategory.tax);
+  taxSettlement('00304', 'سند تسوية ضريبية', 'Tax Settlement Voucher', VoucherCategory.tax),
+
+  // ── Bank Deposit Vouchers (10000–10002) ──
+  cashDeposit('10000', 'إيداع نقدي', 'Cash Deposit', VoucherCategory.bankDeposit),
+  checkDeposit('10001', 'إيداع شيك', 'Check Deposit', VoucherCategory.bankDeposit),
+  electronicDeposit('10002', 'إيداع إلكتروني', 'Electronic Deposit', VoucherCategory.bankDeposit),
+
+  // ── Bank Withdrawal Vouchers (10100–10102) ──
+  cashWithdrawal('10100', 'سحب نقدي', 'Cash Withdrawal', VoucherCategory.bankWithdrawal),
+  checkWithdrawal('10101', 'سحب بشيك', 'Check Withdrawal', VoucherCategory.bankWithdrawal),
+  atmWithdrawal('10102', 'سحب عبر الصراف', 'ATM Withdrawal', VoucherCategory.bankWithdrawal),
+
+  // ── Transfer Vouchers (10200–10203) ──
+  bankTransfer('10200', 'تحويل بنكي', 'Bank Transfer', VoucherCategory.transfer),
+  interAccountTransfer('10201', 'تحويل بين حسابات', 'Inter-Account Transfer', VoucherCategory.transfer),
+  electronicTransfer('10202', 'تحويل إلكتروني', 'Electronic Transfer', VoucherCategory.transfer),
+  currencyExchange('10203', 'تحويل عملات', 'Currency Exchange', VoucherCategory.transfer),
+
+  // ── Bill Payment Vouchers (10300–10305) ──
+  utilityBillPayment('10300', 'دفع فواتير خدمات', 'Utility Bill Payment', VoucherCategory.billPayment),
+  generalBillPayment('10301', 'دفع فواتير متنوعة', 'General Bill Payment', VoucherCategory.billPayment),
+  internetBillPayment('10302', 'دفع فواتير إنترنت', 'Internet Bill Payment', VoucherCategory.billPayment),
+  telecomRecharge('10303', 'شحن اتصالات', 'Telecom Recharge', VoucherCategory.billPayment),
+  gameRecharge('10304', 'شحن ألعاب', 'Game Credit Recharge', VoucherCategory.billPayment),
+  entertainmentRecharge('10305', 'شحن ترفيه', 'Entertainment Recharge', VoucherCategory.billPayment);
 
   const VoucherServiceId(this.code, this.nameAr, this.nameEn, this.category);
 
@@ -58,7 +82,11 @@ enum VoucherCategory {
   accountingEntry('قيود محاسبية', 'Accounting Entries'),
   receipt('سندات قبض', 'Receipt Vouchers'),
   payment('سندات صرف', 'Payment Vouchers'),
-  tax('سندات ضريبية', 'Tax Vouchers');
+  tax('سندات ضريبية', 'Tax Vouchers'),
+  bankDeposit('إيداعات بنكية', 'Bank Deposits'),
+  bankWithdrawal('سحوبات بنكية', 'Bank Withdrawals'),
+  transfer('التحويلات', 'Transfers'),
+  billPayment('دفع الفواتير', 'Bill Payments');
 
   const VoucherCategory(this.nameAr, this.nameEn);
 
@@ -74,7 +102,8 @@ enum VoucherPaymentMethod {
   bankTransfer('تحويل بنكي', 'Bank Transfer'),
   check('شيك', 'Check'),
   electronic('إلكتروني', 'Electronic'),
-  installment('تقسيط', 'Installment');
+  installment('تقسيط', 'Installment'),
+  currencyExchange('تحويل عملات', 'Currency Exchange');
 
   const VoucherPaymentMethod(this.nameAr, this.nameEn);
 

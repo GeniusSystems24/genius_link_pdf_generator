@@ -5,6 +5,59 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-02-05
+
+### Added
+
+#### Banking Voucher Templates (v3.1.0)
+
+Extends the voucher system with 4 new banking template classes covering 15 service IDs. All templates support bilingual RTL/LTR layouts, batch PDF generation, and the full voucher styling system.
+
+**New Service IDs:**
+- `VoucherServiceId.cashDeposit` (10000) — Cash deposit into bank account
+- `VoucherServiceId.checkDeposit` (10001) — Check deposit into bank account
+- `VoucherServiceId.electronicDeposit` (10002) — Electronic transfer deposit
+- `VoucherServiceId.cashWithdrawal` (10100) — Cash withdrawal from bank account
+- `VoucherServiceId.checkWithdrawal` (10101) — Withdrawal via issued check
+- `VoucherServiceId.atmWithdrawal` (10102) — ATM withdrawal
+- `VoucherServiceId.bankTransfer` (10200) — Bank-to-bank transfer
+- `VoucherServiceId.interAccountTransfer` (10201) — Transfer between own accounts
+- `VoucherServiceId.electronicTransfer` (10202) — Electronic platform transfer
+- `VoucherServiceId.currencyExchange` (10203) — Foreign exchange transaction
+- `VoucherServiceId.utilityBillPayment` (10300) — Electricity, water, gas, phone
+- `VoucherServiceId.generalBillPayment` (10301) — Miscellaneous bills and dues
+- `VoucherServiceId.internetBillPayment` (10302) — Internet service bills
+- `VoucherServiceId.telecomRecharge` (10303) — Mobile operator packages
+- `VoucherServiceId.gameRecharge` (10304) — Gaming platform credit
+- `VoucherServiceId.entertainmentRecharge` (10305) — Streaming subscriptions
+
+**New Template Classes:**
+- `BankDepositVoucher` — Bank deposit vouchers with denomination breakdown table for cash deposits, check details for check deposits, and electronic transfer references
+- `BankWithdrawalVoucher` — Bank withdrawal vouchers with authorized person info, ATM location/card details, and check withdrawal support
+- `TransferVoucher` — Transfer vouchers with source/destination account blocks, beneficiary info, fees/commission, net amount calculation, and currency exchange support
+- `BillPaymentVoucher` — Bill payment vouchers with service provider info, subtype-specific bill details (meter readings, consumption, plans, mobile numbers), and confirmation references
+
+**New Data Models:**
+- `VoucherBankInfo` — Bank account information (name, branch, account number, IBAN, SWIFT, currency, balance)
+- `VoucherTransferData` — Transfer details (source/destination accounts, beneficiary, fees, net amount, platform)
+- `VoucherBillData` — Bill payment details (provider, subscriber, billing period, meter, consumption, plan, mobile, confirmation)
+- `BankingSignatories` — Extension with factory methods: `depositor`, `bankTeller`, `requester`, `treasury`, `authorizedSignatory`, `operator`
+
+**New Voucher Categories:**
+- `VoucherCategory.bankDeposit` — Bank Deposits / إيداعات بنكية
+- `VoucherCategory.bankWithdrawal` — Bank Withdrawals / سحوبات بنكية
+- `VoucherCategory.transfer` — Transfers / التحويلات
+- `VoucherCategory.billPayment` — Bill Payments / دفع الفواتير
+
+**New Payment Method:**
+- `VoucherPaymentMethod.currencyExchange` — Currency exchange with source/target currency, exchange rate, and fee
+
+**Example:**
+- `buildBankingVoucherDemoReport()` — Demo generating 4 banking vouchers in one batch PDF (cash deposit, check withdrawal, bank transfer, utility bill)
+- Banking Vouchers card added to Examples Showcase screen
+
+---
+
 ## [3.0.0] - 2026-02-04
 
 ### Added

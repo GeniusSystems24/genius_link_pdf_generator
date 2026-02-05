@@ -12,6 +12,7 @@ import '../documents/position_tracking_demo_document.dart';
 import '../documents/qr_attachments_demo_document.dart';
 import '../documents/report_composer_demo_document.dart';
 import '../documents/voucher_demo_builder.dart';
+import '../documents/banking_voucher_demo_builder.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 
@@ -93,6 +94,17 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
           icon: Icons.receipt_long_rounded,
           gradient: AppColors.warningGradient,
           onGenerate: _generateVoucherDemo,
+        ),
+        _ExampleItem(
+          id: 'banking_vouchers',
+          title: 'Banking Vouchers',
+          titleAr: 'السندات البنكية',
+          description:
+              'Bank deposits, withdrawals, transfers, and bill payments in one PDF.',
+          descriptionAr: 'إيداعات وسحوبات بنكية وتحويلات ودفع فواتير في ملف واحد.',
+          icon: Icons.account_balance_rounded,
+          gradient: AppColors.cyanGradient,
+          onGenerate: _generateBankingVoucherDemo,
         ),
       ];
 
@@ -465,6 +477,26 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
       _showError(_isRTL
           ? 'تعذر إنشاء عرض سندات الخدمات.'
           : 'Failed to generate vouchers demo.');
+    }
+  }
+
+  Future<void> _generateBankingVoucherDemo() async {
+    try {
+      final bytes = buildBankingVoucherDemoReport(config: _createConfig());
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/banking_voucher_demo.pdf';
+      await GeniusPdfService().saveToPath(
+        bytes: Uint8List.fromList(bytes),
+        path: filePath,
+      );
+      await OpenFile.open(filePath);
+      _showSuccess(_isRTL
+          ? 'تم إنشاء عرض السندات البنكية.'
+          : 'Banking vouchers demo generated.');
+    } catch (_) {
+      _showError(_isRTL
+          ? 'تعذر إنشاء عرض السندات البنكية.'
+          : 'Failed to generate banking vouchers demo.');
     }
   }
 

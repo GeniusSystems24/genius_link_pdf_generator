@@ -74,6 +74,10 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
   Accounting entries, receipt/payment vouchers, tax vouchers — bilingual batch PDFs
 
+### 🏦 **Banking Vouchers** (v3.1.0)
+
+  Bank deposits, withdrawals, transfers, bill payments — with denomination tables and fee tracking
+
 ### 📊 **Barcodes & QR Codes**
 
   EAN-13, Code128, QR Code, DataMatrix, PDF417, ZATCA QR
@@ -2271,6 +2275,163 @@ Supports 11 currencies: SAR, USD, EUR, GBP, AED, KWD, QAR, BHD, OMR, EGP, JOD.
 
 ---
 
+## Banking Vouchers (v3.1.0)
+
+4 banking template classes covering 15 service IDs for bank deposits, withdrawals, transfers, and bill payments.
+
+### Supported Banking Voucher Types
+
+| Category | Service IDs | Template Class |
+|---|---|---|
+| Bank Deposits | 10000–10002 | `BankDepositVoucher` |
+| Bank Withdrawals | 10100–10102 | `BankWithdrawalVoucher` |
+| Transfers | 10200–10203 | `TransferVoucher` |
+| Bill Payments | 10300–10305 | `BillPaymentVoucher` |
+
+### Bank Deposit Voucher
+
+```dart
+final deposit = BankDepositVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.cashDeposit,
+    voucherNumber: 'BD-2026-0031',
+    voucherDate: DateTime.now(),
+    amount: 75000,
+    paymentDetails: VoucherPaymentDetails(
+      method: VoucherPaymentMethod.cash,
+      denominations: {500: 100, 200: 50, 100: 100},
+    ),
+  ),
+  bankInfo: VoucherBankInfo(
+    bankName: 'Al Rajhi Bank',
+    bankNameAr: 'مصرف الراجحي',
+    accountNumber: '608010167519',
+    iban: 'SA0380000000608010167519',
+  ),
+);
+```
+
+### Bank Withdrawal Voucher
+
+```dart
+final withdrawal = BankWithdrawalVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.checkWithdrawal,
+    voucherNumber: 'BW-2026-0012',
+    voucherDate: DateTime.now(),
+    amount: 32000,
+    paymentDetails: VoucherPaymentDetails(
+      method: VoucherPaymentMethod.check,
+      checkNumber: 'CHK-045872',
+      draweeBankName: 'Al Rajhi Bank',
+    ),
+  ),
+  bankInfo: VoucherBankInfo(
+    bankName: 'Al Rajhi Bank',
+    bankNameAr: 'مصرف الراجحي',
+    accountNumber: '608010167519',
+  ),
+);
+```
+
+### Transfer Voucher
+
+```dart
+final transfer = TransferVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.bankTransfer,
+    voucherNumber: 'TF-2026-0089',
+    voucherDate: DateTime.now(),
+    amount: 150000,
+  ),
+  transferData: VoucherTransferData(
+    sourceAccount: VoucherBankInfo(
+      bankName: 'Al Rajhi Bank',
+      iban: 'SA0380000000608010167519',
+      balanceBefore: 520000,
+    ),
+    destinationAccount: VoucherBankInfo(
+      bankName: 'NCB',
+      iban: 'SA4410000020501234567890',
+      balanceBefore: 85000,
+    ),
+    transferFee: 25,
+    netAmount: 149975,
+  ),
+);
+```
+
+### Bill Payment Voucher
+
+```dart
+final bill = BillPaymentVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.utilityBillPayment,
+    voucherNumber: 'BP-2026-0155',
+    voucherDate: DateTime.now(),
+    amount: 2850,
+  ),
+  billData: VoucherBillData(
+    providerName: 'Saudi Electricity Company',
+    providerNameAr: 'شركة الكهرباء السعودية',
+    subscriberNumber: '1100234567',
+    serviceType: 'Electricity',
+    serviceTypeAr: 'كهرباء',
+    meterNumber: 'MTR-00045872',
+    consumption: 4200,
+    consumptionUnit: 'kWh',
+    confirmationNumber: 'SADAD-20260205-78542-CONF',
+  ),
+);
+```
+
+### Banking Data Models
+
+```dart
+// Bank account info
+final bank = VoucherBankInfo(
+  bankName: 'Al Rajhi Bank',
+  bankNameAr: 'مصرف الراجحي',
+  branchName: 'King Fahd Road',
+  accountNumber: '608010167519',
+  iban: 'SA0380000000608010167519',
+  swiftCode: 'RJHISARI',
+  currency: 'SAR',
+  balanceBefore: 520000,
+);
+
+// Transfer data
+final transfer = VoucherTransferData(
+  sourceAccount: sourceBank,
+  destinationAccount: destBank,
+  beneficiaryName: 'Vendor Co.',
+  transferFee: 25,
+  commission: 10,
+  netAmount: 149965,
+);
+
+// Bill data
+final bill = VoucherBillData(
+  providerName: 'SEC',
+  subscriberNumber: '1100234567',
+  meterNumber: 'MTR-00045872',
+  consumption: 4200,
+  consumptionUnit: 'kWh',
+  rate: 0.18,
+  confirmationNumber: 'CONF-12345',
+);
+```
+
+---
+
 ## Barcodes & QR Codes (v2.3.3+1)
 
 Generate 1D barcodes and 2D QR codes directly in PDF documents with full styling support.
@@ -3332,6 +3493,10 @@ lib/
                 ├── receipt_voucher.dart
                 ├── payment_voucher.dart
                 ├── tax_voucher.dart
+                ├── bank_deposit_voucher.dart
+                ├── bank_withdrawal_voucher.dart
+                ├── transfer_voucher.dart
+                ├── bill_payment_voucher.dart
                 └── voucher_batch.dart
 ```
 

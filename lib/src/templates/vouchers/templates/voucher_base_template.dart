@@ -325,6 +325,14 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
         if (pd.cardType != null) fields.add(_InfoPair('نوع البطاقة', 'Card Type', pd.cardType!));
         if (pd.cardLastFour != null) fields.add(_InfoPair('آخر 4 أرقام', 'Last 4 Digits', '****${pd.cardLastFour}'));
         break;
+      case VoucherPaymentMethod.currencyExchange:
+        if (pd.sourceCurrency != null) fields.add(_InfoPair('عملة المصدر', 'Source Currency', pd.sourceCurrency!));
+        if (pd.targetCurrency != null) fields.add(_InfoPair('العملة المستهدفة', 'Target Currency', pd.targetCurrency!));
+        if (pd.exchangeRate != null) fields.add(_InfoPair('سعر الصرف', 'Exchange Rate', pd.exchangeRate!.toStringAsFixed(4)));
+        if (pd.sourceAmount != null) fields.add(_InfoPair('المبلغ الأصلي', 'Source Amount', _formatNumber(pd.sourceAmount!)));
+        if (pd.targetAmount != null) fields.add(_InfoPair('المبلغ المحوّل', 'Target Amount', _formatNumber(pd.targetAmount!)));
+        if (pd.exchangeFee != null) fields.add(_InfoPair('رسوم التحويل', 'Exchange Fee', _formatNumber(pd.exchangeFee!)));
+        break;
       case VoucherPaymentMethod.cash:
       case VoucherPaymentMethod.installment:
         break;
