@@ -599,6 +599,161 @@ class VoucherRemittanceData {
   }
 }
 
+/// Trade-specific data for purchase, sales, and return vouchers.
+class VoucherTradeData {
+  const VoucherTradeData({
+    this.orderNumber,
+    this.orderDate,
+    this.salesperson,
+    this.salespersonAr,
+    this.subtotal,
+    this.totalDiscount,
+    this.taxableAmount,
+    this.vatRate = 15.0,
+    this.vatAmount,
+    this.grandTotal,
+    this.dueDate,
+    this.creditPeriodDays,
+    this.advanceAmount,
+    this.remainingBalance,
+    this.deliveryDate,
+    this.numberOfInstallments,
+    this.installmentAmount,
+    this.warehouseName,
+    this.warehouseNameAr,
+    this.receivedBy,
+    this.receivedByAr,
+    this.dispatchedBy,
+    this.dispatchedByAr,
+    this.shippingAddress,
+    this.shippingAddressAr,
+    this.deliveryMethod,
+    this.deliveryMethodAr,
+    this.originalVoucherNumber,
+    this.originalVoucherDate,
+    this.returnReason,
+    this.returnReasonDescription,
+    this.returnReasonDescriptionAr,
+    this.refundMethod,
+    this.refundMethodAr,
+    this.refundAmount,
+    this.inspectedBy,
+    this.inspectedByAr,
+  });
+
+  // Order reference
+  final String? orderNumber;
+  final DateTime? orderDate;
+  final String? salesperson;
+  final String? salespersonAr;
+
+  // Summary calculations
+  final double? subtotal;
+  final double? totalDiscount;
+  final double? taxableAmount;
+  final double vatRate;
+  final double? vatAmount;
+  final double? grandTotal;
+
+  // Payment terms
+  final DateTime? dueDate;
+  final int? creditPeriodDays;
+  final double? advanceAmount;
+  final double? remainingBalance;
+  final DateTime? deliveryDate;
+  final int? numberOfInstallments;
+  final double? installmentAmount;
+
+  // Warehouse
+  final String? warehouseName;
+  final String? warehouseNameAr;
+  final String? receivedBy;
+  final String? receivedByAr;
+  final String? dispatchedBy;
+  final String? dispatchedByAr;
+
+  // Delivery (sales)
+  final String? shippingAddress;
+  final String? shippingAddressAr;
+  final String? deliveryMethod;
+  final String? deliveryMethodAr;
+
+  // Return-specific
+  final String? originalVoucherNumber;
+  final DateTime? originalVoucherDate;
+  final VoucherReturnReason? returnReason;
+  final String? returnReasonDescription;
+  final String? returnReasonDescriptionAr;
+  final String? refundMethod;
+  final String? refundMethodAr;
+  final double? refundAmount;
+  final String? inspectedBy;
+  final String? inspectedByAr;
+
+  /// Whether this is a credit/deferred payment type.
+  bool isCredit(VoucherServiceId serviceId) {
+    return serviceId == VoucherServiceId.creditPurchase ||
+        serviceId == VoucherServiceId.creditSale ||
+        serviceId == VoucherServiceId.creditPurchaseReturn ||
+        serviceId == VoucherServiceId.creditSalesReturn;
+  }
+
+  /// Whether this is an advance payment type.
+  bool isAdvance(VoucherServiceId serviceId) {
+    return serviceId == VoucherServiceId.advancePurchase ||
+        serviceId == VoucherServiceId.advanceSale ||
+        serviceId == VoucherServiceId.advancePurchaseReturn ||
+        serviceId == VoucherServiceId.advanceSalesReturn;
+  }
+
+  /// Whether this is an installment type.
+  bool isInstallment(VoucherServiceId serviceId) {
+    return serviceId == VoucherServiceId.installmentPurchase ||
+        serviceId == VoucherServiceId.installmentSale ||
+        serviceId == VoucherServiceId.installmentPurchaseReturn ||
+        serviceId == VoucherServiceId.installmentSalesReturn;
+  }
+}
+
+/// Signatory factory for trade-specific roles.
+extension TradeSignatories on VoucherSignatory {
+  static VoucherSignatory purchasing({String? name}) => VoucherSignatory(
+        role: 'Purchasing Dept',
+        roleAr: 'قسم المشتريات',
+        name: name,
+      );
+
+  static VoucherSignatory salesDept({String? name}) => VoucherSignatory(
+        role: 'Sales Dept',
+        roleAr: 'قسم المبيعات',
+        name: name,
+      );
+
+  static VoucherSignatory warehouseKeeper({String? name}) => VoucherSignatory(
+        role: 'Warehouse Keeper',
+        roleAr: 'أمين المستودع',
+        name: name,
+      );
+
+  static VoucherSignatory qualityInspector({String? name}) => VoucherSignatory(
+        role: 'Quality Inspector',
+        roleAr: 'مفتش الجودة',
+        name: name,
+      );
+
+  static VoucherSignatory customer({String? name}) => VoucherSignatory(
+        role: 'Customer',
+        roleAr: 'العميل',
+        name: name,
+      );
+
+  static VoucherSignatory supplier({String? name}) => VoucherSignatory(
+        role: 'Supplier',
+        roleAr: 'المورد',
+        name: name,
+      );
+}
+
 /// Signatory factory for remittance-specific roles.
 extension RemittanceSignatories on VoucherSignatory {
   static VoucherSignatory sender({String? name}) => VoucherSignatory(

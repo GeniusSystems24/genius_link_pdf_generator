@@ -65,7 +65,31 @@ enum VoucherServiceId {
   domesticPersonalIncoming('10450', 'حوالة محلية شخصية واردة', 'Domestic Personal Incoming', VoucherCategory.remittanceIncoming),
   domesticCommercialIncoming('10451', 'حوالة محلية تجارية واردة', 'Domestic Commercial Incoming', VoucherCategory.remittanceIncoming),
   internationalPersonalIncoming('10550', 'حوالة دولية شخصية واردة', 'International Personal Incoming', VoucherCategory.remittanceIncoming),
-  internationalCommercialIncoming('10551', 'حوالة دولية تجارية واردة', 'International Commercial Incoming', VoucherCategory.remittanceIncoming);
+  internationalCommercialIncoming('10551', 'حوالة دولية تجارية واردة', 'International Commercial Incoming', VoucherCategory.remittanceIncoming),
+
+  // ── Purchase Vouchers (20000–20003) ──
+  cashPurchase('20000', 'شراء نقدي', 'Cash Purchase', VoucherCategory.purchase),
+  creditPurchase('20001', 'شراء آجل', 'Credit Purchase', VoucherCategory.purchase),
+  advancePurchase('20002', 'شراء بدفعة مقدمة', 'Advance Purchase', VoucherCategory.purchase),
+  installmentPurchase('20003', 'شراء بالتقسيط', 'Installment Purchase', VoucherCategory.purchase),
+
+  // ── Sales Vouchers (20200–20203) ──
+  cashSale('20200', 'بيع نقدي', 'Cash Sale', VoucherCategory.sales),
+  creditSale('20201', 'بيع آجل', 'Credit Sale', VoucherCategory.sales),
+  advanceSale('20202', 'بيع بدفعة مقدمة', 'Advance Sale', VoucherCategory.sales),
+  installmentSale('20203', 'بيع بالتقسيط', 'Installment Sale', VoucherCategory.sales),
+
+  // ── Purchase Return Vouchers (20400–20403) ──
+  cashPurchaseReturn('20400', 'مرتجع شراء نقدي', 'Cash Purchase Return', VoucherCategory.purchaseReturn),
+  creditPurchaseReturn('20401', 'مرتجع شراء آجل', 'Credit Purchase Return', VoucherCategory.purchaseReturn),
+  advancePurchaseReturn('20402', 'مرتجع شراء بدفعة مقدمة', 'Advance Purchase Return', VoucherCategory.purchaseReturn),
+  installmentPurchaseReturn('20403', 'مرتجع شراء بالتقسيط', 'Installment Purchase Return', VoucherCategory.purchaseReturn),
+
+  // ── Sales Return Vouchers (20450–20453) ──
+  cashSalesReturn('20450', 'مرتجع بيع نقدي', 'Cash Sales Return', VoucherCategory.salesReturn),
+  creditSalesReturn('20451', 'مرتجع بيع آجل', 'Credit Sales Return', VoucherCategory.salesReturn),
+  advanceSalesReturn('20452', 'مرتجع بيع بدفعة مقدمة', 'Advance Sales Return', VoucherCategory.salesReturn),
+  installmentSalesReturn('20453', 'مرتجع بيع بالتقسيط', 'Installment Sales Return', VoucherCategory.salesReturn);
 
   const VoucherServiceId(this.code, this.nameAr, this.nameEn, this.category);
 
@@ -100,7 +124,11 @@ enum VoucherCategory {
   transfer('التحويلات', 'Transfers'),
   billPayment('دفع الفواتير', 'Bill Payments'),
   remittanceOutgoing('حوالات صادرة', 'Outgoing Remittances'),
-  remittanceIncoming('حوالات واردة', 'Incoming Remittances');
+  remittanceIncoming('حوالات واردة', 'Incoming Remittances'),
+  purchase('مشتريات', 'Purchases'),
+  sales('مبيعات', 'Sales'),
+  purchaseReturn('مرتجعات مشتريات', 'Purchase Returns'),
+  salesReturn('مرتجعات مبيعات', 'Sales Returns');
 
   const VoucherCategory(this.nameAr, this.nameEn);
 
@@ -150,6 +178,23 @@ enum VoucherTaxType {
   taxSettlement('تسوية ضريبية', 'Tax Settlement');
 
   const VoucherTaxType(this.nameAr, this.nameEn);
+
+  final String nameAr;
+  final String nameEn;
+
+  String displayName({bool isRTL = true}) => isRTL ? nameAr : nameEn;
+}
+
+/// Return reasons for purchase/sales return vouchers.
+enum VoucherReturnReason {
+  defective('منتج معيب', 'Defective Product'),
+  wrongItem('منتج خاطئ', 'Wrong Item'),
+  qualityIssue('مشكلة جودة', 'Quality Issue'),
+  orderCancellation('إلغاء الطلب', 'Order Cancellation'),
+  overDelivery('زيادة في التسليم', 'Over Delivery'),
+  other('أخرى', 'Other');
+
+  const VoucherReturnReason(this.nameAr, this.nameEn);
 
   final String nameAr;
   final String nameEn;

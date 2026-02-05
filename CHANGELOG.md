@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] - 2026-02-05
+
+### Added
+
+#### Trade Voucher Templates
+- **`PurchaseVoucher`** — 4 service IDs (20000–20003): Cash Purchase, Credit Purchase, Advance Purchase, Installment Purchase
+  - Supplier info, PO reference, items table with discount/tax columns
+  - Invoice summary (subtotal, discount, taxable, VAT, grand total)
+  - Payment terms per subtype (credit period, advance amount, installment schedule)
+  - Warehouse receiving information
+- **`SalesVoucher`** — 4 service IDs (20200–20203): Cash Sale, Credit Sale, Advance Sale, Installment Sale
+  - Customer info, SO reference, salesperson
+  - Items table, invoice summary, payment terms
+  - Delivery information (method, shipping address, delivery date)
+- **`PurchaseReturnVoucher`** — 4 service IDs (20400–20403): Cash/Credit/Advance/Installment Purchase Return
+  - Original purchase reference, return reason badge
+  - Returned items table, return summary
+  - Refund/settlement block per subtype (cash refund, liability reduction, advance refund, installment adjustment)
+  - Quality inspection and warehouse info
+- **`SalesReturnVoucher`** — 4 service IDs (20450–20453): Cash/Credit/Advance/Installment Sales Return
+  - Original sale reference, return reason badge
+  - Returned items table, return summary
+  - Refund/settlement block per subtype (cash refund, receivable reduction, customer refund, installment adjustment)
+
+#### New Models & Enums
+- **`VoucherTradeData`** — comprehensive trade data model with order reference, summary calculations, payment terms, warehouse, delivery, and return-specific fields
+- **`VoucherReturnReason`** enum — defective, wrongItem, qualityIssue, orderCancellation, overDelivery, other
+- **`TradeSignatories`** extension — purchasing, salesDept, warehouseKeeper, qualityInspector, customer, supplier
+- 4 new `VoucherCategory` values: `purchase`, `sales`, `purchaseReturn`, `salesReturn`
+- 16 new `VoucherServiceId` entries (20000–20453)
+
+#### Example
+- `trade_voucher_demo_builder.dart` — 4-voucher batch demo (credit purchase with 4 items, cash sale with delivery, cash purchase return with defective reason, credit sales return with cancellation)
+
+---
+
 ## [3.2.0] - 2026-02-05
 
 ### Added

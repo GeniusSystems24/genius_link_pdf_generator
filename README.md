@@ -82,6 +82,10 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
   Domestic and international outgoing/incoming remittances — with exchange rates, compliance, and tracking
 
+### 🛒 **Trade Vouchers** (v3.3.0)
+
+  Purchase, sales, purchase returns, and sales returns — with items tables, invoice summaries, and payment terms
+
 ### 📊 **Barcodes & QR Codes**
 
   EAN-13, Code128, QR Code, DataMatrix, PDF417, ZATCA QR
@@ -2540,6 +2544,144 @@ final data = VoucherRemittanceData(
 
 ---
 
+## Trade Vouchers (v3.3.0)
+
+Generate purchase, sales, purchase return, and sales return vouchers with full trade document support.
+
+### Trade Types
+
+| Code | Template | Category |
+|------|----------|----------|
+| 20000–20003 | `PurchaseVoucher` | Cash / Credit / Advance / Installment |
+| 20200–20203 | `SalesVoucher` | Cash / Credit / Advance / Installment |
+| 20400–20403 | `PurchaseReturnVoucher` | Cash / Credit / Advance / Installment |
+| 20450–20453 | `SalesReturnVoucher` | Cash / Credit / Advance / Installment |
+
+### Purchase Voucher
+
+```dart
+final voucher = PurchaseVoucher(
+  config: config,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.creditPurchase,
+    voucherNumber: 'PU-2026-001',
+    voucherDate: DateTime.now(),
+    amount: 28750,
+    party: const VoucherParty(name: 'ABC Supplies', nameAr: 'مؤسسة أبك للتوريدات'),
+    items: [
+      const VoucherLineItem(
+        lineNumber: 1, description: 'Office Chair',
+        quantity: 5, unitPrice: 2500, totalAmount: 12500,
+      ),
+    ],
+  ),
+  tradeData: VoucherTradeData(
+    orderNumber: 'PO-2026-045',
+    subtotal: 25000,
+    vatRate: 15,
+    vatAmount: 3750,
+    grandTotal: 28750,
+    dueDate: DateTime(2026, 3, 7),
+    creditPeriodDays: 30,
+  ),
+);
+```
+
+### Sales Voucher
+
+```dart
+final voucher = SalesVoucher(
+  config: config,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.cashSale,
+    voucherNumber: 'SL-2026-001',
+    voucherDate: DateTime.now(),
+    amount: 17250,
+    party: const VoucherParty(name: 'Tech Corp', nameAr: 'شركة التقنية'),
+    items: [
+      const VoucherLineItem(
+        lineNumber: 1, description: 'Smart Conference System',
+        quantity: 1, unitPrice: 12000, totalAmount: 13800,
+      ),
+    ],
+  ),
+  tradeData: VoucherTradeData(
+    orderNumber: 'SO-2026-078',
+    salesperson: 'Omar Al-Harbi',
+    subtotal: 15000,
+    vatRate: 15,
+    vatAmount: 2250,
+    grandTotal: 17250,
+    deliveryMethod: 'Company Vehicle',
+    deliveryDate: DateTime(2026, 2, 7),
+  ),
+);
+```
+
+### Purchase Return Voucher
+
+```dart
+final voucher = PurchaseReturnVoucher(
+  config: config,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.cashPurchaseReturn,
+    voucherNumber: 'PR-2026-001',
+    voucherDate: DateTime.now(),
+    amount: 5750,
+    party: const VoucherParty(name: 'ABC Supplies', nameAr: 'مؤسسة أبك للتوريدات'),
+    items: [
+      const VoucherLineItem(
+        lineNumber: 1, description: 'Defective Chair',
+        quantity: 2, unitPrice: 2500, totalAmount: 5750,
+      ),
+    ],
+  ),
+  tradeData: VoucherTradeData(
+    originalVoucherNumber: 'PU-2026-045',
+    returnReason: VoucherReturnReason.defective,
+    subtotal: 5000,
+    vatAmount: 750,
+    grandTotal: 5750,
+    refundAmount: 5750,
+    refundMethod: 'Cash',
+  ),
+);
+```
+
+### Sales Return Voucher
+
+```dart
+final voucher = SalesReturnVoucher(
+  config: config,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.creditSalesReturn,
+    voucherNumber: 'SR-2026-001',
+    voucherDate: DateTime.now(),
+    amount: 3450,
+    party: const VoucherParty(name: 'Tech Corp', nameAr: 'شركة التقنية'),
+    items: [
+      const VoucherLineItem(
+        lineNumber: 1, description: 'Installation Service (Cancelled)',
+        quantity: 1, unitPrice: 3000, totalAmount: 3450,
+      ),
+    ],
+  ),
+  tradeData: VoucherTradeData(
+    originalVoucherNumber: 'SL-2026-078',
+    returnReason: VoucherReturnReason.orderCancellation,
+    subtotal: 3000,
+    vatAmount: 450,
+    grandTotal: 3450,
+  ),
+);
+```
+
+---
+
 ## Barcodes & QR Codes (v2.3.3+1)
 
 Generate 1D barcodes and 2D QR codes directly in PDF documents with full styling support.
@@ -3607,6 +3749,10 @@ lib/
                 ├── bill_payment_voucher.dart
                 ├── remittance_outgoing_voucher.dart
                 ├── remittance_incoming_voucher.dart
+                ├── purchase_voucher.dart
+                ├── sales_voucher.dart
+                ├── purchase_return_voucher.dart
+                ├── sales_return_voucher.dart
                 └── voucher_batch.dart
 ```
 
