@@ -86,6 +86,10 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
   Purchase, sales, purchase returns, and sales returns — with items tables, invoice summaries, and payment terms
 
+### 🎁 **Auxiliary Vouchers** (v3.4.0)
+
+  Gift/grant vouchers and inventory operations — with donor/recipient info, warehouse transfers, damage write-offs
+
 ### 📊 **Barcodes & QR Codes**
 
   EAN-13, Code128, QR Code, DataMatrix, PDF417, ZATCA QR
@@ -2682,6 +2686,129 @@ final voucher = SalesReturnVoucher(
 
 ---
 
+## Auxiliary Vouchers (v3.4.0)
+
+Generate gift/grant vouchers and inventory operation vouchers with full operational support.
+
+### Auxiliary Types
+
+| Code | Template | Category |
+|------|----------|----------|
+| 20500–20501 | `GiftVoucher` | Received Gift / Given Gift |
+| 20600–20604 | `InventoryVoucher` | Addition / Issue / Adjustment / Transfer / Damage |
+
+### Gift Voucher (Received)
+
+```dart
+final voucher = GiftVoucher(
+  config: config,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.receivedGift,
+    voucherNumber: 'GF-2026-001',
+    voucherDate: DateTime.now(),
+    amount: 5000,
+    items: [
+      const VoucherLineItem(
+        lineNumber: 1, description: 'Dell Monitor 27"',
+        quantity: 2, unitPrice: 2500, totalAmount: 5000,
+      ),
+    ],
+  ),
+  giftData: VoucherGiftData(
+    direction: GiftDirection.received,
+    donorName: 'Tech Partners Inc.',
+    occasion: 'Partnership Agreement',
+    taxTreatment: 'VAT exempt - gift',
+  ),
+);
+```
+
+### Gift Voucher (Given)
+
+```dart
+final voucher = GiftVoucher(
+  config: config,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.givenGift,
+    voucherNumber: 'GF-2026-002',
+    voucherDate: DateTime.now(),
+    amount: 1200,
+    items: [
+      const VoucherLineItem(
+        lineNumber: 1, description: 'Premium Gift Set',
+        quantity: 1, unitPrice: 1200, totalAmount: 1200,
+      ),
+    ],
+  ),
+  giftData: VoucherGiftData(
+    direction: GiftDirection.given,
+    recipientName: 'Al Salam Trading Co.',
+    occasion: 'Annual Partner Appreciation',
+  ),
+);
+```
+
+### Inventory Transfer Voucher
+
+```dart
+final voucher = InventoryVoucher(
+  config: config,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.inventoryTransfer,
+    voucherNumber: 'INV-2026-001',
+    voucherDate: DateTime.now(),
+    amount: 15750,
+    items: [
+      const VoucherLineItem(
+        lineNumber: 1, description: 'Widget A',
+        quantity: 50, unitPrice: 150, totalAmount: 7500,
+      ),
+    ],
+  ),
+  inventoryData: VoucherInventoryData(
+    operationType: InventoryOperationType.transfer,
+    sourceWarehouse: 'Main Warehouse',
+    destinationWarehouse: 'Branch Warehouse',
+    transferOrderNumber: 'TO-2026-034',
+  ),
+);
+```
+
+### Inventory Damage Voucher
+
+```dart
+final voucher = InventoryVoucher(
+  config: config,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.inventoryDamage,
+    voucherNumber: 'INV-2026-002',
+    voucherDate: DateTime.now(),
+    amount: 4200,
+    items: [
+      const VoucherLineItem(
+        lineNumber: 1, description: 'Paper Supplies Box',
+        quantity: 20, unitPrice: 120, totalAmount: 2400,
+      ),
+    ],
+  ),
+  inventoryData: VoucherInventoryData(
+    operationType: InventoryOperationType.damage,
+    sourceWarehouse: 'Main Warehouse',
+    damageType: InventoryDamageType.waterDamage,
+    damageDescription: 'Roof leak during heavy rain',
+    inspectedBy: 'Ahmed Al-Rashid',
+    insuranceClaim: true,
+    insuranceClaimNumber: 'INS-2026-089',
+  ),
+);
+```
+
+---
+
 ## Barcodes & QR Codes (v2.3.3+1)
 
 Generate 1D barcodes and 2D QR codes directly in PDF documents with full styling support.
@@ -3753,6 +3880,8 @@ lib/
                 ├── sales_voucher.dart
                 ├── purchase_return_voucher.dart
                 ├── sales_return_voucher.dart
+                ├── gift_voucher.dart
+                ├── inventory_voucher.dart
                 └── voucher_batch.dart
 ```
 

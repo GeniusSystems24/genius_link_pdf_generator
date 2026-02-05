@@ -35,5 +35,9 @@ export 'templates/sales_voucher.dart';
 export 'templates/purchase_return_voucher.dart';
 export 'templates/sales_return_voucher.dart';
 
+// Auxiliary voucher templates (v3.4.0)
+export 'templates/gift_voucher.dart';
+export 'templates/inventory_voucher.dart';
+
 // Batch generation
 export 'templates/voucher_batch.dart';

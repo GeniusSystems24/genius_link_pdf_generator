@@ -89,7 +89,18 @@ enum VoucherServiceId {
   cashSalesReturn('20450', 'مرتجع بيع نقدي', 'Cash Sales Return', VoucherCategory.salesReturn),
   creditSalesReturn('20451', 'مرتجع بيع آجل', 'Credit Sales Return', VoucherCategory.salesReturn),
   advanceSalesReturn('20452', 'مرتجع بيع بدفعة مقدمة', 'Advance Sales Return', VoucherCategory.salesReturn),
-  installmentSalesReturn('20453', 'مرتجع بيع بالتقسيط', 'Installment Sales Return', VoucherCategory.salesReturn);
+  installmentSalesReturn('20453', 'مرتجع بيع بالتقسيط', 'Installment Sales Return', VoucherCategory.salesReturn),
+
+  // ── Gift/Grant Vouchers (20500–20501) ──
+  receivedGift('20500', 'هدية واردة', 'Received Gift/Grant', VoucherCategory.gift),
+  givenGift('20501', 'هدية صادرة', 'Given Gift', VoucherCategory.gift),
+
+  // ── Inventory Vouchers (20600–20604) ──
+  inventoryAddition('20600', 'إضافة مخزون', 'Inventory Addition', VoucherCategory.inventory),
+  inventoryIssue('20601', 'صرف مخزون', 'Inventory Issue', VoucherCategory.inventory),
+  inventoryAdjustment('20602', 'تسوية مخزون', 'Inventory Adjustment', VoucherCategory.inventory),
+  inventoryTransfer('20603', 'تحويل مخزون', 'Inventory Transfer', VoucherCategory.inventory),
+  inventoryDamage('20604', 'إتلاف مخزون', 'Inventory Damage/Write-off', VoucherCategory.inventory);
 
   const VoucherServiceId(this.code, this.nameAr, this.nameEn, this.category);
 
@@ -128,7 +139,9 @@ enum VoucherCategory {
   purchase('مشتريات', 'Purchases'),
   sales('مبيعات', 'Sales'),
   purchaseReturn('مرتجعات مشتريات', 'Purchase Returns'),
-  salesReturn('مرتجعات مبيعات', 'Sales Returns');
+  salesReturn('مرتجعات مبيعات', 'Sales Returns'),
+  gift('الهدايا والمنح', 'Gifts & Grants'),
+  inventory('سندات المخزون', 'Inventory Vouchers');
 
   const VoucherCategory(this.nameAr, this.nameEn);
 
@@ -195,6 +208,70 @@ enum VoucherReturnReason {
   other('أخرى', 'Other');
 
   const VoucherReturnReason(this.nameAr, this.nameEn);
+
+  final String nameAr;
+  final String nameEn;
+
+  String displayName({bool isRTL = true}) => isRTL ? nameAr : nameEn;
+}
+
+/// Gift direction for gift vouchers.
+enum GiftDirection {
+  received('واردة', 'Received'),
+  given('صادرة', 'Given');
+
+  const GiftDirection(this.nameAr, this.nameEn);
+
+  final String nameAr;
+  final String nameEn;
+
+  String displayName({bool isRTL = true}) => isRTL ? nameAr : nameEn;
+}
+
+/// Inventory operation types.
+enum InventoryOperationType {
+  addition('إضافة', 'Addition'),
+  issue('صرف', 'Issue'),
+  adjustment('تسوية', 'Adjustment'),
+  transfer('تحويل', 'Transfer'),
+  damage('إتلاف', 'Damage/Write-off');
+
+  const InventoryOperationType(this.nameAr, this.nameEn);
+
+  final String nameAr;
+  final String nameEn;
+
+  String displayName({bool isRTL = true}) => isRTL ? nameAr : nameEn;
+}
+
+/// Inventory adjustment reasons.
+enum InventoryAdjustmentReason {
+  physicalCount('جرد فعلي', 'Physical Count'),
+  dataEntryError('خطأ إدخال', 'Data Entry Error'),
+  revaluation('إعادة تقييم', 'Revaluation'),
+  reconciliation('مطابقة', 'Reconciliation'),
+  systemCorrection('تصحيح نظام', 'System Correction'),
+  other('أخرى', 'Other');
+
+  const InventoryAdjustmentReason(this.nameAr, this.nameEn);
+
+  final String nameAr;
+  final String nameEn;
+
+  String displayName({bool isRTL = true}) => isRTL ? nameAr : nameEn;
+}
+
+/// Inventory damage types.
+enum InventoryDamageType {
+  expired('منتهي الصلاحية', 'Expired'),
+  broken('مكسور', 'Broken'),
+  lost('مفقود', 'Lost'),
+  obsolete('متقادم', 'Obsolete'),
+  waterDamage('تلف مائي', 'Water Damage'),
+  fireDamage('تلف حريق', 'Fire Damage'),
+  other('أخرى', 'Other');
+
+  const InventoryDamageType(this.nameAr, this.nameEn);
 
   final String nameAr;
   final String nameEn;

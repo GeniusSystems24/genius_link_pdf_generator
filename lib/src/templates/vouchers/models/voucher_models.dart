@@ -775,3 +775,167 @@ extension RemittanceSignatories on VoucherSignatory {
         name: name,
       );
 }
+
+/// Gift/Grant voucher-specific data.
+class VoucherGiftData {
+  const VoucherGiftData({
+    required this.direction,
+    this.occasion,
+    this.occasionAr,
+    this.donorName,
+    this.donorNameAr,
+    this.recipientName,
+    this.recipientNameAr,
+    this.giftReason,
+    this.giftReasonAr,
+    this.fairMarketValue,
+    this.taxTreatment,
+    this.taxTreatmentAr,
+    this.authorizationReference,
+  });
+
+  /// Gift direction: received or given.
+  final GiftDirection direction;
+
+  /// Occasion for the gift (e.g., "Annual Partner Appreciation").
+  final String? occasion;
+  final String? occasionAr;
+
+  /// For received gifts: donor's name.
+  final String? donorName;
+  final String? donorNameAr;
+
+  /// For given gifts: recipient's name.
+  final String? recipientName;
+  final String? recipientNameAr;
+
+  /// Reason for the gift.
+  final String? giftReason;
+  final String? giftReasonAr;
+
+  /// Estimated fair market value for accounting.
+  final double? fairMarketValue;
+
+  /// Tax treatment notes (e.g., "VAT exempt", "Deductible expense").
+  final String? taxTreatment;
+  final String? taxTreatmentAr;
+
+  /// Authorization/approval reference.
+  final String? authorizationReference;
+}
+
+/// Inventory voucher-specific data.
+class VoucherInventoryData {
+  const VoucherInventoryData({
+    required this.operationType,
+    this.sourceWarehouse,
+    this.sourceWarehouseAr,
+    this.destinationWarehouse,
+    this.destinationWarehouseAr,
+    this.requestingDepartment,
+    this.requestingDepartmentAr,
+    this.projectCode,
+    this.adjustmentReason,
+    this.damageType,
+    this.damageDescription,
+    this.damageDescriptionAr,
+    this.transferOrderNumber,
+    this.authorizationReference,
+    this.inspectedBy,
+    this.inspectedByAr,
+    this.disposalMethod,
+    this.disposalMethodAr,
+    this.insuranceClaim,
+    this.insuranceClaimNumber,
+  });
+
+  /// Type of inventory operation.
+  final InventoryOperationType operationType;
+
+  /// Source warehouse (for issue, transfer, damage).
+  final String? sourceWarehouse;
+  final String? sourceWarehouseAr;
+
+  /// Destination warehouse (for addition, transfer).
+  final String? destinationWarehouse;
+  final String? destinationWarehouseAr;
+
+  /// Department/project requesting the issue.
+  final String? requestingDepartment;
+  final String? requestingDepartmentAr;
+  final String? projectCode;
+
+  /// Adjustment reason (for adjustment operations).
+  final InventoryAdjustmentReason? adjustmentReason;
+
+  /// Damage type (for damage/write-off operations).
+  final InventoryDamageType? damageType;
+  final String? damageDescription;
+  final String? damageDescriptionAr;
+
+  /// Transfer order number (for transfers).
+  final String? transferOrderNumber;
+
+  /// Authorization reference.
+  final String? authorizationReference;
+
+  /// Inspector for damage vouchers.
+  final String? inspectedBy;
+  final String? inspectedByAr;
+
+  /// Disposal method for damaged goods.
+  final String? disposalMethod;
+  final String? disposalMethodAr;
+
+  /// Whether insurance claim is filed.
+  final bool? insuranceClaim;
+  final String? insuranceClaimNumber;
+}
+
+/// Signatory factory for gift voucher-specific roles.
+extension GiftSignatories on VoucherSignatory {
+  static VoucherSignatory donor({String? name}) => VoucherSignatory(
+        role: 'Donor',
+        roleAr: 'المانح',
+        name: name,
+      );
+
+  static VoucherSignatory recipient({String? name}) => VoucherSignatory(
+        role: 'Recipient',
+        roleAr: 'المستلم',
+        name: name,
+      );
+
+  static VoucherSignatory marketing({String? name}) => VoucherSignatory(
+        role: 'Marketing Dept',
+        roleAr: 'قسم التسويق',
+        name: name,
+      );
+}
+
+/// Signatory factory for inventory voucher-specific roles.
+extension InventorySignatories on VoucherSignatory {
+  static VoucherSignatory warehouseManager({String? name}) => VoucherSignatory(
+        role: 'Warehouse Manager',
+        roleAr: 'مدير المستودع',
+        name: name,
+      );
+
+  static VoucherSignatory storekeeper({String? name}) => VoucherSignatory(
+        role: 'Storekeeper',
+        roleAr: 'أمين المخزن',
+        name: name,
+      );
+
+  static VoucherSignatory requestor({String? name}) => VoucherSignatory(
+        role: 'Requestor',
+        roleAr: 'مقدم الطلب',
+        name: name,
+      );
+
+  static VoucherSignatory insuranceOfficer({String? name}) => VoucherSignatory(
+        role: 'Insurance Officer',
+        roleAr: 'مسؤول التأمين',
+        name: name,
+      );
+}

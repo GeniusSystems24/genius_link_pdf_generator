@@ -15,6 +15,7 @@ import '../documents/remittance_voucher_demo_builder.dart';
 import '../documents/report_composer_demo_document.dart';
 import '../documents/voucher_demo_builder.dart';
 import '../documents/trade_voucher_demo_builder.dart';
+import '../documents/auxiliary_voucher_demo_builder.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 import '../widgets/component_page.dart';
@@ -91,6 +92,12 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen>
       icon: Icons.storefront_rounded,
       gradient: AppColors.successGradient,
     ),
+    _ExampleTab(
+      id: 'auxiliary_vouchers',
+      title: 'Auxiliary Vouchers',
+      icon: Icons.card_giftcard_rounded,
+      gradient: AppColors.warningGradient,
+    ),
   ];
 
   @override
@@ -131,6 +138,7 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen>
                 _buildBankingVouchersTab(isDark),
                 _buildRemittanceVouchersTab(isDark),
                 _buildTradeVouchersTab(isDark),
+                _buildAuxiliaryVouchersTab(isDark),
               ],
             ),
           ),
@@ -402,6 +410,30 @@ final bytes = buildTradeVoucherDemoReport(config: config);
     );
   }
 
+  Widget _buildAuxiliaryVouchersTab(bool isDark) {
+    return ComponentPage(
+      title: 'Auxiliary Vouchers',
+      description:
+          'Gift/grant vouchers and inventory operations in one PDF.',
+      icon: Icons.card_giftcard_rounded,
+      gradient: AppColors.warningGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generateAuxiliaryVoucherDemo,
+      codeExample: '''
+final bytes = buildAuxiliaryVoucherDemoReport(config: config);
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.card_giftcard_rounded,
+        'Auxiliary Vouchers',
+        _isRTL ? 'السندات المساعدة' : null,
+      ),
+    );
+  }
+
   Widget _buildGenericPreview(
       bool isDark, IconData icon, String label, String? subLabel) {
     return Container(
@@ -643,6 +675,29 @@ final bytes = buildTradeVoucherDemoReport(config: config);
       _showError(_isRTL
           ? 'تعذر إنشاء عرض سندات التجارة.'
           : 'Failed to generate trade vouchers demo.');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
+    }
+  }
+
+  Future<void> _generateAuxiliaryVoucherDemo() async {
+    setState(() => _isGenerating = true);
+    try {
+      final bytes = buildAuxiliaryVoucherDemoReport(config: _createConfig());
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/auxiliary_voucher_demo.pdf';
+      await GeniusPdfService().saveToPath(
+        bytes: Uint8List.fromList(bytes),
+        path: filePath,
+      );
+      await OpenFile.open(filePath);
+      _showSuccess(_isRTL
+          ? 'تم إنشاء عرض السندات المساعدة.'
+          : 'Auxiliary vouchers demo generated.');
+    } catch (_) {
+      _showError(_isRTL
+          ? 'تعذر إنشاء عرض السندات المساعدة.'
+          : 'Failed to generate auxiliary vouchers demo.');
     } finally {
       if (mounted) setState(() => _isGenerating = false);
     }

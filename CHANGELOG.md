@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2026-02-05
+
+### Added
+
+#### Auxiliary Voucher Templates (Gift & Inventory)
+- **`GiftVoucher`** — 2 service IDs (20500–20501): Received Gift/Grant, Given Gift
+  - Direction-based layout (received vs given)
+  - Donor/recipient info sections
+  - Gift details (occasion, reason)
+  - Items table with fair market value
+  - Tax treatment notes
+  - Authorization reference
+- **`InventoryVoucher`** — 5 service IDs (20600–20604): Addition, Issue, Adjustment, Transfer, Damage/Write-off
+  - Operation type-specific layouts
+  - Source/destination warehouse info
+  - Requesting department and project code
+  - Items table with dynamic column headers per operation
+  - Value impact summary
+  - Adjustment reason (for adjustments)
+  - Damage details (type, description, inspection, disposal, insurance claim)
+
+#### New Models & Enums
+- **`VoucherGiftData`** — gift data model with direction, donor/recipient, occasion, reason, fair market value, tax treatment, authorization
+- **`VoucherInventoryData`** — inventory data model with operation type, warehouses, department, adjustment reason, damage type/description, inspection, disposal, insurance claim
+- **`GiftDirection`** enum — received, given
+- **`InventoryOperationType`** enum — addition, issue, adjustment, transfer, damage
+- **`InventoryAdjustmentReason`** enum — physicalCount, dataEntryError, revaluation, reconciliation, systemCorrection, other
+- **`InventoryDamageType`** enum — expired, broken, lost, obsolete, waterDamage, fireDamage, other
+- **`GiftSignatories`** extension — donor, recipient, marketing
+- **`InventorySignatories`** extension — warehouseManager, storekeeper, requestor, insuranceOfficer
+- 2 new `VoucherCategory` values: `gift`, `inventory`
+- 7 new `VoucherServiceId` entries (20500–20604)
+
+#### Example
+- `auxiliary_voucher_demo_builder.dart` — 5-voucher batch demo (received gift, given gift, inventory transfer, inventory damage with insurance claim, inventory adjustment)
+
+---
+
 ## [3.3.0] - 2026-02-05
 
 ### Added
