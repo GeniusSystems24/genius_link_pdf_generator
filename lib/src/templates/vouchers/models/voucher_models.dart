@@ -476,3 +476,147 @@ extension BankingSignatories on VoucherSignatory {
         name: name,
       );
 }
+
+/// Remittance-specific data for outgoing/incoming remittance vouchers.
+class VoucherRemittanceData {
+  const VoucherRemittanceData({
+    required this.senderName,
+    this.senderNameAr,
+    this.senderIdNumber,
+    this.senderIdType,
+    this.senderIdTypeAr,
+    this.senderPhone,
+    this.senderAddress,
+    this.senderAddressAr,
+    this.senderCountry,
+    this.senderCountryAr,
+    required this.beneficiaryName,
+    this.beneficiaryNameAr,
+    this.beneficiaryIdNumber,
+    this.beneficiaryIdType,
+    this.beneficiaryIdTypeAr,
+    this.beneficiaryPhone,
+    this.beneficiaryAddress,
+    this.beneficiaryAddressAr,
+    this.beneficiaryCountry,
+    this.beneficiaryCountryAr,
+    this.beneficiaryBankName,
+    this.beneficiaryBankNameAr,
+    this.beneficiaryAccountNumber,
+    this.beneficiaryIban,
+    this.beneficiarySwiftCode,
+    this.correspondentBank,
+    this.correspondentBankAr,
+    this.sourceCurrency,
+    this.targetCurrency,
+    this.exchangeRate,
+    this.sourceAmount,
+    this.targetAmount,
+    this.transferFee,
+    this.exchangeMargin,
+    this.totalCost,
+    this.purposeCode,
+    this.purposeDescription,
+    this.purposeDescriptionAr,
+    this.amlReference,
+    this.trackingNumber,
+    this.expectedDeliveryDate,
+    this.disbursementMethod,
+    this.disbursementMethodAr,
+  });
+
+  // Sender
+  final String senderName;
+  final String? senderNameAr;
+  final String? senderIdNumber;
+  final String? senderIdType;
+  final String? senderIdTypeAr;
+  final String? senderPhone;
+  final String? senderAddress;
+  final String? senderAddressAr;
+  final String? senderCountry;
+  final String? senderCountryAr;
+
+  // Beneficiary
+  final String beneficiaryName;
+  final String? beneficiaryNameAr;
+  final String? beneficiaryIdNumber;
+  final String? beneficiaryIdType;
+  final String? beneficiaryIdTypeAr;
+  final String? beneficiaryPhone;
+  final String? beneficiaryAddress;
+  final String? beneficiaryAddressAr;
+  final String? beneficiaryCountry;
+  final String? beneficiaryCountryAr;
+  final String? beneficiaryBankName;
+  final String? beneficiaryBankNameAr;
+  final String? beneficiaryAccountNumber;
+  final String? beneficiaryIban;
+  final String? beneficiarySwiftCode;
+  final String? correspondentBank;
+  final String? correspondentBankAr;
+
+  // Currency & exchange (for international)
+  final String? sourceCurrency;
+  final String? targetCurrency;
+  final double? exchangeRate;
+  final double? sourceAmount;
+  final double? targetAmount;
+
+  // Fees
+  final double? transferFee;
+  final double? exchangeMargin;
+  final double? totalCost;
+
+  // Compliance
+  final String? purposeCode;
+  final String? purposeDescription;
+  final String? purposeDescriptionAr;
+  final String? amlReference;
+
+  // Tracking
+  final String? trackingNumber;
+  final DateTime? expectedDeliveryDate;
+
+  // Disbursement (for incoming)
+  final String? disbursementMethod;
+  final String? disbursementMethodAr;
+
+  /// Whether this is an international remittance (based on service IDs 10500/10501/10550/10551).
+  bool isInternational(VoucherServiceId serviceId) {
+    return serviceId == VoucherServiceId.internationalPersonalOutgoing ||
+        serviceId == VoucherServiceId.internationalCommercialOutgoing ||
+        serviceId == VoucherServiceId.internationalPersonalIncoming ||
+        serviceId == VoucherServiceId.internationalCommercialIncoming;
+  }
+
+  /// Whether this is a commercial remittance.
+  bool isCommercial(VoucherServiceId serviceId) {
+    return serviceId == VoucherServiceId.domesticCommercialOutgoing ||
+        serviceId == VoucherServiceId.internationalCommercialOutgoing ||
+        serviceId == VoucherServiceId.domesticCommercialIncoming ||
+        serviceId == VoucherServiceId.internationalCommercialIncoming;
+  }
+}
+
+/// Signatory factory for remittance-specific roles.
+extension RemittanceSignatories on VoucherSignatory {
+  static VoucherSignatory sender({String? name}) => VoucherSignatory(
+        role: 'Sender',
+        roleAr: 'المرسل',
+        name: name,
+      );
+
+  static VoucherSignatory beneficiary({String? name}) => VoucherSignatory(
+        role: 'Beneficiary',
+        roleAr: 'المستفيد',
+        name: name,
+      );
+
+  static VoucherSignatory complianceOfficer({String? name}) =>
+      VoucherSignatory(
+        role: 'Compliance Officer',
+        roleAr: 'مسؤول الامتثال',
+        name: name,
+      );
+}

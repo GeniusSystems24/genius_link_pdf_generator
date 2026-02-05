@@ -53,7 +53,19 @@ enum VoucherServiceId {
   internetBillPayment('10302', 'دفع فواتير إنترنت', 'Internet Bill Payment', VoucherCategory.billPayment),
   telecomRecharge('10303', 'شحن اتصالات', 'Telecom Recharge', VoucherCategory.billPayment),
   gameRecharge('10304', 'شحن ألعاب', 'Game Credit Recharge', VoucherCategory.billPayment),
-  entertainmentRecharge('10305', 'شحن ترفيه', 'Entertainment Recharge', VoucherCategory.billPayment);
+  entertainmentRecharge('10305', 'شحن ترفيه', 'Entertainment Recharge', VoucherCategory.billPayment),
+
+  // ── Outgoing Remittance Vouchers (10400–10401, 10500–10501) ──
+  domesticPersonalOutgoing('10400', 'حوالة محلية شخصية صادرة', 'Domestic Personal Outgoing', VoucherCategory.remittanceOutgoing),
+  domesticCommercialOutgoing('10401', 'حوالة محلية تجارية صادرة', 'Domestic Commercial Outgoing', VoucherCategory.remittanceOutgoing),
+  internationalPersonalOutgoing('10500', 'حوالة دولية شخصية صادرة', 'International Personal Outgoing', VoucherCategory.remittanceOutgoing),
+  internationalCommercialOutgoing('10501', 'حوالة دولية تجارية صادرة', 'International Commercial Outgoing', VoucherCategory.remittanceOutgoing),
+
+  // ── Incoming Remittance Vouchers (10450–10451, 10550–10551) ──
+  domesticPersonalIncoming('10450', 'حوالة محلية شخصية واردة', 'Domestic Personal Incoming', VoucherCategory.remittanceIncoming),
+  domesticCommercialIncoming('10451', 'حوالة محلية تجارية واردة', 'Domestic Commercial Incoming', VoucherCategory.remittanceIncoming),
+  internationalPersonalIncoming('10550', 'حوالة دولية شخصية واردة', 'International Personal Incoming', VoucherCategory.remittanceIncoming),
+  internationalCommercialIncoming('10551', 'حوالة دولية تجارية واردة', 'International Commercial Incoming', VoucherCategory.remittanceIncoming);
 
   const VoucherServiceId(this.code, this.nameAr, this.nameEn, this.category);
 
@@ -86,7 +98,9 @@ enum VoucherCategory {
   bankDeposit('إيداعات بنكية', 'Bank Deposits'),
   bankWithdrawal('سحوبات بنكية', 'Bank Withdrawals'),
   transfer('التحويلات', 'Transfers'),
-  billPayment('دفع الفواتير', 'Bill Payments');
+  billPayment('دفع الفواتير', 'Bill Payments'),
+  remittanceOutgoing('حوالات صادرة', 'Outgoing Remittances'),
+  remittanceIncoming('حوالات واردة', 'Incoming Remittances');
 
   const VoucherCategory(this.nameAr, this.nameEn);
 

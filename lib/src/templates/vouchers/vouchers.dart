@@ -25,5 +25,9 @@ export 'templates/bank_withdrawal_voucher.dart';
 export 'templates/transfer_voucher.dart';
 export 'templates/bill_payment_voucher.dart';
 
+// Remittance voucher templates (v3.2.0)
+export 'templates/remittance_outgoing_voucher.dart';
+export 'templates/remittance_incoming_voucher.dart';
+
 // Batch generation
 export 'templates/voucher_batch.dart';

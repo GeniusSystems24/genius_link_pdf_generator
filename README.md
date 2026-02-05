@@ -78,6 +78,10 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
   Bank deposits, withdrawals, transfers, bill payments — with denomination tables and fee tracking
 
+### 💸 **Remittance Vouchers** (v3.2.0)
+
+  Domestic and international outgoing/incoming remittances — with exchange rates, compliance, and tracking
+
 ### 📊 **Barcodes & QR Codes**
 
   EAN-13, Code128, QR Code, DataMatrix, PDF417, ZATCA QR
@@ -2432,6 +2436,110 @@ final bill = VoucherBillData(
 
 ---
 
+## Remittance Vouchers (v3.2.0)
+
+2 remittance template classes covering 8 service IDs for domestic and international money transfers, with sender/beneficiary info, exchange details, compliance, and tracking.
+
+### Supported Remittance Types
+
+| Category | Service IDs | Template Class |
+|---|---|---|
+| Outgoing Remittances | 10400–10401, 10500–10501 | `RemittanceOutgoingVoucher` |
+| Incoming Remittances | 10450–10451, 10550–10551 | `RemittanceIncomingVoucher` |
+
+### Outgoing Remittance (International)
+
+```dart
+final remittance = RemittanceOutgoingVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.internationalPersonalOutgoing,
+    voucherNumber: 'RO-2026-0042',
+    voucherDate: DateTime.now(),
+    amount: 8500,
+  ),
+  remittanceData: VoucherRemittanceData(
+    senderName: 'Khaled Ibrahim',
+    senderNameAr: 'خالد إبراهيم',
+    senderIdNumber: '2312345678',
+    beneficiaryName: 'Hassan Ibrahim',
+    beneficiaryCountry: 'Egypt',
+    beneficiaryBankName: 'National Bank of Egypt',
+    beneficiarySwiftCode: 'NBEGEGCX',
+    sourceCurrency: 'SAR',
+    targetCurrency: 'EGP',
+    exchangeRate: 13.2450,
+    sourceAmount: 8500,
+    targetAmount: 112582.50,
+    transferFee: 45,
+    amlReference: 'AML-2026-FEB-04521',
+    trackingNumber: 'INT-2026020542-002',
+    expectedDeliveryDate: DateTime(2026, 2, 7),
+  ),
+);
+```
+
+### Incoming Remittance (International)
+
+```dart
+final incoming = RemittanceIncomingVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.internationalCommercialIncoming,
+    voucherNumber: 'RI-2026-0029',
+    voucherDate: DateTime.now(),
+    amount: 187500,
+  ),
+  remittanceData: VoucherRemittanceData(
+    senderName: 'Gulf Tech Solutions LLC',
+    senderCountry: 'UAE',
+    beneficiaryName: 'Genius Systems',
+    beneficiaryIban: 'SA0380000000608010167519',
+    sourceCurrency: 'AED',
+    targetCurrency: 'SAR',
+    exchangeRate: 1.0204,
+    sourceAmount: 183750,
+    targetAmount: 187500,
+    disbursementMethod: 'To Account',
+    disbursementMethodAr: 'إلى الحساب البنكي',
+  ),
+);
+```
+
+### Remittance Data Model
+
+```dart
+final data = VoucherRemittanceData(
+  // Sender
+  senderName: 'Mohammed',
+  senderIdNumber: '1012345678',
+  senderPhone: '+966501234567',
+  senderCountry: 'Saudi Arabia',
+
+  // Beneficiary
+  beneficiaryName: 'Ali Hassan',
+  beneficiaryBankName: 'National Bank of Egypt',
+  beneficiarySwiftCode: 'NBEGEGCX',
+  correspondentBank: 'Citibank N.A.',
+
+  // Exchange
+  sourceCurrency: 'SAR',
+  targetCurrency: 'EGP',
+  exchangeRate: 13.2450,
+
+  // Fees & compliance
+  transferFee: 45,
+  exchangeMargin: 12,
+  purposeCode: 'PER',
+  amlReference: 'AML-2026-FEB-04521',
+  trackingNumber: 'INT-2026020542-002',
+);
+```
+
+---
+
 ## Barcodes & QR Codes (v2.3.3+1)
 
 Generate 1D barcodes and 2D QR codes directly in PDF documents with full styling support.
@@ -3497,6 +3605,8 @@ lib/
                 ├── bank_withdrawal_voucher.dart
                 ├── transfer_voucher.dart
                 ├── bill_payment_voucher.dart
+                ├── remittance_outgoing_voucher.dart
+                ├── remittance_incoming_voucher.dart
                 └── voucher_batch.dart
 ```
 

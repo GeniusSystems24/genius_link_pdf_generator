@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2026-02-05
+
+### Added
+
+#### Remittance Voucher Templates (v3.2.0)
+
+Extends the voucher system with 2 new remittance template classes covering 8 service IDs for domestic and international, personal and commercial money transfers. Includes sender/beneficiary info blocks, currency exchange details, fee breakdowns, compliance/AML fields, and tracking references.
+
+**New Service IDs:**
+- `VoucherServiceId.domesticPersonalOutgoing` (10400) — Personal remittance within the country
+- `VoucherServiceId.domesticCommercialOutgoing` (10401) — Commercial remittance within the country
+- `VoucherServiceId.internationalPersonalOutgoing` (10500) — Personal remittance abroad
+- `VoucherServiceId.internationalCommercialOutgoing` (10501) — Commercial remittance abroad
+- `VoucherServiceId.domesticPersonalIncoming` (10450) — Personal remittance received locally
+- `VoucherServiceId.domesticCommercialIncoming` (10451) — Commercial remittance received locally
+- `VoucherServiceId.internationalPersonalIncoming` (10550) — Personal remittance from abroad
+- `VoucherServiceId.internationalCommercialIncoming` (10551) — Commercial remittance from abroad
+
+**New Template Classes:**
+- `RemittanceOutgoingVoucher` — Outgoing remittance vouchers with sender info, beneficiary info (bank/SWIFT/correspondent bank for international), currency exchange details, fees breakdown, compliance/AML section, and tracking number with expected delivery
+- `RemittanceIncomingVoucher` — Incoming remittance vouchers with sender info, beneficiary info, exchange details for international transfers, receiving fees, and disbursement method display
+
+**New Data Model:**
+- `VoucherRemittanceData` — Comprehensive remittance data with sender/beneficiary details (name, ID, phone, address, country), bank routing (account, IBAN, SWIFT, correspondent bank), currency exchange (source/target currency, rate, amounts), fees (transfer fee, exchange margin, total cost), compliance (purpose code, AML reference), and tracking (tracking number, expected delivery, disbursement method)
+
+**New Voucher Categories:**
+- `VoucherCategory.remittanceOutgoing` — Outgoing Remittances / حوالات صادرة
+- `VoucherCategory.remittanceIncoming` — Incoming Remittances / حوالات واردة
+
+**New Signatories:**
+- `RemittanceSignatories.sender()` — Sender / المرسل
+- `RemittanceSignatories.beneficiary()` — Beneficiary / المستفيد
+- `RemittanceSignatories.complianceOfficer()` — Compliance Officer / مسؤول الامتثال
+
+**Example:**
+- `buildRemittanceVoucherDemoReport()` — Demo generating 4 remittance vouchers (domestic outgoing, international outgoing, domestic incoming, international incoming) in one batch PDF
+- Remittance Vouchers card added to Examples Showcase screen
+
+---
+
 ## [3.1.0] - 2026-02-05
 
 ### Added

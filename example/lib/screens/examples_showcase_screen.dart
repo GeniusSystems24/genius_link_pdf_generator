@@ -13,6 +13,7 @@ import '../documents/qr_attachments_demo_document.dart';
 import '../documents/report_composer_demo_document.dart';
 import '../documents/voucher_demo_builder.dart';
 import '../documents/banking_voucher_demo_builder.dart';
+import '../documents/remittance_voucher_demo_builder.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 
@@ -105,6 +106,17 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
           icon: Icons.account_balance_rounded,
           gradient: AppColors.cyanGradient,
           onGenerate: _generateBankingVoucherDemo,
+        ),
+        _ExampleItem(
+          id: 'remittance_vouchers',
+          title: 'Remittance Vouchers',
+          titleAr: 'سندات الحوالات',
+          description:
+              'Domestic and international outgoing/incoming remittance vouchers.',
+          descriptionAr: 'حوالات محلية ودولية صادرة وواردة في ملف واحد.',
+          icon: Icons.send_rounded,
+          gradient: AppColors.purpleGradient,
+          onGenerate: _generateRemittanceVoucherDemo,
         ),
       ];
 
@@ -497,6 +509,26 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
       _showError(_isRTL
           ? 'تعذر إنشاء عرض السندات البنكية.'
           : 'Failed to generate banking vouchers demo.');
+    }
+  }
+
+  Future<void> _generateRemittanceVoucherDemo() async {
+    try {
+      final bytes = buildRemittanceVoucherDemoReport(config: _createConfig());
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/remittance_voucher_demo.pdf';
+      await GeniusPdfService().saveToPath(
+        bytes: Uint8List.fromList(bytes),
+        path: filePath,
+      );
+      await OpenFile.open(filePath);
+      _showSuccess(_isRTL
+          ? 'تم إنشاء عرض سندات الحوالات.'
+          : 'Remittance vouchers demo generated.');
+    } catch (_) {
+      _showError(_isRTL
+          ? 'تعذر إنشاء عرض سندات الحوالات.'
+          : 'Failed to generate remittance vouchers demo.');
     }
   }
 
