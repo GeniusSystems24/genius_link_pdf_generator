@@ -11,6 +11,7 @@ import '../documents/multi_grid_summary_demo_document.dart';
 import '../documents/position_tracking_demo_document.dart';
 import '../documents/qr_attachments_demo_document.dart';
 import '../documents/report_composer_demo_document.dart';
+import '../documents/voucher_demo_builder.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 
@@ -81,6 +82,17 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
           icon: Icons.auto_awesome_rounded,
           gradient: AppColors.tealGradient,
           onGenerate: _generateReportComposer,
+        ),
+        _ExampleItem(
+          id: 'service_vouchers',
+          title: 'Service Vouchers',
+          titleAr: 'سندات الخدمات',
+          description:
+              'Accounting entries, receipts, payments, and tax vouchers in one PDF.',
+          descriptionAr: 'قيود محاسبية وسندات قبض وصرف وضريبية في ملف واحد.',
+          icon: Icons.receipt_long_rounded,
+          gradient: AppColors.warningGradient,
+          onGenerate: _generateVoucherDemo,
         ),
       ];
 
@@ -433,6 +445,26 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen> {
       _showError(_isRTL
           ? 'تعذر إنشاء مثال مُركّب التقارير.'
           : 'Failed to generate report composer.');
+    }
+  }
+
+  Future<void> _generateVoucherDemo() async {
+    try {
+      final bytes = buildVoucherDemoReport(config: _createConfig());
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/voucher_demo.pdf';
+      await GeniusPdfService().saveToPath(
+        bytes: Uint8List.fromList(bytes),
+        path: filePath,
+      );
+      await OpenFile.open(filePath);
+      _showSuccess(_isRTL
+          ? 'تم إنشاء عرض سندات الخدمات.'
+          : 'Service vouchers demo generated.');
+    } catch (_) {
+      _showError(_isRTL
+          ? 'تعذر إنشاء عرض سندات الخدمات.'
+          : 'Failed to generate vouchers demo.');
     }
   }
 

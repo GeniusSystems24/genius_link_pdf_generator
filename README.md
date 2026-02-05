@@ -70,6 +70,10 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
   Payslips, employee reports, attendance reports, leave reports
 
+### 🧾 **Service Vouchers** (v3.0.0)
+
+  Accounting entries, receipt/payment vouchers, tax vouchers — bilingual batch PDFs
+
 ### 📊 **Barcodes & QR Codes**
 
   EAN-13, Code128, QR Code, DataMatrix, PDF417, ZATCA QR
@@ -2105,6 +2109,168 @@ final leaveReport = LeaveReportTemplate(
 
 ---
 
+## Service Vouchers (v3.0.0)
+
+A bilingual (Arabic/English) service voucher system for generating professional financial documents. Supports RTL/LTR layouts, multi-voucher batch PDFs, and 5 pre-built styles.
+
+### Supported Voucher Types
+
+| Category | Service IDs | Template Class |
+|---|---|---|
+| Accounting Entries | 00001–00004 | `AccountingEntryVoucher` |
+| Receipt Vouchers | 00100–00103 | `ReceiptVoucher` |
+| Payment Vouchers | 00200–00203 | `PaymentVoucher` |
+| Tax Vouchers | 00300–00304 | `TaxVoucher` |
+
+### Accounting Entry Voucher
+
+```dart
+final voucher = AccountingEntryVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.simpleEntry,
+    voucherNumber: 'JV-2026-0001',
+    voucherDate: DateTime(2026, 2, 4),
+    amount: 15000,
+    description: 'Purchase of office equipment',
+    descriptionAr: 'شراء معدات مكتبية',
+    accountEntries: [
+      VoucherAccountEntry(
+        accountCode: '1500',
+        accountName: 'Office Equipment',
+        accountNameAr: 'معدات مكتبية',
+        debitAmount: 15000,
+      ),
+      VoucherAccountEntry(
+        accountCode: '1100',
+        accountName: 'Cash in Hand',
+        accountNameAr: 'النقد في الصندوق',
+        creditAmount: 15000,
+      ),
+    ],
+    signatories: [
+      VoucherSignatory.preparedBy(name: 'Mohammed'),
+      VoucherSignatory.approvedBy(name: 'Abdullah'),
+    ],
+  ),
+);
+```
+
+### Receipt Voucher
+
+```dart
+final receipt = ReceiptVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.cashReceipt,
+    voucherNumber: 'RV-2026-0142',
+    voucherDate: DateTime.now(),
+    amount: 25000,
+    party: VoucherParty(
+      name: 'Al-Faisal Trading',
+      nameAr: 'شركة الفيصل التجارية',
+      code: 'C-1024',
+    ),
+    paymentDetails: VoucherPaymentDetails(
+      method: VoucherPaymentMethod.cash,
+    ),
+  ),
+  style: GeniusPdfVoucherStyle.financial(),
+);
+```
+
+### Payment Voucher (with Deductions)
+
+```dart
+final payment = PaymentVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.bankTransferPayment,
+    voucherNumber: 'PV-2026-0087',
+    voucherDate: DateTime.now(),
+    amount: 45000,
+    party: VoucherParty(name: 'Vendor Co.', nameAr: 'شركة المورد'),
+    paymentDetails: VoucherPaymentDetails(
+      method: VoucherPaymentMethod.bankTransfer,
+      bankName: 'Al Rajhi Bank',
+      iban: 'SA0380000000608010167519',
+    ),
+  ),
+  deductions: [
+    PaymentDeduction(name: 'Withholding Tax', nameAr: 'ضريبة استقطاع', amount: 2250),
+  ],
+);
+```
+
+### Tax Voucher
+
+```dart
+final tax = TaxVoucher(
+  config: pdfConfig,
+  company: companyInfo,
+  data: VoucherData(
+    serviceId: VoucherServiceId.vatVoucher,
+    voucherNumber: 'TV-2026-0015',
+    voucherDate: DateTime.now(),
+    amount: 37500,
+  ),
+  taxData: VoucherTaxData(
+    taxType: VoucherTaxType.vat,
+    taxPeriodStart: DateTime(2026, 1, 1),
+    taxPeriodEnd: DateTime(2026, 3, 31),
+    outputVat: 75000,
+    inputVat: 37500,
+    netVat: 37500,
+  ),
+  style: GeniusPdfVoucherStyle.government(),
+);
+```
+
+### Batch PDF (Multiple Vouchers)
+
+```dart
+final batch = GeniusPdfVoucherBatch(
+  config: pdfConfig,
+  vouchers: [accountingEntry, receipt, payment, taxVoucher],
+  options: GeniusPdfVoucherBatchOptions(
+    addPageBreakBetweenVouchers: true,
+    addBatchSummary: true,
+    batchTitle: 'Monthly Vouchers — Feb 2026',
+    batchTitleAr: 'السندات الشهرية — فبراير 2026',
+  ),
+);
+
+final bytes = batch.generate();
+batch.dispose();
+```
+
+### Voucher Styles
+
+| Style | Use Case |
+|---|---|
+| `.standard()` | Default — clean professional look |
+| `.formal()` | Conservative corporate documents |
+| `.minimal()` | Simple, lightweight layout |
+| `.financial()` | Bold financial institution style |
+| `.government()` | Government/authority documents |
+
+### Amount to Words
+
+```dart
+// English: "Twenty-Five Thousand Riyal Only"
+AmountToWords.toEnglish(25000, currency: 'SAR');
+
+// Arabic: "خمسة وعشرون ألفاً ريال فقط لا غير"
+AmountToWords.toArabic(25000, currency: 'SAR');
+```
+
+Supports 11 currencies: SAR, USD, EUR, GBP, AED, KWD, QAR, BHD, OMR, EGP, JOD.
+
+---
+
 ## Barcodes & QR Codes (v2.3.3+1)
 
 Generate 1D barcodes and 2D QR codes directly in PDF documents with full styling support.
@@ -3152,7 +3318,21 @@ lib/
         ├── payslip_template.dart
         ├── employee_report_template.dart
         ├── attendance_report_template.dart
-        └── leave_report_template.dart
+        ├── leave_report_template.dart
+        └── vouchers/
+            ├── vouchers.dart
+            ├── models/
+            │   ├── voucher_enums.dart
+            │   ├── voucher_models.dart
+            │   ├── voucher_style.dart
+            │   └── amount_to_words.dart
+            └── templates/
+                ├── voucher_base_template.dart
+                ├── accounting_entry_voucher.dart
+                ├── receipt_voucher.dart
+                ├── payment_voucher.dart
+                ├── tax_voucher.dart
+                └── voucher_batch.dart
 ```
 
 ---

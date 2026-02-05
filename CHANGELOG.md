@@ -5,6 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-02-04
+
+### Added
+
+#### Service Voucher Template System (v3.0.0)
+
+A comprehensive, bilingual (Arabic/English) service voucher system for generating professional financial documents. All vouchers support RTL/LTR layouts, multi-voucher batch PDFs, and customizable styling.
+
+**Core Models:**
+- `VoucherServiceId` — Enum of 17 service IDs across 4 categories: Accounting Entries (00001–00004), Receipt Vouchers (00100–00103), Payment Vouchers (00200–00203), Tax Vouchers (00300–00304)
+- `VoucherCategory` — Categorizes vouchers: `accountingEntry`, `receipt`, `payment`, `tax`
+- `VoucherData` — Core data model with voucher number, date, amount, currency, party, payment details, line items, account entries, signatories, and custom fields
+- `VoucherParty` — Party information with bilingual name, code, VAT number, address, phone, bank details
+- `VoucherLineItem` — Line item with quantity, unit price, discount, tax, and total
+- `VoucherAccountEntry` — Accounting allocation with account code, cost center, debit/credit amounts
+- `VoucherPaymentDetails` — Payment method details (cash, bank transfer, check, electronic) with method-specific fields
+- `VoucherSignatory` — Signatory block with factory constructors: `preparedBy`, `reviewedBy`, `approvedBy`, `receivedBy`, `cashier`, `accountant`, `manager`
+- `VoucherTaxData` — Tax-specific data for income tax, VAT, government fees, customs duty, tax settlement
+- `VoucherPaymentMethod` — Payment method enum: `cash`, `bankTransfer`, `check`, `electronic`, `installment`
+- `VoucherCopyType` — Copy type enum: `original`, `copy`, `duplicate`
+- `VoucherTaxType` — Tax type enum: `incomeTax`, `vat`, `governmentFee`, `customsDuty`, `taxSettlement`
+
+**Styling:**
+- `GeniusPdfVoucherStyle` — Full style configuration with colors, typography, layout, and options
+- Factory styles: `.standard()`, `.formal()`, `.minimal()`, `.financial()`, `.government()`
+- `copyWith()` method for easy customization
+
+**Utilities:**
+- `AmountToWords` — Converts numeric amounts to Arabic and English words
+- `CurrencyInfo` — Currency data for 11 currencies: SAR, USD, EUR, GBP, AED, KWD, QAR, BHD, OMR, EGP, JOD
+- Proper Arabic grammar for thousands/millions/billions
+
+**Template Classes:**
+- `GeniusPdfVoucherTemplate` — Abstract base class with shared drawing methods: header, title, voucher info, party info, payment details, account entries table, items table, amount block, amount in words, notes, signatures, footer
+- `AccountingEntryVoucher` — For service IDs 00001–00004 (Simple Entry, Compound Entry, Opening Entry, Adjusting Entry)
+- `ReceiptVoucher` — For service IDs 00100–00103 (Cash Receipt, Bank Transfer Receipt, Check Receipt, Electronic Receipt)
+- `PaymentVoucher` — For service IDs 00200–00203 (Cash Payment, Bank Transfer Payment, Check Payment, Electronic Payment) with deduction support via `PaymentDeduction`
+- `TaxVoucher` — For service IDs 00300–00304 (Income Tax, VAT, Government Fees, Customs Duty, Tax Settlement) with type-specific calculation tables
+
+**Batch Generation:**
+- `GeniusPdfVoucherBatch` — Combine multiple vouchers into a single PDF document
+- `GeniusPdfVoucherBatchOptions` — Configure page breaks, batch summary page, batch title
+- Summary page with voucher list table and grand total
+
+**Example:**
+- `buildVoucherDemoReport()` — Demo function generating 5 different vouchers in one batch PDF
+- Service Vouchers card added to Examples Showcase screen
+
+---
+
 ## [2.12.8] - 2026-02-04
 
 ### Removed
