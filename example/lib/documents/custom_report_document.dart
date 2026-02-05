@@ -69,7 +69,6 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
 
   // Use fonts from GeniusPdfConfig
   final PdfFont regularFont = data.config.baseFont;
-  final PdfFont boldFont = data.config.boldFont;
   final PdfFont titleFont = data.config.headerFont;
   final PdfFont subtitleFont = data.config.smallFont;
 

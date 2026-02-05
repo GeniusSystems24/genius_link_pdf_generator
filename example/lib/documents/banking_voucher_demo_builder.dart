@@ -4,8 +4,6 @@
 /// TransferVoucher, and BillPaymentVoucher templates.
 library;
 
-import 'dart:typed_data';
-
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
 /// Builds a demo PDF containing 4 banking vouchers in a single batch.

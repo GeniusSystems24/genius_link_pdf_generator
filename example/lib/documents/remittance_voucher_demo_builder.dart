@@ -4,8 +4,6 @@
 /// for both domestic and international, personal and commercial flows.
 library;
 
-import 'dart:typed_data';
-
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
 /// Builds a demo PDF containing 4 remittance vouchers in a single batch.
