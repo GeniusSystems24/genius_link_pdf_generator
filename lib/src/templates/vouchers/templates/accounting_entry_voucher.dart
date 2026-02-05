@@ -7,9 +7,7 @@
 /// - **00004** Adjusting Entry — end-of-period corrections
 library;
 
-import 'package:flutter/painting.dart' show Rect;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
-
 
 /// Generates an accounting entry voucher PDF page.
 ///
@@ -39,70 +37,31 @@ class AccountingEntryVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
+    // Account entries table (the core of accounting voucher)
+    drawAccountEntriesTable();
+
     // Description
     if (data.description != null || data.descriptionAr != null) {
       _drawDescription();
     }
-
-    // Account entries table (the core of accounting voucher)
-    drawAccountEntriesTable();
 
     // Amount block
     drawAmountBlock();
   }
 
   void _drawDescription() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
-    _drawSectionLabelLocal(y, 'البيان', 'Description');
-
+    addSectionHeading('البيان', 'Description');
     final descAr = data.descriptionAr ?? data.description ?? '';
     final descEn = data.description ?? '';
 
-    // Arabic description
-    g.drawString(
-      descAr,
-      bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(8, y + 16, contentWidth - 16, 14),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: PdfTextDirection.rightToLeft,
-      ),
-    );
-
-    // English description below
-    if (descEn.isNotEmpty && descEn != descAr) {
-      g.drawString(
-        descEn,
-        smallFont,
-        brush: PdfSolidBrush(PdfColor(120, 120, 120)),
-        bounds: Rect.fromLTWH(8, y + 32, contentWidth - 16, 12),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.left,
-          textDirection: PdfTextDirection.leftToRight,
-        ),
-      );
-      resetY(y + 48 + style.sectionSpacing);
-    } else {
-      resetY(y + 32 + style.sectionSpacing);
+    if (descAr.isNotEmpty) {
+      addLine(descAr, font: bodyFont, topMargin: 2);
     }
-  }
 
-  void _drawSectionLabelLocal(double y, String labelAr, String labelEn) {
-    final g = currentPage.graphics;
-    g.drawRectangle(
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(0, y, 3, 13),
-    );
-    g.drawString(
-      '$labelAr  |  $labelEn',
-      boldBodyFont,
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
+    if (descEn.isNotEmpty && descEn != descAr) {
+      addLine(descEn, font: smallFont, topMargin: 2);
+    }
+    addSpace(style.sectionSpacing);
   }
 
   @override

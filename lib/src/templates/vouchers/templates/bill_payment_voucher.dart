@@ -9,16 +9,8 @@
 /// - **10305** Entertainment Recharge — streaming and entertainment subscriptions
 library;
 
-import 'package:flutter/painting.dart' show Rect;
+import 'package:flutter/material.dart' as m;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-
-import '../../../components/components.dart';
-import '../../../core/pdf_config.dart';
-import '../models/voucher_enums.dart';
-import '../models/voucher_models.dart';
-import '../models/voucher_style.dart';
-import 'voucher_base_template.dart';
 
 /// Generates a bill payment voucher PDF page.
 ///
@@ -55,6 +47,9 @@ class BillPaymentVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
+    // Account allocation
+    drawAccountEntriesTable();
+
     // Service provider info
     _drawProviderInfo();
 
@@ -71,172 +66,172 @@ class BillPaymentVoucher extends GeniusPdfVoucherTemplate {
     if (billData.confirmationNumber != null) {
       _drawConfirmation();
     }
-
-    // Account allocation
-    if (data.accountEntries.isNotEmpty) {
-      drawAccountEntriesTable();
-    }
   }
 
   void _drawProviderInfo() {
-    final y = currentY;
-    _drawLabel(y, 'مقدم الخدمة', 'Service Provider');
-    var infoY = y + 16;
-
-    final fields = <_BillInfoPair>[
-      _BillInfoPair(
-          'مقدم الخدمة', 'Provider', billData.displayProvider(isRTL: isRTL)),
+    final items = <GeniusPdfLabeledValue>[
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Provider',
+        labelAr: 'مقدم الخدمة',
+        value: billData.displayProvider(isRTL: isRTL),
+      ),
       if (billData.subscriberNumber != null)
-        _BillInfoPair(
-            'رقم المشترك', 'Subscriber No', billData.subscriberNumber!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Subscriber No',
+          labelAr: 'رقم المشترك',
+          value: billData.subscriberNumber!,
+        ),
     ];
 
-    for (var i = 0; i < fields.length; i += 2) {
-      final pair1 = fields[i];
-      final pair2 = (i + 1 < fields.length) ? fields[i + 1] : null;
-      _drawFieldPair(infoY, pair1, pair2);
-      infoY += 14;
-    }
-
-    resetY(infoY + style.sectionSpacing);
+    addInfoSection(
+      labelAr: 'مقدم الخدمة',
+      labelEn: 'Service Provider',
+      items: items,
+      columns: 2,
+    );
   }
 
   void _drawBillDetails() {
-    final y = currentY;
-    _drawLabel(y, 'تفاصيل الفاتورة', 'Bill Details');
-    var infoY = y + 16;
-
-    final fields = <_BillInfoPair>[];
+    final items = <GeniusPdfLabeledValue>[];
+    void addItem(String labelAr, String labelEn, String value) {
+      items.add(GeniusPdfLabeledValue(
+        config: config,
+        label: labelEn,
+        labelAr: labelAr,
+        value: value,
+      ));
+    }
 
     switch (data.serviceId) {
       case VoucherServiceId.utilityBillPayment:
         if (billData.serviceType != null) {
-          fields.add(_BillInfoPair(
-              'نوع الخدمة',
-              'Service Type',
-              isRTL
-                  ? (billData.serviceTypeAr ?? billData.serviceType!)
-                  : billData.serviceType!));
+          addItem(
+            'نوع الخدمة',
+            'Service Type',
+            isRTL
+                ? (billData.serviceTypeAr ?? billData.serviceType!)
+                : billData.serviceType!,
+          );
         }
         if (billData.meterNumber != null) {
-          fields.add(
-              _BillInfoPair('رقم العداد', 'Meter No', billData.meterNumber!));
+          addItem('رقم العداد', 'Meter No', billData.meterNumber!);
         }
         if (billData.billingPeriod != null) {
-          fields.add(_BillInfoPair(
-              'فترة الفوترة',
-              'Billing Period',
-              isRTL
-                  ? (billData.billingPeriodAr ?? billData.billingPeriod!)
-                  : billData.billingPeriod!));
+          addItem(
+            'فترة الفوترة',
+            'Billing Period',
+            isRTL
+                ? (billData.billingPeriodAr ?? billData.billingPeriod!)
+                : billData.billingPeriod!,
+          );
         }
         if (billData.consumption != null) {
           final unit = billData.consumptionUnit ?? 'kWh';
-          fields.add(_BillInfoPair(
-              'الاستهلاك', 'Consumption', '${billData.consumption} $unit'));
+          addItem(
+            'الاستهلاك',
+            'Consumption',
+            '${billData.consumption} $unit',
+          );
         }
         if (billData.rate != null) {
-          fields.add(_BillInfoPair(
-              'التعرفة', 'Rate', billData.rate!.toStringAsFixed(4)));
+          addItem('التعرفة', 'Rate', billData.rate!.toStringAsFixed(4));
         }
         break;
 
       case VoucherServiceId.generalBillPayment:
         if (billData.billNumber != null) {
-          fields.add(
-              _BillInfoPair('رقم الفاتورة', 'Bill No', billData.billNumber!));
+          addItem('رقم الفاتورة', 'Bill No', billData.billNumber!);
         }
         if (billData.dueDate != null) {
-          fields.add(_BillInfoPair(
-              'تاريخ الاستحقاق', 'Due Date', _fmtDate(billData.dueDate!)));
+          addItem(
+            'تاريخ الاستحقاق',
+            'Due Date',
+            _fmtDate(billData.dueDate!),
+          );
         }
         if (billData.serviceType != null) {
-          fields.add(_BillInfoPair(
-              'نوع الفاتورة',
-              'Bill Type',
-              isRTL
-                  ? (billData.serviceTypeAr ?? billData.serviceType!)
-                  : billData.serviceType!));
+          addItem(
+            'نوع الفاتورة',
+            'Bill Type',
+            isRTL
+                ? (billData.serviceTypeAr ?? billData.serviceType!)
+                : billData.serviceType!,
+          );
         }
         break;
 
       case VoucherServiceId.internetBillPayment:
         if (billData.planName != null) {
-          fields.add(_BillInfoPair(
-              'الباقة',
-              'Plan',
-              isRTL
-                  ? (billData.planNameAr ?? billData.planName!)
-                  : billData.planName!));
+          addItem(
+            'الباقة',
+            'Plan',
+            isRTL ? (billData.planNameAr ?? billData.planName!) : billData.planName!,
+          );
         }
         if (billData.billingPeriod != null) {
-          fields.add(_BillInfoPair(
-              'فترة الفوترة',
-              'Billing Period',
-              isRTL
-                  ? (billData.billingPeriodAr ?? billData.billingPeriod!)
-                  : billData.billingPeriod!));
+          addItem(
+            'فترة الفوترة',
+            'Billing Period',
+            isRTL
+                ? (billData.billingPeriodAr ?? billData.billingPeriod!)
+                : billData.billingPeriod!,
+          );
         }
         break;
 
       case VoucherServiceId.telecomRecharge:
         if (billData.mobileNumber != null) {
-          fields.add(
-              _BillInfoPair('رقم الجوال', 'Mobile No', billData.mobileNumber!));
+          addItem('رقم الجوال', 'Mobile No', billData.mobileNumber!);
         }
         if (billData.planName != null) {
-          fields.add(_BillInfoPair(
-              'الباقة',
-              'Package',
-              isRTL
-                  ? (billData.planNameAr ?? billData.planName!)
-                  : billData.planName!));
+          addItem(
+            'الباقة',
+            'Package',
+            isRTL ? (billData.planNameAr ?? billData.planName!) : billData.planName!,
+          );
         }
         if (billData.validity != null) {
-          fields.add(_BillInfoPair(
-              'الصلاحية',
-              'Validity',
-              isRTL
-                  ? (billData.validityAr ?? billData.validity!)
-                  : billData.validity!));
+          addItem(
+            'الصلاحية',
+            'Validity',
+            isRTL ? (billData.validityAr ?? billData.validity!) : billData.validity!,
+          );
         }
         break;
 
       case VoucherServiceId.gameRecharge:
         if (billData.planName != null) {
-          fields.add(_BillInfoPair(
-              'اللعبة',
-              'Game',
-              isRTL
-                  ? (billData.planNameAr ?? billData.planName!)
-                  : billData.planName!));
+          addItem(
+            'اللعبة',
+            'Game',
+            isRTL ? (billData.planNameAr ?? billData.planName!) : billData.planName!,
+          );
         }
         if (billData.serviceType != null) {
-          fields.add(_BillInfoPair(
-              'نوع الرصيد',
-              'Credit Type',
-              isRTL
-                  ? (billData.serviceTypeAr ?? billData.serviceType!)
-                  : billData.serviceType!));
+          addItem(
+            'نوع الرصيد',
+            'Credit Type',
+            isRTL ? (billData.serviceTypeAr ?? billData.serviceType!) : billData.serviceType!,
+          );
         }
         break;
 
       case VoucherServiceId.entertainmentRecharge:
         if (billData.planName != null) {
-          fields.add(_BillInfoPair(
-              'المنصة',
-              'Platform',
-              isRTL
-                  ? (billData.planNameAr ?? billData.planName!)
-                  : billData.planName!));
+          addItem(
+            'المنصة',
+            'Platform',
+            isRTL ? (billData.planNameAr ?? billData.planName!) : billData.planName!,
+          );
         }
         if (billData.validity != null) {
-          fields.add(_BillInfoPair(
-              'الصلاحية',
-              'Validity',
-              isRTL
-                  ? (billData.validityAr ?? billData.validity!)
-                  : billData.validity!));
+          addItem(
+            'الصلاحية',
+            'Validity',
+            isRTL ? (billData.validityAr ?? billData.validity!) : billData.validity!,
+          );
         }
         break;
 
@@ -244,81 +239,56 @@ class BillPaymentVoucher extends GeniusPdfVoucherTemplate {
         break;
     }
 
-    for (var i = 0; i < fields.length; i += 2) {
-      final pair1 = fields[i];
-      final pair2 = (i + 1 < fields.length) ? fields[i + 1] : null;
-      _drawFieldPair(infoY, pair1, pair2);
-      infoY += 14;
+    if (items.isNotEmpty) {
+      addInfoSection(
+        labelAr: 'تفاصيل الفاتورة',
+        labelEn: 'Bill Details',
+        items: items,
+        columns: 2,
+      );
     }
-
-    resetY(infoY + style.sectionSpacing);
   }
 
   void _drawConfirmation() {
-    final g = currentPage.graphics;
-    final y = currentY;
+    final items = <GeniusPdfLabeledValue>[
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Transaction Reference',
+        labelAr: 'مرجع العملية',
+        value: billData.confirmationNumber!,
+      ),
+    ];
 
-    _drawLabel(y, 'مرجع العملية', 'Transaction Reference');
-
-    g.drawRectangle(
-      brush: PdfSolidBrush((style.amountHighlightColor.toPdfColor())),
-      pen: PdfPen((style.primaryColor.toPdfColor()), width: 0.5),
-      bounds: Rect.fromLTWH(0, y + 16, contentWidth, 18),
+    final highlightStyle = GeniusPdfInfoBoxStyle(
+      backgroundColor: style.amountHighlightColor,
+      borderStyle: GeniusPdfBorderStyle.all(
+        color: style.primaryColor,
+        width: style.borderWidth,
+      ),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 8, vertical: 6),
+      labelStyle: GeniusPdfTextStyle(
+        fontSize: style.bodyFontSize,
+        fontWeight: m.FontWeight.w600,
+        color: style.primaryColor,
+      ),
+      valueStyle: GeniusPdfTextStyle(
+        fontSize: style.bodyFontSize,
+        fontWeight: m.FontWeight.bold,
+        color: style.primaryColor,
+      ),
+      labelAlign: GeniusPdfTextAlign.start,
+      valueAlign: GeniusPdfTextAlign.end,
+      labelValueLayout: GeniusPdfLabelValueLayout.horizontal,
+      showDivider: false,
     );
-    g.drawString(
-      billData.confirmationNumber!,
-      boldBodyFont,
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(4, y + 19, contentWidth - 8, 14),
-      format: PdfStringFormat(alignment: PdfTextAlignment.center),
+
+    addInfoSection(
+      labelAr: 'مرجع العملية',
+      labelEn: 'Transaction Reference',
+      items: items,
+      columns: 1,
+      styleOverride: highlightStyle,
     );
-
-    resetY(y + 38 + style.sectionSpacing);
-  }
-
-  void _drawLabel(double y, String labelAr, String labelEn) {
-    final g = currentPage.graphics;
-    g.drawRectangle(
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(0, y, 3, 13),
-    );
-    g.drawString(
-      '$labelAr  |  $labelEn',
-      boldBodyFont,
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-  }
-
-  void _drawFieldPair(double y, _BillInfoPair pair1, [_BillInfoPair? pair2]) {
-    final g = currentPage.graphics;
-    final halfWidth = contentWidth / 2;
-
-    final label1 = isRTL ? pair1.labelAr : pair1.labelEn;
-    g.drawString('$label1: ', boldBodyFont,
-        brush: PdfSolidBrush((style.accentColor.toPdfColor())),
-        bounds: Rect.fromLTWH(4, y, halfWidth * 0.4 - 4, 12),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-    g.drawString(pair1.value, bodyFont,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-
-    if (pair2 != null) {
-      final label2 = isRTL ? pair2.labelAr : pair2.labelEn;
-      g.drawString('$label2: ', boldBodyFont,
-          brush: PdfSolidBrush((style.accentColor.toPdfColor())),
-          bounds: Rect.fromLTWH(halfWidth + 4, y, halfWidth * 0.4 - 4, 12),
-          format:
-              PdfStringFormat(alignment: startAlign, textDirection: textDir));
-      g.drawString(pair2.value, bodyFont,
-          brush: PdfBrushes.black,
-          bounds: Rect.fromLTWH(
-              halfWidth + halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
-          format:
-              PdfStringFormat(alignment: startAlign, textDirection: textDir));
-    }
   }
 
   String _fmtDate(DateTime d) =>
@@ -329,11 +299,4 @@ class BillPaymentVoucher extends GeniusPdfVoucherTemplate {
         BankingSignatories.requester(),
         VoucherSignatory.accountant(),
       ];
-}
-
-class _BillInfoPair {
-  const _BillInfoPair(this.labelAr, this.labelEn, this.value);
-  final String labelAr;
-  final String labelEn;
-  final String value;
 }

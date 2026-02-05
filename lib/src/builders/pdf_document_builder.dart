@@ -88,6 +88,9 @@ abstract class GeniusPdfDocumentBuilder {
   /// The current page index (0-based, -1 = no pages yet).
   int _currentIndex = -1;
 
+  /// Default page border pen applied to newly created pages.
+  PdfPen? _defaultPageBorderPen;
+
   /// The string format based on text direction (RTL/LTR).
   late final PdfStringFormat _format;
 
@@ -273,6 +276,13 @@ abstract class GeniusPdfDocumentBuilder {
     );
   }
 
+  /// Sets a default border pen to apply on every new page.
+  ///
+  /// Pass `null` to disable the default border.
+  void setDefaultPageBorder(PdfPen? pen) {
+    _defaultPageBorderPen = pen;
+  }
+
   /// Sets the current page to [page] and optionally updates the Y position.
   ///
   /// This is useful when a component (like a grid) creates new pages during
@@ -334,7 +344,8 @@ abstract class GeniusPdfDocumentBuilder {
       tag: 'Builder',
     );
 
-    if (borderPen != null) {
+    final effectiveBorderPen = borderPen ?? _defaultPageBorderPen;
+    if (effectiveBorderPen != null) {
       page.graphics.drawRectangle(
         bounds: Rect.fromLTWH(
           0,
@@ -342,7 +353,7 @@ abstract class GeniusPdfDocumentBuilder {
           page.getClientSize().width,
           page.getClientSize().height,
         ),
-        pen: borderPen,
+        pen: effectiveBorderPen,
       );
     }
 

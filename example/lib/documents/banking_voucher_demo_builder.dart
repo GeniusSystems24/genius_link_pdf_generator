@@ -61,7 +61,6 @@ List<int> buildBankingVoucherDemoReport({
       accountNumber: '608010167519',
       iban: 'SA0380000000608010167519',
     ),
-    style: GeniusPdfVoucherStyle.financial(),
   );
 
   // ── 2. Check Withdrawal ──
@@ -161,7 +160,6 @@ List<int> buildBankingVoucherDemoReport({
       transferFee: 25,
       netAmount: 149975,
     ),
-    style: GeniusPdfVoucherStyle.formal(),
   );
 
   // ── 4. Utility Bill Payment ──
@@ -208,7 +206,6 @@ List<int> buildBankingVoucherDemoReport({
       dueDate: DateTime(2026, 2, 15),
       confirmationNumber: 'SADAD-20260205-78542-CONF',
     ),
-    style: GeniusPdfVoucherStyle.minimal(),
   );
 
   // ── Build Batch ──

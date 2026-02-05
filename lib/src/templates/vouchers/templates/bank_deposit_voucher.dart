@@ -6,16 +6,7 @@
 /// - **10002** Electronic Deposit — electronic transfer deposit
 library;
 
-import 'package:flutter/painting.dart' show Rect;
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-
-import '../../../components/components.dart';
-import '../../../core/pdf_config.dart';
-import '../../../extensions/color_extensions.dart';
-import '../models/voucher_enums.dart';
-import '../models/voucher_models.dart';
-import '../models/voucher_style.dart';
-import 'voucher_base_template.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
 /// Generates a bank deposit voucher PDF page.
 ///
@@ -51,6 +42,9 @@ class BankDepositVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
+    // Account allocation
+    drawAccountEntriesTable();
+
     // Bank information
     _drawBankInfo();
 
@@ -64,90 +58,130 @@ class BankDepositVoucher extends GeniusPdfVoucherTemplate {
     if (data.description != null || data.descriptionAr != null) {
       _drawPurpose();
     }
-
-    // Account allocation
-    if (data.accountEntries.isNotEmpty) {
-      drawAccountEntriesTable();
-    }
   }
 
   void _drawBankInfo() {
-    final y = currentY;
-    _drawLabel(y, 'معلومات البنك', 'Bank Information');
-    var infoY = y + 16;
-
-    final fields = <_DepositInfoPair>[
-      _DepositInfoPair('البنك', 'Bank', bankInfo.displayBankName(isRTL: isRTL)),
+    final items = <GeniusPdfLabeledValue>[
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Bank',
+        labelAr: 'البنك',
+        value: bankInfo.displayBankName(isRTL: isRTL),
+      ),
       if (bankInfo.branchName != null)
-        _DepositInfoPair('الفرع', 'Branch',
-            isRTL ? (bankInfo.branchNameAr ?? bankInfo.branchName!) : bankInfo.branchName!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Branch',
+          labelAr: 'الفرع',
+          value: isRTL
+              ? (bankInfo.branchNameAr ?? bankInfo.branchName!)
+              : bankInfo.branchName!,
+        ),
       if (bankInfo.accountNumber != null)
-        _DepositInfoPair('رقم الحساب', 'Account No', bankInfo.accountNumber!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Account No',
+          labelAr: 'رقم الحساب',
+          value: bankInfo.accountNumber!,
+        ),
       if (bankInfo.iban != null)
-        _DepositInfoPair('الآيبان', 'IBAN', bankInfo.iban!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'IBAN',
+          labelAr: 'الآيبان',
+          value: bankInfo.iban!,
+        ),
     ];
 
-    for (var i = 0; i < fields.length; i += 2) {
-      final pair1 = fields[i];
-      final pair2 = (i + 1 < fields.length) ? fields[i + 1] : null;
-      _drawFieldPair(infoY, pair1, pair2);
-      infoY += 14;
-    }
-
-    resetY(infoY + style.sectionSpacing);
+    addInfoSection(
+      labelAr: 'معلومات البنك',
+      labelEn: 'Bank Information',
+      items: items,
+      columns: 2,
+    );
   }
 
   void _drawDepositDetails() {
-    final y = currentY;
-    _drawLabel(y, 'تفاصيل الإيداع', 'Deposit Details');
-    var infoY = y + 16;
-
-    final fields = <_DepositInfoPair>[];
+    final items = <GeniusPdfLabeledValue>[];
+    void addItem(String labelAr, String labelEn, String value) {
+      items.add(GeniusPdfLabeledValue(
+        config: config,
+        label: labelEn,
+        labelAr: labelAr,
+        value: value,
+      ));
+    }
 
     switch (data.serviceId) {
       case VoucherServiceId.cashDeposit:
-        fields.add(_DepositInfoPair('نوع الإيداع', 'Deposit Type',
-            isRTL ? 'إيداع نقدي' : 'Cash Deposit'));
+        addItem(
+          'نوع الإيداع',
+          'Deposit Type',
+          isRTL ? 'إيداع نقدي' : 'Cash Deposit',
+        );
         if (data.paymentDetails?.denominations != null) {
           // Denomination breakdown will be drawn as a table below
         }
         break;
       case VoucherServiceId.checkDeposit:
-        fields.add(_DepositInfoPair('نوع الإيداع', 'Deposit Type',
-            isRTL ? 'إيداع شيك' : 'Check Deposit'));
+        addItem(
+          'نوع الإيداع',
+          'Deposit Type',
+          isRTL ? 'إيداع شيك' : 'Check Deposit',
+        );
         final pd = data.paymentDetails;
         if (pd != null) {
-          if (pd.checkNumber != null) fields.add(_DepositInfoPair('رقم الشيك', 'Check No', pd.checkNumber!));
-          if (pd.draweeBankName != null) fields.add(_DepositInfoPair('البنك المسحوب عليه', 'Drawee Bank', pd.draweeBankName!));
-          if (pd.checkDate != null) fields.add(_DepositInfoPair('تاريخ الشيك', 'Check Date', _fmtDate(pd.checkDate!)));
-          if (pd.dueDate != null) fields.add(_DepositInfoPair('تاريخ الاستحقاق', 'Due Date', _fmtDate(pd.dueDate!)));
+          if (pd.checkNumber != null) {
+            addItem('رقم الشيك', 'Check No', pd.checkNumber!);
+          }
+          if (pd.draweeBankName != null) {
+            addItem('البنك المسحوب عليه', 'Drawee Bank', pd.draweeBankName!);
+          }
+          if (pd.checkDate != null) {
+            addItem('تاريخ الشيك', 'Check Date', _fmtDate(pd.checkDate!));
+          }
+          if (pd.dueDate != null) {
+            addItem('تاريخ الاستحقاق', 'Due Date', _fmtDate(pd.dueDate!));
+          }
         }
         if (data.party != null) {
-          fields.add(_DepositInfoPair('اسم المحرر', 'Drawer Name', data.party!.displayName(isRTL: isRTL)));
+          addItem(
+            'اسم المحرر',
+            'Drawer Name',
+            data.party!.displayName(isRTL: isRTL),
+          );
         }
         break;
       case VoucherServiceId.electronicDeposit:
-        fields.add(_DepositInfoPair('نوع الإيداع', 'Deposit Type',
-            isRTL ? 'إيداع إلكتروني' : 'Electronic Deposit'));
+        addItem(
+          'نوع الإيداع',
+          'Deposit Type',
+          isRTL ? 'إيداع إلكتروني' : 'Electronic Deposit',
+        );
         final pd = data.paymentDetails;
         if (pd != null) {
-          if (pd.transferReference != null) fields.add(_DepositInfoPair('مرجع التحويل', 'Transfer Ref', pd.transferReference!));
-          if (pd.transactionId != null) fields.add(_DepositInfoPair('رقم العملية', 'Transaction ID', pd.transactionId!));
-          if (pd.gatewayName != null) fields.add(_DepositInfoPair('مصدر التحويل', 'Transfer Source', pd.gatewayName!));
+          if (pd.transferReference != null) {
+            addItem('مرجع التحويل', 'Transfer Ref', pd.transferReference!);
+          }
+          if (pd.transactionId != null) {
+            addItem('رقم العملية', 'Transaction ID', pd.transactionId!);
+          }
+          if (pd.gatewayName != null) {
+            addItem('مصدر التحويل', 'Transfer Source', pd.gatewayName!);
+          }
         }
         break;
       default:
         break;
     }
-
-    for (var i = 0; i < fields.length; i += 2) {
-      final pair1 = fields[i];
-      final pair2 = (i + 1 < fields.length) ? fields[i + 1] : null;
-      _drawFieldPair(infoY, pair1, pair2);
-      infoY += 14;
+    if (items.isNotEmpty) {
+      addInfoSection(
+        labelAr: 'تفاصيل الإيداع',
+        labelEn: 'Deposit Details',
+        items: items,
+        columns: 2,
+      );
     }
-
-    resetY(infoY + style.sectionSpacing);
 
     // Denomination table for cash deposit
     if (data.serviceId == VoucherServiceId.cashDeposit &&
@@ -195,62 +229,10 @@ class BankDepositVoucher extends GeniusPdfVoucherTemplate {
   }
 
   void _drawPurpose() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
-    _drawLabel(y, 'الغرض', 'Purpose');
     final text = isRTL ? (data.descriptionAr ?? data.description ?? '') : (data.description ?? '');
-    g.drawString(
-      text,
-      bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(4, y + 16, contentWidth - 8, 28),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-
-    resetY(y + 46 + style.sectionSpacing);
-  }
-
-  void _drawLabel(double y, String labelAr, String labelEn) {
-    final g = currentPage.graphics;
-    g.drawRectangle(
-      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
-      bounds: Rect.fromLTWH(0, y, 3, 13),
-    );
-    g.drawString(
-      '$labelAr  |  $labelEn',
-      boldBodyFont,
-      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
-      bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-  }
-
-  void _drawFieldPair(double y, _DepositInfoPair pair1, [_DepositInfoPair? pair2]) {
-    final g = currentPage.graphics;
-    final halfWidth = contentWidth / 2;
-
-    final label1 = isRTL ? pair1.labelAr : pair1.labelEn;
-    g.drawString('$label1: ', boldBodyFont,
-      brush: PdfSolidBrush(style.accentColor.toPdfColor()),
-      bounds: Rect.fromLTWH(4, y, halfWidth * 0.4 - 4, 12),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-    g.drawString(pair1.value, bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-
-    if (pair2 != null) {
-      final label2 = isRTL ? pair2.labelAr : pair2.labelEn;
-      g.drawString('$label2: ', boldBodyFont,
-        brush: PdfSolidBrush(style.accentColor.toPdfColor()),
-        bounds: Rect.fromLTWH(halfWidth + 4, y, halfWidth * 0.4 - 4, 12),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-      g.drawString(pair2.value, bodyFont,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(halfWidth + halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-    }
+    addSectionHeading('الغرض', 'Purpose');
+    addLine(text, font: bodyFont, topMargin: 2);
+    addSpace(style.sectionSpacing);
   }
 
   String _fmtDate(DateTime d) =>
@@ -267,11 +249,4 @@ class BankDepositVoucher extends GeniusPdfVoucherTemplate {
         VoucherSignatory.cashier(),
         BankingSignatories.bankTeller(),
       ];
-}
-
-class _DepositInfoPair {
-  const _DepositInfoPair(this.labelAr, this.labelEn, this.value);
-  final String labelAr;
-  final String labelEn;
-  final String value;
 }

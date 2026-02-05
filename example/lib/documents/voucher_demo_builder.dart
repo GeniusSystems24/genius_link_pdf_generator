@@ -99,7 +99,6 @@ List<int> buildVoucherDemoReport({required GeniusPdfConfig config}) {
         ),
       ],
     ),
-    style: GeniusPdfVoucherStyle.financial(),
   );
 
   // ── 3. Bank Transfer Payment ──
@@ -189,7 +188,6 @@ List<int> buildVoucherDemoReport({required GeniusPdfConfig config}) {
       inputVat: 37500,
       netVat: 37500,
     ),
-    style: GeniusPdfVoucherStyle.government(),
   );
 
   // ── 5. Check Receipt ──
@@ -233,7 +231,6 @@ List<int> buildVoucherDemoReport({required GeniusPdfConfig config}) {
         ),
       ],
     ),
-    style: GeniusPdfVoucherStyle.minimal(),
   );
 
   // ── Generate Batch ──

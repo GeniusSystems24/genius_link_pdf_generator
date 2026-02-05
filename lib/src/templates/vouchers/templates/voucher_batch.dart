@@ -9,7 +9,10 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../../builders/pdf_document_builder.dart';
+import '../../../components/components.dart';
 import '../../../core/pdf_config.dart';
+import '../../../extensions/color_extensions.dart';
 import '../models/voucher_style.dart';
 import 'voucher_base_template.dart';
 
@@ -103,87 +106,147 @@ class GeniusPdfVoucherBatch {
   }
 
   void _addSummaryPage(PdfDocument doc) {
+    final summaryBuilder = _VoucherBatchSummaryBuilder(
+      config: config,
+      vouchers: vouchers,
+      options: options,
+      style: style,
+    );
+    final bytes = summaryBuilder.generate();
+    summaryBuilder.dispose();
+
+    final summaryDoc = PdfDocument(inputBytes: Uint8List.fromList(bytes));
+    final template = summaryDoc.pages[0].createTemplate();
     final page = doc.pages.add();
-    final g = page.graphics;
-    final font = config.fontBuild(fontSize: style.titleFontSize);
-    final bodyFont = config.fontBuild(fontSize: style.bodyFontSize);
-    final boldFont = config.fontBuild(
+    page.graphics.drawPdfTemplate(
+      template,
+      Offset.zero,
+      Size(page.getClientSize().width, page.getClientSize().height),
+    );
+    summaryDoc.dispose();
+  }
+
+  void dispose() {
+    // Templates already disposed in generate()
+  }
+}
+
+class _VoucherBatchSummaryBuilder extends GeniusPdfDocumentBuilder {
+  _VoucherBatchSummaryBuilder({
+    required GeniusPdfConfig config,
+    required this.vouchers,
+    required this.options,
+    required this.style,
+  }) : super(config);
+
+  final List<GeniusPdfVoucherTemplate> vouchers;
+  final GeniusPdfVoucherBatchOptions options;
+  final GeniusPdfVoucherStyle style;
+
+  @override
+  void build() {
+    if (style.showBorder) {
+      setDefaultPageBorder(
+        style.borderColor.toPdfPen(width: style.borderWidth),
+      );
+    }
+
+    final titleText = _resolveTitle();
+    final titleRich = GeniusPdfRichTextBuilder(
+      config: config,
+      defaultStyle: GeniusPdfTextStyle(
+        fontSize: style.titleFontSize,
+        color: style.primaryColor,
+        alignment: GeniusPdfTextAlign.center,
+      ),
+      paragraphAlignment: GeniusPdfParagraphAlignment.center,
+    ).bold(titleText, color: style.primaryColor).build();
+    addRichText(titleRich, spacing: 0);
+    addSpace(6);
+
+    final subtitle =
+        'عدد السندات: ${vouchers.length}  |  Total Vouchers: ${vouchers.length}';
+    final subtitleRich = GeniusPdfRichTextBuilder(
+      config: config,
+      defaultStyle: GeniusPdfTextStyle(
         fontSize: style.bodyFontSize,
-        fontBytes: config.boldFontBytes ?? config.baseFontBytes);
-    final w = page.getClientSize().width;
-    var y = 20.0;
+        color: style.accentColor,
+        alignment: GeniusPdfTextAlign.center,
+      ),
+      paragraphAlignment: GeniusPdfParagraphAlignment.center,
+    ).text(subtitle).build();
+    addRichText(subtitleRich, spacing: 0);
+    addSpace(style.sectionSpacing);
 
-    // Title
-    final title = options.batchTitleAr ?? options.batchTitle ?? 'ملخص الدفعة  |  Batch Summary';
-    g.drawString(
-      title,
-      font,
-      brush: PdfSolidBrush(PdfColor.fromCMYK(80, 60, 0, 40)),
-      bounds: Rect.fromLTWH(0, y, w, 22),
-      format: PdfStringFormat(alignment: PdfTextAlignment.center),
-    );
-    y += 30;
-
-    // Subtitle
-    g.drawString(
-      'عدد السندات: ${vouchers.length}  |  Total Vouchers: ${vouchers.length}',
-      bodyFont,
-      bounds: Rect.fromLTWH(0, y, w, 14),
-      format: PdfStringFormat(alignment: PdfTextAlignment.center),
-    );
-    y += 24;
-
-    // Voucher list
-    final headerColor = PdfSolidBrush(PdfColor.fromCMYK(80, 60, 0, 40));
-    g.drawString('#', boldFont, brush: headerColor,
-        bounds: Rect.fromLTWH(0, y, 30, 14));
-    g.drawString('Voucher No / رقم السند', boldFont, brush: headerColor,
-        bounds: Rect.fromLTWH(30, y, 150, 14));
-    g.drawString('Type / النوع', boldFont, brush: headerColor,
-        bounds: Rect.fromLTWH(180, y, 180, 14));
-    g.drawString('Amount / المبلغ', boldFont, brush: headerColor,
-        bounds: Rect.fromLTWH(360, y, w - 360, 14),
-        format: PdfStringFormat(alignment: PdfTextAlignment.right));
-    y += 16;
-
-    g.drawLine(PdfPen(PdfColor(180, 180, 180), width: 0.5),
-        Offset(0, y), Offset(w, y));
-    y += 4;
-
+    final rows = <GeniusPdfGridRow>[];
     double totalAmount = 0;
+
     for (var i = 0; i < vouchers.length; i++) {
       final v = vouchers[i].data;
       totalAmount += v.amount;
-
-      g.drawString('${i + 1}', bodyFont, bounds: Rect.fromLTWH(0, y, 30, 14));
-      g.drawString(v.voucherNumber, bodyFont, bounds: Rect.fromLTWH(30, y, 150, 14));
-      g.drawString(v.serviceId.bilingualName(), bodyFont,
-          bounds: Rect.fromLTWH(180, y, 180, 14));
-      g.drawString('${_formatNum(v.amount)} ${v.currency}', bodyFont,
-          bounds: Rect.fromLTWH(360, y, w - 360, 14),
-          format: PdfStringFormat(alignment: PdfTextAlignment.right));
-      y += 16;
+      rows.add(GeniusPdfGridRow(cells: {
+        'idx': i + 1,
+        'number': v.voucherNumber,
+        'type': v.serviceId.bilingualName(),
+        'amount': '${_formatNum(v.amount)} ${v.currency}',
+      }));
     }
 
-    // Total
-    y += 4;
-    g.drawLine(PdfPen(PdfColor(180, 180, 180), width: 0.5),
-        Offset(0, y), Offset(w, y));
-    y += 6;
-    g.drawString('الإجمالي  |  Total', boldFont, brush: headerColor,
-        bounds: Rect.fromLTWH(0, y, 360, 14));
-    g.drawString('${_formatNum(totalAmount)} ${vouchers.first.data.currency}',
-        boldFont, brush: headerColor,
-        bounds: Rect.fromLTWH(360, y, w - 360, 14),
-        format: PdfStringFormat(alignment: PdfTextAlignment.right));
+    rows.add(GeniusPdfGridRow.total({
+      'idx': '',
+      'number': '',
+      'type': isRTL ? 'الإجمالي' : 'Total',
+      'amount': '${_formatNum(totalAmount)} ${vouchers.first.data.currency}',
+    }));
+
+    final grid = GeniusPdfDataGrid(
+      config: config,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'idx',
+          title: '#',
+          titleAr: '#',
+          width: 32,
+          alignment: GeniusPdfTextAlign.center,
+        ),
+        GeniusPdfGridColumn(
+          id: 'number',
+          title: 'Voucher No',
+          titleAr: 'رقم السند',
+          flexFactor: 2,
+        ),
+        GeniusPdfGridColumn(
+          id: 'type',
+          title: 'Type',
+          titleAr: 'النوع',
+          flexFactor: 3,
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          flexFactor: 2,
+          alignment: GeniusPdfTextAlign.end,
+        ),
+      ],
+      rows: rows,
+      style: GeniusPdfGridStyle.classic(),
+    );
+
+    addGrid(grid, spacing: 0);
+  }
+
+  String _resolveTitle() {
+    if (options.batchTitleAr != null && options.batchTitle != null) {
+      return '${options.batchTitleAr}  |  ${options.batchTitle}';
+    }
+    if (options.batchTitleAr != null) return options.batchTitleAr!;
+    if (options.batchTitle != null) return options.batchTitle!;
+    return 'ملخص الدفعة  |  Batch Summary';
   }
 
   String _formatNum(double n) {
     return n.toStringAsFixed(2).replaceAllMapped(
         RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
-  }
-
-  void dispose() {
-    // Templates already disposed in generate()
   }
 }

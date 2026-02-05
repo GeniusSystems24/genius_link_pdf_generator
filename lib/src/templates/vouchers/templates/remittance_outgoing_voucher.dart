@@ -7,16 +7,8 @@
 /// - **10501** International Commercial Outgoing — commercial remittance abroad
 library;
 
-import 'package:flutter/material.dart' show Color;
-import 'package:flutter/painting.dart' show Rect;
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-
-import '../../../components/components.dart';
-import '../../../core/pdf_config.dart';
-import '../../../extensions/color_extensions.dart';
-import '../models/voucher_models.dart';
-import '../models/voucher_style.dart';
-import 'voucher_base_template.dart';
+import 'package:flutter/material.dart' as m;
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
 /// Generates an outgoing remittance voucher PDF page.
 ///
@@ -53,6 +45,9 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
+    // Account allocation
+    drawAccountEntriesTable();
+
     // Domestic / International badge
     _drawTypeBadge();
 
@@ -81,136 +76,220 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
     if (remittanceData.trackingNumber != null) {
       _drawTracking();
     }
-
-    // Account allocation
-    if (data.accountEntries.isNotEmpty) {
-      drawAccountEntriesTable();
-    }
   }
 
   void _drawTypeBadge() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
     final badgeText = _isInternational
         ? (isRTL ? 'دولية' : 'International')
         : (isRTL ? 'محلية' : 'Domestic');
     final badgeColor =
-        _isInternational ? const Color(0xFF1565C0) : const Color(0xFF2E7D32);
+        _isInternational ? const m.Color(0xFF1565C0) : const m.Color(0xFF2E7D32);
 
-    final badgeWidth = 90.0;
-    final badgeHeight = 18.0;
-    final badgeX = (contentWidth - badgeWidth) / 2;
-
-    g.drawRectangle(
-      brush: PdfSolidBrush(badgeColor.toPdfColor()),
-      bounds: Rect.fromLTWH(badgeX, y, badgeWidth, badgeHeight),
-    );
-    g.drawString(
+    final richText = GeniusPdfRichTextBuilder(
+      config: config,
+      paragraphAlignment: GeniusPdfParagraphAlignment.center,
+    ).badge(
       badgeText,
-      smallFont,
-      brush: PdfSolidBrush(PdfColor(255, 255, 255)),
-      bounds: Rect.fromLTWH(badgeX, y + 3, badgeWidth, badgeHeight),
-      format: PdfStringFormat(alignment: PdfTextAlignment.center),
-    );
+      backgroundColor: badgeColor,
+      color: const m.Color(0xFFFFFFFF),
+    ).build();
 
-    resetY(y + badgeHeight + style.sectionSpacing);
+    addRichText(richText, spacing: 0);
+    addSpace(style.sectionSpacing);
   }
 
   void _drawSenderInfo() {
-    final y = currentY;
-    _drawLabel(y, 'معلومات المرسل', 'Sender Information');
-    var infoY = y + 16;
-
-    final fields = <_RPair>[
-      _RPair('الاسم', 'Name',
-          isRTL ? (remittanceData.senderNameAr ?? remittanceData.senderName) : remittanceData.senderName),
+    final items = <GeniusPdfLabeledValue>[
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Name',
+        labelAr: 'الاسم',
+        value: isRTL
+            ? (remittanceData.senderNameAr ?? remittanceData.senderName)
+            : remittanceData.senderName,
+      ),
       if (remittanceData.senderIdNumber != null)
-        _RPair('رقم الهوية', 'ID No', remittanceData.senderIdNumber!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'ID No',
+          labelAr: 'رقم الهوية',
+          value: remittanceData.senderIdNumber!,
+        ),
       if (remittanceData.senderIdType != null)
-        _RPair('نوع الهوية', 'ID Type',
-            isRTL ? (remittanceData.senderIdTypeAr ?? remittanceData.senderIdType!) : remittanceData.senderIdType!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'ID Type',
+          labelAr: 'نوع الهوية',
+          value: isRTL
+              ? (remittanceData.senderIdTypeAr ?? remittanceData.senderIdType!)
+              : remittanceData.senderIdType!,
+        ),
       if (remittanceData.senderPhone != null)
-        _RPair('الهاتف', 'Phone', remittanceData.senderPhone!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Phone',
+          labelAr: 'الهاتف',
+          value: remittanceData.senderPhone!,
+        ),
       if (remittanceData.senderAddress != null)
-        _RPair('العنوان', 'Address',
-            isRTL ? (remittanceData.senderAddressAr ?? remittanceData.senderAddress!) : remittanceData.senderAddress!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Address',
+          labelAr: 'العنوان',
+          value: isRTL
+              ? (remittanceData.senderAddressAr ?? remittanceData.senderAddress!)
+              : remittanceData.senderAddress!,
+        ),
     ];
 
-    for (var i = 0; i < fields.length; i += 2) {
-      _drawFieldPair(infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
-      infoY += 14;
-    }
-
-    resetY(infoY + style.sectionSpacing);
+    addInfoSection(
+      labelAr: 'معلومات المرسل',
+      labelEn: 'Sender Information',
+      items: items,
+      columns: 2,
+    );
   }
 
   void _drawBeneficiaryInfo() {
-    final y = currentY;
-    _drawLabel(y, 'معلومات المستفيد', 'Beneficiary Information');
-    var infoY = y + 16;
-
-    final fields = <_RPair>[
-      _RPair('الاسم', 'Name',
-          isRTL ? (remittanceData.beneficiaryNameAr ?? remittanceData.beneficiaryName) : remittanceData.beneficiaryName),
+    final items = <GeniusPdfLabeledValue>[
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Name',
+        labelAr: 'الاسم',
+        value: isRTL
+            ? (remittanceData.beneficiaryNameAr ?? remittanceData.beneficiaryName)
+            : remittanceData.beneficiaryName,
+      ),
       if (remittanceData.beneficiaryIdNumber != null)
-        _RPair('رقم الهوية', 'ID No', remittanceData.beneficiaryIdNumber!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'ID No',
+          labelAr: 'رقم الهوية',
+          value: remittanceData.beneficiaryIdNumber!,
+        ),
       if (remittanceData.beneficiaryPhone != null)
-        _RPair('الهاتف', 'Phone', remittanceData.beneficiaryPhone!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Phone',
+          labelAr: 'الهاتف',
+          value: remittanceData.beneficiaryPhone!,
+        ),
       if (remittanceData.beneficiaryCountry != null)
-        _RPair('الدولة', 'Country',
-            isRTL ? (remittanceData.beneficiaryCountryAr ?? remittanceData.beneficiaryCountry!) : remittanceData.beneficiaryCountry!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Country',
+          labelAr: 'الدولة',
+          value: isRTL
+              ? (remittanceData.beneficiaryCountryAr ?? remittanceData.beneficiaryCountry!)
+              : remittanceData.beneficiaryCountry!,
+        ),
       if (remittanceData.beneficiaryAddress != null)
-        _RPair('العنوان', 'Address',
-            isRTL ? (remittanceData.beneficiaryAddressAr ?? remittanceData.beneficiaryAddress!) : remittanceData.beneficiaryAddress!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Address',
+          labelAr: 'العنوان',
+          value: isRTL
+              ? (remittanceData.beneficiaryAddressAr ?? remittanceData.beneficiaryAddress!)
+              : remittanceData.beneficiaryAddress!,
+        ),
       if (remittanceData.beneficiaryBankName != null)
-        _RPair('البنك', 'Bank',
-            isRTL ? (remittanceData.beneficiaryBankNameAr ?? remittanceData.beneficiaryBankName!) : remittanceData.beneficiaryBankName!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Bank',
+          labelAr: 'البنك',
+          value: isRTL
+              ? (remittanceData.beneficiaryBankNameAr ??
+                  remittanceData.beneficiaryBankName!)
+              : remittanceData.beneficiaryBankName!,
+        ),
       if (remittanceData.beneficiaryAccountNumber != null)
-        _RPair('رقم الحساب', 'Account No', remittanceData.beneficiaryAccountNumber!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Account No',
+          labelAr: 'رقم الحساب',
+          value: remittanceData.beneficiaryAccountNumber!,
+        ),
       if (remittanceData.beneficiaryIban != null)
-        _RPair('الآيبان', 'IBAN', remittanceData.beneficiaryIban!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'IBAN',
+          labelAr: 'الآيبان',
+          value: remittanceData.beneficiaryIban!,
+        ),
       if (_isInternational && remittanceData.beneficiarySwiftCode != null)
-        _RPair('سويفت', 'SWIFT', remittanceData.beneficiarySwiftCode!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'SWIFT',
+          labelAr: 'سويفت',
+          value: remittanceData.beneficiarySwiftCode!,
+        ),
       if (_isInternational && remittanceData.correspondentBank != null)
-        _RPair('البنك المراسل', 'Correspondent Bank',
-            isRTL ? (remittanceData.correspondentBankAr ?? remittanceData.correspondentBank!) : remittanceData.correspondentBank!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Correspondent Bank',
+          labelAr: 'البنك المراسل',
+          value: isRTL
+              ? (remittanceData.correspondentBankAr ??
+                  remittanceData.correspondentBank!)
+              : remittanceData.correspondentBank!,
+        ),
     ];
 
-    for (var i = 0; i < fields.length; i += 2) {
-      _drawFieldPair(infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
-      infoY += 14;
-    }
-
-    resetY(infoY + style.sectionSpacing);
+    addInfoSection(
+      labelAr: 'معلومات المستفيد',
+      labelEn: 'Beneficiary Information',
+      items: items,
+      columns: 2,
+    );
   }
 
   void _drawRemittanceDetails() {
     if (!_isInternational) return; // domestic has no exchange details
 
-    final y = currentY;
-    _drawLabel(y, 'تفاصيل التحويل', 'Remittance Details');
-    var infoY = y + 16;
-
-    final fields = <_RPair>[
+    final items = <GeniusPdfLabeledValue>[
       if (remittanceData.sourceCurrency != null)
-        _RPair('العملة المصدر', 'Source Currency', remittanceData.sourceCurrency!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Source Currency',
+          labelAr: 'العملة المصدر',
+          value: remittanceData.sourceCurrency!,
+        ),
       if (remittanceData.targetCurrency != null)
-        _RPair('العملة المستهدفة', 'Target Currency', remittanceData.targetCurrency!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Target Currency',
+          labelAr: 'العملة المستهدفة',
+          value: remittanceData.targetCurrency!,
+        ),
       if (remittanceData.exchangeRate != null)
-        _RPair('سعر الصرف', 'Exchange Rate', remittanceData.exchangeRate!.toStringAsFixed(4)),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Exchange Rate',
+          labelAr: 'سعر الصرف',
+          value: remittanceData.exchangeRate!.toStringAsFixed(4),
+        ),
       if (remittanceData.sourceAmount != null)
-        _RPair('المبلغ الأصلي', 'Source Amount', _fmtNum(remittanceData.sourceAmount!)),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Source Amount',
+          labelAr: 'المبلغ الأصلي',
+          value: _fmtNum(remittanceData.sourceAmount!),
+        ),
       if (remittanceData.targetAmount != null)
-        _RPair('المبلغ المحوّل', 'Target Amount', _fmtNum(remittanceData.targetAmount!)),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Target Amount',
+          labelAr: 'المبلغ المحوّل',
+          value: _fmtNum(remittanceData.targetAmount!),
+        ),
     ];
 
-    for (var i = 0; i < fields.length; i += 2) {
-      _drawFieldPair(infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
-      infoY += 14;
-    }
-
-    resetY(infoY + style.sectionSpacing);
+    addInfoSection(
+      labelAr: 'تفاصيل التحويل',
+      labelEn: 'Remittance Details',
+      items: items,
+      columns: 2,
+    );
   }
 
   void _drawFees() {
@@ -218,129 +297,123 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
         remittanceData.exchangeMargin == null &&
         remittanceData.totalCost == null) return;
 
-    final y = currentY;
-    _drawLabel(y, 'الرسوم', 'Fees');
-    var infoY = y + 16;
-
-    final fields = <_RPair>[
+    final items = <GeniusPdfLabeledValue>[
       if (remittanceData.transferFee != null)
-        _RPair('رسوم التحويل', 'Transfer Fee', '${_fmtNum(remittanceData.transferFee!)} ${data.currency}'),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Transfer Fee',
+          labelAr: 'رسوم التحويل',
+          value: '${_fmtNum(remittanceData.transferFee!)} ${data.currency}',
+        ),
       if (remittanceData.exchangeMargin != null)
-        _RPair('هامش الصرف', 'Exchange Margin', '${_fmtNum(remittanceData.exchangeMargin!)} ${data.currency}'),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Exchange Margin',
+          labelAr: 'هامش الصرف',
+          value: '${_fmtNum(remittanceData.exchangeMargin!)} ${data.currency}',
+        ),
       if (remittanceData.totalCost != null)
-        _RPair('التكلفة الإجمالية', 'Total Cost', '${_fmtNum(remittanceData.totalCost!)} ${data.currency}'),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Total Cost',
+          labelAr: 'التكلفة الإجمالية',
+          value: '${_fmtNum(remittanceData.totalCost!)} ${data.currency}',
+        ),
     ];
 
-    for (var i = 0; i < fields.length; i += 2) {
-      _drawFieldPair(infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
-      infoY += 14;
-    }
-
-    resetY(infoY + style.sectionSpacing);
+    addInfoSection(
+      labelAr: 'الرسوم',
+      labelEn: 'Fees',
+      items: items,
+      columns: 2,
+    );
   }
 
   void _drawCompliance() {
-    final y = currentY;
-    _drawLabel(y, 'الامتثال', 'Compliance');
-    var infoY = y + 16;
-
-    final fields = <_RPair>[
+    final items = <GeniusPdfLabeledValue>[
       if (remittanceData.purposeCode != null)
-        _RPair('رمز الغرض', 'Purpose Code', remittanceData.purposeCode!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Purpose Code',
+          labelAr: 'رمز الغرض',
+          value: remittanceData.purposeCode!,
+        ),
       if (remittanceData.purposeDescription != null)
-        _RPair('الغرض', 'Purpose',
-            isRTL ? (remittanceData.purposeDescriptionAr ?? remittanceData.purposeDescription!) : remittanceData.purposeDescription!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Purpose',
+          labelAr: 'الغرض',
+          value: isRTL
+              ? (remittanceData.purposeDescriptionAr ??
+                  remittanceData.purposeDescription!)
+              : remittanceData.purposeDescription!,
+        ),
       if (remittanceData.amlReference != null)
-        _RPair('مرجع مكافحة غسل الأموال', 'AML Reference', remittanceData.amlReference!),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'AML Reference',
+          labelAr: 'مرجع مكافحة غسل الأموال',
+          value: remittanceData.amlReference!,
+        ),
     ];
 
-    for (var i = 0; i < fields.length; i += 2) {
-      _drawFieldPair(infoY, fields[i], i + 1 < fields.length ? fields[i + 1] : null);
-      infoY += 14;
-    }
+    if (items.isEmpty) return;
 
-    resetY(infoY + style.sectionSpacing);
+    addInfoSection(
+      labelAr: 'الامتثال',
+      labelEn: 'Compliance',
+      items: items,
+      columns: 2,
+    );
   }
 
   void _drawTracking() {
-    final g = currentPage.graphics;
-    final y = currentY;
+    final items = <GeniusPdfLabeledValue>[
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Tracking No',
+        labelAr: 'رقم التتبع',
+        value: remittanceData.trackingNumber!,
+      ),
+      if (remittanceData.expectedDeliveryDate != null)
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Expected Delivery',
+          labelAr: 'التسليم المتوقع',
+          value: _fmtDate(remittanceData.expectedDeliveryDate!),
+        ),
+    ];
 
-    _drawLabel(y, 'التتبع', 'Tracking');
-
-    g.drawRectangle(
-      brush: PdfSolidBrush(style.amountHighlightColor.toPdfColor()),
-      pen: PdfPen(style.primaryColor.toPdfColor(), width: 0.5),
-      bounds: Rect.fromLTWH(0, y + 16, contentWidth, 28),
+    final highlightStyle = GeniusPdfInfoBoxStyle(
+      backgroundColor: style.amountHighlightColor,
+      borderStyle: GeniusPdfBorderStyle.all(
+        color: style.primaryColor,
+        width: style.borderWidth,
+      ),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 8, vertical: 6),
+      labelStyle: GeniusPdfTextStyle(
+        fontSize: style.bodyFontSize,
+        fontWeight: m.FontWeight.w600,
+        color: style.primaryColor,
+      ),
+      valueStyle: GeniusPdfTextStyle(
+        fontSize: style.bodyFontSize,
+        fontWeight: m.FontWeight.bold,
+        color: style.primaryColor,
+      ),
+      labelAlign: GeniusPdfTextAlign.start,
+      valueAlign: GeniusPdfTextAlign.end,
+      labelValueLayout: GeniusPdfLabelValueLayout.horizontal,
+      showDivider: false,
     );
 
-    final trackingText =
-        '${isRTL ? "رقم التتبع" : "Tracking No"}: ${remittanceData.trackingNumber}';
-    g.drawString(
-      trackingText,
-      boldBodyFont,
-      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
-      bounds: Rect.fromLTWH(8, y + 19, contentWidth / 2 - 8, 14),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
+    addInfoSection(
+      labelAr: 'التتبع',
+      labelEn: 'Tracking',
+      items: items,
+      columns: items.length > 1 ? 2 : 1,
+      styleOverride: highlightStyle,
     );
-
-    if (remittanceData.expectedDeliveryDate != null) {
-      final dateText =
-          '${isRTL ? "التسليم المتوقع" : "Expected Delivery"}: ${_fmtDate(remittanceData.expectedDeliveryDate!)}';
-      g.drawString(
-        dateText,
-        bodyFont,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(contentWidth / 2, y + 19, contentWidth / 2 - 8, 14),
-        format: PdfStringFormat(alignment: endAlign, textDirection: textDir),
-      );
-    }
-
-    resetY(y + 48 + style.sectionSpacing);
-  }
-
-  // ── Drawing helpers ──
-
-  void _drawLabel(double y, String labelAr, String labelEn) {
-    final g = currentPage.graphics;
-    g.drawRectangle(
-      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
-      bounds: Rect.fromLTWH(0, y, 3, 13),
-    );
-    g.drawString(
-      '$labelAr  |  $labelEn',
-      boldBodyFont,
-      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
-      bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-  }
-
-  void _drawFieldPair(double y, _RPair pair1, [_RPair? pair2]) {
-    final g = currentPage.graphics;
-    final halfWidth = contentWidth / 2;
-
-    final label1 = isRTL ? pair1.labelAr : pair1.labelEn;
-    g.drawString('$label1: ', boldBodyFont,
-      brush: PdfSolidBrush(style.accentColor.toPdfColor()),
-        bounds: Rect.fromLTWH(4, y, halfWidth * 0.4 - 4, 12),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-    g.drawString(pair1.value, bodyFont,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-
-    if (pair2 != null) {
-      final label2 = isRTL ? pair2.labelAr : pair2.labelEn;
-      g.drawString('$label2: ', boldBodyFont,
-          brush: PdfSolidBrush(style.accentColor.toPdfColor()),
-          bounds: Rect.fromLTWH(halfWidth + 4, y, halfWidth * 0.4 - 4, 12),
-          format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-      g.drawString(pair2.value, bodyFont,
-          brush: PdfBrushes.black,
-          bounds: Rect.fromLTWH(halfWidth + halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
-          format: PdfStringFormat(alignment: startAlign, textDirection: textDir));
-    }
   }
 
   String _fmtNum(double n) {
@@ -362,11 +435,4 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
         RemittanceSignatories.complianceOfficer(),
         VoucherSignatory.manager(),
       ];
-}
-
-class _RPair {
-  const _RPair(this.labelAr, this.labelEn, this.value);
-  final String labelAr;
-  final String labelEn;
-  final String value;
 }

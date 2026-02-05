@@ -5,13 +5,13 @@
 /// templates extend this class and override [buildVoucherContent].
 library;
 
-import 'dart:ui';
-
+import 'package:flutter/material.dart' as m;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../builders/pdf_document_builder.dart';
 import '../../../components/components.dart';
 import '../../../core/pdf_config.dart';
+import '../../../extensions/color_extensions.dart';
 import '../models/amount_to_words.dart';
 import '../models/voucher_enums.dart';
 import '../models/voucher_models.dart';
@@ -66,8 +66,24 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 
   @override
   void build() {
+    final now = DateTime.now();
+    addFooter(
+      userName: data.voucherNumber,
+      userLabel: isRTL ? 'الرقم التسلسلي: ' : 'S/N: ',
+      printTime:
+          'طباعة: ${_formatDate(now)}  |  Printed: ${_formatDate(now)}',
+      font: smallFont,
+    );
+
+    if (style.showBorder) {
+      setDefaultPageBorder(
+        style.borderColor.toPdfPen(width: style.borderWidth),
+      );
+    } else {
+      setDefaultPageBorder(null);
+    }
+
     newPage();
-    _drawPageBorder();
     drawVoucherHeader();
     drawVoucherTitle();
     drawVoucherInfo();
@@ -77,7 +93,6 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       drawNotesBlock();
     }
     drawSignatureBlock();
-    drawVoucherFooter();
   }
 
   /// Override in subclass to draw the voucher-specific body content.
@@ -85,159 +100,63 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 
   // ── Header ──
 
-  /// Draws the company header with logo, name, and basic info.
+  /// Draws the report-style header (company info + bilingual title).
   void drawVoucherHeader() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
-    // Header background
-    g.drawRectangle(
-      brush: PdfSolidBrush(PdfColor.fromCMYK(
-        _toCmyk(style.primaryColor)[0],
-        _toCmyk(style.primaryColor)[1],
-        _toCmyk(style.primaryColor)[2],
-        _toCmyk(style.primaryColor)[3],
-      )),
-      bounds: Rect.fromLTWH(0, y, pageWidth, style.headerHeight),
+    final header = GeniusPdfReportHeader(
+      title: data.serviceId.nameEn,
+      titleAr: data.serviceId.nameAr,
+      company: company,
+      config: config.copyWith(textDirection: m.TextDirection.ltr),
+      style: const GeniusPdfReportHeaderStyle.classic(),
+      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
     );
 
-    // Company name
-    final companyNameAr = company.nameAr ?? company.name;
-    final companyNameEn = company.name;
-
-    final headerFont = config.fontBuild(
-        fontSize: style.titleFontSize + 2,
-        fontBytes: config.boldFontBytes ?? config.baseFontBytes);
-    final headerSmall = config.fontBuild(
-        fontSize: style.smallFontSize,
-        fontBytes: config.baseFontBytes);
-
-    final brush = PdfSolidBrush(_pdfColor(style.headerTextColor));
-    final fmt = PdfStringFormat(
-      alignment: PdfTextAlignment.center,
-      lineAlignment: PdfVerticalAlignment.middle,
-      textDirection: PdfTextDirection.rightToLeft,
-    );
-    final fmtSmall = PdfStringFormat(
-      alignment: PdfTextAlignment.center,
-      textDirection: PdfTextDirection.rightToLeft,
-    );
-
-    // Arabic name centered
-    g.drawString(
-      companyNameAr,
-      headerFont,
-      brush: brush,
-      bounds: Rect.fromLTWH(0, y + 8, pageWidth, 22),
-      format: fmt,
-    );
-
-    // English name below Arabic
-    final fmtEn = PdfStringFormat(
-      alignment: PdfTextAlignment.center,
-      textDirection: PdfTextDirection.leftToRight,
-    );
-    g.drawString(
-      companyNameEn,
-      headerSmall,
-      brush: brush,
-      bounds: Rect.fromLTWH(0, y + 30, pageWidth, 14),
-      format: fmtEn,
-    );
-
-    // VAT number if available
-    if (company.vatNumber != null) {
-      g.drawString(
-        'الرقم الضريبي: ${company.vatNumber}  |  VAT No: ${company.vatNumber}',
-        smallFont,
-        brush: brush,
-        bounds: Rect.fromLTWH(0, y + 46, pageWidth, 12),
-        format: fmtSmall,
-      );
-    }
-
-    // CR number if available
-    if (company.crNumber != null) {
-      g.drawString(
-        'س.ت: ${company.crNumber}  |  CR: ${company.crNumber}',
-        smallFont,
-        brush: brush,
-        bounds: Rect.fromLTWH(0, y + 58, pageWidth, 12),
-        format: fmtSmall,
-      );
-    }
-
-    resetY(y + style.headerHeight + style.sectionSpacing);
+    addReportHeader(header, height: 100, spacing: 0);
+    addSpace(style.sectionSpacing);
   }
 
   // ── Voucher Title ──
 
-  /// Draws the bilingual voucher title with optional service ID badge.
+  /// Draws optional service ID badge and copy label below the header.
   void drawVoucherTitle() {
-    final g = currentPage.graphics;
-    final y = currentY;
+    final showBadge = style.showServiceIdBadge;
+    final showCopy = style.showCopyLabel;
 
-    final titleAr = data.serviceId.nameAr;
-    final titleEn = data.serviceId.nameEn;
-    final bilingualTitle = '$titleAr  /  $titleEn';
+    if (!showBadge && !showCopy) return;
 
-    // Title text
-    final titleFmt = PdfStringFormat(
-      alignment: PdfTextAlignment.center,
-      textDirection: PdfTextDirection.rightToLeft,
-    );
-    g.drawString(
-      bilingualTitle,
-      boldTitleFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
-      bounds: Rect.fromLTWH(0, y, pageWidth, 22),
-      format: titleFmt,
-    );
-
-    // Service ID badge
-    if (style.showServiceIdBadge) {
-      final badgeText = data.serviceId.code;
-      final badgeWidth = 55.0;
-      final badgeHeight = 16.0;
-      final badgeX = (pageWidth - badgeWidth) / 2;
-      final badgeY = y + 24;
-
-      g.drawRectangle(
-        brush: PdfSolidBrush(_pdfColor(style.badgeColor)),
-        bounds: Rect.fromLTWH(badgeX, badgeY, badgeWidth, badgeHeight),
-      );
-      g.drawString(
-        badgeText,
-        smallFont,
-        brush: PdfSolidBrush(_pdfColor(style.badgeTextColor)),
-        bounds: Rect.fromLTWH(badgeX, badgeY + 2, badgeWidth, badgeHeight),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
-      );
-
-      resetY(badgeY + badgeHeight + style.sectionSpacing);
-    } else {
-      resetY(y + 24 + style.sectionSpacing);
-    }
-
-    // Copy type label
-    if (style.showCopyLabel) {
+    if (showCopy) {
       final copyText = data.copyType.displayName(isRTL: isRTL);
-      g.drawString(
-        copyText,
-        smallFont,
-        brush: PdfSolidBrush(_pdfColor(style.accentColor)),
-        bounds: Rect.fromLTWH(0, currentY - style.sectionSpacing, pageWidth, 12),
-        format: PdfStringFormat(alignment: endAlign, textDirection: textDir),
-      );
+      final richText = GeniusPdfRichTextBuilder(
+        config: config,
+        defaultStyle: GeniusPdfTextStyle(
+          fontSize: style.smallFontSize,
+          color: style.accentColor,
+          alignment: GeniusPdfTextAlign.end,
+        ),
+        paragraphAlignment: GeniusPdfParagraphAlignment.end,
+      ).bold(copyText, color: style.accentColor).build();
+      addRichText(richText, spacing: 0);
     }
+
+    if (showBadge) {
+      final richText = GeniusPdfRichTextBuilder(
+        config: config,
+        paragraphAlignment: GeniusPdfParagraphAlignment.center,
+      ).badge(
+        data.serviceId.code,
+        backgroundColor: style.badgeColor,
+        color: style.badgeTextColor,
+      ).build();
+      addRichText(richText, spacing: showCopy ? 2 : 0);
+    }
+
+    addSpace(style.sectionSpacing);
   }
 
   // ── Voucher Info Row ──
 
   /// Draws the basic voucher info: number, date, reference.
   void drawVoucherInfo() {
-    final y = currentY;
-
     final infoPairs = <_InfoPair>[
       _InfoPair('رقم السند', 'Voucher No', data.voucherNumber),
       _InfoPair('التاريخ', 'Date', _formattedDate),
@@ -246,9 +165,74 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       if (data.fiscalPeriod != null)
         _InfoPair('الفترة المالية', 'Fiscal Period', data.fiscalPeriod!),
     ];
+    if (infoPairs.isEmpty) return;
 
-    _drawInfoRow(y, infoPairs);
-    resetY(y + 28 + style.sectionSpacing);
+    final columns = <GeniusPdfGridColumn>[
+      for (var i = 0; i < infoPairs.length; i++)
+        GeniusPdfGridColumn(
+          id: 'c$i',
+          title: infoPairs[i].labelEn,
+          titleAr: infoPairs[i].labelAr,
+          alignment: GeniusPdfTextAlign.center,
+          flexFactor: 1,
+        ),
+    ];
+
+    final row = GeniusPdfGridRow(
+      cells: {
+        for (var i = 0; i < infoPairs.length; i++) 'c$i': infoPairs[i].value,
+      },
+    );
+
+    final headerStyle = GeniusPdfCellStyle(
+      textStyle: GeniusPdfTextStyle(
+        fontSize: style.smallFontSize,
+        fontWeight: m.FontWeight.w600,
+        color: style.accentColor,
+        alignment: GeniusPdfTextAlign.center,
+      ),
+      backgroundColor: style.tableHeaderColor,
+      border: GeniusPdfBorderStyle.all(
+        color: style.borderColor,
+        width: style.borderWidth,
+      ),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 4, vertical: 3),
+    );
+
+    final cellStyle = GeniusPdfCellStyle(
+      textStyle: GeniusPdfTextStyle(
+        fontSize: style.bodyFontSize,
+        fontWeight: m.FontWeight.bold,
+        alignment: GeniusPdfTextAlign.center,
+      ),
+      border: GeniusPdfBorderStyle.all(
+        color: style.borderColor,
+        width: style.borderWidth,
+      ),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 4, vertical: 4),
+    );
+
+    final grid = GeniusPdfDataGrid(
+      config: config,
+      columns: columns,
+      rows: [row],
+      style: GeniusPdfGridStyle.classic().copyWith(
+        headerStyle: headerStyle,
+        cellStyle: cellStyle,
+        showHeader: true,
+        repeatHeaderOnPages: false,
+        alternateRowColors: false,
+        gridLineColor: style.borderColor,
+        gridLineWidth: style.borderWidth,
+      ),
+    );
+
+    final result = addGrid(grid, spacing: 0);
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: style.sectionSpacing);
+    } else {
+      addSpace(style.sectionSpacing);
+    }
   }
 
   // ── Party Info ──
@@ -260,31 +244,29 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
   }) {
     if (data.party == null) return;
 
-    final y = currentY;
     final party = data.party!;
-
-    _drawSectionLabel(y, labelAr, labelEn);
-    var infoY = y + 16;
-
-    final fields = <_InfoPair>[
-      _InfoPair('الاسم', 'Name', party.displayName(isRTL: isRTL)),
-      if (party.code != null) _InfoPair('الرمز', 'Code', party.code!),
-      if (party.vatNumber != null) _InfoPair('الرقم الضريبي', 'VAT No', party.vatNumber!),
-      if (party.idNumber != null) _InfoPair('رقم الهوية', 'ID No', party.idNumber!),
-      if (party.phone != null) _InfoPair('الهاتف', 'Phone', party.phone!),
+    final items = <GeniusPdfLabeledValue>[
+      _labeledValue('الاسم', 'Name', party.displayName(isRTL: isRTL)),
+      if (party.code != null) _labeledValue('الرمز', 'Code', party.code!),
+      if (party.vatNumber != null)
+        _labeledValue('الرقم الضريبي', 'VAT No', party.vatNumber!),
+      if (party.idNumber != null)
+        _labeledValue('رقم الهوية', 'ID No', party.idNumber!),
+      if (party.phone != null) _labeledValue('الهاتف', 'Phone', party.phone!),
       if (party.address != null || party.addressAr != null)
-        _InfoPair('العنوان', 'Address',
-            isRTL ? (party.addressAr ?? party.address!) : party.address!),
+        _labeledValue(
+          'العنوان',
+          'Address',
+          isRTL ? (party.addressAr ?? party.address!) : party.address!,
+        ),
     ];
 
-    for (var i = 0; i < fields.length; i += 2) {
-      final pair1 = fields[i];
-      final pair2 = (i + 1 < fields.length) ? fields[i + 1] : null;
-      _drawLabelValuePair(infoY, pair1, pair2);
-      infoY += 14;
-    }
-
-    resetY(infoY + style.sectionSpacing);
+    addInfoSection(
+      labelAr: labelAr,
+      labelEn: labelEn,
+      items: items,
+      columns: 2,
+    );
   }
 
   // ── Payment Details ──
@@ -293,59 +275,140 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
   void drawPaymentDetails() {
     if (data.paymentDetails == null) return;
 
-    final y = currentY;
     final pd = data.paymentDetails!;
-
-    _drawSectionLabel(y, 'تفاصيل الدفع', 'Payment Details');
-    var infoY = y + 16;
-
-    final fields = <_InfoPair>[
-      _InfoPair('طريقة الدفع', 'Payment Method', pd.method.displayName(isRTL: isRTL)),
+    final fields = <GeniusPdfLabeledValue>[
+      _labeledValue(
+        'طريقة الدفع',
+        'Payment Method',
+        pd.method.displayName(isRTL: isRTL),
+      ),
     ];
 
     switch (pd.method) {
       case VoucherPaymentMethod.bankTransfer:
-        if (pd.bankName != null) fields.add(_InfoPair('البنك', 'Bank', pd.bankName!));
-        if (pd.accountNumber != null) fields.add(_InfoPair('رقم الحساب', 'Account No', pd.accountNumber!));
-        if (pd.iban != null) fields.add(_InfoPair('الآيبان', 'IBAN', pd.iban!));
-        if (pd.transferReference != null)
-          fields.add(_InfoPair('مرجع التحويل', 'Transfer Ref', pd.transferReference!));
-        if (pd.transferDate != null)
-          fields.add(_InfoPair('تاريخ التحويل', 'Transfer Date', _formatDate(pd.transferDate!)));
+        if (pd.bankName != null) {
+          fields.add(_labeledValue('البنك', 'Bank', pd.bankName!));
+        }
+        if (pd.accountNumber != null) {
+          fields.add(_labeledValue('رقم الحساب', 'Account No', pd.accountNumber!));
+        }
+        if (pd.iban != null) {
+          fields.add(_labeledValue('الآيبان', 'IBAN', pd.iban!));
+        }
+        if (pd.transferReference != null) {
+          fields.add(_labeledValue('مرجع التحويل', 'Transfer Ref', pd.transferReference!));
+        }
+        if (pd.transferDate != null) {
+          fields.add(_labeledValue(
+            'تاريخ التحويل',
+            'Transfer Date',
+            _formatDate(pd.transferDate!),
+          ));
+        }
         break;
       case VoucherPaymentMethod.check:
-        if (pd.checkNumber != null) fields.add(_InfoPair('رقم الشيك', 'Check No', pd.checkNumber!));
-        if (pd.draweeBankName != null) fields.add(_InfoPair('البنك المسحوب عليه', 'Drawee Bank', pd.draweeBankName!));
-        if (pd.checkDate != null) fields.add(_InfoPair('تاريخ الشيك', 'Check Date', _formatDate(pd.checkDate!)));
-        if (pd.dueDate != null) fields.add(_InfoPair('تاريخ الاستحقاق', 'Due Date', _formatDate(pd.dueDate!)));
+        if (pd.checkNumber != null) {
+          fields.add(_labeledValue('رقم الشيك', 'Check No', pd.checkNumber!));
+        }
+        if (pd.draweeBankName != null) {
+          fields.add(_labeledValue(
+            'البنك المسحوب عليه',
+            'Drawee Bank',
+            pd.draweeBankName!,
+          ));
+        }
+        if (pd.checkDate != null) {
+          fields.add(_labeledValue(
+            'تاريخ الشيك',
+            'Check Date',
+            _formatDate(pd.checkDate!),
+          ));
+        }
+        if (pd.dueDate != null) {
+          fields.add(_labeledValue(
+            'تاريخ الاستحقاق',
+            'Due Date',
+            _formatDate(pd.dueDate!),
+          ));
+        }
         break;
       case VoucherPaymentMethod.electronic:
-        if (pd.gatewayName != null) fields.add(_InfoPair('بوابة الدفع', 'Gateway', pd.gatewayName!));
-        if (pd.transactionId != null) fields.add(_InfoPair('رقم العملية', 'Transaction ID', pd.transactionId!));
-        if (pd.cardType != null) fields.add(_InfoPair('نوع البطاقة', 'Card Type', pd.cardType!));
-        if (pd.cardLastFour != null) fields.add(_InfoPair('آخر 4 أرقام', 'Last 4 Digits', '****${pd.cardLastFour}'));
+        if (pd.gatewayName != null) {
+          fields.add(_labeledValue('بوابة الدفع', 'Gateway', pd.gatewayName!));
+        }
+        if (pd.transactionId != null) {
+          fields.add(_labeledValue(
+            'رقم العملية',
+            'Transaction ID',
+            pd.transactionId!,
+          ));
+        }
+        if (pd.cardType != null) {
+          fields.add(_labeledValue('نوع البطاقة', 'Card Type', pd.cardType!));
+        }
+        if (pd.cardLastFour != null) {
+          fields.add(_labeledValue(
+            'آخر 4 أرقام',
+            'Last 4 Digits',
+            '****${pd.cardLastFour}',
+          ));
+        }
         break;
       case VoucherPaymentMethod.currencyExchange:
-        if (pd.sourceCurrency != null) fields.add(_InfoPair('عملة المصدر', 'Source Currency', pd.sourceCurrency!));
-        if (pd.targetCurrency != null) fields.add(_InfoPair('العملة المستهدفة', 'Target Currency', pd.targetCurrency!));
-        if (pd.exchangeRate != null) fields.add(_InfoPair('سعر الصرف', 'Exchange Rate', pd.exchangeRate!.toStringAsFixed(4)));
-        if (pd.sourceAmount != null) fields.add(_InfoPair('المبلغ الأصلي', 'Source Amount', _formatNumber(pd.sourceAmount!)));
-        if (pd.targetAmount != null) fields.add(_InfoPair('المبلغ المحوّل', 'Target Amount', _formatNumber(pd.targetAmount!)));
-        if (pd.exchangeFee != null) fields.add(_InfoPair('رسوم التحويل', 'Exchange Fee', _formatNumber(pd.exchangeFee!)));
+        if (pd.sourceCurrency != null) {
+          fields.add(_labeledValue(
+            'عملة المصدر',
+            'Source Currency',
+            pd.sourceCurrency!,
+          ));
+        }
+        if (pd.targetCurrency != null) {
+          fields.add(_labeledValue(
+            'العملة المستهدفة',
+            'Target Currency',
+            pd.targetCurrency!,
+          ));
+        }
+        if (pd.exchangeRate != null) {
+          fields.add(_labeledValue(
+            'سعر الصرف',
+            'Exchange Rate',
+            pd.exchangeRate!.toStringAsFixed(4),
+          ));
+        }
+        if (pd.sourceAmount != null) {
+          fields.add(_labeledValue(
+            'المبلغ الأصلي',
+            'Source Amount',
+            _formatNumber(pd.sourceAmount!),
+          ));
+        }
+        if (pd.targetAmount != null) {
+          fields.add(_labeledValue(
+            'المبلغ المحوّل',
+            'Target Amount',
+            _formatNumber(pd.targetAmount!),
+          ));
+        }
+        if (pd.exchangeFee != null) {
+          fields.add(_labeledValue(
+            'رسوم التحويل',
+            'Exchange Fee',
+            _formatNumber(pd.exchangeFee!),
+          ));
+        }
         break;
       case VoucherPaymentMethod.cash:
       case VoucherPaymentMethod.installment:
         break;
     }
 
-    for (var i = 0; i < fields.length; i += 2) {
-      final pair1 = fields[i];
-      final pair2 = (i + 1 < fields.length) ? fields[i + 1] : null;
-      _drawLabelValuePair(infoY, pair1, pair2);
-      infoY += 14;
-    }
-
-    resetY(infoY + style.sectionSpacing);
+    addInfoSection(
+      labelAr: 'تفاصيل الدفع',
+      labelEn: 'Payment Details',
+      items: fields,
+      columns: 2,
+    );
   }
 
   // ── Account Entries Table ──
@@ -354,8 +417,9 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
   void drawAccountEntriesTable() {
     if (data.accountEntries.isEmpty) return;
 
-    final y = currentY;
-    _drawSectionLabel(y, 'القيود المحاسبية', 'Account Entries');
+    addSectionHeading('القيود المحاسبية', 'Account Entries');
+    addSpace(4);
+    final hasCostCenter = data.accountEntries.any((e) => e.costCenter != null);
 
     final grid = GeniusPdfDataGrid(
       config: config,
@@ -367,7 +431,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
         const GeniusPdfGridColumn(
           id: 'name', title: 'Account Name', titleAr: 'اسم الحساب', flexFactor: 3,
         ),
-        if (data.accountEntries.any((e) => e.costCenter != null))
+        if (hasCostCenter)
           const GeniusPdfGridColumn(
             id: 'cc', title: 'Cost Center', titleAr: 'مركز تكلفة', flexFactor: 1,
           ),
@@ -383,7 +447,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
           GeniusPdfGridRow(cells: {
             'code': entry.accountCode,
             'name': isRTL ? (entry.accountNameAr ?? entry.accountName) : entry.accountName,
-            if (data.accountEntries.any((e) => e.costCenter != null))
+            if (hasCostCenter)
               'cc': isRTL ? (entry.costCenterAr ?? entry.costCenter ?? '') : (entry.costCenter ?? ''),
             'debit': entry.debitAmount > 0 ? entry.debitAmount : '',
             'credit': entry.creditAmount > 0 ? entry.creditAmount : '',
@@ -392,131 +456,65 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
         GeniusPdfGridRow.total({
           'code': '',
           'name': isRTL ? 'الإجمالي' : 'Total',
-          if (data.accountEntries.any((e) => e.costCenter != null)) 'cc': '',
+          if (hasCostCenter) 'cc': '',
           'debit': data.accountEntries.fold<double>(0, (s, e) => s + e.debitAmount),
           'credit': data.accountEntries.fold<double>(0, (s, e) => s + e.creditAmount),
         }),
       ],
-      style: GeniusPdfGridStyle(
-        headerStyle: GeniusPdfCellStyle(
-          textStyle: GeniusPdfTextStyle(
-            fontSize: style.tableFontSize,
-            fontWeight: FontWeight.bold,
-            color: style.tableHeaderTextColor,
-          ),
-          backgroundColor: style.tableHeaderColor,
-          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
-          padding: GeniusPdfCellPadding.all(style.cellPadding),
-        ),
-        cellStyle: GeniusPdfCellStyle(
-          textStyle: GeniusPdfTextStyle(fontSize: style.tableFontSize),
-          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
-          padding: GeniusPdfCellPadding.all(style.cellPadding),
-        ),
-        alternateRowStyle: GeniusPdfCellStyle(
-          textStyle: GeniusPdfTextStyle(fontSize: style.tableFontSize),
-          backgroundColor: style.tableAltRowColor,
-          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
-          padding: GeniusPdfCellPadding.all(style.cellPadding),
-        ),
-        borderStyle: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
-      ),
+      style: GeniusPdfGridStyle.classic(),
     );
 
-    resetY(y + 16);
-    grid.drawAt(page: currentPage, x: 0, y: currentY, width: contentWidth);
-    final gridHeight = (data.accountEntries.length + 2) * 20.0;
-    resetY(currentY + gridHeight + style.sectionSpacing);
+    final result = addGrid(grid, spacing: 0);
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: style.sectionSpacing);
+    } else {
+      addSpace(style.sectionSpacing);
+    }
   }
 
   // ── Amount Block ──
 
   /// Draws the total amount highlight block.
   void drawAmountBlock() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
-    final boxHeight = 28.0;
-    g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.amountHighlightColor)),
-      pen: PdfPen(_pdfColor(style.primaryColor), width: style.borderWidth),
-      bounds: Rect.fromLTWH(0, y, contentWidth, boxHeight),
-    );
-
     final amountLabel = isRTL ? 'المبلغ' : 'Amount';
     final amountStr = '$_formattedAmount ${data.currency}';
-
-    g.drawString(
-      '$amountLabel:  $amountStr',
-      boldTitleFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
-      bounds: Rect.fromLTWH(8, y + 4, contentWidth - 16, boxHeight - 8),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.center,
-        textDirection: textDir,
-      ),
+    final box = GeniusPdfInfoBox(
+      config: config,
+      items: [
+        GeniusPdfLabeledValue(
+          config: config,
+          label: amountLabel,
+          labelAr: 'المبلغ',
+          value: amountStr,
+        ),
+      ],
+      style: _highlightBoxStyle(),
+      columns: 1,
     );
 
-    resetY(y + boxHeight + style.sectionSpacing);
+    addInfoBox(box, spacing: 0);
+    addSpace(style.sectionSpacing);
   }
 
   // ── Amount in Words ──
 
   /// Draws the amount in words in both Arabic and English.
   void drawAmountInWords() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
     final wordsAr = AmountToWords.toArabic(data.amount, currency: data.currency);
     final wordsEn = AmountToWords.toEnglish(data.amount, currency: data.currency);
-
-    _drawSectionLabel(y, 'المبلغ بالحروف', 'Amount in Words');
-
-    final fmtAr = PdfStringFormat(
-      alignment: PdfTextAlignment.right,
-      textDirection: PdfTextDirection.rightToLeft,
-    );
-    g.drawString(
-      wordsAr,
-      boldBodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(4, y + 16, contentWidth - 8, 14),
-      format: fmtAr,
-    );
-
-    final fmtEn = PdfStringFormat(
-      alignment: PdfTextAlignment.left,
-      textDirection: PdfTextDirection.leftToRight,
-    );
-    g.drawString(
-      wordsEn,
-      bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(4, y + 32, contentWidth - 8, 14),
-      format: fmtEn,
-    );
-
-    resetY(y + 48 + style.sectionSpacing);
+    addSectionHeading('المبلغ بالحروف', 'Amount in Words');
+    addLine(wordsAr, font: boldBodyFont, topMargin: 2);
+    addLine(wordsEn, font: bodyFont, topMargin: 2);
+    addSpace(style.sectionSpacing);
   }
 
   // ── Notes ──
 
   void drawNotesBlock() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
-    _drawSectionLabel(y, 'ملاحظات', 'Notes');
-
     final noteText = isRTL ? (data.notesAr ?? data.notes ?? '') : (data.notes ?? '');
-    g.drawString(
-      noteText,
-      bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(4, y + 16, contentWidth - 8, 30),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-
-    resetY(y + 48 + style.sectionSpacing);
+    addSectionHeading('ملاحظات', 'Notes');
+    addLine(noteText, font: bodyFont, topMargin: 2);
+    addSpace(style.sectionSpacing);
   }
 
   // ── Signatures ──
@@ -529,226 +527,215 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 
     if (signatories.isEmpty) return;
 
-    final g = currentPage.graphics;
-    var y = currentY;
-
-    // Ensure enough space
-    final neededHeight = style.signatureBlockHeight + 10;
-    if (y + neededHeight > pageHeight - 40) {
+    final neededHeight = style.signatureBlockHeight + style.sectionSpacing;
+    if (!canFit(neededHeight)) {
       newPage();
-      _drawPageBorder();
-      y = currentY;
     }
 
-    final count = signatories.length;
-    final colWidth = contentWidth / count;
-
-    for (var i = 0; i < count; i++) {
-      final sig = signatories[i];
-      final x = i * colWidth;
-
-      // Role label
-      final roleText = '${sig.roleAr ?? sig.role}\n${sig.role}';
-      g.drawString(
-        roleText,
-        smallFont,
-        brush: PdfSolidBrush(_pdfColor(style.accentColor)),
-        bounds: Rect.fromLTWH(x + 4, y, colWidth - 8, 22),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: PdfTextDirection.rightToLeft,
+    final columns = <GeniusPdfGridColumn>[
+      for (var i = 0; i < signatories.length; i++)
+        GeniusPdfGridColumn(
+          id: 's$i',
+          title: '',
+          alignment: GeniusPdfTextAlign.center,
+          flexFactor: 1,
         ),
-      );
+    ];
 
-      // Name (if provided)
-      if (sig.name != null) {
-        g.drawString(
-          sig.name!,
-          bodyFont,
-          brush: PdfBrushes.black,
-          bounds: Rect.fromLTWH(x + 4, y + 24, colWidth - 8, 12),
-          format: PdfStringFormat(alignment: PdfTextAlignment.center),
-        );
-      }
-
-      // Signature line
-      if (sig.showSignatureLine) {
-        final lineY = y + style.signatureBlockHeight - 15;
-        g.drawLine(
-          PdfPen(_pdfColor(style.borderColor), width: 0.5),
-          Offset(x + 12, lineY),
-          Offset(x + colWidth - 12, lineY),
-        );
-      }
-
-      // Vertical separator
-      if (i < count - 1) {
-        g.drawLine(
-          PdfPen(_pdfColor(style.borderColor), width: 0.3),
-          Offset(x + colWidth, y),
-          Offset(x + colWidth, y + style.signatureBlockHeight),
-        );
-      }
-    }
-
-    resetY(y + style.signatureBlockHeight + style.sectionSpacing);
-  }
-
-  // ── Footer ──
-
-  void drawVoucherFooter() {
-    final g = currentPage.graphics;
-    final footerY = pageHeight - 30;
-
-    // Separator line
-    g.drawLine(
-      PdfPen(_pdfColor(style.borderColor), width: 0.5),
-      Offset(0, footerY),
-      Offset(pageWidth, footerY),
+    final roleStyle = GeniusPdfCellStyle(
+      textStyle: GeniusPdfTextStyle(
+        fontSize: style.smallFontSize,
+        fontWeight: m.FontWeight.w600,
+        color: style.accentColor,
+        alignment: GeniusPdfTextAlign.center,
+      ),
+      border: const GeniusPdfBorderStyle.none(),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 4, vertical: 2),
     );
 
-    final now = DateTime.now();
-    final printDate = 'طبع: ${_formatDate(now)}  |  Printed: ${_formatDate(now)}';
-    g.drawString(
-      printDate,
-      smallFont,
-      brush: PdfSolidBrush(_pdfColor(style.borderColor)),
-      bounds: Rect.fromLTWH(4, footerY + 4, pageWidth / 2 - 8, 12),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.left,
-        textDirection: PdfTextDirection.leftToRight,
+    final nameStyle = GeniusPdfCellStyle(
+      textStyle: GeniusPdfTextStyle(
+        fontSize: style.bodyFontSize,
+        alignment: GeniusPdfTextAlign.center,
+      ),
+      border: const GeniusPdfBorderStyle.none(),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 4, vertical: 2),
+    );
+
+    final lineStyle = GeniusPdfCellStyle(
+      textStyle: const GeniusPdfTextStyle(fontSize: 1, color: m.Color(0x00000000)),
+      border: GeniusPdfBorderStyle.bottom(
+        color: style.borderColor,
+        width: 0.5,
+      ),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 12, vertical: 6),
+    );
+
+    final hasNames = signatories.any(
+      (s) => s.name != null && s.name!.trim().isNotEmpty,
+    );
+
+    final rows = <GeniusPdfGridRow>[
+      GeniusPdfGridRow(
+        cells: {
+          for (var i = 0; i < signatories.length; i++)
+            's$i': _signatureRole(signatories[i]),
+        },
+        style: roleStyle,
+      ),
+      if (hasNames)
+        GeniusPdfGridRow(
+          cells: {
+            for (var i = 0; i < signatories.length; i++)
+              's$i': signatories[i].name ?? '',
+          },
+          style: nameStyle,
+        ),
+      GeniusPdfGridRow(
+        cells: {
+          for (var i = 0; i < signatories.length; i++) 's$i': '',
+        },
+        style: lineStyle,
+        height: 18,
+      ),
+    ];
+
+    final grid = GeniusPdfDataGrid(
+      config: config,
+      columns: columns,
+      rows: rows,
+      style: const GeniusPdfGridStyle().copyWith(
+        showHeader: false,
+        borderStyle: const GeniusPdfBorderStyle.none(),
+        outerBorderStyle: const GeniusPdfBorderStyle.none(),
+        showGridLines: false,
+        showVerticalLines: false,
+        showHorizontalLines: false,
+        alternateRowColors: false,
       ),
     );
 
-    final serial = 'S/N: ${data.voucherNumber}';
-    g.drawString(
-      serial,
-      smallFont,
-      brush: PdfSolidBrush(_pdfColor(style.borderColor)),
-      bounds: Rect.fromLTWH(pageWidth / 2, footerY + 4, pageWidth / 2 - 4, 12),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+    final result = addGrid(grid, spacing: 0);
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: style.sectionSpacing);
+    } else {
+      addSpace(style.sectionSpacing);
+    }
+  }
+
+
+  // Shared Layout Helpers
+
+  void addSectionHeading(String labelAr, String labelEn) {
+    final title = isRTL ? labelAr : labelEn;
+    addLine(
+      title,
+      font: boldBodyFont,
+      brush: style.primaryColor.toPdfBrush(),
+      topMargin: 0,
     );
   }
 
-  // ── Shared Drawing Helpers ──
+  void addInfoSection({
+    required String labelAr,
+    required String labelEn,
+    required List<GeniusPdfLabeledValue> items,
+    int columns = 2,
+    GeniusPdfInfoBoxStyle? styleOverride,
+  }) {
+    if (items.isEmpty) return;
 
-  /// Draws a page border if enabled.
-  void _drawPageBorder() {
-    if (!style.showBorder) return;
-    currentPage.graphics.drawRectangle(
-      pen: PdfPen(_pdfColor(style.borderColor), width: style.borderWidth),
-      bounds: Rect.fromLTWH(0, 0, pageWidth, pageHeight),
+    final box = GeniusPdfInfoBox(
+      config: config,
+      title: labelEn,
+      titleAr: labelAr,
+      items: items,
+      columns: columns,
+      style: styleOverride ?? _sectionBoxStyle(),
     );
+
+    addInfoBox(box, spacing: 0);
+    addSpace(style.sectionSpacing);
   }
 
-  /// Draws a section label with bilingual text.
-  void _drawSectionLabel(double y, String labelAr, String labelEn) {
-    final g = currentPage.graphics;
-
-    // Accent line
-    g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
-      bounds: Rect.fromLTWH(0, y, 3, 13),
-    );
-
-    g.drawString(
-      '$labelAr  |  $labelEn',
-      boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.primaryColor)),
-      bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
-      format: PdfStringFormat(
-        alignment: startAlign,
-        textDirection: textDir,
+  GeniusPdfInfoBoxStyle _sectionBoxStyle() {
+    return const GeniusPdfInfoBoxStyle.headerContent().copyWith(
+      borderStyle: GeniusPdfBorderStyle.all(
+        color: style.borderColor,
+        width: style.borderWidth,
       ),
+      headerBackgroundColor: style.tableHeaderColor,
+      headerPadding:
+          const GeniusPdfCellPadding.symmetric(horizontal: 6, vertical: 4),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 6, vertical: 4),
+      dividerColor: style.borderColor,
+      dividerWidth: style.borderWidth,
+      titleStyle: GeniusPdfTextStyle.header(
+        fontSize: style.bodyFontSize,
+        color: style.primaryColor,
+        alignment: GeniusPdfTextAlign.start,
+      ),
+      contentStyle: GeniusPdfTextStyle.body(fontSize: style.bodyFontSize),
+      labelStyle: GeniusPdfTextStyle(
+        fontSize: style.bodyFontSize,
+        fontWeight: m.FontWeight.w600,
+        color: style.accentColor,
+      ),
+      valueStyle: GeniusPdfTextStyle(fontSize: style.bodyFontSize),
+      labelAlign: GeniusPdfTextAlign.start,
+      valueAlign: GeniusPdfTextAlign.end,
+      labelValueLayout: GeniusPdfLabelValueLayout.horizontal,
     );
   }
 
-  /// Draws a row of info pairs (label: value) evenly distributed.
-  void _drawInfoRow(double y, List<_InfoPair> pairs) {
-    final g = currentPage.graphics;
-    final colWidth = contentWidth / pairs.length;
-
-    // Background
-    g.drawRectangle(
-      brush: PdfSolidBrush(_pdfColor(style.tableHeaderColor)),
-      pen: PdfPen(_pdfColor(style.borderColor), width: 0.5),
-      bounds: Rect.fromLTWH(0, y, contentWidth, 26),
+  GeniusPdfInfoBoxStyle _highlightBoxStyle() {
+    return GeniusPdfInfoBoxStyle(
+      backgroundColor: style.amountHighlightColor,
+      borderStyle: GeniusPdfBorderStyle.all(
+        color: style.primaryColor,
+        width: style.borderWidth,
+      ),
+      padding: const GeniusPdfCellPadding.symmetric(horizontal: 8, vertical: 6),
+      titleStyle: GeniusPdfTextStyle.header(
+        fontSize: style.bodyFontSize,
+        color: style.primaryColor,
+        alignment: GeniusPdfTextAlign.start,
+      ),
+      contentStyle: GeniusPdfTextStyle.body(fontSize: style.bodyFontSize),
+      labelStyle: GeniusPdfTextStyle(
+        fontSize: style.bodyFontSize,
+        fontWeight: m.FontWeight.w600,
+        color: style.primaryColor,
+      ),
+      valueStyle: GeniusPdfTextStyle(
+        fontSize: style.bodyFontSize,
+        fontWeight: m.FontWeight.bold,
+        color: style.primaryColor,
+      ),
+      labelAlign: GeniusPdfTextAlign.start,
+      valueAlign: GeniusPdfTextAlign.end,
+      labelValueLayout: GeniusPdfLabelValueLayout.horizontal,
+      showDivider: false,
     );
-
-    for (var i = 0; i < pairs.length; i++) {
-      final pair = pairs[i];
-      final x = i * colWidth;
-
-      // Label
-      final label = isRTL ? pair.labelAr : pair.labelEn;
-      g.drawString(
-        label,
-        smallFont,
-        brush: PdfSolidBrush(_pdfColor(style.accentColor)),
-        bounds: Rect.fromLTWH(x + 4, y + 2, colWidth - 8, 10),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
-      );
-
-      // Value
-      g.drawString(
-        pair.value,
-        boldBodyFont,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(x + 4, y + 13, colWidth - 8, 12),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
-      );
-
-      // Separator
-      if (i < pairs.length - 1) {
-        g.drawLine(
-          PdfPen(_pdfColor(style.borderColor), width: 0.3),
-          Offset(x + colWidth, y + 3),
-          Offset(x + colWidth, y + 23),
-        );
-      }
-    }
   }
 
-  /// Draws a label-value pair row (1 or 2 pairs per row).
-  void _drawLabelValuePair(double y, _InfoPair pair1, [_InfoPair? pair2]) {
-    final g = currentPage.graphics;
-    final halfWidth = contentWidth / 2;
-
-    // First pair
-    final label1 = isRTL ? pair1.labelAr : pair1.labelEn;
-    g.drawString(
-      '$label1: ',
-      boldBodyFont,
-      brush: PdfSolidBrush(_pdfColor(style.accentColor)),
-      bounds: Rect.fromLTWH(4, y, halfWidth * 0.4 - 4, 12),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
+  GeniusPdfLabeledValue _labeledValue(
+    String labelAr,
+    String labelEn,
+    String value,
+  ) {
+    return GeniusPdfLabeledValue(
+      config: config,
+      label: labelEn,
+      labelAr: labelAr,
+      value: value,
     );
-    g.drawString(
-      pair1.value,
-      bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
+  }
 
-    // Second pair
-    if (pair2 != null) {
-      final label2 = isRTL ? pair2.labelAr : pair2.labelEn;
-      g.drawString(
-        '$label2: ',
-        boldBodyFont,
-        brush: PdfSolidBrush(_pdfColor(style.accentColor)),
-        bounds: Rect.fromLTWH(halfWidth + 4, y, halfWidth * 0.4 - 4, 12),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-      );
-      g.drawString(
-        pair2.value,
-        bodyFont,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(halfWidth + halfWidth * 0.4, y, halfWidth * 0.6 - 4, 12),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-      );
-    }
+  String _signatureRole(VoucherSignatory sig) {
+    final roleAr = sig.roleAr ?? sig.role;
+    if (roleAr == sig.role) return sig.role;
+    return '${roleAr}\n${sig.role}';
   }
 
   /// Draws a data grid for line items.
@@ -758,43 +745,21 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
     String labelAr = 'التفاصيل',
     String labelEn = 'Details',
   }) {
-    final y = currentY;
-    _drawSectionLabel(y, labelAr, labelEn);
-    resetY(y + 16);
-
+    addSectionHeading(labelAr, labelEn);
+    addSpace(4);
     final grid = GeniusPdfDataGrid(
       config: config,
       columns: columns,
       rows: rows,
-      style: GeniusPdfGridStyle(
-        headerStyle: GeniusPdfCellStyle(
-          textStyle: GeniusPdfTextStyle(
-            fontSize: style.tableFontSize,
-            fontWeight: FontWeight.bold,
-            color: style.tableHeaderTextColor,
-          ),
-          backgroundColor: style.tableHeaderColor,
-          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
-          padding: GeniusPdfCellPadding.all(style.cellPadding),
-        ),
-        cellStyle: GeniusPdfCellStyle(
-          textStyle: GeniusPdfTextStyle(fontSize: style.tableFontSize),
-          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
-          padding: GeniusPdfCellPadding.all(style.cellPadding),
-        ),
-        alternateRowStyle: GeniusPdfCellStyle(
-          textStyle: GeniusPdfTextStyle(fontSize: style.tableFontSize),
-          backgroundColor: style.tableAltRowColor,
-          border: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
-          padding: GeniusPdfCellPadding.all(style.cellPadding),
-        ),
-        borderStyle: GeniusPdfBorderStyle.all(color: style.borderColor, width: 0.5),
-      ),
+      style: GeniusPdfGridStyle.classic(),
     );
 
-    grid.drawAt(page: currentPage, x: 0, y: currentY, width: contentWidth);
-    final gridHeight = (rows.length + 1) * 20.0;
-    resetY(currentY + gridHeight + style.sectionSpacing);
+    final result = addGrid(grid, spacing: 0);
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: style.sectionSpacing);
+    } else {
+      addSpace(style.sectionSpacing);
+    }
   }
 
   /// Default signatories when none are provided.
@@ -816,23 +781,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
 
-  PdfColor _pdfColor(Color c) =>
-      PdfColor(c.red, c.green, c.blue, c.alpha);
-
-  List<double> _toCmyk(Color c) {
-    final r = c.red / 255;
-    final g = c.green / 255;
-    final b = c.blue / 255;
-    final k = 1.0 - [r, g, b].reduce((a, b) => a > b ? a : b);
-    if (k >= 1.0) return [0, 0, 0, 100];
-    return [
-      ((1 - r - k) / (1 - k)) * 100,
-      ((1 - g - k) / (1 - k)) * 100,
-      ((1 - b - k) / (1 - k)) * 100,
-      k * 100,
-    ];
   }
-}
 
 /// Internal helper for info pairs.
 class _InfoPair {

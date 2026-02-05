@@ -8,17 +8,7 @@
 /// - **00304** Tax Settlement — audit/correction differences
 library;
 
-import 'dart:ui';
-
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-
-import '../../../components/components.dart';
-import '../../../core/pdf_config.dart';
-import '../../../extensions/color_extensions.dart';
-import '../models/voucher_enums.dart';
-import '../models/voucher_models.dart';
-import '../models/voucher_style.dart';
-import 'voucher_base_template.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
 /// Generates a tax voucher PDF page.
 ///
@@ -55,6 +45,9 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
+    // Account allocation
+    drawAccountEntriesTable();
+
     // Tax period info
     _drawTaxPeriod();
 
@@ -73,83 +66,100 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
     drawPaymentDetails();
 
     // Account allocation
-    if (data.accountEntries.isNotEmpty) {
-      drawAccountEntriesTable();
-    }
   }
 
   void _drawTaxPeriod() {
-    final y = currentY;
-    final infoPairs = <_TaxInfoPair>[
-      _TaxInfoPair('نوع الضريبة', 'Tax Type', taxData.taxType.displayName(isRTL: isRTL)),
+    final items = <GeniusPdfLabeledValue>[
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Tax Type',
+        labelAr: 'نوع الضريبة',
+        value: taxData.taxType.displayName(isRTL: isRTL),
+      ),
       if (taxData.taxPeriodStart != null)
-        _TaxInfoPair('من تاريخ', 'From', _formatDate(taxData.taxPeriodStart!)),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'From',
+          labelAr: 'من تاريخ',
+          value: _formatDate(taxData.taxPeriodStart!),
+        ),
       if (taxData.taxPeriodEnd != null)
-        _TaxInfoPair('إلى تاريخ', 'To', _formatDate(taxData.taxPeriodEnd!)),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'To',
+          labelAr: 'إلى تاريخ',
+          value: _formatDate(taxData.taxPeriodEnd!),
+        ),
       if (taxData.filingDeadline != null)
-        _TaxInfoPair('الموعد النهائي', 'Deadline', _formatDate(taxData.filingDeadline!)),
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Deadline',
+          labelAr: 'الموعد النهائي',
+          value: _formatDate(taxData.filingDeadline!),
+        ),
     ];
 
-    _drawInfoRowLocal(y, infoPairs);
-    resetY(y + 28 + style.sectionSpacing);
+    addInfoSection(
+      labelAr: 'فترة الضريبة',
+      labelEn: 'Tax Period',
+      items: items,
+      columns: 2,
+    );
   }
 
   void _drawTaxAuthority() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
-    _drawLabel(y, 'الجهة الضريبية', 'Tax Authority');
-
     final authorityName = isRTL
         ? (taxData.taxAuthorityNameAr ?? taxData.taxAuthorityName ?? '')
         : (taxData.taxAuthorityName ?? '');
 
-    g.drawString(
-      authorityName,
-      bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(8, y + 16, contentWidth * 0.6, 12),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
+    final items = <GeniusPdfLabeledValue>[
+      GeniusPdfLabeledValue(
+        config: config,
+        label: 'Authority',
+        labelAr: 'الجهة الضريبية',
+        value: authorityName,
+      ),
+      if (taxData.taxAuthorityRef != null)
+        GeniusPdfLabeledValue(
+          config: config,
+          label: 'Ref No',
+          labelAr: 'الرقم المرجعي',
+          value: taxData.taxAuthorityRef!,
+        ),
+    ];
+
+    addInfoSection(
+      labelAr: 'الجهة الضريبية',
+      labelEn: 'Tax Authority',
+      items: items,
+      columns: 2,
     );
-
-    if (taxData.taxAuthorityRef != null) {
-      final refLabel = isRTL ? 'الرقم المرجعي' : 'Ref No';
-      g.drawString(
-        '$refLabel: ${taxData.taxAuthorityRef}',
-        bodyFont,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(contentWidth * 0.6, y + 16, contentWidth * 0.4 - 4, 12),
-        format: PdfStringFormat(alignment: endAlign),
-      );
-    }
-
-    resetY(y + 30 + style.sectionSpacing);
   }
 
   void _drawTaxCalculation() {
-    final y = currentY;
-    _drawLabel(y, 'احتساب الضريبة', 'Tax Calculation');
+    addSectionHeading('احتساب الضريبة', 'Tax Calculation');
+    addSpace(4);
 
     switch (taxData.taxType) {
       case VoucherTaxType.incomeTax:
-        _drawIncomeTaxCalc(y + 18);
+        _drawIncomeTaxCalc();
         break;
       case VoucherTaxType.vat:
-        _drawVatCalc(y + 18);
+        _drawVatCalc();
         break;
       case VoucherTaxType.governmentFee:
-        _drawFeeCalc(y + 18);
+        _drawFeeCalc();
         break;
       case VoucherTaxType.customsDuty:
-        _drawCustomsCalc(y + 18);
+        _drawCustomsCalc();
         break;
       case VoucherTaxType.taxSettlement:
-        _drawSettlementCalc(y + 18);
+        _drawSettlementCalc();
         break;
     }
   }
 
-  void _drawIncomeTaxCalc(double startY) {
+  void _drawIncomeTaxCalc() {
     final rows = <_CalcRow>[
       if (taxData.taxableAmount != null)
         _CalcRow('الدخل الخاضع للضريبة', 'Taxable Income', taxData.taxableAmount!),
@@ -162,10 +172,10 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
       if (taxData.balanceDue != null)
         _CalcRow('الرصيد المستحق', 'Balance Due', taxData.balanceDue!, isTotal: true),
     ];
-    _drawCalcTable(startY, rows);
+    _drawCalcTable(rows);
   }
 
-  void _drawVatCalc(double startY) {
+  void _drawVatCalc() {
     final rows = <_CalcRow>[
       if (taxData.outputVat != null)
         _CalcRow('ضريبة المخرجات', 'Output VAT', taxData.outputVat!),
@@ -176,37 +186,46 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
       if (taxData.netVat != null)
         _CalcRow('صافي الضريبة المستحقة', 'Net VAT Due', taxData.netVat!, isTotal: true),
     ];
-    _drawCalcTable(startY, rows);
+    _drawCalcTable(rows);
   }
 
-  void _drawFeeCalc(double startY) {
+  void _drawFeeCalc() {
     final rows = <_CalcRow>[
       _CalcRow('المبلغ المستحق', 'Amount Due', data.amount, isTotal: true),
     ];
-    _drawCalcTable(startY, rows);
+    _drawCalcTable(rows);
   }
 
-  void _drawCustomsCalc(double startY) {
-    final g = currentPage.graphics;
-    var rowY = startY;
-
-    // Goods info
+  void _drawCustomsCalc() {
+    final items = <GeniusPdfLabeledValue>[];
     if (taxData.hsCode != null) {
-      _drawCalcField(rowY, 'رمز التعرفة', 'HS Code', taxData.hsCode!);
-      rowY += 14;
+      items.add(GeniusPdfLabeledValue(
+        config: config,
+        label: 'HS Code',
+        labelAr: 'رمز التعرفة',
+        value: taxData.hsCode!,
+      ));
     }
     if (taxData.goodsDescription != null) {
-      final desc = isRTL ? (taxData.goodsDescriptionAr ?? taxData.goodsDescription!) : taxData.goodsDescription!;
-      _drawCalcField(rowY, 'وصف البضاعة', 'Goods Description', desc);
-      rowY += 14;
+      final desc = isRTL
+          ? (taxData.goodsDescriptionAr ?? taxData.goodsDescription!)
+          : taxData.goodsDescription!;
+      items.add(GeniusPdfLabeledValue(
+        config: config,
+        label: 'Goods Description',
+        labelAr: 'وصف البضاعة',
+        value: desc,
+      ));
     }
 
-    g.drawLine(
-      PdfPen(style.borderColor.toPdfColor(), width: 0.3),
-      Offset(0, rowY + 2),
-      Offset(contentWidth, rowY + 2),
-    );
-    rowY += 6;
+    if (items.isNotEmpty) {
+      addInfoSection(
+        labelAr: 'بيانات البضاعة',
+        labelEn: 'Goods Info',
+        items: items,
+        columns: 1,
+      );
+    }
 
     final rows = <_CalcRow>[
       if (taxData.customsValue != null)
@@ -215,10 +234,10 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
         _CalcRow('نسبة الرسم', 'Duty Rate', taxData.dutyRate!, isPercent: true),
       _CalcRow('مبلغ الرسوم', 'Duty Amount', data.amount, isTotal: true),
     ];
-    _drawCalcTable(rowY, rows);
+    _drawCalcTable(rows);
   }
 
-  void _drawSettlementCalc(double startY) {
+  void _drawSettlementCalc() {
     final rows = <_CalcRow>[
       if (taxData.originalAssessment != null)
         _CalcRow('التقييم الأصلي', 'Original Assessment', taxData.originalAssessment!),
@@ -230,39 +249,18 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
         _CalcRow('فوائد', 'Interest', taxData.interestAmount!),
       _CalcRow('المبلغ الإجمالي', 'Total Amount', data.amount, isTotal: true),
     ];
-    _drawCalcTable(startY, rows);
+    _drawCalcTable(rows);
   }
 
-  void _drawCalcTable(double startY, List<_CalcRow> rows) {
-    final g = currentPage.graphics;
-    var rowY = startY;
+  void _drawCalcTable(List<_CalcRow> rows) {
+    if (rows.isEmpty) {
+      addSpace(style.sectionSpacing);
+      return;
+    }
 
+    final gridRows = <GeniusPdfGridRow>[];
     for (final row in rows) {
       final label = isRTL ? row.labelAr : row.labelEn;
-      final font = row.isTotal ? boldBodyFont : bodyFont;
-      final valueColor = row.isDeduction
-          ? style.debitColor.toPdfColor()
-          : row.isTotal
-            ? style.primaryColor.toPdfColor()
-              : PdfColor(0, 0, 0);
-
-      if (row.isTotal) {
-        g.drawLine(
-          PdfPen(style.borderColor.toPdfColor(), width: 0.5),
-          Offset(contentWidth * 0.5, rowY - 1),
-          Offset(contentWidth, rowY - 1),
-        );
-        rowY += 3;
-      }
-
-      g.drawString(
-        label,
-        font,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(8, rowY, contentWidth * 0.6, 13),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-      );
-
       String valueStr;
       if (row.isPercent) {
         valueStr = '${row.value.toStringAsFixed(1)}%';
@@ -271,80 +269,48 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
         if (row.isDeduction) valueStr = '($valueStr)';
       }
 
-      g.drawString(
-        valueStr,
-        font,
-        brush: PdfSolidBrush(valueColor),
-        bounds: Rect.fromLTWH(contentWidth * 0.6, rowY, contentWidth * 0.4 - 8, 13),
-        format: PdfStringFormat(alignment: endAlign),
-      );
-
-      rowY += 16;
+      if (row.isTotal) {
+        gridRows.add(GeniusPdfGridRow.total({
+          'label': label,
+          'value': valueStr,
+        }));
+      } else {
+        gridRows.add(GeniusPdfGridRow(cells: {
+          'label': label,
+          'value': valueStr,
+        }));
+      }
     }
 
-    resetY(rowY + style.sectionSpacing);
-  }
-
-  void _drawCalcField(double y, String labelAr, String labelEn, String value) {
-    final g = currentPage.graphics;
-    final label = isRTL ? labelAr : labelEn;
-
-    g.drawString(
-      '$label: $value',
-      bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(8, y, contentWidth - 16, 12),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-  }
-
-  void _drawLabel(double y, String labelAr, String labelEn) {
-    final g = currentPage.graphics;
-    g.drawRectangle(
-      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
-      bounds: Rect.fromLTWH(0, y, 3, 13),
-    );
-    g.drawString(
-      '$labelAr  |  $labelEn',
-      boldBodyFont,
-      brush: PdfSolidBrush(style.primaryColor.toPdfColor()),
-      bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-  }
-
-  void _drawInfoRowLocal(double y, List<_TaxInfoPair> pairs) {
-    final g = currentPage.graphics;
-    final colWidth = contentWidth / pairs.length;
-
-    g.drawRectangle(
-      brush: PdfSolidBrush(style.tableHeaderColor.toPdfColor()),
-      pen: PdfPen(style.borderColor.toPdfColor(), width: 0.5),
-      bounds: Rect.fromLTWH(0, y, contentWidth, 26),
+    final grid = GeniusPdfDataGrid(
+      config: config,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'label',
+          title: 'Item',
+          titleAr: 'البند',
+          flexFactor: 3,
+        ),
+        GeniusPdfGridColumn(
+          id: 'value',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          width: 120,
+          alignment: GeniusPdfTextAlign.end,
+        ),
+      ],
+      rows: gridRows,
+      style: GeniusPdfGridStyle.classic().copyWith(
+        showHeader: false,
+        alternateRowColors: false,
+      ),
     );
 
-    for (var i = 0; i < pairs.length; i++) {
-      final pair = pairs[i];
-      final x = i * colWidth;
-
-      final label = isRTL ? pair.labelAr : pair.labelEn;
-      g.drawString(label, smallFont,
-          brush: PdfSolidBrush(style.accentColor.toPdfColor()),
-          bounds: Rect.fromLTWH(x + 4, y + 2, colWidth - 8, 10),
-          format: PdfStringFormat(alignment: PdfTextAlignment.center));
-
-      g.drawString(pair.value, boldBodyFont,
-          brush: PdfBrushes.black,
-          bounds: Rect.fromLTWH(x + 4, y + 13, colWidth - 8, 12),
-          format: PdfStringFormat(alignment: PdfTextAlignment.center));
-
-      if (i < pairs.length - 1) {
-        g.drawLine(
-          PdfPen(style.borderColor.toPdfColor(), width: 0.3),
-          Offset(x + colWidth, y + 3),
-          Offset(x + colWidth, y + 23),
-        );
-      }
+    final result = addGrid(grid, spacing: 0);
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: style.sectionSpacing);
+    } else {
+      addSpace(style.sectionSpacing);
     }
   }
 
@@ -366,13 +332,6 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
         VoucherSignatory.manager(),
         VoucherSignatory(role: 'Authorized Signatory', roleAr: 'المفوض بالتوقيع'),
       ];
-}
-
-class _TaxInfoPair {
-  const _TaxInfoPair(this.labelAr, this.labelEn, this.value);
-  final String labelAr;
-  final String labelEn;
-  final String value;
 }
 
 class _CalcRow {

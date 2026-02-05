@@ -63,7 +63,6 @@ List<int> buildRemittanceVoucherDemoReport({
       purposeDescriptionAr: 'دعم عائلي',
       trackingNumber: 'DOM-2026020541-001',
     ),
-    style: GeniusPdfVoucherStyle.financial(),
   );
 
   // ── 2. International Personal Outgoing ──
@@ -112,7 +111,6 @@ List<int> buildRemittanceVoucherDemoReport({
       trackingNumber: 'INT-2026020542-002',
       expectedDeliveryDate: DateTime(2026, 2, 7),
     ),
-    style: GeniusPdfVoucherStyle.standard(),
   );
 
   // ── 3. Domestic Commercial Incoming ──
@@ -152,7 +150,6 @@ List<int> buildRemittanceVoucherDemoReport({
       disbursementMethod: 'To Account',
       disbursementMethodAr: 'إلى الحساب البنكي',
     ),
-    style: GeniusPdfVoucherStyle.formal(),
   );
 
   // ── 4. International Commercial Incoming ──
@@ -187,7 +184,6 @@ List<int> buildRemittanceVoucherDemoReport({
       disbursementMethod: 'To Account',
       disbursementMethodAr: 'إلى الحساب البنكي',
     ),
-    style: GeniusPdfVoucherStyle.standard(),
   );
 
   // ── Build Batch ──

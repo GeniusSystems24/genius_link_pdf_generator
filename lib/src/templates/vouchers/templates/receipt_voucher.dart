@@ -7,9 +7,7 @@
 /// - **00103** Electronic Receipt — received via electronic payment
 library;
 
-import 'package:flutter/painting.dart' show Rect;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
-
 
 /// Generates a receipt voucher PDF page.
 ///
@@ -36,6 +34,9 @@ class ReceiptVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
+    // Account allocation
+    drawAccountEntriesTable();
+
     // Received from
     drawPartyInfo(labelAr: 'استلمنا من', labelEn: 'Received From');
 
@@ -49,44 +50,13 @@ class ReceiptVoucher extends GeniusPdfVoucherTemplate {
     if (data.description != null || data.descriptionAr != null) {
       _drawPurpose();
     }
-
-    // Account allocation
-    if (data.accountEntries.isNotEmpty) {
-      drawAccountEntriesTable();
-    }
   }
 
   void _drawPurpose() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
-    _drawLabel(y, 'وذلك عن', 'Purpose');
-
     final text = isRTL ? (data.descriptionAr ?? data.description ?? '') : (data.description ?? '');
-    g.drawString(
-      text,
-      bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(4, y + 16, contentWidth - 8, 28),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-
-    resetY(y + 46 + style.sectionSpacing);
-  }
-
-  void _drawLabel(double y, String labelAr, String labelEn) {
-    final g = currentPage.graphics;
-    g.drawRectangle(
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(0, y, 3, 13),
-    );
-    g.drawString(
-      '$labelAr  |  $labelEn',
-      boldBodyFont,
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
+    addSectionHeading('وذلك عن', 'Purpose');
+    addLine(text, font: bodyFont, topMargin: 2);
+    addSpace(style.sectionSpacing);
   }
 
   @override

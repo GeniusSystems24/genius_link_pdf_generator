@@ -7,15 +7,7 @@
 /// - **00203** Electronic Payment — paid via electronic method
 library;
 
-import 'package:flutter/painting.dart' show Rect, Offset;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-
-import '../../../components/components.dart';
-import '../../../core/pdf_config.dart';
-import '../models/voucher_models.dart';
-import '../models/voucher_style.dart';
-import 'voucher_base_template.dart';
 
 /// Generates a payment voucher PDF page.
 ///
@@ -46,6 +38,9 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
+    // Account allocation
+    drawAccountEntriesTable();
+
     // Paid to
     drawPartyInfo(labelAr: 'صرفنا إلى', labelEn: 'Paid To');
 
@@ -64,105 +59,67 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
     if (deductions.isNotEmpty) {
       _drawDeductions();
     }
-
-    // Account allocation
-    if (data.accountEntries.isNotEmpty) {
-      drawAccountEntriesTable();
-    }
   }
 
   void _drawPurpose() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
-    _drawLabel(y, 'وذلك عن', 'Purpose');
-
     final text = isRTL
         ? (data.descriptionAr ?? data.description ?? '')
         : (data.description ?? '');
-    g.drawString(
-      text,
-      bodyFont,
-      brush: PdfBrushes.black,
-      bounds: Rect.fromLTWH(4, y + 16, contentWidth - 8, 28),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-
-    resetY(y + 46 + style.sectionSpacing);
+    addSectionHeading('وذلك عن', 'Purpose');
+    addLine(text, font: bodyFont, topMargin: 2);
+    addSpace(style.sectionSpacing);
   }
 
   void _drawDeductions() {
-    final g = currentPage.graphics;
-    final y = currentY;
-
-    _drawLabel(y, 'الاستقطاعات', 'Deductions');
-
-    var rowY = y + 18;
     double totalDeductions = 0;
+    final rows = <GeniusPdfGridRow>[
+      for (final ded in deductions)
+        GeniusPdfGridRow(cells: {
+          'name': isRTL ? (ded.nameAr ?? ded.name) : ded.name,
+          'amount': ded.amount,
+        }),
+    ];
 
     for (final ded in deductions) {
-      final label = isRTL ? (ded.nameAr ?? ded.name) : ded.name;
-      g.drawString(
-        label,
-        bodyFont,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(8, rowY, contentWidth * 0.6, 12),
-        format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-      );
-      g.drawString(
-        ded.amount.toString(),
-        bodyFont,
-        brush: PdfSolidBrush((style.debitColor.toPdfColor())),
-        bounds:
-            Rect.fromLTWH(contentWidth * 0.6, rowY, contentWidth * 0.4 - 8, 12),
-        format: PdfStringFormat(alignment: endAlign),
-      );
       totalDeductions += ded.amount;
-      rowY += 14;
     }
 
-    // Net amount
     final netAmount = data.amount - totalDeductions;
-    g.drawLine(
-      PdfPen((style.borderColor.toPdfColor()), width: 0.5),
-      Offset(contentWidth * 0.5, rowY),
-      Offset(contentWidth, rowY),
-    );
-    rowY += 4;
+    rows.add(GeniusPdfGridRow.total({
+      'name': isRTL ? 'صافي المبلغ' : 'Net Amount',
+      'amount': netAmount,
+    }));
 
-    final netLabel = isRTL ? 'صافي المبلغ' : 'Net Amount';
-    g.drawString(
-      netLabel,
-      boldBodyFont,
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(8, rowY, contentWidth * 0.6, 12),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
-    g.drawString(
-      '${(netAmount)} ${data.currency}',
-      boldBodyFont,
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds:
-          Rect.fromLTWH(contentWidth * 0.6, rowY, contentWidth * 0.4 - 8, 12),
-      format: PdfStringFormat(alignment: endAlign),
+    addSectionHeading('الاستقطاعات', 'Deductions');
+    addSpace(4);
+
+    final grid = GeniusPdfDataGrid(
+      config: config,
+      columns: [
+        const GeniusPdfGridColumn(
+          id: 'name',
+          title: 'Deduction',
+          titleAr: 'الاستقطاع',
+          flexFactor: 3,
+        ),
+        GeniusPdfGridColumn.currency(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          width: 90,
+          currencySymbol: '',
+        ),
+      ],
+      rows: rows,
+      style: GeniusPdfGridStyle.classic(),
     );
 
-    resetY(rowY + 16 + style.sectionSpacing);
-  }
-
-  void _drawLabel(double y, String labelAr, String labelEn) {
-    final g = currentPage.graphics;
-    g.drawRectangle(
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(0, y, 3, 13),
-    );
-    g.drawString(
-      '$labelAr  |  $labelEn',
-      boldBodyFont,
-      brush: PdfSolidBrush((style.primaryColor.toPdfColor())),
-      bounds: Rect.fromLTWH(8, y, contentWidth - 8, 13),
-      format: PdfStringFormat(alignment: startAlign, textDirection: textDir),
-    );
+    final result = addGrid(grid, spacing: 0);
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: style.sectionSpacing);
+    } else {
+      addSpace(style.sectionSpacing);
+    }
   }
 
   @override
