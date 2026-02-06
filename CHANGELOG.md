@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0] - 2026-02-06
+
+### Added
+
+#### Complete Voucher Demo — Comprehensive Example
+- **`complete_voucher_demo_builder.dart`** — showcases all 16 voucher template classes in a single batch PDF
+  - One representative voucher from each template class
+  - Demonstrates the full breadth of the voucher system
+  - 16 vouchers covering 64 service ID subtypes
+
+#### Example Showcase Enhancement
+- **Complete Demo tab** — new tab in the example app showcasing all voucher types
+  - Icon: `library_books_rounded`
+  - Generates a comprehensive 16-page PDF with one voucher from each template class
+
+### Summary
+- **16 template classes**: AccountingEntry, Receipt, Payment, Tax, BankDeposit, BankWithdrawal, Transfer, BillPayment, RemittanceOutgoing, RemittanceIncoming, Purchase, Sales, PurchaseReturn, SalesReturn, Gift, Inventory
+- **64 service ID subtypes**: Each template class supports 2-6 payment/operation variants
+- **Full bilingual support**: Arabic/English throughout all templates and examples
+
+---
+
 ## [3.4.0] - 2026-02-05
 
 ### Added

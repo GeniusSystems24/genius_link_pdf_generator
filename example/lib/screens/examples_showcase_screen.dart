@@ -16,6 +16,7 @@ import '../documents/report_composer_demo_document.dart';
 import '../documents/voucher_demo_builder.dart';
 import '../documents/trade_voucher_demo_builder.dart';
 import '../documents/auxiliary_voucher_demo_builder.dart';
+import '../documents/complete_voucher_demo_builder.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 import '../widgets/component_page.dart';
@@ -98,6 +99,12 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen>
       icon: Icons.card_giftcard_rounded,
       gradient: AppColors.warningGradient,
     ),
+    _ExampleTab(
+      id: 'complete_demo',
+      title: 'Complete Demo',
+      icon: Icons.library_books_rounded,
+      gradient: AppColors.primaryGradient,
+    ),
   ];
 
   @override
@@ -139,6 +146,7 @@ class _ExamplesShowcaseScreenState extends State<ExamplesShowcaseScreen>
                 _buildRemittanceVouchersTab(isDark),
                 _buildTradeVouchersTab(isDark),
                 _buildAuxiliaryVouchersTab(isDark),
+                _buildCompleteDemoTab(isDark),
               ],
             ),
           ),
@@ -434,6 +442,30 @@ final bytes = buildAuxiliaryVoucherDemoReport(config: config);
     );
   }
 
+  Widget _buildCompleteDemoTab(bool isDark) {
+    return ComponentPage(
+      title: 'Complete Demo',
+      description:
+          'All 16 voucher template classes (64 subtypes) in one comprehensive PDF.',
+      icon: Icons.library_books_rounded,
+      gradient: AppColors.primaryGradient,
+      isDark: isDark,
+      isRTL: _isRTL,
+      onRTLChanged: (v) => setState(() => _isRTL = v),
+      isGenerating: _isGenerating,
+      onGenerate: _generateCompleteDemo,
+      codeExample: '''
+final bytes = buildCompleteVoucherDemoReport(config: config);
+''',
+      preview: _buildGenericPreview(
+        isDark,
+        Icons.library_books_rounded,
+        'Complete Demo',
+        _isRTL ? 'عرض شامل' : null,
+      ),
+    );
+  }
+
   Widget _buildGenericPreview(
       bool isDark, IconData icon, String label, String? subLabel) {
     return Container(
@@ -698,6 +730,29 @@ final bytes = buildAuxiliaryVoucherDemoReport(config: config);
       _showError(_isRTL
           ? 'تعذر إنشاء عرض السندات المساعدة.'
           : 'Failed to generate auxiliary vouchers demo.');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
+    }
+  }
+
+  Future<void> _generateCompleteDemo() async {
+    setState(() => _isGenerating = true);
+    try {
+      final bytes = buildCompleteVoucherDemoReport(config: _createConfig());
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/complete_voucher_demo.pdf';
+      await GeniusPdfService().saveToPath(
+        bytes: Uint8List.fromList(bytes),
+        path: filePath,
+      );
+      await OpenFile.open(filePath);
+      _showSuccess(_isRTL
+          ? 'تم إنشاء العرض الشامل.'
+          : 'Complete vouchers demo generated.');
+    } catch (_) {
+      _showError(_isRTL
+          ? 'تعذر إنشاء العرض الشامل.'
+          : 'Failed to generate complete vouchers demo.');
     } finally {
       if (mounted) setState(() => _isGenerating = false);
     }

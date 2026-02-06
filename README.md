@@ -90,6 +90,10 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
   Gift/grant vouchers and inventory operations — with donor/recipient info, warehouse transfers, damage write-offs
 
+### 📚 **Complete Demo** (v3.5.0)
+
+  Comprehensive example showcasing all 16 voucher template classes (64 subtypes) in a single batch PDF
+
 ### 📊 **Barcodes & QR Codes**
 
   EAN-13, Code128, QR Code, DataMatrix, PDF417, ZATCA QR
