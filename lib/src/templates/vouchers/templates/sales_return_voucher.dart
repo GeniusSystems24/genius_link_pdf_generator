@@ -45,6 +45,14 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
+    // Account allocation
+    if (data.accountEntries.isNotEmpty) {
+      drawAccountEntriesTable();
+    }
+
+    // Amount block
+    drawAmountBlock();
+
     // Customer info
     drawPartyInfo(labelAr: 'معلومات العميل', labelEn: 'Customer Information');
 
@@ -65,26 +73,20 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
     // Refund / settlement
     _drawRefundSettlement();
 
-    // Amount block
-    drawAmountBlock();
-
     // Warehouse info
     if (tradeData.warehouseName != null) {
       _drawWarehouse();
-    }
-
-    // Account allocation
-    if (data.accountEntries.isNotEmpty) {
-      drawAccountEntriesTable();
     }
   }
 
   void _drawOriginalReference() {
     final items = <GeniusPdfLabeledValue>[
       if (tradeData.originalVoucherNumber != null)
-        _lv('رقم سند البيع الأصلي', 'Original SO No', tradeData.originalVoucherNumber!),
+        _lv('رقم سند البيع الأصلي', 'Original SO No',
+            tradeData.originalVoucherNumber!),
       if (tradeData.originalVoucherDate != null)
-        _lv('تاريخ السند الأصلي', 'Original Date', _fmtDate(tradeData.originalVoucherDate!)),
+        _lv('تاريخ السند الأصلي', 'Original Date',
+            _fmtDate(tradeData.originalVoucherDate!)),
     ];
 
     if (items.isEmpty) return;
@@ -101,12 +103,16 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
     final items = <GeniusPdfLabeledValue>[];
 
     if (tradeData.returnReason != null) {
-      items.add(_lv('السبب', 'Reason', tradeData.returnReason!.displayName(isRTL: isRTL)));
+      items.add(_lv('السبب', 'Reason',
+          tradeData.returnReason!.displayName(isRTL: isRTL)));
     }
 
-    if (tradeData.returnReasonDescription != null || tradeData.returnReasonDescriptionAr != null) {
+    if (tradeData.returnReasonDescription != null ||
+        tradeData.returnReasonDescriptionAr != null) {
       final desc = isRTL
-          ? (tradeData.returnReasonDescriptionAr ?? tradeData.returnReasonDescription ?? '')
+          ? (tradeData.returnReasonDescriptionAr ??
+              tradeData.returnReasonDescription ??
+              '')
           : (tradeData.returnReasonDescription ?? '');
       items.add(_lv('التفاصيل', 'Details', desc));
     }
@@ -127,32 +133,53 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
 
     final columns = <GeniusPdfGridColumn>[
       const GeniusPdfGridColumn(
-        id: 'no', title: '#', titleAr: '#', width: 30,
+        id: 'no',
+        title: '#',
+        titleAr: '#',
+        width: 30,
         alignment: GeniusPdfTextAlign.center,
       ),
       if (hasCode)
         const GeniusPdfGridColumn(
-          id: 'code', title: 'Code', titleAr: 'الرمز', width: 55,
+          id: 'code',
+          title: 'Code',
+          titleAr: 'الرمز',
+          width: 55,
           alignment: GeniusPdfTextAlign.center,
         ),
       const GeniusPdfGridColumn(
-        id: 'desc', title: 'Description', titleAr: 'الوصف', flexFactor: 3,
+        id: 'desc',
+        title: 'Description',
+        titleAr: 'الوصف',
+        flexFactor: 3,
       ),
       const GeniusPdfGridColumn(
-        id: 'qty', title: 'Returned Qty', titleAr: 'الكمية المرتجعة', width: 60,
+        id: 'qty',
+        title: 'Returned Qty',
+        titleAr: 'الكمية المرتجعة',
+        width: 60,
         alignment: GeniusPdfTextAlign.center,
       ),
       GeniusPdfGridColumn.currency(
-        id: 'price', title: 'Unit Price', titleAr: 'سعر الوحدة', width: 70,
+        id: 'price',
+        title: 'Unit Price',
+        titleAr: 'سعر الوحدة',
+        width: 70,
         currencySymbol: '',
       ),
       if (hasTax)
         GeniusPdfGridColumn.currency(
-          id: 'tax', title: 'Tax Adj', titleAr: 'تعديل ضريبي', width: 55,
+          id: 'tax',
+          title: 'Tax Adj',
+          titleAr: 'تعديل ضريبي',
+          width: 55,
           currencySymbol: '',
         ),
       GeniusPdfGridColumn.currency(
-        id: 'total', title: 'Total', titleAr: 'الإجمالي', width: 75,
+        id: 'total',
+        title: 'Total',
+        titleAr: 'الإجمالي',
+        width: 75,
         currencySymbol: '',
       ),
     ];
@@ -162,7 +189,9 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
         GeniusPdfGridRow(cells: {
           'no': item.lineNumber,
           if (hasCode) 'code': item.itemCode ?? '',
-          'desc': isRTL ? (item.descriptionAr ?? item.description) : item.description,
+          'desc': isRTL
+              ? (item.descriptionAr ?? item.description)
+              : item.description,
           'qty': item.quantity,
           'price': item.unitPrice,
           if (hasTax) 'tax': item.taxAmount ?? 0,
@@ -183,11 +212,14 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
 
     final items = <GeniusPdfLabeledValue>[
       if (tradeData.subtotal != null)
-        _lv('المجموع الفرعي', 'Subtotal', '${_fmtNum(tradeData.subtotal!)} ${data.currency}'),
+        _lv('المجموع الفرعي', 'Subtotal',
+            '${_fmtNum(tradeData.subtotal!)} ${data.currency}'),
       if (tradeData.vatAmount != null)
-        _lv('تعديل ضريبي', 'Tax Adjustment', '${_fmtNum(tradeData.vatAmount!)} ${data.currency}'),
+        _lv('تعديل ضريبي', 'Tax Adjustment',
+            '${_fmtNum(tradeData.vatAmount!)} ${data.currency}'),
       if (tradeData.grandTotal != null)
-        _lv('الإجمالي', 'Grand Total', '${_fmtNum(tradeData.grandTotal!)} ${data.currency}'),
+        _lv('الإجمالي', 'Grand Total',
+            '${_fmtNum(tradeData.grandTotal!)} ${data.currency}'),
     ];
 
     addInfoSection(
@@ -208,8 +240,12 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
             '${_fmtNum(tradeData.refundAmount!)} ${data.currency}'));
       }
       if (tradeData.refundMethod != null) {
-        items.add(_lv('طريقة الاسترداد', 'Refund Method',
-            isRTL ? (tradeData.refundMethodAr ?? tradeData.refundMethod!) : tradeData.refundMethod!));
+        items.add(_lv(
+            'طريقة الاسترداد',
+            'Refund Method',
+            isRTL
+                ? (tradeData.refundMethodAr ?? tradeData.refundMethod!)
+                : tradeData.refundMethod!));
       }
     } else if (tradeData.isCredit(sid)) {
       items.add(_lv('تخفيض الذمة المدينة', 'Receivable Reduction',
@@ -220,8 +256,12 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
             '${_fmtNum(tradeData.refundAmount!)} ${data.currency}'));
       }
       if (tradeData.refundMethod != null) {
-        items.add(_lv('طريقة الاسترداد', 'Refund Method',
-            isRTL ? (tradeData.refundMethodAr ?? tradeData.refundMethod!) : tradeData.refundMethod!));
+        items.add(_lv(
+            'طريقة الاسترداد',
+            'Refund Method',
+            isRTL
+                ? (tradeData.refundMethodAr ?? tradeData.refundMethod!)
+                : tradeData.refundMethod!));
       }
     } else if (tradeData.isInstallment(sid)) {
       items.add(_lv('تعديل الأقساط', 'Installment Adjustment',
@@ -244,11 +284,19 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
 
   void _drawWarehouse() {
     final items = <GeniusPdfLabeledValue>[
-      _lv('المستودع', 'Warehouse',
-          isRTL ? (tradeData.warehouseNameAr ?? tradeData.warehouseName!) : tradeData.warehouseName!),
+      _lv(
+          'المستودع',
+          'Warehouse',
+          isRTL
+              ? (tradeData.warehouseNameAr ?? tradeData.warehouseName!)
+              : tradeData.warehouseName!),
       if (tradeData.inspectedBy != null)
-        _lv('فحص بواسطة', 'Inspected By',
-            isRTL ? (tradeData.inspectedByAr ?? tradeData.inspectedBy!) : tradeData.inspectedBy!),
+        _lv(
+            'فحص بواسطة',
+            'Inspected By',
+            isRTL
+                ? (tradeData.inspectedByAr ?? tradeData.inspectedBy!)
+                : tradeData.inspectedBy!),
     ];
 
     addInfoSection(
@@ -275,8 +323,9 @@ class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
       return n.truncate().toString().replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     }
-    return n.toStringAsFixed(2).replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
 
   String _fmtDate(DateTime d) =>

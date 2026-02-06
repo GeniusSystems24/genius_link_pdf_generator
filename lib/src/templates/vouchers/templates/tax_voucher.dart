@@ -48,6 +48,12 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
     // Account allocation
     drawAccountEntriesTable();
 
+    // Amount block
+    drawAmountBlock();
+
+    // Tax-specific calculation table
+    _drawTaxCalculation();
+
     // Tax period info
     _drawTaxPeriod();
 
@@ -56,16 +62,8 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
       _drawTaxAuthority();
     }
 
-    // Tax-specific calculation table
-    _drawTaxCalculation();
-
-    // Amount block
-    drawAmountBlock();
-
     // Payment details
     drawPaymentDetails();
-
-    // Account allocation
   }
 
   void _drawTaxPeriod() {
@@ -162,15 +160,19 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
   void _drawIncomeTaxCalc() {
     final rows = <_CalcRow>[
       if (taxData.taxableAmount != null)
-        _CalcRow('الدخل الخاضع للضريبة', 'Taxable Income', taxData.taxableAmount!),
+        _CalcRow(
+            'الدخل الخاضع للضريبة', 'Taxable Income', taxData.taxableAmount!),
       if (taxData.taxRate != null)
         _CalcRow('نسبة الضريبة', 'Tax Rate', taxData.taxRate!, isPercent: true),
       if (taxData.taxAmount != null)
         _CalcRow('مبلغ الضريبة', 'Tax Amount', taxData.taxAmount!),
       if (taxData.previousPayments != null)
-        _CalcRow('مدفوعات سابقة', 'Previous Payments', taxData.previousPayments!, isDeduction: true),
+        _CalcRow(
+            'مدفوعات سابقة', 'Previous Payments', taxData.previousPayments!,
+            isDeduction: true),
       if (taxData.balanceDue != null)
-        _CalcRow('الرصيد المستحق', 'Balance Due', taxData.balanceDue!, isTotal: true),
+        _CalcRow('الرصيد المستحق', 'Balance Due', taxData.balanceDue!,
+            isTotal: true),
     ];
     _drawCalcTable(rows);
   }
@@ -180,11 +182,13 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
       if (taxData.outputVat != null)
         _CalcRow('ضريبة المخرجات', 'Output VAT', taxData.outputVat!),
       if (taxData.inputVat != null)
-        _CalcRow('ضريبة المدخلات', 'Input VAT', taxData.inputVat!, isDeduction: true),
+        _CalcRow('ضريبة المدخلات', 'Input VAT', taxData.inputVat!,
+            isDeduction: true),
       if (taxData.adjustments != null && taxData.adjustments != 0)
         _CalcRow('تسويات', 'Adjustments', taxData.adjustments!),
       if (taxData.netVat != null)
-        _CalcRow('صافي الضريبة المستحقة', 'Net VAT Due', taxData.netVat!, isTotal: true),
+        _CalcRow('صافي الضريبة المستحقة', 'Net VAT Due', taxData.netVat!,
+            isTotal: true),
     ];
     _drawCalcTable(rows);
   }
@@ -240,7 +244,8 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
   void _drawSettlementCalc() {
     final rows = <_CalcRow>[
       if (taxData.originalAssessment != null)
-        _CalcRow('التقييم الأصلي', 'Original Assessment', taxData.originalAssessment!),
+        _CalcRow('التقييم الأصلي', 'Original Assessment',
+            taxData.originalAssessment!),
       if (taxData.revisedAmount != null)
         _CalcRow('المبلغ المعدل', 'Revised Amount', taxData.revisedAmount!),
       if (taxData.penaltyAmount != null && taxData.penaltyAmount! > 0)
@@ -322,15 +327,17 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
       return n.truncate().toString().replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     }
-    return n.toStringAsFixed(2).replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
 
   @override
   List<VoucherSignatory> defaultSignatories() => [
         VoucherSignatory(role: 'Tax Accountant', roleAr: 'محاسب الضرائب'),
         VoucherSignatory.manager(),
-        VoucherSignatory(role: 'Authorized Signatory', roleAr: 'المفوض بالتوقيع'),
+        VoucherSignatory(
+            role: 'Authorized Signatory', roleAr: 'المفوض بالتوقيع'),
       ];
 }
 

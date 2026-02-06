@@ -40,13 +40,13 @@ class AccountingEntryVoucher extends GeniusPdfVoucherTemplate {
     // Account entries table (the core of accounting voucher)
     drawAccountEntriesTable();
 
+    // Amount block
+    drawAmountBlock();
+
     // Description
     if (data.description != null || data.descriptionAr != null) {
       _drawDescription();
     }
-
-    // Amount block
-    drawAmountBlock();
   }
 
   void _drawDescription() {

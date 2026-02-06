@@ -46,15 +46,6 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
-    // Operation type
-    _drawOperationInfo();
-
-    // Warehouse info (varies by operation)
-    _drawWarehouseInfo();
-
-    // Reference info (PO, transfer order, etc.)
-    _drawReferenceInfo();
-
     // Items table
     if (data.items.isNotEmpty) {
       _drawItemsTable();
@@ -70,6 +61,15 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
     if (data.accountEntries.isNotEmpty) {
       drawAccountEntriesTable();
     }
+
+    // Operation type
+    _drawOperationInfo();
+
+    // Warehouse info (varies by operation)
+    _drawWarehouseInfo();
+
+    // Reference info (PO, transfer order, etc.)
+    _drawReferenceInfo();
 
     // Operation-specific details
     _drawOperationDetails();
@@ -104,8 +104,13 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
       final label = op == InventoryOperationType.transfer
           ? (isRTL ? 'من المستودع' : 'From Warehouse')
           : (isRTL ? 'المستودع' : 'Warehouse');
-      items.add(_lv('من المستودع', label,
-          isRTL ? (inventoryData.sourceWarehouseAr ?? inventoryData.sourceWarehouse!) : inventoryData.sourceWarehouse!));
+      items.add(_lv(
+          'من المستودع',
+          label,
+          isRTL
+              ? (inventoryData.sourceWarehouseAr ??
+                  inventoryData.sourceWarehouse!)
+              : inventoryData.sourceWarehouse!));
     }
 
     // Destination warehouse
@@ -113,14 +118,24 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
       final label = op == InventoryOperationType.transfer
           ? (isRTL ? 'إلى المستودع' : 'To Warehouse')
           : (isRTL ? 'المستودع' : 'Warehouse');
-      items.add(_lv('إلى المستودع', label,
-          isRTL ? (inventoryData.destinationWarehouseAr ?? inventoryData.destinationWarehouse!) : inventoryData.destinationWarehouse!));
+      items.add(_lv(
+          'إلى المستودع',
+          label,
+          isRTL
+              ? (inventoryData.destinationWarehouseAr ??
+                  inventoryData.destinationWarehouse!)
+              : inventoryData.destinationWarehouse!));
     }
 
     // Requesting department (for issue)
     if (inventoryData.requestingDepartment != null) {
-      items.add(_lv('القسم الطالب', 'Requesting Dept',
-          isRTL ? (inventoryData.requestingDepartmentAr ?? inventoryData.requestingDepartment!) : inventoryData.requestingDepartment!));
+      items.add(_lv(
+          'القسم الطالب',
+          'Requesting Dept',
+          isRTL
+              ? (inventoryData.requestingDepartmentAr ??
+                  inventoryData.requestingDepartment!)
+              : inventoryData.requestingDepartment!));
     }
 
     if (inventoryData.projectCode != null) {
@@ -145,11 +160,13 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
     }
 
     if (inventoryData.transferOrderNumber != null) {
-      items.add(_lv('رقم أمر التحويل', 'Transfer Order No', inventoryData.transferOrderNumber!));
+      items.add(_lv('رقم أمر التحويل', 'Transfer Order No',
+          inventoryData.transferOrderNumber!));
     }
 
     if (inventoryData.authorizationReference != null) {
-      items.add(_lv('مرجع الاعتماد', 'Authorization Ref', inventoryData.authorizationReference!));
+      items.add(_lv('مرجع الاعتماد', 'Authorization Ref',
+          inventoryData.authorizationReference!));
     }
 
     if (items.isEmpty) return;
@@ -195,32 +212,53 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
 
     final columns = <GeniusPdfGridColumn>[
       const GeniusPdfGridColumn(
-        id: 'no', title: '#', titleAr: '#', width: 30,
+        id: 'no',
+        title: '#',
+        titleAr: '#',
+        width: 30,
         alignment: GeniusPdfTextAlign.center,
       ),
       if (hasCode)
         const GeniusPdfGridColumn(
-          id: 'code', title: 'Item Code', titleAr: 'رمز الصنف', width: 70,
+          id: 'code',
+          title: 'Item Code',
+          titleAr: 'رمز الصنف',
+          width: 70,
           alignment: GeniusPdfTextAlign.center,
         ),
       const GeniusPdfGridColumn(
-        id: 'desc', title: 'Description', titleAr: 'الوصف', flexFactor: 3,
+        id: 'desc',
+        title: 'Description',
+        titleAr: 'الوصف',
+        flexFactor: 3,
       ),
       if (hasUnit)
         const GeniusPdfGridColumn(
-          id: 'unit', title: 'Unit', titleAr: 'الوحدة', width: 50,
+          id: 'unit',
+          title: 'Unit',
+          titleAr: 'الوحدة',
+          width: 50,
           alignment: GeniusPdfTextAlign.center,
         ),
       GeniusPdfGridColumn(
-        id: 'qty', title: qtyTitle, titleAr: qtyTitleAr, width: 70,
+        id: 'qty',
+        title: qtyTitle,
+        titleAr: qtyTitleAr,
+        width: 70,
         alignment: GeniusPdfTextAlign.center,
       ),
       GeniusPdfGridColumn.currency(
-        id: 'cost', title: 'Unit Cost', titleAr: 'تكلفة الوحدة', width: 70,
+        id: 'cost',
+        title: 'Unit Cost',
+        titleAr: 'تكلفة الوحدة',
+        width: 70,
         currencySymbol: '',
       ),
       GeniusPdfGridColumn.currency(
-        id: 'total', title: 'Total Value', titleAr: 'القيمة الإجمالية', width: 85,
+        id: 'total',
+        title: 'Total Value',
+        titleAr: 'القيمة الإجمالية',
+        width: 85,
         currencySymbol: '',
       ),
     ];
@@ -230,8 +268,12 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
         GeniusPdfGridRow(cells: {
           'no': item.lineNumber,
           if (hasCode) 'code': item.itemCode ?? '',
-          'desc': isRTL ? (item.descriptionAr ?? item.description) : item.description,
-          if (hasUnit) 'unit': isRTL ? (item.unitAr ?? item.unit ?? '') : (item.unit ?? ''),
+          'desc': isRTL
+              ? (item.descriptionAr ?? item.description)
+              : item.description,
+          if (hasUnit)
+            'unit':
+                isRTL ? (item.unitAr ?? item.unit ?? '') : (item.unit ?? ''),
           'qty': item.quantity,
           'cost': item.unitPrice,
           'total': item.totalAmount,
@@ -298,7 +340,8 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
     }
 
     final items = <GeniusPdfLabeledValue>[
-      _lv(impactLabelAr, impactLabel, '${_fmtNum(data.amount)} ${data.currency}'),
+      _lv(impactLabelAr, impactLabel,
+          '${_fmtNum(data.amount)} ${data.currency}'),
     ];
 
     addInfoSection(
@@ -314,7 +357,8 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
     final items = <GeniusPdfLabeledValue>[];
 
     // Adjustment-specific
-    if (op == InventoryOperationType.adjustment && inventoryData.adjustmentReason != null) {
+    if (op == InventoryOperationType.adjustment &&
+        inventoryData.adjustmentReason != null) {
       items.add(_lv('سبب التعديل', 'Adjustment Reason',
           inventoryData.adjustmentReason!.displayName(isRTL: isRTL)));
     }
@@ -326,25 +370,42 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
             inventoryData.damageType!.displayName(isRTL: isRTL)));
       }
 
-      if (inventoryData.damageDescription != null || inventoryData.damageDescriptionAr != null) {
-        items.add(_lv('وصف التلف', 'Damage Description',
-            isRTL ? (inventoryData.damageDescriptionAr ?? inventoryData.damageDescription!) : inventoryData.damageDescription!));
+      if (inventoryData.damageDescription != null ||
+          inventoryData.damageDescriptionAr != null) {
+        items.add(_lv(
+            'وصف التلف',
+            'Damage Description',
+            isRTL
+                ? (inventoryData.damageDescriptionAr ??
+                    inventoryData.damageDescription!)
+                : inventoryData.damageDescription!));
       }
 
       if (inventoryData.inspectedBy != null) {
-        items.add(_lv('فحص بواسطة', 'Inspected By',
-            isRTL ? (inventoryData.inspectedByAr ?? inventoryData.inspectedBy!) : inventoryData.inspectedBy!));
+        items.add(_lv(
+            'فحص بواسطة',
+            'Inspected By',
+            isRTL
+                ? (inventoryData.inspectedByAr ?? inventoryData.inspectedBy!)
+                : inventoryData.inspectedBy!));
       }
 
       if (inventoryData.disposalMethod != null) {
-        items.add(_lv('طريقة التخلص', 'Disposal Method',
-            isRTL ? (inventoryData.disposalMethodAr ?? inventoryData.disposalMethod!) : inventoryData.disposalMethod!));
+        items.add(_lv(
+            'طريقة التخلص',
+            'Disposal Method',
+            isRTL
+                ? (inventoryData.disposalMethodAr ??
+                    inventoryData.disposalMethod!)
+                : inventoryData.disposalMethod!));
       }
 
       if (inventoryData.insuranceClaim == true) {
-        items.add(_lv('مطالبة تأمين', 'Insurance Claim', isRTL ? 'نعم' : 'Yes'));
+        items
+            .add(_lv('مطالبة تأمين', 'Insurance Claim', isRTL ? 'نعم' : 'Yes'));
         if (inventoryData.insuranceClaimNumber != null) {
-          items.add(_lv('رقم المطالبة', 'Claim Number', inventoryData.insuranceClaimNumber!));
+          items.add(_lv('رقم المطالبة', 'Claim Number',
+              inventoryData.insuranceClaimNumber!));
         }
       }
     }
@@ -375,8 +436,9 @@ class InventoryVoucher extends GeniusPdfVoucherTemplate {
       return n.truncate().toString().replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     }
-    return n.toStringAsFixed(2).replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
 
   @override

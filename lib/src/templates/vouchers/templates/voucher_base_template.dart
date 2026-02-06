@@ -37,7 +37,8 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 
   bool get isRTL => config.isRTL;
   PdfFont get titleFont => config.fontBuild(fontSize: style.titleFontSize);
-  PdfFont get subtitleFont => config.fontBuild(fontSize: style.subtitleFontSize);
+  PdfFont get subtitleFont =>
+      config.fontBuild(fontSize: style.subtitleFontSize);
   PdfFont get bodyFont => config.fontBuild(fontSize: style.bodyFontSize);
   PdfFont get smallFont => config.fontBuild(fontSize: style.smallFontSize);
   PdfFont get boldTitleFont => config.fontBuild(
@@ -50,9 +51,6 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
   PdfFont get boldTableFont => config.fontBuild(
       fontSize: style.tableFontSize,
       fontBytes: config.boldFontBytes ?? config.baseFontBytes);
-
-  PdfTextDirection get textDir =>
-      isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
   PdfTextAlignment get startAlign =>
       isRTL ? PdfTextAlignment.right : PdfTextAlignment.left;
   PdfTextAlignment get endAlign =>
@@ -70,8 +68,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
     addFooter(
       userName: data.voucherNumber,
       userLabel: isRTL ? 'الرقم التسلسلي: ' : 'S/N: ',
-      printTime:
-          'طباعة: ${_formatDate(now)}  |  Printed: ${_formatDate(now)}',
+      printTime: 'طباعة: ${_formatDate(now)}  |  Printed: ${_formatDate(now)}',
       font: smallFont,
     );
 
@@ -119,38 +116,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 
   /// Draws optional service ID badge and copy label below the header.
   void drawVoucherTitle() {
-    final showBadge = style.showServiceIdBadge;
-    final showCopy = style.showCopyLabel;
-
-    if (!showBadge && !showCopy) return;
-
-    if (showCopy) {
-      final copyText = data.copyType.displayName(isRTL: isRTL);
-      final richText = GeniusPdfRichTextBuilder(
-        config: config,
-        defaultStyle: GeniusPdfTextStyle(
-          fontSize: style.smallFontSize,
-          color: style.accentColor,
-          alignment: GeniusPdfTextAlign.end,
-        ),
-        paragraphAlignment: GeniusPdfParagraphAlignment.end,
-      ).bold(copyText, color: style.accentColor).build();
-      addRichText(richText, spacing: 0);
-    }
-
-    if (showBadge) {
-      final richText = GeniusPdfRichTextBuilder(
-        config: config,
-        paragraphAlignment: GeniusPdfParagraphAlignment.center,
-      ).badge(
-        data.serviceId.code,
-        backgroundColor: style.badgeColor,
-        color: style.badgeTextColor,
-      ).build();
-      addRichText(richText, spacing: showCopy ? 2 : 0);
-    }
-
-    addSpace(style.sectionSpacing);
+    // Removed: "Original" indicator and badge
   }
 
   // ── Voucher Info Row ──
@@ -290,13 +256,15 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
           fields.add(_labeledValue('البنك', 'Bank', pd.bankName!));
         }
         if (pd.accountNumber != null) {
-          fields.add(_labeledValue('رقم الحساب', 'Account No', pd.accountNumber!));
+          fields.add(
+              _labeledValue('رقم الحساب', 'Account No', pd.accountNumber!));
         }
         if (pd.iban != null) {
           fields.add(_labeledValue('الآيبان', 'IBAN', pd.iban!));
         }
         if (pd.transferReference != null) {
-          fields.add(_labeledValue('مرجع التحويل', 'Transfer Ref', pd.transferReference!));
+          fields.add(_labeledValue(
+              'مرجع التحويل', 'Transfer Ref', pd.transferReference!));
         }
         if (pd.transferDate != null) {
           fields.add(_labeledValue(
@@ -425,30 +393,51 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       columns: [
         const GeniusPdfGridColumn(
-          id: 'code', title: 'Account', titleAr: 'الحساب', width: 65,
+          id: 'code',
+          title: 'Account',
+          titleAr: 'الحساب',
+          width: 65,
           alignment: GeniusPdfTextAlign.center,
         ),
         const GeniusPdfGridColumn(
-          id: 'name', title: 'Account Name', titleAr: 'اسم الحساب', flexFactor: 3,
+          id: 'name',
+          title: 'Account Name',
+          titleAr: 'اسم الحساب',
+          flexFactor: 3,
         ),
         if (hasCostCenter)
           const GeniusPdfGridColumn(
-            id: 'cc', title: 'Cost Center', titleAr: 'مركز تكلفة', flexFactor: 1,
+            id: 'cc',
+            title: 'Cost Center',
+            titleAr: 'مركز تكلفة',
+            flexFactor: 1,
           ),
         GeniusPdfGridColumn.currency(
-          id: 'debit', title: 'Debit', titleAr: 'مدين', width: 85, currencySymbol: '',
+          id: 'debit',
+          title: 'Debit',
+          titleAr: 'مدين',
+          width: 85,
+          currencySymbol: '',
         ),
         GeniusPdfGridColumn.currency(
-          id: 'credit', title: 'Credit', titleAr: 'دائن', width: 85, currencySymbol: '',
+          id: 'credit',
+          title: 'Credit',
+          titleAr: 'دائن',
+          width: 85,
+          currencySymbol: '',
         ),
       ],
       rows: [
         for (final entry in data.accountEntries)
           GeniusPdfGridRow(cells: {
             'code': entry.accountCode,
-            'name': isRTL ? (entry.accountNameAr ?? entry.accountName) : entry.accountName,
+            'name': isRTL
+                ? (entry.accountNameAr ?? entry.accountName)
+                : entry.accountName,
             if (hasCostCenter)
-              'cc': isRTL ? (entry.costCenterAr ?? entry.costCenter ?? '') : (entry.costCenter ?? ''),
+              'cc': isRTL
+                  ? (entry.costCenterAr ?? entry.costCenter ?? '')
+                  : (entry.costCenter ?? ''),
             'debit': entry.debitAmount > 0 ? entry.debitAmount : '',
             'credit': entry.creditAmount > 0 ? entry.creditAmount : '',
           }),
@@ -457,8 +446,10 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
           'code': '',
           'name': isRTL ? 'الإجمالي' : 'Total',
           if (hasCostCenter) 'cc': '',
-          'debit': data.accountEntries.fold<double>(0, (s, e) => s + e.debitAmount),
-          'credit': data.accountEntries.fold<double>(0, (s, e) => s + e.creditAmount),
+          'debit':
+              data.accountEntries.fold<double>(0, (s, e) => s + e.debitAmount),
+          'credit':
+              data.accountEntries.fold<double>(0, (s, e) => s + e.creditAmount),
         }),
       ],
       style: GeniusPdfGridStyle.classic(),
@@ -500,8 +491,10 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 
   /// Draws the amount in words in both Arabic and English.
   void drawAmountInWords() {
-    final wordsAr = AmountToWords.toArabic(data.amount, currency: data.currency);
-    final wordsEn = AmountToWords.toEnglish(data.amount, currency: data.currency);
+    final wordsAr =
+        AmountToWords.toArabic(data.amount, currency: data.currency);
+    final wordsEn =
+        AmountToWords.toEnglish(data.amount, currency: data.currency);
     addSectionHeading('المبلغ بالحروف', 'Amount in Words');
     addLine(wordsAr, font: boldBodyFont, topMargin: 2);
     addLine(wordsEn, font: bodyFont, topMargin: 2);
@@ -511,7 +504,8 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
   // ── Notes ──
 
   void drawNotesBlock() {
-    final noteText = isRTL ? (data.notesAr ?? data.notes ?? '') : (data.notes ?? '');
+    final noteText =
+        isRTL ? (data.notesAr ?? data.notes ?? '') : (data.notes ?? '');
     addSectionHeading('ملاحظات', 'Notes');
     addLine(noteText, font: bodyFont, topMargin: 2);
     addSpace(style.sectionSpacing);
@@ -521,9 +515,8 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 
   /// Draws the signature blocks at the bottom of the voucher.
   void drawSignatureBlock() {
-    final signatories = data.signatories.isNotEmpty
-      ? data.signatories
-      : defaultSignatories();
+    final signatories =
+        data.signatories.isNotEmpty ? data.signatories : defaultSignatories();
 
     if (signatories.isEmpty) return;
 
@@ -563,12 +556,14 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
     );
 
     final lineStyle = GeniusPdfCellStyle(
-      textStyle: const GeniusPdfTextStyle(fontSize: 1, color: m.Color(0x00000000)),
+      textStyle:
+          const GeniusPdfTextStyle(fontSize: 1, color: m.Color(0x00000000)),
       border: GeniusPdfBorderStyle.bottom(
         color: style.borderColor,
         width: 0.5,
       ),
-      padding: const GeniusPdfCellPadding.symmetric(horizontal: 12, vertical: 6),
+      padding:
+          const GeniusPdfCellPadding.symmetric(horizontal: 12, vertical: 6),
     );
 
     final hasNames = signatories.any(
@@ -622,7 +617,6 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       addSpace(style.sectionSpacing);
     }
   }
-
 
   // Shared Layout Helpers
 
@@ -775,13 +769,14 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   String _formatNumber(double n) {
-    if (n == n.truncateToDouble()) return n.truncate().toString().replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
-    return n.toStringAsFixed(2).replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+    if (n == n.truncateToDouble())
+      return n.truncate().toString().replaceAllMapped(
+          RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
-
-  }
+}
 
 /// Internal helper for info pairs.
 class _InfoPair {

@@ -45,6 +45,9 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
     // Account allocation
     drawAccountEntriesTable();
 
+    // Amount block
+    drawAmountBlock();
+
     // Source account
     _drawAccountBlock(
       labelAr: 'حساب المصدر',
@@ -66,9 +69,6 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
     if (transferData.transferFee != null || transferData.commission != null) {
       _drawFeesBlock();
     }
-
-    // Amount block
-    drawAmountBlock();
 
     // Purpose / description
     if (data.description != null || data.descriptionAr != null) {
@@ -159,7 +159,8 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
             'اسم المستفيد',
             'Beneficiary',
             isRTL
-                ? (transferData.beneficiaryNameAr ?? transferData.beneficiaryName!)
+                ? (transferData.beneficiaryNameAr ??
+                    transferData.beneficiaryName!)
                 : transferData.beneficiaryName!,
           );
         }
@@ -214,10 +215,12 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
             );
           }
           if (pd.sourceAmount != null) {
-            addItem('المبلغ الأصلي', 'Source Amount', _fmtNum(pd.sourceAmount!));
+            addItem(
+                'المبلغ الأصلي', 'Source Amount', _fmtNum(pd.sourceAmount!));
           }
           if (pd.targetAmount != null) {
-            addItem('المبلغ المحوّل', 'Target Amount', _fmtNum(pd.targetAmount!));
+            addItem(
+                'المبلغ المحوّل', 'Target Amount', _fmtNum(pd.targetAmount!));
           }
         }
         break;
@@ -305,17 +308,21 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
   }
 
   void _drawPurpose() {
-    final text = isRTL ? (data.descriptionAr ?? data.description ?? '') : (data.description ?? '');
+    final text = isRTL
+        ? (data.descriptionAr ?? data.description ?? '')
+        : (data.description ?? '');
     addSectionHeading('الغرض', 'Purpose');
     addLine(text, font: bodyFont, topMargin: 2);
     addSpace(style.sectionSpacing);
   }
 
   String _fmtNum(double n) {
-    if (n == n.truncateToDouble()) return n.truncate().toString().replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
-    return n.toStringAsFixed(2).replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+    if (n == n.truncateToDouble())
+      return n.truncate().toString().replaceAllMapped(
+          RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
 
   @override

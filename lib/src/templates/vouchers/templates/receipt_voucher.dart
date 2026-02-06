@@ -37,14 +37,14 @@ class ReceiptVoucher extends GeniusPdfVoucherTemplate {
     // Account allocation
     drawAccountEntriesTable();
 
+    // Amount block
+    drawAmountBlock();
+
     // Received from
     drawPartyInfo(labelAr: 'استلمنا من', labelEn: 'Received From');
 
     // Payment details
     drawPaymentDetails();
-
-    // Amount block
-    drawAmountBlock();
 
     // Purpose / description
     if (data.description != null || data.descriptionAr != null) {
@@ -53,7 +53,9 @@ class ReceiptVoucher extends GeniusPdfVoucherTemplate {
   }
 
   void _drawPurpose() {
-    final text = isRTL ? (data.descriptionAr ?? data.description ?? '') : (data.description ?? '');
+    final text = isRTL
+        ? (data.descriptionAr ?? data.description ?? '')
+        : (data.description ?? '');
     addSectionHeading('وذلك عن', 'Purpose');
     addLine(text, font: bodyFont, topMargin: 2);
     addSpace(style.sectionSpacing);

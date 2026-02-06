@@ -43,15 +43,6 @@ class GiftVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
-    // Direction badge
-    _drawDirectionInfo();
-
-    // Party info (donor or recipient)
-    _drawPartyInfo();
-
-    // Gift details (occasion, reason)
-    _drawGiftDetails();
-
     // Items table
     if (data.items.isNotEmpty) {
       _drawItemsTable();
@@ -77,71 +68,73 @@ class GiftVoucher extends GeniusPdfVoucherTemplate {
     if (giftData.authorizationReference != null) {
       _drawAuthorization();
     }
+
+    // Combined Gift & Party Info (Moved to bottom)
+    _drawCombinedInfo();
+
+    // Gift details
+    _drawGiftDetails();
   }
 
-  void _drawDirectionInfo() {
+  void _drawCombinedInfo() {
+    final items = <GeniusPdfLabeledValue>[];
+
+    // Direction
     final directionText = giftData.direction.displayName(isRTL: isRTL);
     final directionLabel = isRTL ? 'اتجاه الهدية' : 'Gift Direction';
+    items.add(_lv(directionLabel, directionLabel, directionText));
 
-    final items = <GeniusPdfLabeledValue>[
-      _lv(directionLabel, directionLabel, directionText),
-    ];
+    // Party (Donor/Recipient)
+    final isReceived = giftData.direction == GiftDirection.received;
+    if (isReceived) {
+      if (giftData.donorName != null || giftData.donorNameAr != null) {
+        items.add(_lv(
+            'اسم المانح',
+            'Donor Name',
+            isRTL
+                ? (giftData.donorNameAr ?? giftData.donorName!)
+                : giftData.donorName!));
+      }
+    } else {
+      if (giftData.recipientName != null || giftData.recipientNameAr != null) {
+        items.add(_lv(
+            'اسم المستلم',
+            'Recipient Name',
+            isRTL
+                ? (giftData.recipientNameAr ?? giftData.recipientName!)
+                : giftData.recipientName!));
+      }
+    }
+
+    if (items.isEmpty) return;
 
     addInfoSection(
       labelAr: 'معلومات الهدية',
       labelEn: 'Gift Information',
       items: items,
-      columns: 1,
+      columns: 2,
     );
-  }
-
-  void _drawPartyInfo() {
-    final isReceived = giftData.direction == GiftDirection.received;
-
-    if (isReceived) {
-      // Draw donor info
-      if (giftData.donorName != null || giftData.donorNameAr != null) {
-        final items = <GeniusPdfLabeledValue>[
-          _lv('اسم المانح', 'Donor Name',
-              isRTL ? (giftData.donorNameAr ?? giftData.donorName!) : giftData.donorName!),
-        ];
-
-        addInfoSection(
-          labelAr: 'معلومات المانح',
-          labelEn: 'Donor Information',
-          items: items,
-          columns: 1,
-        );
-      }
-    } else {
-      // Draw recipient info
-      if (giftData.recipientName != null || giftData.recipientNameAr != null) {
-        final items = <GeniusPdfLabeledValue>[
-          _lv('اسم المستلم', 'Recipient Name',
-              isRTL ? (giftData.recipientNameAr ?? giftData.recipientName!) : giftData.recipientName!),
-        ];
-
-        addInfoSection(
-          labelAr: 'معلومات المستلم',
-          labelEn: 'Recipient Information',
-          items: items,
-          columns: 1,
-        );
-      }
-    }
   }
 
   void _drawGiftDetails() {
     final items = <GeniusPdfLabeledValue>[];
 
     if (giftData.occasion != null || giftData.occasionAr != null) {
-      items.add(_lv('المناسبة', 'Occasion',
-          isRTL ? (giftData.occasionAr ?? giftData.occasion!) : giftData.occasion!));
+      items.add(_lv(
+          'المناسبة',
+          'Occasion',
+          isRTL
+              ? (giftData.occasionAr ?? giftData.occasion!)
+              : giftData.occasion!));
     }
 
     if (giftData.giftReason != null || giftData.giftReasonAr != null) {
-      items.add(_lv('سبب الهدية', 'Gift Reason',
-          isRTL ? (giftData.giftReasonAr ?? giftData.giftReason!) : giftData.giftReason!));
+      items.add(_lv(
+          'سبب الهدية',
+          'Gift Reason',
+          isRTL
+              ? (giftData.giftReasonAr ?? giftData.giftReason!)
+              : giftData.giftReason!));
     }
 
     if (items.isEmpty) return;
@@ -159,23 +152,38 @@ class GiftVoucher extends GeniusPdfVoucherTemplate {
 
     final columns = <GeniusPdfGridColumn>[
       const GeniusPdfGridColumn(
-        id: 'no', title: '#', titleAr: '#', width: 30,
+        id: 'no',
+        title: '#',
+        titleAr: '#',
+        width: 30,
         alignment: GeniusPdfTextAlign.center,
       ),
       if (hasCode)
         const GeniusPdfGridColumn(
-          id: 'code', title: 'Code', titleAr: 'الرمز', width: 60,
+          id: 'code',
+          title: 'Code',
+          titleAr: 'الرمز',
+          width: 60,
           alignment: GeniusPdfTextAlign.center,
         ),
       const GeniusPdfGridColumn(
-        id: 'desc', title: 'Description', titleAr: 'الوصف', flexFactor: 3,
+        id: 'desc',
+        title: 'Description',
+        titleAr: 'الوصف',
+        flexFactor: 3,
       ),
       const GeniusPdfGridColumn(
-        id: 'qty', title: 'Qty', titleAr: 'الكمية', width: 50,
+        id: 'qty',
+        title: 'Qty',
+        titleAr: 'الكمية',
+        width: 50,
         alignment: GeniusPdfTextAlign.center,
       ),
       GeniusPdfGridColumn.currency(
-        id: 'value', title: 'Fair Value', titleAr: 'القيمة العادلة', width: 90,
+        id: 'value',
+        title: 'Fair Value',
+        titleAr: 'القيمة العادلة',
+        width: 90,
         currencySymbol: '',
       ),
     ];
@@ -185,7 +193,9 @@ class GiftVoucher extends GeniusPdfVoucherTemplate {
         GeniusPdfGridRow(cells: {
           'no': item.lineNumber,
           if (hasCode) 'code': item.itemCode ?? '',
-          'desc': isRTL ? (item.descriptionAr ?? item.description) : item.description,
+          'desc': isRTL
+              ? (item.descriptionAr ?? item.description)
+              : item.description,
           'qty': item.quantity,
           'value': item.totalAmount,
         }),
@@ -205,7 +215,8 @@ class GiftVoucher extends GeniusPdfVoucherTemplate {
           '${_fmtNum(data.amount)} ${data.currency}'),
     ];
 
-    if (giftData.fairMarketValue != null && giftData.fairMarketValue != data.amount) {
+    if (giftData.fairMarketValue != null &&
+        giftData.fairMarketValue != data.amount) {
       items.add(_lv('القيمة السوقية المقدرة', 'Estimated Market Value',
           '${_fmtNum(giftData.fairMarketValue!)} ${data.currency}'));
     }
@@ -237,7 +248,8 @@ class GiftVoucher extends GeniusPdfVoucherTemplate {
 
   void _drawAuthorization() {
     final items = <GeniusPdfLabeledValue>[
-      _lv('مرجع الاعتماد', 'Authorization Ref', giftData.authorizationReference!),
+      _lv('مرجع الاعتماد', 'Authorization Ref',
+          giftData.authorizationReference!),
     ];
 
     addInfoSection(
@@ -264,8 +276,9 @@ class GiftVoucher extends GeniusPdfVoucherTemplate {
       return n.truncate().toString().replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     }
-    return n.toStringAsFixed(2).replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
 
   @override

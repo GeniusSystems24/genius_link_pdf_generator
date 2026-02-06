@@ -58,14 +58,14 @@ class BankWithdrawalVoucher extends GeniusPdfVoucherTemplate {
     // Account allocation
     drawAccountEntriesTable();
 
+    // Amount block
+    drawAmountBlock();
+
     // Bank information
     _drawBankInfo();
 
     // Withdrawal details (varies by subtype)
     _drawWithdrawalDetails();
-
-    // Amount block
-    drawAmountBlock();
 
     // Purpose / description
     if (data.description != null || data.descriptionAr != null) {
@@ -136,7 +136,9 @@ class BankWithdrawalVoucher extends GeniusPdfVoucherTemplate {
           addItem(
             'الشخص المخول',
             'Authorized Person',
-            isRTL ? (authorizedPersonAr ?? authorizedPerson!) : authorizedPerson!,
+            isRTL
+                ? (authorizedPersonAr ?? authorizedPerson!)
+                : authorizedPerson!,
           );
         }
         break;
@@ -194,7 +196,9 @@ class BankWithdrawalVoucher extends GeniusPdfVoucherTemplate {
   }
 
   void _drawPurpose() {
-    final text = isRTL ? (data.descriptionAr ?? data.description ?? '') : (data.description ?? '');
+    final text = isRTL
+        ? (data.descriptionAr ?? data.description ?? '')
+        : (data.description ?? '');
     addSectionHeading('الغرض', 'Purpose');
     addLine(text, font: bodyFont, topMargin: 2);
     addSpace(style.sectionSpacing);

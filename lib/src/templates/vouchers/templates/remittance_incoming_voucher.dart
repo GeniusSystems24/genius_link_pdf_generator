@@ -49,6 +49,9 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
     // Account allocation
     drawAccountEntriesTable();
 
+    // Net amount credited
+    drawAmountBlock();
+
     // Domestic / International badge
     _drawTypeBadge();
 
@@ -66,9 +69,6 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
     // Fees
     _drawFees();
 
-    // Net amount credited
-    drawAmountBlock();
-
     // Disbursement method
     if (remittanceData.disbursementMethod != null) {
       _drawDisbursement();
@@ -79,17 +79,20 @@ class RemittanceIncomingVoucher extends GeniusPdfVoucherTemplate {
     final badgeText = _isInternational
         ? (isRTL ? 'دولية' : 'International')
         : (isRTL ? 'محلية' : 'Domestic');
-    final badgeColor =
-        _isInternational ? const m.Color(0xFF1565C0) : const m.Color(0xFF2E7D32);
+    final badgeColor = _isInternational
+        ? const m.Color(0xFF1565C0)
+        : const m.Color(0xFF2E7D32);
 
     final richText = GeniusPdfRichTextBuilder(
       config: config,
       paragraphAlignment: GeniusPdfParagraphAlignment.center,
-    ).badge(
-      badgeText,
-      backgroundColor: badgeColor,
-      color: const m.Color(0xFFFFFFFF),
-    ).build();
+    )
+        .badge(
+          badgeText,
+          backgroundColor: badgeColor,
+          color: const m.Color(0xFFFFFFFF),
+        )
+        .build();
 
     addRichText(richText, spacing: 0);
     addSpace(style.sectionSpacing);

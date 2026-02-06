@@ -26,12 +26,12 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 /// ```
 class PaymentVoucher extends GeniusPdfVoucherTemplate {
   PaymentVoucher({
-    required GeniusPdfConfig config,
-    required GeniusPdfCompanyInfo company,
-    required VoucherData data,
+    required super.config,
+    required super.company,
+    required super.data,
     this.deductions = const [],
-    GeniusPdfVoucherStyle style = const GeniusPdfVoucherStyle(),
-  }) : super(config: config, company: company, data: data, style: style);
+    super.style,
+  });
 
   /// Optional deductions (tax withholding, discounts, penalties).
   final List<PaymentDeduction> deductions;
@@ -41,14 +41,14 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
     // Account allocation
     drawAccountEntriesTable();
 
+    // Amount block
+    drawAmountBlock();
+
     // Paid to
     drawPartyInfo(labelAr: 'صرفنا إلى', labelEn: 'Paid To');
 
     // Payment details
     drawPaymentDetails();
-
-    // Amount block
-    drawAmountBlock();
 
     // Purpose / description
     if (data.description != null || data.descriptionAr != null) {
@@ -111,7 +111,7 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
         ),
       ],
       rows: rows,
-      style: GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     final result = addGrid(grid, spacing: 0);
@@ -127,7 +127,7 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
         VoucherSignatory.preparedBy(),
         VoucherSignatory.accountant(),
         VoucherSignatory.manager(),
-        VoucherSignatory(
+        const VoucherSignatory(
           role: 'Beneficiary',
           roleAr: 'المستفيد',
         ),

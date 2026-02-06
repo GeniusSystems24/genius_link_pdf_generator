@@ -48,6 +48,9 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
     // Account allocation
     drawAccountEntriesTable();
 
+    // Amount block
+    drawAmountBlock();
+
     // Domestic / International badge
     _drawTypeBadge();
 
@@ -62,9 +65,6 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
 
     // Fees
     _drawFees();
-
-    // Amount block
-    drawAmountBlock();
 
     // Compliance
     if (remittanceData.amlReference != null ||
@@ -82,17 +82,20 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
     final badgeText = _isInternational
         ? (isRTL ? 'دولية' : 'International')
         : (isRTL ? 'محلية' : 'Domestic');
-    final badgeColor =
-        _isInternational ? const m.Color(0xFF1565C0) : const m.Color(0xFF2E7D32);
+    final badgeColor = _isInternational
+        ? const m.Color(0xFF1565C0)
+        : const m.Color(0xFF2E7D32);
 
     final richText = GeniusPdfRichTextBuilder(
       config: config,
       paragraphAlignment: GeniusPdfParagraphAlignment.center,
-    ).badge(
-      badgeText,
-      backgroundColor: badgeColor,
-      color: const m.Color(0xFFFFFFFF),
-    ).build();
+    )
+        .badge(
+          badgeText,
+          backgroundColor: badgeColor,
+          color: const m.Color(0xFFFFFFFF),
+        )
+        .build();
 
     addRichText(richText, spacing: 0);
     addSpace(style.sectionSpacing);
@@ -137,7 +140,8 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
           label: 'Address',
           labelAr: 'العنوان',
           value: isRTL
-              ? (remittanceData.senderAddressAr ?? remittanceData.senderAddress!)
+              ? (remittanceData.senderAddressAr ??
+                  remittanceData.senderAddress!)
               : remittanceData.senderAddress!,
         ),
     ];
@@ -157,7 +161,8 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
         label: 'Name',
         labelAr: 'الاسم',
         value: isRTL
-            ? (remittanceData.beneficiaryNameAr ?? remittanceData.beneficiaryName)
+            ? (remittanceData.beneficiaryNameAr ??
+                remittanceData.beneficiaryName)
             : remittanceData.beneficiaryName,
       ),
       if (remittanceData.beneficiaryIdNumber != null)
@@ -180,7 +185,8 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
           label: 'Country',
           labelAr: 'الدولة',
           value: isRTL
-              ? (remittanceData.beneficiaryCountryAr ?? remittanceData.beneficiaryCountry!)
+              ? (remittanceData.beneficiaryCountryAr ??
+                  remittanceData.beneficiaryCountry!)
               : remittanceData.beneficiaryCountry!,
         ),
       if (remittanceData.beneficiaryAddress != null)
@@ -189,7 +195,8 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
           label: 'Address',
           labelAr: 'العنوان',
           value: isRTL
-              ? (remittanceData.beneficiaryAddressAr ?? remittanceData.beneficiaryAddress!)
+              ? (remittanceData.beneficiaryAddressAr ??
+                  remittanceData.beneficiaryAddress!)
               : remittanceData.beneficiaryAddress!,
         ),
       if (remittanceData.beneficiaryBankName != null)
@@ -421,8 +428,9 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
       return n.truncate().toString().replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     }
-    return n.toStringAsFixed(2).replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
 
   String _fmtDate(DateTime d) =>

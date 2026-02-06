@@ -42,6 +42,14 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   void buildVoucherContent() {
+    // Account allocation
+    if (data.accountEntries.isNotEmpty) {
+      drawAccountEntriesTable();
+    }
+
+    // Amount block
+    drawAmountBlock();
+
     // Supplier info
     drawPartyInfo(labelAr: 'معلومات المورد', labelEn: 'Supplier Information');
 
@@ -61,17 +69,9 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
     // Payment terms (varies by subtype)
     _drawPaymentTerms();
 
-    // Amount block
-    drawAmountBlock();
-
     // Warehouse info
     if (tradeData.warehouseName != null) {
       _drawWarehouse();
-    }
-
-    // Account allocation
-    if (data.accountEntries.isNotEmpty) {
-      drawAccountEntriesTable();
     }
   }
 
@@ -93,47 +93,75 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
   void _drawItemsTable() {
     final hasCode = data.items.any((i) => i.itemCode != null);
     final hasUnit = data.items.any((i) => i.unit != null);
-    final hasDiscount = data.items.any((i) => i.discountAmount != null || i.discountPercent != null);
+    final hasDiscount = data.items
+        .any((i) => i.discountAmount != null || i.discountPercent != null);
     final hasTax = data.items.any((i) => i.taxAmount != null);
 
     final columns = <GeniusPdfGridColumn>[
       const GeniusPdfGridColumn(
-        id: 'no', title: '#', titleAr: '#', width: 30,
+        id: 'no',
+        title: '#',
+        titleAr: '#',
+        width: 30,
         alignment: GeniusPdfTextAlign.center,
       ),
       if (hasCode)
         const GeniusPdfGridColumn(
-          id: 'code', title: 'Code', titleAr: 'الرمز', width: 55,
+          id: 'code',
+          title: 'Code',
+          titleAr: 'الرمز',
+          width: 55,
           alignment: GeniusPdfTextAlign.center,
         ),
       const GeniusPdfGridColumn(
-        id: 'desc', title: 'Description', titleAr: 'الوصف', flexFactor: 3,
+        id: 'desc',
+        title: 'Description',
+        titleAr: 'الوصف',
+        flexFactor: 3,
       ),
       const GeniusPdfGridColumn(
-        id: 'qty', title: 'Qty', titleAr: 'الكمية', width: 40,
+        id: 'qty',
+        title: 'Qty',
+        titleAr: 'الكمية',
+        width: 40,
         alignment: GeniusPdfTextAlign.center,
       ),
       if (hasUnit)
         const GeniusPdfGridColumn(
-          id: 'unit', title: 'Unit', titleAr: 'الوحدة', width: 45,
+          id: 'unit',
+          title: 'Unit',
+          titleAr: 'الوحدة',
+          width: 45,
           alignment: GeniusPdfTextAlign.center,
         ),
       GeniusPdfGridColumn.currency(
-        id: 'price', title: 'Unit Price', titleAr: 'سعر الوحدة', width: 70,
+        id: 'price',
+        title: 'Unit Price',
+        titleAr: 'سعر الوحدة',
+        width: 70,
         currencySymbol: '',
       ),
       if (hasDiscount)
         GeniusPdfGridColumn.currency(
-          id: 'disc', title: 'Discount', titleAr: 'الخصم', width: 55,
+          id: 'disc',
+          title: 'Discount',
+          titleAr: 'الخصم',
+          width: 55,
           currencySymbol: '',
         ),
       if (hasTax)
         GeniusPdfGridColumn.currency(
-          id: 'tax', title: 'Tax', titleAr: 'الضريبة', width: 55,
+          id: 'tax',
+          title: 'Tax',
+          titleAr: 'الضريبة',
+          width: 55,
           currencySymbol: '',
         ),
       GeniusPdfGridColumn.currency(
-        id: 'total', title: 'Total', titleAr: 'الإجمالي', width: 75,
+        id: 'total',
+        title: 'Total',
+        titleAr: 'الإجمالي',
+        width: 75,
         currencySymbol: '',
       ),
     ];
@@ -143,9 +171,13 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
         GeniusPdfGridRow(cells: {
           'no': item.lineNumber,
           if (hasCode) 'code': item.itemCode ?? '',
-          'desc': isRTL ? (item.descriptionAr ?? item.description) : item.description,
+          'desc': isRTL
+              ? (item.descriptionAr ?? item.description)
+              : item.description,
           'qty': item.quantity,
-          if (hasUnit) 'unit': isRTL ? (item.unitAr ?? item.unit ?? '') : (item.unit ?? ''),
+          if (hasUnit)
+            'unit':
+                isRTL ? (item.unitAr ?? item.unit ?? '') : (item.unit ?? ''),
           'price': item.unitPrice,
           if (hasDiscount) 'disc': item.discountAmount ?? 0,
           if (hasTax) 'tax': item.taxAmount ?? 0,
@@ -166,16 +198,22 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
 
     final items = <GeniusPdfLabeledValue>[
       if (tradeData.subtotal != null)
-        _lv('المجموع الفرعي', 'Subtotal', '${_fmtNum(tradeData.subtotal!)} ${data.currency}'),
+        _lv('المجموع الفرعي', 'Subtotal',
+            '${_fmtNum(tradeData.subtotal!)} ${data.currency}'),
       if (tradeData.totalDiscount != null && tradeData.totalDiscount! > 0)
-        _lv('إجمالي الخصم', 'Total Discount', '(${_fmtNum(tradeData.totalDiscount!)}) ${data.currency}'),
+        _lv('إجمالي الخصم', 'Total Discount',
+            '(${_fmtNum(tradeData.totalDiscount!)}) ${data.currency}'),
       if (tradeData.taxableAmount != null)
-        _lv('المبلغ الخاضع للضريبة', 'Taxable Amount', '${_fmtNum(tradeData.taxableAmount!)} ${data.currency}'),
+        _lv('المبلغ الخاضع للضريبة', 'Taxable Amount',
+            '${_fmtNum(tradeData.taxableAmount!)} ${data.currency}'),
       if (tradeData.vatAmount != null)
-        _lv('ضريبة القيمة المضافة (${tradeData.vatRate}%)', 'VAT (${tradeData.vatRate}%)',
+        _lv(
+            'ضريبة القيمة المضافة (${tradeData.vatRate}%)',
+            'VAT (${tradeData.vatRate}%)',
             '${_fmtNum(tradeData.vatAmount!)} ${data.currency}'),
       if (tradeData.grandTotal != null)
-        _lv('الإجمالي الكلي', 'Grand Total', '${_fmtNum(tradeData.grandTotal!)} ${data.currency}'),
+        _lv('الإجمالي الكلي', 'Grand Total',
+            '${_fmtNum(tradeData.grandTotal!)} ${data.currency}'),
     ];
 
     addInfoSection(
@@ -194,7 +232,8 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
 
     if (tradeData.isCredit(sid)) {
       if (tradeData.dueDate != null) {
-        items.add(_lv('تاريخ الاستحقاق', 'Due Date', _fmtDate(tradeData.dueDate!)));
+        items.add(
+            _lv('تاريخ الاستحقاق', 'Due Date', _fmtDate(tradeData.dueDate!)));
       }
       if (tradeData.creditPeriodDays != null) {
         items.add(_lv('فترة الائتمان', 'Credit Period',
@@ -210,11 +249,13 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
             '${_fmtNum(tradeData.remainingBalance!)} ${data.currency}'));
       }
       if (tradeData.deliveryDate != null) {
-        items.add(_lv('تاريخ التسليم', 'Delivery Date', _fmtDate(tradeData.deliveryDate!)));
+        items.add(_lv('تاريخ التسليم', 'Delivery Date',
+            _fmtDate(tradeData.deliveryDate!)));
       }
     } else if (tradeData.isInstallment(sid)) {
       if (tradeData.numberOfInstallments != null) {
-        items.add(_lv('عدد الأقساط', 'Installments', '${tradeData.numberOfInstallments}'));
+        items.add(_lv('عدد الأقساط', 'Installments',
+            '${tradeData.numberOfInstallments}'));
       }
       if (tradeData.installmentAmount != null) {
         items.add(_lv('قيمة القسط', 'Installment Amount',
@@ -234,11 +275,19 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
 
   void _drawWarehouse() {
     final items = <GeniusPdfLabeledValue>[
-      _lv('المستودع', 'Warehouse',
-          isRTL ? (tradeData.warehouseNameAr ?? tradeData.warehouseName!) : tradeData.warehouseName!),
+      _lv(
+          'المستودع',
+          'Warehouse',
+          isRTL
+              ? (tradeData.warehouseNameAr ?? tradeData.warehouseName!)
+              : tradeData.warehouseName!),
       if (tradeData.receivedBy != null)
-        _lv('استلم بواسطة', 'Received By',
-            isRTL ? (tradeData.receivedByAr ?? tradeData.receivedBy!) : tradeData.receivedBy!),
+        _lv(
+            'استلم بواسطة',
+            'Received By',
+            isRTL
+                ? (tradeData.receivedByAr ?? tradeData.receivedBy!)
+                : tradeData.receivedBy!),
     ];
 
     addInfoSection(
@@ -265,8 +314,9 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
       return n.truncate().toString().replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     }
-    return n.toStringAsFixed(2).replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
   }
 
   String _fmtDate(DateTime d) =>

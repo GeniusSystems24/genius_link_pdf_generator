@@ -50,17 +50,17 @@ class BillPaymentVoucher extends GeniusPdfVoucherTemplate {
     // Account allocation
     drawAccountEntriesTable();
 
+    // Amount block
+    drawAmountBlock();
+
+    // Payment method
+    drawPaymentDetails();
+
     // Service provider info
     _drawProviderInfo();
 
     // Bill details (varies by subtype)
     _drawBillDetails();
-
-    // Payment method
-    drawPaymentDetails();
-
-    // Amount block
-    drawAmountBlock();
 
     // Confirmation / transaction reference
     if (billData.confirmationNumber != null) {
@@ -167,7 +167,9 @@ class BillPaymentVoucher extends GeniusPdfVoucherTemplate {
           addItem(
             'الباقة',
             'Plan',
-            isRTL ? (billData.planNameAr ?? billData.planName!) : billData.planName!,
+            isRTL
+                ? (billData.planNameAr ?? billData.planName!)
+                : billData.planName!,
           );
         }
         if (billData.billingPeriod != null) {
@@ -189,14 +191,18 @@ class BillPaymentVoucher extends GeniusPdfVoucherTemplate {
           addItem(
             'الباقة',
             'Package',
-            isRTL ? (billData.planNameAr ?? billData.planName!) : billData.planName!,
+            isRTL
+                ? (billData.planNameAr ?? billData.planName!)
+                : billData.planName!,
           );
         }
         if (billData.validity != null) {
           addItem(
             'الصلاحية',
             'Validity',
-            isRTL ? (billData.validityAr ?? billData.validity!) : billData.validity!,
+            isRTL
+                ? (billData.validityAr ?? billData.validity!)
+                : billData.validity!,
           );
         }
         break;
@@ -206,14 +212,18 @@ class BillPaymentVoucher extends GeniusPdfVoucherTemplate {
           addItem(
             'اللعبة',
             'Game',
-            isRTL ? (billData.planNameAr ?? billData.planName!) : billData.planName!,
+            isRTL
+                ? (billData.planNameAr ?? billData.planName!)
+                : billData.planName!,
           );
         }
         if (billData.serviceType != null) {
           addItem(
             'نوع الرصيد',
             'Credit Type',
-            isRTL ? (billData.serviceTypeAr ?? billData.serviceType!) : billData.serviceType!,
+            isRTL
+                ? (billData.serviceTypeAr ?? billData.serviceType!)
+                : billData.serviceType!,
           );
         }
         break;
@@ -223,14 +233,18 @@ class BillPaymentVoucher extends GeniusPdfVoucherTemplate {
           addItem(
             'المنصة',
             'Platform',
-            isRTL ? (billData.planNameAr ?? billData.planName!) : billData.planName!,
+            isRTL
+                ? (billData.planNameAr ?? billData.planName!)
+                : billData.planName!,
           );
         }
         if (billData.validity != null) {
           addItem(
             'الصلاحية',
             'Validity',
-            isRTL ? (billData.validityAr ?? billData.validity!) : billData.validity!,
+            isRTL
+                ? (billData.validityAr ?? billData.validity!)
+                : billData.validity!,
           );
         }
         break;

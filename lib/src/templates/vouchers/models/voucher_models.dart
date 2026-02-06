@@ -79,8 +79,7 @@ class VoucherParty {
   final String? iban;
 
   /// Display name based on direction.
-  String displayName({bool isRTL = true}) =>
-      isRTL ? (nameAr ?? name) : name;
+  String displayName({bool isRTL = true}) => isRTL ? (nameAr ?? name) : name;
 }
 
 /// Line item for voucher detail tables.
@@ -224,8 +223,7 @@ class VoucherSignatory {
   final DateTime? date;
   final bool showSignatureLine;
 
-  String displayRole({bool isRTL = true}) =>
-      isRTL ? (roleAr ?? role) : role;
+  String displayRole({bool isRTL = true}) => isRTL ? (roleAr ?? role) : role;
 
   // Common signatory factories
   factory VoucherSignatory.preparedBy({String? name}) => VoucherSignatory(
@@ -768,8 +766,7 @@ extension RemittanceSignatories on VoucherSignatory {
         name: name,
       );
 
-  static VoucherSignatory complianceOfficer({String? name}) =>
-      VoucherSignatory(
+  static VoucherSignatory complianceOfficer({String? name}) => VoucherSignatory(
         role: 'Compliance Officer',
         roleAr: 'مسؤول الامتثال',
         name: name,

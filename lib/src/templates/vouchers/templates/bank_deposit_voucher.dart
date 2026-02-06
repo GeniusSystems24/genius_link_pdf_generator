@@ -45,14 +45,14 @@ class BankDepositVoucher extends GeniusPdfVoucherTemplate {
     // Account allocation
     drawAccountEntriesTable();
 
+    // Amount block
+    drawAmountBlock();
+
     // Bank information
     _drawBankInfo();
 
     // Deposit details (varies by subtype)
     _drawDepositDetails();
-
-    // Amount block
-    drawAmountBlock();
 
     // Purpose / description
     if (data.description != null || data.descriptionAr != null) {
@@ -193,23 +193,33 @@ class BankDepositVoucher extends GeniusPdfVoucherTemplate {
 
   void _drawDenominationTable() {
     final denominations = data.paymentDetails!.denominations!;
-    final sortedKeys = denominations.keys.toList()..sort((a, b) => b.compareTo(a));
+    final sortedKeys = denominations.keys.toList()
+      ..sort((a, b) => b.compareTo(a));
 
     drawItemsTable(
       labelAr: 'تفصيل الفئات النقدية',
       labelEn: 'Cash Denomination Breakdown',
       columns: [
         const GeniusPdfGridColumn(
-          id: 'denom', title: 'Denomination', titleAr: 'الفئة',
-          width: 120, alignment: GeniusPdfTextAlign.center,
+          id: 'denom',
+          title: 'Denomination',
+          titleAr: 'الفئة',
+          width: 120,
+          alignment: GeniusPdfTextAlign.center,
         ),
         const GeniusPdfGridColumn(
-          id: 'count', title: 'Count', titleAr: 'العدد',
-          width: 80, alignment: GeniusPdfTextAlign.center,
+          id: 'count',
+          title: 'Count',
+          titleAr: 'العدد',
+          width: 80,
+          alignment: GeniusPdfTextAlign.center,
         ),
         GeniusPdfGridColumn.currency(
-          id: 'total', title: 'Total', titleAr: 'المجموع',
-          width: 120, currencySymbol: '',
+          id: 'total',
+          title: 'Total',
+          titleAr: 'المجموع',
+          width: 120,
+          currencySymbol: '',
         ),
       ],
       rows: [
@@ -222,14 +232,17 @@ class BankDepositVoucher extends GeniusPdfVoucherTemplate {
         GeniusPdfGridRow.total({
           'denom': isRTL ? 'الإجمالي' : 'Total',
           'count': '',
-          'total': denominations.entries.fold<double>(0, (s, e) => s + e.key * e.value),
+          'total': denominations.entries
+              .fold<double>(0, (s, e) => s + e.key * e.value),
         }),
       ],
     );
   }
 
   void _drawPurpose() {
-    final text = isRTL ? (data.descriptionAr ?? data.description ?? '') : (data.description ?? '');
+    final text = isRTL
+        ? (data.descriptionAr ?? data.description ?? '')
+        : (data.description ?? '');
     addSectionHeading('الغرض', 'Purpose');
     addLine(text, font: bodyFont, topMargin: 2);
     addSpace(style.sectionSpacing);
