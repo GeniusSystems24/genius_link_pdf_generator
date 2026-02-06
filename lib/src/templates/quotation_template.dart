@@ -492,9 +492,7 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
       font: captionFont,
       format: PdfStringFormat(
         alignment: PdfTextAlignment.center,
-        textDirection: config.isRTL
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight,
+        textDirection: config.pdfTextDirection
       ),
     ).draw(
         page: page,

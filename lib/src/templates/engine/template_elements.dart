@@ -268,6 +268,9 @@ class TextElement extends TemplateElement {
     final format = PdfStringFormat(
       alignment: style?.alignment ?? alignment,
       lineAlignment: PdfVerticalAlignment.top,
+      textDirection: context.isRtl
+          ? PdfTextDirection.rightToLeft
+          : PdfTextDirection.leftToRight,
     );
 
     final size = font.measureString(
@@ -295,6 +298,9 @@ class TextElement extends TemplateElement {
     final format = PdfStringFormat(
       alignment: PdfTextAlignment.left,
       lineAlignment: PdfVerticalAlignment.top,
+      textDirection: context.isRtl
+          ? PdfTextDirection.rightToLeft
+          : PdfTextDirection.leftToRight,
     );
 
     return font
@@ -396,6 +402,9 @@ class VariableElement extends TemplateElement {
     final format = PdfStringFormat(
       alignment: style?.alignment ?? alignment,
       lineAlignment: PdfVerticalAlignment.top,
+      textDirection: context.isRtl
+          ? PdfTextDirection.rightToLeft
+          : PdfTextDirection.leftToRight,
     );
 
     final size = font.measureString(
@@ -425,6 +434,9 @@ class VariableElement extends TemplateElement {
     final format = PdfStringFormat(
       alignment: PdfTextAlignment.left,
       lineAlignment: PdfVerticalAlignment.top,
+      textDirection: context.isRtl
+          ? PdfTextDirection.rightToLeft
+          : PdfTextDirection.leftToRight,
     );
 
     return font
@@ -1157,6 +1169,9 @@ class TableElement extends TemplateElement {
           format: PdfStringFormat(
             alignment:
                 context.isRtl ? PdfTextAlignment.right : PdfTextAlignment.left,
+            textDirection: context.isRtl
+                ? PdfTextDirection.rightToLeft
+                : PdfTextDirection.leftToRight,
           ),
         );
         headerX += columnWidths[i];
@@ -1193,6 +1208,9 @@ class TableElement extends TemplateElement {
               alignment: context.isRtl
                   ? PdfTextAlignment.right
                   : PdfTextAlignment.left,
+              textDirection: context.isRtl
+                  ? PdfTextDirection.rightToLeft
+                  : PdfTextDirection.leftToRight,
             ),
           );
           cellX += columnWidths[i];

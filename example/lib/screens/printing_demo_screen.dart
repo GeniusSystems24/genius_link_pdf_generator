@@ -94,12 +94,14 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
         titleFont,
         brush: PdfSolidBrush(PdfColor(0, 51, 102)),
         bounds: const Rect.fromLTWH(50, 100, 500, 40),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
       g1.drawString(
         'Advanced Printing Demo (v2.2.1)',
         font,
         brush: PdfSolidBrush(PdfColor(100, 100, 100)),
         bounds: const Rect.fromLTWH(50, 150, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
       g1.drawLine(
         PdfPen(PdfColor(0, 51, 102), width: 2),
@@ -111,12 +113,14 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
         font,
         brush: PdfSolidBrush(PdfColor(100, 100, 100)),
         bounds: const Rect.fromLTWH(50, 210, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
       g1.drawString(
         'Page 1 of 3',
         font,
         brush: PdfSolidBrush(PdfColor(150, 150, 150)),
         bounds: const Rect.fromLTWH(50, 750, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       // Page 2
@@ -127,6 +131,7 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
         titleFont,
         brush: PdfSolidBrush(PdfColor(0, 51, 102)),
         bounds: const Rect.fromLTWH(50, 50, 500, 40),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
       g2.drawLine(
         PdfPen(PdfColor(200, 200, 200)),
@@ -152,6 +157,7 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
           font,
           brush: PdfSolidBrush(PdfColor(0, 0, 0)),
           bounds: Rect.fromLTWH(50, yPos, 500, 25),
+          format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
         );
         yPos += 30;
       }
@@ -161,6 +167,7 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
         font,
         brush: PdfSolidBrush(PdfColor(150, 150, 150)),
         bounds: const Rect.fromLTWH(50, 750, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       // Page 3
@@ -171,6 +178,7 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
         titleFont,
         brush: PdfSolidBrush(PdfColor(0, 51, 102)),
         bounds: const Rect.fromLTWH(50, 50, 500, 40),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
       g3.drawLine(
         PdfPen(PdfColor(200, 200, 200)),
@@ -182,12 +190,14 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
         font,
         brush: PdfSolidBrush(PdfColor(0, 0, 0)),
         bounds: const Rect.fromLTWH(50, 110, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
       g3.drawString(
         'Use this to verify font rendering in print output.',
         font,
         brush: PdfSolidBrush(PdfColor(100, 100, 100)),
         bounds: const Rect.fromLTWH(50, 140, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       g3.drawRectangle(
@@ -203,6 +213,7 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
         font,
         brush: PdfSolidBrush(PdfColor(100, 100, 100)),
         bounds: const Rect.fromLTWH(50, 320, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       g3.drawString(
@@ -210,6 +221,7 @@ class _PrintingDemoScreenState extends State<PrintingDemoScreen>
         font,
         brush: PdfSolidBrush(PdfColor(150, 150, 150)),
         bounds: const Rect.fromLTWH(50, 750, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       _samplePdfBytes = Uint8List.fromList(await document.save());

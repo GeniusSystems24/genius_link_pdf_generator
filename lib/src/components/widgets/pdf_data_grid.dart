@@ -574,9 +574,7 @@ class GeniusPdfDataGrid {
       alignment: alignment.toPdfTextAlignment(config.isRTL),
       lineAlignment:
           cellStyle.textStyle.verticalAlignment.toPdfVerticalAlignment(),
-      textDirection: config.isRTL
-          ? PdfTextDirection.rightToLeft
-          : PdfTextDirection.leftToRight,
+      textDirection: config.pdfTextDirection
     );
   }
 

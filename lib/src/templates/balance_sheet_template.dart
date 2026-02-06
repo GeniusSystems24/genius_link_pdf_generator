@@ -185,6 +185,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -340,6 +341,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -357,6 +359,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
         format: PdfStringFormat(
           alignment:
               config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+          textDirection: config.pdfTextDirection
         ),
       );
     }
@@ -376,6 +379,7 @@ class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 

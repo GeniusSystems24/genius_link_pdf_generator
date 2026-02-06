@@ -359,7 +359,9 @@ class GeniusPdfSummarySection {
       bounds: Rect.fromLTWH(valueX, currentY, valueWidth, 0),
       format: PdfStringFormat(
         alignment: isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: PdfTextDirection.leftToRight,
+        textDirection: isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight,
       ),
     );
 

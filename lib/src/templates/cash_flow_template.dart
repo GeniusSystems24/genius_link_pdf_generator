@@ -210,6 +210,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -250,6 +251,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -265,6 +267,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -308,6 +311,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -323,6 +327,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -354,6 +359,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -370,6 +376,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -386,6 +393,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -419,6 +427,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -431,6 +440,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -445,6 +455,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -460,6 +471,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -478,6 +490,7 @@ class CashFlowTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 

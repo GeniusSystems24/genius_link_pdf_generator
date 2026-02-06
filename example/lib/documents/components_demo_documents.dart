@@ -55,11 +55,20 @@ Future<Uint8List> buildComponentDemoBytes({
   return Uint8List.fromList(bytes);
 }
 
-void drawTitle(PdfPage page, PdfFont titleFont, String text) {
+void drawTitle(
+  PdfPage page,
+  PdfFont titleFont,
+  String text, {
+  GeniusPdfConfig? config,
+}) {
+  final textDirection = config?.pdfTextDirection ?? PdfTextDirection.leftToRight;
   page.graphics.drawString(
     text,
     titleFont,
     bounds: Rect.fromLTWH(20, 20, page.getClientSize().width - 40, 30),
-    format: PdfStringFormat(alignment: PdfTextAlignment.center),
+    format: PdfStringFormat(
+      alignment: PdfTextAlignment.center,
+      textDirection: textDirection,
+    ),
   );
 }

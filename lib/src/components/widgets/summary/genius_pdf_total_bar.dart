@@ -115,7 +115,7 @@ class GeniusPdfTotalBar {
       ),
       format: PdfStringFormat(
         alignment: config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: PdfTextDirection.leftToRight,
+        textDirection: config.pdfTextDirection,
       ),
     );
 

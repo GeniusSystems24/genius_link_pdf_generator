@@ -62,9 +62,7 @@ class GeniusPdfQRCode {
         ),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
+          textDirection: config.pdfTextDirection
         ),
       );
       totalHeight += 16;

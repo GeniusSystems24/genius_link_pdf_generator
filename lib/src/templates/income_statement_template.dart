@@ -364,6 +364,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -375,6 +376,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -403,6 +405,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -413,6 +416,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -452,6 +456,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -463,6 +468,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
       ),
     );
 

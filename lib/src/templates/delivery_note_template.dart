@@ -199,7 +199,8 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
       bounds: Rect.fromLTWH(pageWidth - 100, 5, 95, 20),
       format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+          lineAlignment: PdfVerticalAlignment.middle,
+          textDirection: config.pdfTextDirection),
     );
   }
 
@@ -460,6 +461,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -472,6 +474,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
         format: PdfStringFormat(
           alignment:
               config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+          textDirection: config.pdfTextDirection
         ),
       );
       yOffset += 14;
@@ -492,6 +495,7 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -530,7 +534,10 @@ class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
           : 'Date/Time Received: _______________',
       baseFont,
       bounds: Rect.fromLTWH((pageWidth - 200) / 2, bottomY + 50, 200, 18),
-      format: PdfStringFormat(alignment: PdfTextAlignment.center),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: config.pdfTextDirection
+      ),
     );
   }
 

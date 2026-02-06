@@ -218,6 +218,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
           alignment: xOffset == 0
               ? (config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left)
               : PdfTextAlignment.right,
+          textDirection: config.pdfTextDirection
         ),
       );
       xOffset += pageWidth * column.$2;
@@ -243,6 +244,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -292,6 +294,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -301,7 +304,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       font,
       bounds: Rect.fromLTWH(
           pageWidth * 0.35, currentY + 2, pageWidth * 0.18 - 5, 16),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
+      ),
     );
 
     // Actual
@@ -310,7 +316,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       font,
       bounds: Rect.fromLTWH(
           pageWidth * 0.53, currentY + 2, pageWidth * 0.18 - 5, 16),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
+      ),
     );
 
     // Variance
@@ -326,7 +335,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       brush: PdfSolidBrush(varianceColor),
       bounds: Rect.fromLTWH(
           pageWidth * 0.71, currentY + 2, pageWidth * 0.15 - 5, 16),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
+      ),
     );
 
     // Variance %
@@ -337,7 +349,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
         brush: PdfSolidBrush(varianceColor),
         bounds: Rect.fromLTWH(
             pageWidth * 0.86, currentY + 2, pageWidth * 0.14 - 5, 16),
-        format: PdfStringFormat(alignment: PdfTextAlignment.right),
+        format: PdfStringFormat(
+          alignment: PdfTextAlignment.right,
+          textDirection: config.pdfTextDirection
+        ),
       );
     }
 
@@ -366,6 +381,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -374,7 +390,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       _boldFont,
       bounds: Rect.fromLTWH(
           pageWidth * 0.35, currentY + 3, pageWidth * 0.18 - 5, 16),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
+      ),
     );
 
     currentPage.graphics.drawString(
@@ -382,7 +401,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       _boldFont,
       bounds: Rect.fromLTWH(
           pageWidth * 0.53, currentY + 3, pageWidth * 0.18 - 5, 16),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
+      ),
     );
 
     final varianceColor =
@@ -397,7 +419,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       brush: PdfSolidBrush(varianceColor),
       bounds: Rect.fromLTWH(
           pageWidth * 0.71, currentY + 3, pageWidth * 0.15 - 5, 16),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
+      ),
     );
 
     if (showVariancePercent) {
@@ -407,7 +432,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
         brush: PdfSolidBrush(varianceColor),
         bounds: Rect.fromLTWH(
             pageWidth * 0.86, currentY + 3, pageWidth * 0.14 - 5, 16),
-        format: PdfStringFormat(alignment: PdfTextAlignment.right),
+        format: PdfStringFormat(
+          alignment: PdfTextAlignment.right,
+          textDirection: config.pdfTextDirection
+        ),
       );
     }
 
@@ -433,6 +461,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -445,7 +474,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       brush: PdfBrushes.white,
       bounds: Rect.fromLTWH(
           pageWidth * 0.35, currentY + 5, pageWidth * 0.18 - 5, 18),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
+      ),
     );
 
     currentPage.graphics.drawString(
@@ -457,7 +489,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       brush: PdfBrushes.white,
       bounds: Rect.fromLTWH(
           pageWidth * 0.53, currentY + 5, pageWidth * 0.18 - 5, 18),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
+      ),
     );
 
     final varianceText = data.totalVariance >= 0
@@ -473,7 +508,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       brush: PdfBrushes.white,
       bounds: Rect.fromLTWH(
           pageWidth * 0.71, currentY + 5, pageWidth * 0.15 - 5, 18),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: config.pdfTextDirection
+      ),
     );
 
     if (showVariancePercent) {
@@ -486,7 +524,10 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
         brush: PdfBrushes.white,
         bounds: Rect.fromLTWH(
             pageWidth * 0.86, currentY + 5, pageWidth * 0.14 - 5, 18),
-        format: PdfStringFormat(alignment: PdfTextAlignment.right),
+        format: PdfStringFormat(
+          alignment: PdfTextAlignment.right,
+          textDirection: config.pdfTextDirection
+        ),
       );
     }
 
@@ -503,6 +544,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -538,6 +580,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
         format: PdfStringFormat(
           alignment:
               config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+          textDirection: config.pdfTextDirection
         ),
       );
       addSpace(20);
@@ -558,6 +601,7 @@ class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 

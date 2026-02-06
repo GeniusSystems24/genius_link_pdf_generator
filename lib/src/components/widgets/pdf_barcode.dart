@@ -178,9 +178,7 @@ class GeniusPdfBarcode {
         ),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
+          textDirection: config.pdfTextDirection
         ),
       );
       currentY += style.captionFontSize + style.textSpacing + 4;
@@ -214,7 +212,10 @@ class GeniusPdfBarcode {
           barcodeWidth,
           barcodeHeight,
         ),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
+        format: PdfStringFormat(
+          alignment: PdfTextAlignment.center,
+          textDirection: config.pdfTextDirection
+        ),
       );
       currentY += barcodeHeight;
     }
@@ -237,7 +238,10 @@ class GeniusPdfBarcode {
           barcodeWidth,
           style.captionFontSize + 4,
         ),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
+        format: PdfStringFormat(
+          alignment: PdfTextAlignment.center,
+          textDirection: config.pdfTextDirection
+        ),
       );
       currentY += style.captionFontSize + 4;
     }
@@ -263,9 +267,7 @@ class GeniusPdfBarcode {
         ),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
+          textDirection: config.pdfTextDirection
         ),
       );
       currentY += style.captionFontSize + 4;
@@ -562,7 +564,10 @@ class GeniusPdfQRCodeGenerator {
           bounds.width - pad * 2,
           qrSize,
         ),
-        format: PdfStringFormat(alignment: PdfTextAlignment.center),
+        format: PdfStringFormat(
+          alignment: PdfTextAlignment.center,
+          textDirection: config.pdfTextDirection
+        ),
       );
       currentY += qrSize;
     }
@@ -587,9 +592,7 @@ class GeniusPdfQRCodeGenerator {
         ),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
+          textDirection: config.pdfTextDirection
         ),
       );
       currentY += style.captionFontSize + 4;
@@ -1022,9 +1025,7 @@ class GeniusBarcodeGroup {
         format: PdfStringFormat(
           alignment:
               config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-          textDirection: config.isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
+          textDirection: config.pdfTextDirection
         ),
       );
       currentY += 24;

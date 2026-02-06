@@ -758,6 +758,7 @@ class GeniusPdfService {
     double rotation = -45,
     double fontSize = 72,
     String outputFileName = 'watermarked',
+    TextDirection textDirection = TextDirection.ltr,
   }) async {
     try {
       GeniusPdfLogger.info('Adding watermark: "$watermarkText"',
@@ -786,6 +787,9 @@ class GeniusPdfService {
 
         // Draw watermark text centered
         final size = font.measureString(watermarkText);
+        final pdfTextDirection = textDirection == TextDirection.rtl
+            ? sf.PdfTextDirection.rightToLeft
+            : sf.PdfTextDirection.leftToRight;
         graphics.drawString(
           watermarkText,
           font,
@@ -794,6 +798,11 @@ class GeniusPdfService {
             center: Offset.zero,
             width: size.width,
             height: size.height,
+          ),
+          format: sf.PdfStringFormat(
+            alignment: sf.PdfTextAlignment.center,
+            lineAlignment: sf.PdfVerticalAlignment.middle,
+            textDirection: pdfTextDirection,
           ),
         );
 

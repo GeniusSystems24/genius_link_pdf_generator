@@ -55,9 +55,7 @@ class GeniusPdfSignatureArea {
         format: PdfStringFormat(
           alignment:
               config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-          textDirection: config.isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
+          textDirection: config.pdfTextDirection
         ),
       );
       currentY += 20;
@@ -89,9 +87,7 @@ class GeniusPdfSignatureArea {
         bounds: Rect.fromLTWH(dateLineX, signatureY + 2, 100, 0),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
+          textDirection: config.pdfTextDirection
         ),
       );
     }

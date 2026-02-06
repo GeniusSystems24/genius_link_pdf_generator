@@ -189,7 +189,8 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
       bounds: Rect.fromLTWH(pageWidth - 100, 5, 95, 22),
       format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+          lineAlignment: PdfVerticalAlignment.middle,
+          textDirection: config.pdfTextDirection),
     );
 
     final header = GeniusPdfReportHeader(
@@ -322,6 +323,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -460,6 +462,7 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 

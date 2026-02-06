@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
-import 'package:genius_pdf_example/main.dart';
+import 'package:genius_pdf_example/main.dart' show geniusPdfConfig;
 
 import '../theme/app_theme.dart';
 
@@ -104,6 +104,7 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
         titleFont,
         brush: PdfSolidBrush(PdfColor(0, 51, 102)),
         bounds: const Rect.fromLTWH(50, 50, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       graphics.drawString(
@@ -111,6 +112,7 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
         font,
         brush: PdfSolidBrush(PdfColor(100, 100, 100)),
         bounds: const Rect.fromLTWH(50, 90, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       graphics.drawLine(
@@ -124,6 +126,7 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
         font,
         brush: PdfSolidBrush(PdfColor(100, 100, 100)),
         bounds: const Rect.fromLTWH(50, 150, 500, 30),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       graphics.drawString(
@@ -132,6 +135,7 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
         font,
         brush: PdfSolidBrush(PdfColor(0, 0, 0)),
         bounds: const Rect.fromLTWH(50, 200, 500, 100),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       final features = [
@@ -149,6 +153,7 @@ class _SharingDemoScreenState extends State<SharingDemoScreen>
           font,
           brush: PdfSolidBrush(PdfColor(0, 0, 0)),
           bounds: Rect.fromLTWH(50, yPos, 500, 25),
+          format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
         );
         yPos += 30;
       }

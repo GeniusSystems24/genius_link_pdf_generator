@@ -242,7 +242,8 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
       bounds: Rect.fromLTWH(pageWidth - 80, 5, 75, 20),
       format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+          lineAlignment: PdfVerticalAlignment.middle,
+          textDirection: config.pdfTextDirection),
     );
   }
 
@@ -483,6 +484,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -515,6 +517,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -534,6 +537,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -555,6 +559,7 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 

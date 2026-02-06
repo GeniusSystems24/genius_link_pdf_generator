@@ -1240,9 +1240,7 @@ class GeniusPdfInfoBox {
 
       final titleFormat = PdfStringFormat(
         alignment: style.titleStyle.alignment.toPdfTextAlignment(config.isRTL),
-        textDirection: config.isRTL
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight,
+        textDirection: config.pdfTextDirection
       );
 
       graphics.drawString(
@@ -1367,9 +1365,7 @@ class GeniusPdfInfoBox {
       final footerFormat = PdfStringFormat(
         alignment:
             effectiveFooterStyle.alignment.toPdfTextAlignment(config.isRTL),
-        textDirection: config.isRTL
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight,
+        textDirection: config.pdfTextDirection
       );
 
       graphics.drawString(
@@ -2280,8 +2276,7 @@ class GeniusPdfSection {
     if (hasTitle) {
       final titleFormat = PdfStringFormat(
         alignment: style.titleStyle.alignment.toPdfTextAlignment(config.isRTL),
-        textDirection:
-            isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+        textDirection: config.pdfTextDirection
       );
 
       if (style.titlePosition == GeniusPdfSectionTitlePosition.above) {
@@ -2424,8 +2419,7 @@ class GeniusPdfSection {
         style.titlePosition == GeniusPdfSectionTitlePosition.inside) {
       final titleFormat = PdfStringFormat(
         alignment: style.titleStyle.alignment.toPdfTextAlignment(config.isRTL),
-        textDirection:
-            isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+        textDirection: config.pdfTextDirection
       );
 
       // Draw header background if specified

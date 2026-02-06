@@ -94,8 +94,7 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
       bounds: Rect.fromLTWH(margin + 10, yOffset + 15, contentWidth - 20, 30),
       format: PdfStringFormat(
         alignment: isRtl ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection:
-            isRtl ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+        textDirection: data.config.pdfTextDirection
       ),
     );
 
@@ -106,8 +105,7 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
       bounds: Rect.fromLTWH(margin + 10, yOffset + 45, contentWidth - 20, 20),
       format: PdfStringFormat(
         alignment: isRtl ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection:
-            isRtl ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight,
+        textDirection: data.config.pdfTextDirection
       ),
     );
 
@@ -120,6 +118,7 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
       bounds: Rect.fromLTWH(margin + 10, yOffset + 45, contentWidth - 20, 20),
       format: PdfStringFormat(
         alignment: isRtl ? PdfTextAlignment.left : PdfTextAlignment.right,
+        textDirection: data.config.pdfTextDirection
       ),
     );
 
@@ -262,6 +261,10 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
       regularFont,
       brush: PdfBrushes.gray,
       bounds: Rect.fromLTWH(margin, footerY, contentWidth / 2, 20),
+      format: PdfStringFormat(
+        alignment: isRtl ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: data.config.pdfTextDirection
+      ),
     );
 
     graphics.drawString(
@@ -270,7 +273,10 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
       brush: PdfBrushes.gray,
       bounds: Rect.fromLTWH(
           margin + contentWidth / 2, footerY, contentWidth / 2, 20),
-      format: PdfStringFormat(alignment: PdfTextAlignment.right),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.right,
+        textDirection: data.config.pdfTextDirection
+      ),
     );
   }
 

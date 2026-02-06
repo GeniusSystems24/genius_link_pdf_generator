@@ -186,6 +186,7 @@ class GeniusPdfDigitalSignature {
         boldFontToUse,
         brush: textBrush,
         bounds: Rect.fromLTWH(8, yOffset, bounds.width - 16, 12),
+        format: PdfStringFormat(textDirection: config.pdfTextDirection),
       );
       yOffset += 14;
     }
@@ -200,6 +201,7 @@ class GeniusPdfDigitalSignature {
         fontToUse,
         brush: textBrush,
         bounds: Rect.fromLTWH(8, yOffset, bounds.width - 16, 12),
+        format: PdfStringFormat(textDirection: config.pdfTextDirection),
       );
       yOffset += 14;
     }
@@ -211,6 +213,7 @@ class GeniusPdfDigitalSignature {
         fontToUse,
         brush: textBrush,
         bounds: Rect.fromLTWH(8, yOffset, bounds.width - 16, 12),
+        format: PdfStringFormat(textDirection: config.pdfTextDirection),
       );
       yOffset += 14;
     }
@@ -222,6 +225,7 @@ class GeniusPdfDigitalSignature {
         fontToUse,
         brush: textBrush,
         bounds: Rect.fromLTWH(8, yOffset, bounds.width - 16, 12),
+        format: PdfStringFormat(textDirection: config.pdfTextDirection),
       );
     }
   }
@@ -289,6 +293,7 @@ class GeniusPdfDigitalSignature {
         boldFontToUse,
         brush: textBrush,
         bounds: Rect.fromLTWH(bounds.left + 8, yOffset, bounds.width - 16, 12),
+        format: PdfStringFormat(textDirection: config.pdfTextDirection),
       );
       yOffset += 14;
     }
@@ -303,6 +308,7 @@ class GeniusPdfDigitalSignature {
         fontToUse,
         brush: textBrush,
         bounds: Rect.fromLTWH(bounds.left + 8, yOffset, bounds.width - 16, 12),
+        format: PdfStringFormat(textDirection: config.pdfTextDirection),
       );
       yOffset += 14;
     }
@@ -314,6 +320,7 @@ class GeniusPdfDigitalSignature {
         fontToUse,
         brush: textBrush,
         bounds: Rect.fromLTWH(bounds.left + 8, yOffset, bounds.width - 16, 12),
+        format: PdfStringFormat(textDirection: config.pdfTextDirection),
       );
       yOffset += 14;
     }
@@ -325,6 +332,7 @@ class GeniusPdfDigitalSignature {
         fontToUse,
         brush: textBrush,
         bounds: Rect.fromLTWH(bounds.left + 8, yOffset, bounds.width - 16, 12),
+        format: PdfStringFormat(textDirection: config.pdfTextDirection),
       );
     }
   }

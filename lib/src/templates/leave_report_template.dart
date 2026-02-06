@@ -666,6 +666,7 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
           alignment:
               config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
           lineAlignment: PdfVerticalAlignment.middle,
+          textDirection: config.pdfTextDirection
         ),
       );
 
@@ -685,6 +686,7 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
           alignment:
               config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
           lineAlignment: PdfVerticalAlignment.middle,
+          textDirection: config.pdfTextDirection
         ),
       );
       colorIndex++;
@@ -788,9 +790,7 @@ class LeaveReportTemplate extends GeniusPdfDocumentBuilder {
       font: captionFont,
       format: PdfStringFormat(
         alignment: PdfTextAlignment.center,
-        textDirection: config.isRTL
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight,
+        textDirection: config.pdfTextDirection
       ),
     ).draw(
         page: page,

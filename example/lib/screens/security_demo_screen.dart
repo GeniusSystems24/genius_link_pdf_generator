@@ -417,6 +417,7 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
         infoFont,
         brush: PdfSolidBrush(PdfColor(0, 0, 0)),
         bounds: Rect.fromLTWH(60, 210, pageSize.width - 120, 80),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
 
       await _saveAndOpenPdf(document, 'encrypted_$type');
@@ -609,7 +610,10 @@ class _SecurityDemoScreenState extends State<SecurityDemoScreen>
       geniusPdfConfig.baseFont,
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(50, 50, pageSize.width - 100, 40),
-      format: PdfStringFormat(alignment: PdfTextAlignment.center),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: geniusPdfConfig.pdfTextDirection,
+      ),
     );
 
     const sampleText = '''
@@ -629,6 +633,7 @@ This document was generated to showcase these features in action.
       geniusPdfConfig.boldFont,
       brush: PdfSolidBrush(PdfColor(50, 50, 50)),
       bounds: Rect.fromLTWH(50, 120, pageSize.width - 100, 200),
+      format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
     );
 
     _drawSampleTable(
@@ -659,6 +664,7 @@ This document was generated to showcase these features in action.
         brush: PdfSolidBrush(PdfColor(255, 255, 255)),
         bounds: Rect.fromLTWH(bounds.left + i * cellWidth + 5, bounds.top + 5,
             cellWidth - 10, cellHeight - 10),
+        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
       );
     }
 
@@ -680,6 +686,7 @@ This document was generated to showcase these features in action.
           brush: PdfSolidBrush(PdfColor(50, 50, 50)),
           bounds: Rect.fromLTWH(bounds.left + c * cellWidth + 5, y + 5,
               cellWidth - 10, cellHeight - 10),
+          format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
         );
       }
     }

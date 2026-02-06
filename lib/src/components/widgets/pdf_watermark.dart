@@ -206,7 +206,8 @@ class GeniusPdfWatermark {
           position.dx, position.dy, textSize.width, textSize.height),
       format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+          lineAlignment: PdfVerticalAlignment.middle,
+          textDirection: config.pdfTextDirection),
     );
 
     // Restore graphics state
@@ -268,7 +269,8 @@ class GeniusPdfWatermark {
     final pageSize = page.getClientSize();
 
     // Create font
-    final font = PdfTrueTypeFont(config.baseFontBytes,
+    final font = PdfTrueTypeFont(
+      config.baseFontBytes,
       settings.fontSize,
       style: settings.isBold ? PdfFontStyle.bold : PdfFontStyle.regular,
     );
@@ -306,7 +308,8 @@ class GeniusPdfWatermark {
           textSize.width, textSize.height),
       format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+          lineAlignment: PdfVerticalAlignment.middle,
+          textDirection: config.pdfTextDirection),
     );
 
     // Restore graphics state
@@ -318,7 +321,8 @@ class GeniusPdfWatermark {
     final pageSize = page.getClientSize();
 
     // Create font
-    final font = PdfTrueTypeFont(config.baseFontBytes,
+    final font = PdfTrueTypeFont(
+      config.baseFontBytes,
       settings.fontSize,
       style: settings.isBold ? PdfFontStyle.bold : PdfFontStyle.regular,
     );
@@ -373,7 +377,8 @@ class GeniusPdfWatermark {
               textSize.width, textSize.height),
           format: PdfStringFormat(
               alignment: PdfTextAlignment.center,
-              lineAlignment: PdfVerticalAlignment.middle),
+              lineAlignment: PdfVerticalAlignment.middle,
+              textDirection: config.pdfTextDirection),
         );
 
         graphics.restore();

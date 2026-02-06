@@ -549,9 +549,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       font: config.baseFont,
       format: PdfStringFormat(
         alignment: PdfTextAlignment.center,
-        textDirection: config.isRTL
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight,
+        textDirection: config.pdfTextDirection
       ),
     );
 

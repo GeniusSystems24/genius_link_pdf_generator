@@ -393,6 +393,7 @@ class PayslipTemplate extends GeniusPdfDocumentBuilder {
       format: PdfStringFormat(
         alignment:
             config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        textDirection: config.pdfTextDirection
       ),
     );
 
@@ -567,9 +568,7 @@ class PayslipTemplate extends GeniusPdfDocumentBuilder {
       font: captionFont,
       format: PdfStringFormat(
         alignment: PdfTextAlignment.center,
-        textDirection: config.isRTL
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight,
+        textDirection: config.pdfTextDirection
       ),
     ).draw(
         page: page,
@@ -659,7 +658,10 @@ class PayslipTemplate extends GeniusPdfDocumentBuilder {
               style: PdfFontStyle.italic),
       brush: PdfSolidBrush(PdfColor(128, 128, 128)),
       bounds: Rect.fromLTWH(0, bottomY, pageWidth, 20),
-      format: PdfStringFormat(alignment: PdfTextAlignment.center),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.center,
+        textDirection: config.pdfTextDirection
+      ),
     );
   }
 
