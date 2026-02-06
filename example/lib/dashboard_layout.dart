@@ -18,6 +18,7 @@ import 'screens/barcode_demo_screen.dart';
 import 'screens/examples_showcase_screen.dart';
 import 'screens/job_manager_demo_screen.dart';
 import 'screens/custom_report_screen.dart';
+import 'screens/modern_vouchers_demo_screen.dart';
 import 'dart:ui'; // For ImageFilter
 
 /// Modern Dashboard Layout with Glassmorphism and Smooth Navigation
@@ -234,6 +235,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       _DrawerItem('grid_richtext', 'Grid+RichText', Icons.format_quote_rounded),
       _DrawerItem('templates', 'Templates', Icons.description_rounded),
       _DrawerItem('templates_demo', 'Templates Demo', Icons.view_quilt_rounded),
+      _DrawerItem('modern_vouchers', 'Modern Vouchers', Icons.verified_rounded),
       _DrawerItem(
           'new_templates', 'Business Templates', Icons.auto_awesome_rounded),
       _DrawerItem('template_engine', 'Template Engine', Icons.tune_rounded),
@@ -618,6 +620,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         return 'Job Manager';
       case 'custom_report':
         return 'Custom Report';
+      case 'modern_vouchers':
+        return 'Modern Vouchers';
       default:
         return 'Genius PDF';
     }
@@ -689,6 +693,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         return const JobManagerDemoScreen();
       case 'custom_report':
         return const CustomReportScreen();
+      case 'modern_vouchers':
+        return const ModernVouchersDemoScreen();
 
       default:
         return DashboardHome(onNavigate: _onItemSelected);

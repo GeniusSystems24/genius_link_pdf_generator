@@ -519,4 +519,10 @@ class GeniusPdfPageSize {
 
   /// Legal page size (8.5 x 14 inches)
   static const Size legal = Size(612, 1008);
+
+  /// B5 page size (176 x 250 mm)
+  /// Converted to points (1 inch = 72 points, 1 mm = 2.83465 points)
+  /// 176mm * 2.83465 = 498.9 points
+  /// 250mm * 2.83465 = 708.7 points
+  static const Size b5 = Size(499, 709);
 }

@@ -12,6 +12,7 @@ export 'models/voucher_style.dart';
 
 // Base template
 export 'templates/voucher_base_template.dart';
+export 'templates/modern_voucher_template.dart';
 
 // Financial voucher templates (v3.0.0)
 export 'templates/accounting_entry_voucher.dart';

@@ -107,6 +107,11 @@ class _DashboardSidebarState extends State<DashboardSidebar>
           icon: Icons.view_quilt_rounded,
         ),
         const NavItem(
+          id: 'modern_vouchers',
+          title: 'Modern Vouchers',
+          icon: Icons.verified_rounded,
+        ),
+        const NavItem(
           id: 'new_templates',
           title: 'Business Templates',
           icon: Icons.auto_awesome_rounded,

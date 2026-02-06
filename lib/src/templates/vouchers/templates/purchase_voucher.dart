@@ -8,6 +8,7 @@
 library;
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import 'modern_voucher_template.dart';
 
 /// Generates a purchase voucher PDF page.
 ///
@@ -329,4 +330,128 @@ class PurchaseVoucher extends GeniusPdfVoucherTemplate {
         VoucherSignatory.accountant(),
         VoucherSignatory.manager(),
       ];
+}
+
+/// Modern Purchase Voucher implementing the "Official" layout.
+class ModernPurchaseVoucher extends ModernVoucherTemplate {
+  ModernPurchaseVoucher({
+    required super.config,
+    required super.company,
+    required super.data,
+    required this.tradeData,
+    super.style,
+  });
+
+  final VoucherTradeData tradeData;
+
+  @override
+  void buildVoucherContent() {
+    // 1. PO Reference
+    if (tradeData.orderNumber != null) {
+      _drawOrderReference();
+    }
+
+    // 2. Items Table
+    final hasCode = data.items.any((i) => i.itemCode != null);
+    final hasUnit = data.items.any((i) => i.unit != null);
+
+    final columns = <GeniusPdfGridColumn>[
+      const GeniusPdfGridColumn(
+        id: 'no',
+        title: 'رقم الصنف\nItem No',
+        alignment: GeniusPdfTextAlign.center,
+        width: 60,
+      ),
+      if (hasCode)
+        const GeniusPdfGridColumn(
+          id: 'code',
+          title: 'الرمز\nCode',
+          alignment: GeniusPdfTextAlign.center,
+          width: 55,
+        ),
+      const GeniusPdfGridColumn(
+        id: 'desc',
+        title: 'اسم الصنف\nItem Name',
+        flexFactor: 3,
+      ),
+      if (hasUnit)
+        const GeniusPdfGridColumn(
+          id: 'unit',
+          title: 'الوحدة\nUnit',
+          alignment: GeniusPdfTextAlign.center,
+          width: 50,
+        ),
+      const GeniusPdfGridColumn(
+        id: 'qty',
+        title: 'الكمية\nQty',
+        alignment: GeniusPdfTextAlign.center,
+        width: 40,
+      ),
+      GeniusPdfGridColumn.currency(
+        id: 'price',
+        title: 'السعر\nPrice',
+        width: 70,
+        currencySymbol: '',
+      ),
+      GeniusPdfGridColumn.currency(
+        id: 'total',
+        title: 'الإجمالي\nTotal',
+        width: 80,
+        currencySymbol: '',
+      ),
+    ];
+
+    final rows = data.items.map((item) {
+      return GeniusPdfGridRow(cells: {
+        'no': item.lineNumber,
+        if (hasCode) 'code': item.itemCode ?? '',
+        'desc':
+            isRTL ? (item.descriptionAr ?? item.description) : item.description,
+        if (hasUnit) 'unit': queryUnit(item),
+        'qty': item.quantity,
+        'price': item.unitPrice,
+        'total': item.totalAmount
+      });
+    }).toList();
+
+    drawItemsTable(
+      columns: columns,
+      rows: rows,
+      labelAr: '',
+      labelEn: '', // No label above table for modern style usually
+    );
+  }
+
+  void _drawOrderReference() {
+    // Similar to base but using modern style if needed,
+    // or reusing addInfoSection which Modern also supports.
+    final items = <GeniusPdfLabeledValue>[
+      _lv('رقم أمر الشراء', 'PO Number', tradeData.orderNumber!),
+      if (tradeData.orderDate != null)
+        _lv('تاريخ الأمر', 'PO Date', _fmtDate(tradeData.orderDate!)),
+    ];
+
+    addInfoSection(
+      labelAr: 'مرجع أمر الشراء',
+      labelEn: 'Purchase Order Reference',
+      items: items,
+      columns: items.length,
+    );
+  }
+
+  // Helpers duplicated/adapted
+  GeniusPdfLabeledValue _lv(String labelAr, String labelEn, String value) {
+    return GeniusPdfLabeledValue(
+      config: config,
+      label: labelEn,
+      labelAr: labelAr,
+      value: value,
+    );
+  }
+
+  String _fmtDate(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  String queryUnit(VoucherLineItem item) =>
+      isRTL ? (item.unitAr ?? item.unit ?? '') : (item.unit ?? '');
 }

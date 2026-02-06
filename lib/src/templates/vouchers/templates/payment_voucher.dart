@@ -8,23 +8,11 @@
 library;
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import 'package:flutter/material.dart' as m;
+import 'modern_voucher_template.dart';
 
-/// Generates a payment voucher PDF page.
-///
-/// ```dart
-/// final voucher = PaymentVoucher(
-///   config: config,
-///   company: companyInfo,
-///   data: VoucherData(
-///     serviceId: VoucherServiceId.cashPayment,
-///     voucherNumber: 'PV-2026-001',
-///     voucherDate: DateTime.now(),
-///     amount: 8500,
-///     party: VoucherParty(name: 'ABC Supplies', nameAr: 'مؤسسة أبك'),
-///   ),
-/// );
-/// ```
-class PaymentVoucher extends GeniusPdfVoucherTemplate {
+/// Generates a payment voucher PDF page using the Modern B5 template.
+class PaymentVoucher extends ModernVoucherTemplate {
   PaymentVoucher({
     required super.config,
     required super.company,
@@ -36,38 +24,121 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
   /// Optional deductions (tax withholding, discounts, penalties).
   final List<PaymentDeduction> deductions;
 
+  // We don't strictly need tradeData for PaymentVoucher unless we want to use shared mixins
+  // But ModernVoucherTemplate doesn't enforce it anymore.
+  @override
+  VoucherTradeData get tradeData => const VoucherTradeData(); // Dummy if needed
+
   @override
   void buildVoucherContent() {
-    // Account allocation
-    drawAccountEntriesTable();
+    // The "Official" table structure from the image:
+    // -----------------------------------------------------------------------------------------
+    // |  Amount  |  Currency  |                 Particulars                 |  Account No     |
+    // |----------|------------|---------------------------------------------|-----------------|
+    // |  500.00  |    SAR     |  Payment for invoice #123                   |    1200001      |
+    // -----------------------------------------------------------------------------------------
 
-    // Amount block
-    drawAmountBlock();
+    // We will build this Main Table.
+    drawMainTable();
 
-    // Paid to
-    drawPartyInfo(labelAr: 'صرفنا إلى', labelEn: 'Paid To');
-
-    // Payment details
-    drawPaymentDetails();
-
-    // Purpose / description
-    if (data.description != null || data.descriptionAr != null) {
-      _drawPurpose();
-    }
-
-    // Deductions (if any)
+    // Deductions below if any
     if (deductions.isNotEmpty) {
       _drawDeductions();
     }
   }
 
-  void _drawPurpose() {
-    final text = isRTL
-        ? (data.descriptionAr ?? data.description ?? '')
-        : (data.description ?? '');
-    addSectionHeading('وذلك عن', 'Purpose');
-    addLine(text, font: bodyFont, topMargin: 2);
-    addSpace(style.sectionSpacing);
+  void drawMainTable() {
+    // Columns
+    // 1. Amount (Prominent)
+    // 2. Currency (Small)
+    // 3. Particulars (Description) - Flexible width
+    // 4. Account No / Code
+    // 5. Cost Center (Optional)
+
+    final columns = [
+      const GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'المبلغ',
+          titleAr: 'المبلغ',
+          flexFactor: 2,
+          alignment: GeniusPdfTextAlign.center),
+      const GeniusPdfGridColumn(
+          id: 'curr',
+          title: 'العملة',
+          titleAr: 'العملة',
+          width: 50,
+          alignment: GeniusPdfTextAlign.center),
+      const GeniusPdfGridColumn(
+          id: 'desc',
+          title: 'البيان',
+          titleAr: 'البيان',
+          flexFactor: 5,
+          alignment: GeniusPdfTextAlign.end // Arabic text
+          ),
+      const GeniusPdfGridColumn(
+          id: 'acc',
+          title: 'رقم الحساب',
+          titleAr: 'رقم الحساب',
+          flexFactor: 2,
+          alignment: GeniusPdfTextAlign.center),
+    ];
+
+    // Rows
+
+    // Combine account entries and main description
+    // If we have account entries, list them. If not, use main voucher description.
+
+    final rows = <GeniusPdfGridRow>[];
+
+    if (data.accountEntries.isNotEmpty) {
+      for (final entry in data.accountEntries) {
+        rows.add(GeniusPdfGridRow(cells: {
+          'amount': _fmtNum(
+              entry.debitAmount > 0 ? entry.debitAmount : entry.creditAmount),
+          'curr': data.currencyAr, // or Symbol
+          'desc': isRTL
+              ? (entry.accountNameAr ?? entry.accountName)
+              : entry.accountName,
+          // Append description to account name if exists?
+          'acc': entry.accountCode,
+        }));
+      }
+    } else {
+      // Simple mode without explicit account entries
+      rows.add(GeniusPdfGridRow(cells: {
+        'amount': _fmtNum(data.amount),
+        'curr': data.currency,
+        'desc': isRTL
+            ? (data.descriptionAr ?? data.description ?? '')
+            : (data.description ?? ''),
+        'acc': ''
+      }));
+    }
+
+    // Fill up empty rows to make the table look substantial?
+    // Image shows a fixed height box.
+    // Let's ensure minimum height by adding empty rows if items are few.
+    while (rows.length < 5) {
+      rows.add(GeniusPdfGridRow(
+          cells: {'amount': '', 'curr': '', 'desc': '', 'acc': ''}));
+    }
+
+    final grid = GeniusPdfDataGrid(
+        config: config,
+        columns: columns,
+        rows: rows,
+        style: const GeniusPdfGridStyle(
+            borderStyle: GeniusPdfBorderStyle.all(width: 0.5),
+            showGridLines: true,
+            headerStyle: GeniusPdfCellStyle(
+                textStyle: GeniusPdfTextStyle(
+                    fontWeight: m.FontWeight.bold, fontSize: 10),
+                backgroundColor: m.Color(0xFFE0E0E0)), // Light grey header
+            cellStyle: GeniusPdfCellStyle(
+                padding: GeniusPdfCellPadding.symmetric(
+                    vertical: 5, horizontal: 2))));
+
+    addGrid(grid, spacing: 10);
   }
 
   void _drawDeductions() {
@@ -76,7 +147,7 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
       for (final ded in deductions)
         GeniusPdfGridRow(cells: {
           'name': isRTL ? (ded.nameAr ?? ded.name) : ded.name,
-          'amount': ded.amount,
+          'amount': _fmtNum(ded.amount),
         }),
     ];
 
@@ -84,54 +155,73 @@ class PaymentVoucher extends GeniusPdfVoucherTemplate {
       totalDeductions += ded.amount;
     }
 
+    // Modern template typically puts Net Amount in the summary area?
+    // Or we can add it here.
     final netAmount = data.amount - totalDeductions;
-    rows.add(GeniusPdfGridRow.total({
-      'name': isRTL ? 'صافي المبلغ' : 'Net Amount',
-      'amount': netAmount,
-    }));
+    rows.add(GeniusPdfGridRow(
+        cells: {
+          'name': isRTL ? 'صافي المبلغ' : 'Net Amount',
+          'amount': _fmtNum(netAmount),
+        },
+        style: const GeniusPdfCellStyle(
+            textStyle: GeniusPdfTextStyle(fontWeight: m.FontWeight.bold),
+            backgroundColor: m.Color(0xFFEEEEEE))));
 
-    addSectionHeading('الاستقطاعات', 'Deductions');
-    addSpace(4);
+    // Section Header
+    final header = GeniusPdfInfoBox(
+        config: config,
+        items: [
+          GeniusPdfLabeledValue(
+              config: config,
+              label: '',
+              value: isRTL ? 'الاستقطاعات' : 'Deductions',
+              valueStyle:
+                  const GeniusPdfTextStyle(fontWeight: m.FontWeight.bold))
+        ],
+        style: const GeniusPdfInfoBoxStyle(
+            borderStyle: GeniusPdfBorderStyle.none(),
+            padding: GeniusPdfCellPadding.all(2)),
+        columns: 1);
+    addInfoBox(header, spacing: 2);
 
     final grid = GeniusPdfDataGrid(
       config: config,
       columns: [
         const GeniusPdfGridColumn(
-          id: 'name',
-          title: 'Deduction',
-          titleAr: 'الاستقطاع',
-          flexFactor: 3,
-        ),
-        GeniusPdfGridColumn.currency(
-          id: 'amount',
-          title: 'Amount',
-          titleAr: 'المبلغ',
-          width: 90,
-          currencySymbol: '',
-        ),
+            id: 'name',
+            title: 'Deduction',
+            titleAr: 'الاستقطاع',
+            flexFactor: 3,
+            alignment: GeniusPdfTextAlign.end),
+        const GeniusPdfGridColumn(
+            id: 'amount',
+            title: 'Amount',
+            titleAr: 'المبلغ',
+            flexFactor: 1,
+            alignment: GeniusPdfTextAlign.center),
       ],
       rows: rows,
-      style: const GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle(
+          borderStyle: GeniusPdfBorderStyle.all(width: 0.5),
+          cellStyle: GeniusPdfCellStyle(
+              padding:
+                  GeniusPdfCellPadding.symmetric(vertical: 4, horizontal: 2))),
     );
 
-    final result = addGrid(grid, spacing: 0);
-    if (result != null) {
-      updateFromLayoutResult(result, spacing: style.sectionSpacing);
-    } else {
-      addSpace(style.sectionSpacing);
-    }
+    addGrid(grid, spacing: 10);
   }
 
-  @override
-  List<VoucherSignatory> defaultSignatories() => [
-        VoucherSignatory.preparedBy(),
-        VoucherSignatory.accountant(),
-        VoucherSignatory.manager(),
-        const VoucherSignatory(
-          role: 'Beneficiary',
-          roleAr: 'المستفيد',
-        ),
-      ];
+  // Helper to format numbers
+  String _fmtNum(double n) {
+    if (n == 0) return ''; // Don't show zero
+    if (n == n.truncateToDouble()) {
+      return n.truncate().toString().replaceAllMapped(
+          RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    }
+    return n
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');
+  }
 }
 
 /// A deduction applied to a payment.

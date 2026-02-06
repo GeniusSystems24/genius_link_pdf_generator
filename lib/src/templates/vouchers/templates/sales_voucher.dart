@@ -8,6 +8,7 @@
 library;
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import 'modern_voucher_template.dart';
 
 /// Generates a sales voucher PDF page.
 ///
@@ -345,4 +346,68 @@ class SalesVoucher extends GeniusPdfVoucherTemplate {
         VoucherSignatory.accountant(),
         TradeSignatories.customer(),
       ];
+}
+
+/// Modern Sales Voucher implementing the "Official" layout.
+class ModernSalesVoucher extends ModernVoucherTemplate {
+  ModernSalesVoucher({
+    required super.config,
+    required super.company,
+    required super.data,
+    required this.tradeData,
+    super.style,
+  });
+
+  final VoucherTradeData tradeData;
+
+  @override
+  void buildVoucherContent() {
+    final columns = [
+      const GeniusPdfGridColumn(
+          id: 'no',
+          title: 'رقم الصنف\nItem No',
+          alignment: GeniusPdfTextAlign.center,
+          width: 60),
+      const GeniusPdfGridColumn(
+          id: 'desc', title: 'اسم الصنف\nItem Name', flexFactor: 3),
+      const GeniusPdfGridColumn(
+          id: 'unit',
+          title: 'الوحدة\nUnit',
+          alignment: GeniusPdfTextAlign.center,
+          width: 50),
+      const GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'الكمية\nQty',
+          alignment: GeniusPdfTextAlign.center,
+          width: 40),
+      const GeniusPdfGridColumn(
+          id: 'bonus',
+          title: 'لـ.المجانية\nFree Qty',
+          alignment: GeniusPdfTextAlign.center,
+          width: 40),
+      GeniusPdfGridColumn.currency(
+          id: 'price', title: 'السعر\nPrice', width: 70),
+      GeniusPdfGridColumn.currency(
+          id: 'total', title: 'الإجمالي\nTotal', width: 80),
+    ];
+
+    final rows = data.items.map((item) {
+      return GeniusPdfGridRow(cells: {
+        'no': item.itemCode ?? '',
+        'desc':
+            isRTL ? (item.descriptionAr ?? item.description) : item.description,
+        'unit': isRTL ? (item.unitAr ?? item.unit ?? '') : (item.unit ?? ''),
+        'qty': item.quantity,
+        'bonus':
+            '', // Field not in standard model? Assuming empty custom field or calculated.
+        'price': item.unitPrice,
+        'total': item.totalAmount
+      });
+    }).toList();
+
+    // Fill empty rows if needed to fill space?
+    // For now just standard grid
+
+    drawItemsTable(columns: columns, rows: rows, labelAr: '', labelEn: '');
+  }
 }

@@ -94,6 +94,11 @@ class AppColors {
     Color(0xCC1E293B), // Slate 800 with 80% opacity
     Color(0xCC0F172A), // Slate 900 with 80% opacity
   ];
+
+  static const List<Color> darkGradient = [
+    Color(0xFF475569), // Slate 600
+    Color(0xFF1E293B), // Slate 800
+  ];
 }
 
 /// Modern App Theme Configuration
