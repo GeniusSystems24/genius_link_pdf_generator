@@ -4,7 +4,6 @@
 /// PurchaseReturnVoucher, and SalesReturnVoucher templates.
 library;
 
-import 'dart:typed_data';
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 

@@ -41,47 +41,6 @@ class GeniusPdfVoucherStyle {
     this.cellPadding = 4,
   });
 
-  // ── Colors ──
-  final Color primaryColor;
-  final Color secondaryColor;
-  final Color headerTextColor;
-  final Color borderColor;
-  final Color tableHeaderColor;
-  final Color tableHeaderTextColor;
-  final Color tableAltRowColor;
-  final Color accentColor;
-  final Color amountHighlightColor;
-  final Color debitColor;
-  final Color creditColor;
-  final Color badgeColor;
-  final Color badgeTextColor;
-
-  // ── Layout ──
-  final double headerHeight;
-  final double marginTop;
-  final double marginBottom;
-  final double marginLeft;
-  final double marginRight;
-  final double sectionSpacing;
-  final double signatureBlockHeight;
-
-  // ── Typography ──
-  final double titleFontSize;
-  final double subtitleFontSize;
-  final double bodyFontSize;
-  final double smallFontSize;
-  final double tableFontSize;
-
-  // ── Options ──
-  final bool showBorder;
-  final bool showServiceIdBadge;
-  final bool showCopyLabel;
-  final bool showWatermark;
-  final String? watermarkText;
-  final double borderWidth;
-  final double headerBorderRadius;
-  final double cellPadding;
-
   // ── Pre-built Styles ──
 
   /// Standard professional style with dark blue header.
@@ -144,6 +103,47 @@ class GeniusPdfVoucherStyle {
         accentColor: Color(0xFFC2185B),
         badgeColor: Color(0xFF880E4F),
       );
+
+  // ── Colors ──
+  final Color primaryColor;
+  final Color secondaryColor;
+  final Color headerTextColor;
+  final Color borderColor;
+  final Color tableHeaderColor;
+  final Color tableHeaderTextColor;
+  final Color tableAltRowColor;
+  final Color accentColor;
+  final Color amountHighlightColor;
+  final Color debitColor;
+  final Color creditColor;
+  final Color badgeColor;
+  final Color badgeTextColor;
+
+  // ── Layout ──
+  final double headerHeight;
+  final double marginTop;
+  final double marginBottom;
+  final double marginLeft;
+  final double marginRight;
+  final double sectionSpacing;
+  final double signatureBlockHeight;
+
+  // ── Typography ──
+  final double titleFontSize;
+  final double subtitleFontSize;
+  final double bodyFontSize;
+  final double smallFontSize;
+  final double tableFontSize;
+
+  // ── Options ──
+  final bool showBorder;
+  final bool showServiceIdBadge;
+  final bool showCopyLabel;
+  final bool showWatermark;
+  final String? watermarkText;
+  final double borderWidth;
+  final double headerBorderRadius;
+  final double cellPadding;
 
   GeniusPdfVoucherStyle copyWith({
     Color? primaryColor,

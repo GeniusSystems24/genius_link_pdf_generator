@@ -29,16 +29,16 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 /// ```
 class BankWithdrawalVoucher extends GeniusPdfVoucherTemplate {
   BankWithdrawalVoucher({
-    required GeniusPdfConfig config,
-    required GeniusPdfCompanyInfo company,
-    required VoucherData data,
+    required super.config,
+    required super.company,
+    required super.data,
     required this.bankInfo,
     this.authorizedPerson,
     this.authorizedPersonAr,
     this.atmLocation,
     this.maskedCardNumber,
-    GeniusPdfVoucherStyle style = const GeniusPdfVoucherStyle(),
-  }) : super(config: config, company: company, data: data, style: style);
+    super.style,
+  });
 
   /// Bank account information for the withdrawal.
   final VoucherBankInfo bankInfo;

@@ -8,7 +8,6 @@
 library;
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
-import 'modern_voucher_template.dart';
 
 /// Generates a sales return voucher PDF page.
 ///
@@ -34,12 +33,12 @@ import 'modern_voucher_template.dart';
 /// ```
 class SalesReturnVoucher extends GeniusPdfVoucherTemplate {
   SalesReturnVoucher({
-    required GeniusPdfConfig config,
-    required GeniusPdfCompanyInfo company,
-    required VoucherData data,
+    required super.config,
+    required super.company,
+    required super.data,
     required this.tradeData,
-    GeniusPdfVoucherStyle style = const GeniusPdfVoucherStyle(),
-  }) : super(config: config, company: company, data: data, style: style);
+    super.style,
+  });
 
   /// Trade-specific data.
   final VoucherTradeData tradeData;
@@ -352,6 +351,7 @@ class ModernSalesReturnVoucher extends ModernVoucherTemplate {
     super.style,
   });
 
+  @override
   final VoucherTradeData tradeData;
 
   @override

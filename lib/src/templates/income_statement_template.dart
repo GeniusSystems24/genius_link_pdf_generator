@@ -339,7 +339,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawSubtotalLine(String label, String labelAr, double amount) {
     // Ensure space before drawing.
-    final lineHeight = 22.0;
+    const lineHeight = 22.0;
     if (remainingHeight < lineHeight + 6) newPage();
 
     final displayLabel = config.isRTL ? labelAr : label;
@@ -428,7 +428,7 @@ class IncomeStatementTemplate extends GeniusPdfDocumentBuilder {
   // ──────────────────────────────────────────────────────────
 
   void _drawNetIncome() {
-    final boxHeight = 30.0;
+    const boxHeight = 30.0;
     if (remainingHeight < boxHeight + 10) newPage();
 
     final label = config.isRTL ? 'صافي الدخل' : 'Net Income';

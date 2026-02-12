@@ -268,7 +268,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       columns: columns,
       rows: rows,
-      style: GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     final result = grid.drawAt(
@@ -510,7 +510,7 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
         bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
 
     final captionHeight = captionLayout?.bounds.height ?? 0;
-    final qrSize = 80.0; // Reduced size
+    const qrSize = 80.0; // Reduced size
     final x = bounds.left + (bounds.width - qrSize) / 2;
     final y = bounds.top + captionHeight + 5;
 

@@ -575,7 +575,7 @@ class PayslipTemplate extends GeniusPdfDocumentBuilder {
         bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
 
     final captionHeight = captionLayout?.bounds.height ?? 0;
-    final qrSize = 80.0;
+    const qrSize = 80.0;
     final x = bounds.left + (bounds.width - qrSize) / 2;
     final y = bounds.top + captionHeight + 5;
 

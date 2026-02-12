@@ -230,7 +230,7 @@ class _VoucherBatchSummaryBuilder extends GeniusPdfDocumentBuilder {
         ),
       ],
       rows: rows,
-      style: GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     addGrid(grid, spacing: 0);

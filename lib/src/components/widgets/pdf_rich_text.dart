@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import '../../../genius_link_pdf_generator.dart';
-import '../../core/pdf_logger.dart';
 
 PdfFont _resolveRichTextBaseFont(PdfFont? baseFont, GeniusPdfConfig config) {
   return baseFont ?? config.baseFont;

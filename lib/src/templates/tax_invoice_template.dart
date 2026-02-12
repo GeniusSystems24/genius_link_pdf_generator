@@ -341,7 +341,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
                 'total': item.lineTotal,
               }))
           .toList(),
-      style: GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     // Use drawAt + updateFromLayoutResult for multi-page grid safety.
@@ -527,7 +527,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
 
   double _drawQRCodeContent(PdfPage page, Rect bounds) {
     if (qrCode != null) {
-      final size = 80.0;
+      const size = 80.0;
       final x = bounds.left + (bounds.width - size) / 2;
       page.graphics.drawImage(
         PdfBitmap(qrCode!.data),
@@ -542,7 +542,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
       PdfPage page, double x, double y, double width) {
     final qrUrl = 'https://localhost:443/invoice/${invoice.invoiceNumber}';
     final caption = 'ID: ${invoice.invoiceNumber}';
-    final qrSize = 80.0;
+    const qrSize = 80.0;
 
     final captionElement = PdfTextElement(
       text: caption,
@@ -584,7 +584,7 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     if (!showSignature) return;
 
     // Ensure enough space for signature area.
-    final signatureHeight = 70.0;
+    const signatureHeight = 70.0;
     if (remainingHeight < signatureHeight) {
       newPage();
     }

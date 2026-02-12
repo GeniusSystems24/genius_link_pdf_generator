@@ -34,12 +34,12 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 /// ```
 class InventoryVoucher extends GeniusPdfVoucherTemplate {
   InventoryVoucher({
-    required GeniusPdfConfig config,
-    required GeniusPdfCompanyInfo company,
-    required VoucherData data,
+    required super.config,
+    required super.company,
+    required super.data,
     required this.inventoryData,
-    GeniusPdfVoucherStyle style = const GeniusPdfVoucherStyle(),
-  }) : super(config: config, company: company, data: data, style: style);
+    super.style,
+  });
 
   /// Inventory-specific data.
   final VoucherInventoryData inventoryData;

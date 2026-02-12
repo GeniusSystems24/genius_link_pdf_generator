@@ -650,16 +650,24 @@ final titles = services.generateTitles(content);
       final buffer = StringBuffer('STRUCTURED DATA EXTRACTION\n');
       buffer.writeln('=' * 40);
       buffer.writeln('\nFound Dates:');
-      for (final date in dates) buffer.writeln('  - $date');
+      for (final date in dates) {
+        buffer.writeln('  - $date');
+      }
 
       buffer.writeln('\nFound Emails:');
-      for (final email in emails) buffer.writeln('  - $email');
+      for (final email in emails) {
+        buffer.writeln('  - $email');
+      }
 
       buffer.writeln('\nFound Phone Numbers:');
-      for (final phone in phones) buffer.writeln('  - $phone');
+      for (final phone in phones) {
+        buffer.writeln('  - $phone');
+      }
 
       buffer.writeln('\nFound Amounts:');
-      for (final amount in amounts) buffer.writeln('  - $amount');
+      for (final amount in amounts) {
+        buffer.writeln('  - $amount');
+      }
 
       setState(() {
         _status = buffer.toString();

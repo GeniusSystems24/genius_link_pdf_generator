@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,45 +13,9 @@ import 'package:path_provider/path_provider.dart';
 
 import '../data/sample_data.dart';
 import '../documents/advanced_layout_demo_document.dart';
-import '../documents/banking_voucher_demo_builder.dart';
-import '../documents/components/data_grid_demo_builder.dart';
-import '../documents/components/grid_infobox_demo_builder.dart';
-import '../documents/components/grid_qrcode_demo_builder.dart';
-import '../documents/components/grid_richtext_demo_builder.dart';
-import '../documents/components/grid_watermark_demo_builder.dart';
-import '../documents/components/headers_demo_builder.dart';
-import '../documents/components/info_box_demo_builder.dart';
-import '../documents/components/rich_text_demo_builder.dart';
-import '../documents/components/summary_demo_builder.dart';
-import '../documents/export_demo_document.dart';
-import '../documents/financial_templates.dart';
-import '../documents/hr_templates.dart';
-import '../documents/invoice_document.dart';
 import '../documents/multi_grid_summary_demo_document.dart';
 import '../documents/position_tracking_demo_document.dart';
 import '../documents/qr_attachments_demo_document.dart';
-import '../documents/remittance_voucher_demo_builder.dart';
-import '../documents/report_composer_demo_document.dart';
-import '../documents/report_document.dart';
-import '../documents/sales_templates.dart';
-import '../documents/smart_space_demo_document.dart';
-import '../documents/simple_document.dart';
-import '../documents/template_builtin_invoice.dart';
-import '../documents/template_builtin_letter.dart';
-import '../documents/template_builtin_report.dart';
-import '../documents/template_contract.dart';
-import '../documents/template_invoice.dart';
-import '../documents/template_json_letter.dart';
-import '../documents/template_json_memo.dart';
-import '../documents/template_purchase_order.dart';
-import '../documents/template_quotation.dart';
-import '../documents/template_receipt.dart';
-import '../documents/template_report.dart';
-import '../documents/template_timesheet.dart';
-import '../documents/templates_demo_documents.dart';
-import '../documents/trade_voucher_demo_builder.dart';
-import '../documents/voucher_demo_builder.dart';
-import '../documents/shared_build.dart';
 import '../main.dart' show geniusPdfConfig;
 import '../theme/app_theme.dart';
 

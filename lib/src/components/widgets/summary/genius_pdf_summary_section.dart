@@ -535,7 +535,7 @@ class _RenderableItem {
       _RenderableItem._(_RenderItemType.groupHeader, null, group);
 
   factory _RenderableItem.groupSeparator() =>
-      _RenderableItem._(_RenderItemType.groupSeparator, null, null);
+      const _RenderableItem._(_RenderItemType.groupSeparator, null, null);
 
   final _RenderItemType type;
   final GeniusPdfSummaryItem? item;

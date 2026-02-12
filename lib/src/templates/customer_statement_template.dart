@@ -383,7 +383,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       columns: columns,
       rows: rows,
-      style: GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     final result = grid.drawAt(
@@ -459,7 +459,7 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
           'total': _formatNumber(aging.total),
         }),
       ],
-      style: GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     final result = agingGrid.drawAt(

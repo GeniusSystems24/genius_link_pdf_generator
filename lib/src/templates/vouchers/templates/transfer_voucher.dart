@@ -30,12 +30,12 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 /// ```
 class TransferVoucher extends GeniusPdfVoucherTemplate {
   TransferVoucher({
-    required GeniusPdfConfig config,
-    required GeniusPdfCompanyInfo company,
-    required VoucherData data,
+    required super.config,
+    required super.company,
+    required super.data,
     required this.transferData,
-    GeniusPdfVoucherStyle style = const GeniusPdfVoucherStyle(),
-  }) : super(config: config, company: company, data: data, style: style);
+    super.style,
+  });
 
   /// Transfer-specific data.
   final VoucherTransferData transferData;
@@ -317,9 +317,10 @@ class TransferVoucher extends GeniusPdfVoucherTemplate {
   }
 
   String _fmtNum(double n) {
-    if (n == n.truncateToDouble())
+    if (n == n.truncateToDouble()) {
       return n.truncate().toString().replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    }
     return n
         .toStringAsFixed(2)
         .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');

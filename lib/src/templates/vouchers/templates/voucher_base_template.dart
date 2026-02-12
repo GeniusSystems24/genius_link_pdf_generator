@@ -35,6 +35,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 
   // ── Convenience getters ──
 
+  @override
   bool get isRTL => config.isRTL;
   PdfFont get titleFont => config.fontBuild(fontSize: style.titleFontSize);
   PdfFont get subtitleFont =>
@@ -182,7 +183,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       columns: columns,
       rows: [row],
-      style: GeniusPdfGridStyle.classic().copyWith(
+      style: const GeniusPdfGridStyle.classic().copyWith(
         headerStyle: headerStyle,
         cellStyle: cellStyle,
         showHeader: true,
@@ -452,7 +453,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
               data.accountEntries.fold<double>(0, (s, e) => s + e.creditAmount),
         }),
       ],
-      style: GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     final result = addGrid(grid, spacing: 0);
@@ -729,7 +730,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
   String _signatureRole(VoucherSignatory sig) {
     final roleAr = sig.roleAr ?? sig.role;
     if (roleAr == sig.role) return sig.role;
-    return '${roleAr}\n${sig.role}';
+    return '$roleAr\n${sig.role}';
   }
 
   /// Draws a data grid for line items.
@@ -745,7 +746,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       columns: columns,
       rows: rows,
-      style: GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     final result = addGrid(grid, spacing: 0);
@@ -769,9 +770,10 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   String _formatNumber(double n) {
-    if (n == n.truncateToDouble())
+    if (n == n.truncateToDouble()) {
       return n.truncate().toString().replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    }
     return n
         .toStringAsFixed(2)
         .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\.)'), (m) => '${m[1]},');

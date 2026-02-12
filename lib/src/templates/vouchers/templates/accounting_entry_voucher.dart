@@ -29,11 +29,11 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 /// ```
 class AccountingEntryVoucher extends GeniusPdfVoucherTemplate {
   AccountingEntryVoucher({
-    required GeniusPdfConfig config,
-    required GeniusPdfCompanyInfo company,
-    required VoucherData data,
-    GeniusPdfVoucherStyle style = const GeniusPdfVoucherStyle(),
-  }) : super(config: config, company: company, data: data, style: style);
+    required super.config,
+    required super.company,
+    required super.data,
+    super.style,
+  });
 
   @override
   void buildVoucherContent() {

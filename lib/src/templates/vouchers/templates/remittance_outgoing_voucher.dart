@@ -31,12 +31,12 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 /// ```
 class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
   RemittanceOutgoingVoucher({
-    required GeniusPdfConfig config,
-    required GeniusPdfCompanyInfo company,
-    required VoucherData data,
+    required super.config,
+    required super.company,
+    required super.data,
     required this.remittanceData,
-    GeniusPdfVoucherStyle style = const GeniusPdfVoucherStyle(),
-  }) : super(config: config, company: company, data: data, style: style);
+    super.style,
+  });
 
   /// Remittance-specific data.
   final VoucherRemittanceData remittanceData;
@@ -302,7 +302,9 @@ class RemittanceOutgoingVoucher extends GeniusPdfVoucherTemplate {
   void _drawFees() {
     if (remittanceData.transferFee == null &&
         remittanceData.exchangeMargin == null &&
-        remittanceData.totalCost == null) return;
+        remittanceData.totalCost == null) {
+      return;
+    }
 
     final items = <GeniusPdfLabeledValue>[
       if (remittanceData.transferFee != null)

@@ -34,12 +34,12 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 /// ```
 class TaxVoucher extends GeniusPdfVoucherTemplate {
   TaxVoucher({
-    required GeniusPdfConfig config,
-    required GeniusPdfCompanyInfo company,
-    required VoucherData data,
+    required super.config,
+    required super.company,
+    required super.data,
     required this.taxData,
-    GeniusPdfVoucherStyle style = const GeniusPdfVoucherStyle(),
-  }) : super(config: config, company: company, data: data, style: style);
+    super.style,
+  });
 
   final VoucherTaxData taxData;
 
@@ -305,7 +305,7 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
         ),
       ],
       rows: gridRows,
-      style: GeniusPdfGridStyle.classic().copyWith(
+      style: const GeniusPdfGridStyle.classic().copyWith(
         showHeader: false,
         alternateRowColors: false,
       ),
@@ -334,9 +334,9 @@ class TaxVoucher extends GeniusPdfVoucherTemplate {
 
   @override
   List<VoucherSignatory> defaultSignatories() => [
-        VoucherSignatory(role: 'Tax Accountant', roleAr: 'محاسب الضرائب'),
+        const VoucherSignatory(role: 'Tax Accountant', roleAr: 'محاسب الضرائب'),
         VoucherSignatory.manager(),
-        VoucherSignatory(
+        const VoucherSignatory(
             role: 'Authorized Signatory', roleAr: 'المفوض بالتوقيع'),
       ];
 }

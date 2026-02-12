@@ -9,7 +9,6 @@ library;
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 import 'package:flutter/material.dart' as m;
-import 'modern_voucher_template.dart';
 
 /// Generates a payment voucher PDF page using the Modern B5 template.
 class PaymentVoucher extends ModernVoucherTemplate {
@@ -119,7 +118,7 @@ class PaymentVoucher extends ModernVoucherTemplate {
     // Image shows a fixed height box.
     // Let's ensure minimum height by adding empty rows if items are few.
     while (rows.length < 5) {
-      rows.add(GeniusPdfGridRow(
+      rows.add(const GeniusPdfGridRow(
           cells: {'amount': '', 'curr': '', 'desc': '', 'acc': ''}));
     }
 

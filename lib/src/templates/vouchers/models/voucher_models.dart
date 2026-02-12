@@ -215,16 +215,6 @@ class VoucherSignatory {
     this.showSignatureLine = true,
   });
 
-  final String role;
-  final String? roleAr;
-  final String? name;
-  final String? title;
-  final String? titleAr;
-  final DateTime? date;
-  final bool showSignatureLine;
-
-  String displayRole({bool isRTL = true}) => isRTL ? (roleAr ?? role) : role;
-
   // Common signatory factories
   factory VoucherSignatory.preparedBy({String? name}) => VoucherSignatory(
         role: 'Prepared by',
@@ -267,6 +257,16 @@ class VoucherSignatory {
         roleAr: 'المدير',
         name: name,
       );
+
+  final String role;
+  final String? roleAr;
+  final String? name;
+  final String? title;
+  final String? titleAr;
+  final DateTime? date;
+  final bool showSignatureLine;
+
+  String displayRole({bool isRTL = true}) => isRTL ? (roleAr ?? role) : role;
 }
 
 /// Tax-specific data for tax vouchers.
