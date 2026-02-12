@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   pdf: ^3.10.8
-  syncfusion_flutter_pdf: ^31.2.18
+  syncfusion_flutter_pdf: ^32.2.4
   printing: ^5.13.3
   path_provider: ^2.1.4
   open_file: ^3.5.9
