@@ -4434,7 +4434,7 @@ GeniusShareTarget.bluetooth(deviceId: 'optional-id')
 // Specific apps
 GeniusShareTarget.whatsApp()
 GeniusShareTarget.telegram()
-GeniusShareTarget.app(packageName: 'com.example.app')
+GeniusShareTarget.app(packageName: 'com.genius_link.app')
 
 // Cloud storage
 GeniusShareTarget.cloud(provider: 'gdrive', folderPath: '/documents')

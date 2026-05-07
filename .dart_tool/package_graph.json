@@ -176,7 +176,7 @@
     },
     {
       "name": "syncfusion_flutter_pdf",
-      "version": "31.2.18",
+      "version": "32.2.4",
       "dependencies": [
         "convert",
         "crypto",
@@ -279,7 +279,7 @@
     },
     {
       "name": "matcher",
-      "version": "0.12.17",
+      "version": "0.12.19",
       "dependencies": [
         "async",
         "meta",
@@ -290,7 +290,7 @@
     },
     {
       "name": "test_api",
-      "version": "0.7.7",
+      "version": "0.7.10",
       "dependencies": [
         "async",
         "boolean_selector",
@@ -627,7 +627,7 @@
     },
     {
       "name": "syncfusion_flutter_core",
-      "version": "31.2.18",
+      "version": "32.2.4",
       "dependencies": [
         "flutter",
         "vector_math"
@@ -667,14 +667,14 @@
     },
     {
       "name": "material_color_utilities",
-      "version": "0.11.1",
+      "version": "0.13.0",
       "dependencies": [
         "collection"
       ]
     },
     {
       "name": "characters",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "dependencies": []
     },
     {
