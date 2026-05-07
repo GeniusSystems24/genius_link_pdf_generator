@@ -31,34 +31,50 @@ bilingual behavior, public API compatibility, and same-change doc/example sync
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **I. Library-first**: Is all new behavior in `lib/src/`? Is any logic
-  currently only in `example/` that must be promoted to the library?
-- **II. Financial correctness**: Does this feature touch monetary calculations?
-  If yes, what rounding strategy is used, and what unit tests cover the totals?
-- **III. Rendering correctness**: What layout, Y-position, column-width, or
-  page-break logic is affected? What single-page and multi-page verification
-  steps are planned in both RTL and LTR modes?
-- **IV. Test-driven bug fixing**: If this is a bug fix, what regression test or
-  documented reproduction script ships in the same change?
-- **V. Backward compatibility**: Does this change any public API, factory
-  constructor, enum value, or behavioral contract? What is the SemVer impact
-  and where is the migration guidance?
-- **VI. Separation of concerns**: Which package layer owns each change:
-  `components`, `builders`, `services`, `printing`, `sharing`, `templates`,
-  `widgets`, or `core`? Why is that the narrowest valid layer? Does any module
-  import across a concern boundary?
-- **VII. RTL/LTR parity**: What Arabic/English text, labels, alignment rules,
-  column order, or RTL/LTR layout calculations are affected? Which example
-  screen or manual verification step exercises both directions?
-- **VIII. Documentation consistency**: Which public barrels, `README.md`,
-  `CHANGELOG.md`, and `example/` files must change with this work? Are all
-  README code examples compilable or marked pseudo-code?
-- **IX. Deterministic outputs**: Does the feature introduce wall-clock time,
+- **I. PDF Generation Correctness First**: Does this change preserve structural
+  validity — openable, printable, exportable, and stable across supported
+  layouts? Is correctness compromised in any way for ergonomics or performance?
+- **II. Scope Boundary**: Does this work stay within PDF generation mechanics?
+  Does it touch business-data validation, financial calculations, or tax logic
+  (prohibited)? Are templates under `lib/templates` and core code under
+  `lib/src` with no crossover?
+- **III. Builder State Integrity**: Which builder state fields (`currentY`,
+  page index, page reference, layout result, header space, footer space) are
+  affected? Is the state synchronized after every drawing operation? Can a
+  partial failure leave state inconsistent?
+- **IV. Header/Footer Safety**: Does this change affect header/footer reserved
+  space calculation? Is content guaranteed not to overlap reserved areas on
+  any new page?
+- **V. Multi-page Component Safety**: Does this component create or continue
+  on new pages? Does it return sufficient layout information for the builder to
+  update page reference, index, and `currentY` correctly after completion?
+- **VI. Deterministic PDF Output**: Does this change introduce wall-clock time,
   random seeds, locale-sensitive defaults, or mutable global state that could
   cause output to vary between calls with identical inputs?
-- **X. Performance safety**: Does the feature process more than one page of
-  content? If yes, is it off the UI thread, and does it provide a progress
-  callback?
+- **VII. Fail Fast With Clear Errors**: Are all invalid generation states caught
+  and reported with descriptive errors? Is any silent partial or corrupt output
+  possible?
+- **VIII. Test Before Fix**: If this is a bug fix, what focused test was added
+  to reproduce the defect before the fix? Does it fail before the fix and pass
+  after? If automated testing is impractical, what manual reproduction script
+  ships in the same change?
+- **IX. Minimal Public API Breakage**: Does this change any public API,
+  factory constructor, enum value, or behavioral contract? What is the SemVer
+  impact and where is the migration guidance in `README.md`/`CHANGELOG.md`?
+- **X. Documentation Discipline**: Which `README.md`, `CHANGELOG.md`, and
+  `example/` files must change with this work? Are all example usages aligned
+  with the updated public surface?
+- **XI. Regression Protection**: Are any previously fixed PDF layout behaviors
+  touched by this change? Are they covered by regression tests before the code
+  is modified?
+- **XII. Resource Safety**: Are PDF documents, images, fonts, and byte buffers
+  acquired and released safely? Is there a deterministic release path for every
+  resource opened during generation?
+- **XIII. Platform Awareness**: Which platforms (mobile, desktop, web) are
+  affected? Is any behavior platform-specific and explicitly documented as such?
+- **XIV. No Silent Layout Corruption**: If a component cannot fit, split, scale,
+  or move safely, does it fail with a clear error rather than silently drawing
+  outside page bounds or producing zero-size output?
 
 ## Project Structure
 
