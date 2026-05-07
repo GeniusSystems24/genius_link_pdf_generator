@@ -85,6 +85,7 @@ export 'src/core/pdf_config.dart';
 export 'src/core/pdf_assets.dart';
 export 'src/core/pdf_logger.dart';
 export 'src/core/pdf_print_theme.dart';
+export 'src/core/financial/financial.dart';
 
 // Models
 export 'src/models/pdf_image.dart';

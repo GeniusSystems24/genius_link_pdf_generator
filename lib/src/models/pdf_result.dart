@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import '../core/financial/financial.dart';
+
 /// Result of a PDF generation operation.
 ///
 /// This sealed class represents either a successful PDF generation
@@ -89,6 +91,17 @@ class GeniusPdfFailure extends GeniusPdfResult {
       stackTrace: stackTrace,
     );
   }
+
+  /// Creates a failure from a [GeniusFinancialValidationResult].
+  factory GeniusPdfFailure.fromValidation(GeniusFinancialValidationResult result) {
+    return GeniusPdfFailure(
+      error: result,
+      message: result.errors.isNotEmpty
+          ? result.errors.first.message
+          : 'Financial validation failed',
+    );
+  }
+
   /// The error that caused the failure.
   final Object error;
 
@@ -97,6 +110,13 @@ class GeniusPdfFailure extends GeniusPdfResult {
 
   /// A human-readable error message.
   final String message;
+
+  /// Returns the [GeniusFinancialValidationResult] if this failure originated
+  /// from financial validation, otherwise null.
+  GeniusFinancialValidationResult? get validationResult =>
+      error is GeniusFinancialValidationResult
+          ? error as GeniusFinancialValidationResult
+          : null;
 
   @override
   String toString() => 'PdfFailure(message: $message)';

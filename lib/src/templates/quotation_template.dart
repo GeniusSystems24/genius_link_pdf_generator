@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart'
@@ -5,7 +6,9 @@ import 'package:syncfusion_flutter_pdf/pdf.dart'
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
+import '../core/financial/financial.dart';
 import '../core/pdf_config.dart';
+import '../models/pdf_result.dart';
 
 /// Quotation item model.
 class QuotationItem {
@@ -169,6 +172,50 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
     // Signatures section
     if (showSignatures) {
       _drawSignatureSection();
+    }
+  }
+
+  /// Validates financial totals then generates the PDF.
+  ///
+  /// Returns [GeniusPdfFailure] if subtotal, discount, tax, or grand total
+  /// validation fails. Pass `validateFinancials: false` to skip validation.
+  Future<GeniusPdfResult> generateResult({
+    bool validateFinancials = true,
+    GeniusFinancialValidationContext? validationContext,
+  }) async {
+    if (validateFinancials) {
+      final policy =
+          validationContext?.roundingPolicy ?? GeniusRoundingPolicy.defaults();
+      final validator = GeniusFinancialValidator(policy);
+
+      final lineTotals =
+          quotation.items.map((i) => i.subtotal).toList();
+      final subtotalResult = validator.validateSubtotal(
+        lineTotals: lineTotals,
+        providedSubtotal: quotation.subTotal,
+      );
+
+      final grandTotalResult = validator.validateGrandTotal(
+        subtotal: quotation.subTotal,
+        discounts: quotation.totalDiscount,
+        vatAmount: quotation.totalTax,
+        fees: 0.0,
+        providedGrandTotal: quotation.grandTotal,
+      );
+
+      final combined =
+          validator.combineResults([subtotalResult, grandTotalResult]);
+
+      if (!combined.isValid) return GeniusPdfFailure.fromValidation(combined);
+    }
+
+    try {
+      return GeniusPdfSuccess(
+        bytes: Uint8List.fromList(generate()),
+        fileName: 'quotation_${quotation.quotationNumber}.pdf',
+      );
+    } catch (e, st) {
+      return GeniusPdfFailure.fromException(e, st);
     }
   }
 

@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart'
@@ -5,7 +6,9 @@ import 'package:syncfusion_flutter_pdf/pdf.dart'
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
+import '../core/financial/financial.dart';
 import '../core/pdf_config.dart';
+import '../models/pdf_result.dart';
 
 /// Note type enum for credit/debit notes.
 enum NoteType {
@@ -170,6 +173,60 @@ class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
     }
 
     _drawSignatureSection();
+  }
+
+  /// Validates financial totals then generates the PDF.
+  ///
+  /// Returns [GeniusPdfFailure] if subtotal, VAT, or grand total validation
+  /// fails. Pass `validateFinancials: false` to skip validation.
+  Future<GeniusPdfResult> generateResult({
+    bool validateFinancials = true,
+    GeniusFinancialValidationContext? validationContext,
+  }) async {
+    if (validateFinancials) {
+      final policy =
+          validationContext?.roundingPolicy ?? GeniusRoundingPolicy.defaults();
+      final validator = GeniusFinancialValidator(policy);
+
+      final lineTotals = note.items.map((i) => i.lineTotal).toList();
+      final subtotalResult = validator.validateSubtotal(
+        lineTotals: lineTotals,
+        providedSubtotal: note.subtotal,
+      );
+
+      final vatResults = note.taxes
+          .map((tax) => validator.validateVat(
+                vatBase: note.subtotal,
+                vatRate: tax.rate,
+                providedVatAmount: note.subtotal * tax.rate / 100,
+              ))
+          .toList();
+
+      final grandTotalResult = validator.validateGrandTotal(
+        subtotal: note.subtotal,
+        discounts: 0.0,
+        vatAmount: note.totalTax,
+        fees: 0.0,
+        providedGrandTotal: note.grandTotal,
+      );
+
+      final combined = validator.combineResults([
+        subtotalResult,
+        ...vatResults,
+        grandTotalResult,
+      ]);
+
+      if (!combined.isValid) return GeniusPdfFailure.fromValidation(combined);
+    }
+
+    try {
+      return GeniusPdfSuccess(
+        bytes: Uint8List.fromList(generate()),
+        fileName: 'note_${note.noteNumber}.pdf',
+      );
+    } catch (e, st) {
+      return GeniusPdfFailure.fromException(e, st);
+    }
   }
 
   void _drawHeader() {

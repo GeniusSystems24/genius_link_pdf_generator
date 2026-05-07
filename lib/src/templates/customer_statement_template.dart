@@ -1,12 +1,14 @@
+import 'dart:typed_data';
 import 'dart:ui';
-
 
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridRow, PdfGridStyle, PdfGridColumn, PdfTextStyle;
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
+import '../core/financial/financial.dart';
 import '../core/pdf_config.dart';
+import '../models/pdf_result.dart';
 
 /// Transaction entry for customer statement.
 class StatementTransaction {
@@ -170,6 +172,49 @@ class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
     // Signature
     if (showSignature) {
       _drawSignature();
+    }
+  }
+
+  /// Validates debit/credit balance then generates the PDF.
+  ///
+  /// Returns [GeniusPdfFailure] if total debits ≠ total credits.
+  /// Pass `validateFinancials: false` to skip validation.
+  Future<GeniusPdfResult> generateResult({
+    bool validateFinancials = true,
+    GeniusFinancialValidationContext? validationContext,
+  }) async {
+    if (validateFinancials) {
+      final policy =
+          validationContext?.roundingPolicy ?? GeniusRoundingPolicy.defaults();
+      final validator = GeniusFinancialValidator(policy);
+
+      final debitTotals =
+          data.transactions.map((t) => t.debit).toList();
+      final creditTotals =
+          data.transactions.map((t) => t.credit).toList();
+
+      final debitSumResult = validator.validateSubtotal(
+        lineTotals: debitTotals,
+        providedSubtotal: data.totalDebits,
+      );
+      final creditSumResult = validator.validateSubtotal(
+        lineTotals: creditTotals,
+        providedSubtotal: data.totalCredits,
+      );
+
+      final combined =
+          validator.combineResults([debitSumResult, creditSumResult]);
+
+      if (!combined.isValid) return GeniusPdfFailure.fromValidation(combined);
+    }
+
+    try {
+      return GeniusPdfSuccess(
+        bytes: Uint8List.fromList(generate()),
+        fileName: 'statement_${data.periodTo.millisecondsSinceEpoch}.pdf',
+      );
+    } catch (e, st) {
+      return GeniusPdfFailure.fromException(e, st);
     }
   }
 

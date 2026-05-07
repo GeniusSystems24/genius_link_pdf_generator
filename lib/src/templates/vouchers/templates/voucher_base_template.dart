@@ -5,13 +5,17 @@
 /// templates extend this class and override [buildVoucherContent].
 library;
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart' as m;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../builders/pdf_document_builder.dart';
 import '../../../components/components.dart';
+import '../../../core/financial/financial.dart';
 import '../../../core/pdf_config.dart';
 import '../../../extensions/color_extensions.dart';
+import '../../../models/pdf_result.dart';
 import '../models/amount_to_words.dart';
 import '../models/voucher_enums.dart';
 import '../models/voucher_models.dart';
@@ -95,6 +99,57 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 
   /// Override in subclass to draw the voucher-specific body content.
   void buildVoucherContent();
+
+  /// Validates accounting entries and currency conversion (if present),
+  /// then generates the PDF.
+  ///
+  /// Returns [GeniusPdfFailure] if validation fails.
+  /// Pass `validateFinancials: false` to skip validation.
+  Future<GeniusPdfResult> generateResult({
+    bool validateFinancials = true,
+    GeniusFinancialValidationContext? validationContext,
+  }) async {
+    if (validateFinancials) {
+      final policy =
+          validationContext?.roundingPolicy ?? GeniusRoundingPolicy.defaults();
+      final validator = GeniusFinancialValidator(policy);
+      final results = <GeniusFinancialValidationResult>[];
+
+      if (data.accountEntries.isNotEmpty) {
+        results.add(validator.validateAccountingEntries(
+          debits: data.accountEntries.map((e) => e.debitAmount).toList(),
+          credits: data.accountEntries.map((e) => e.creditAmount).toList(),
+        ));
+      }
+
+      final pd = data.paymentDetails;
+      if (pd != null &&
+          pd.exchangeRate != null &&
+          pd.sourceAmount != null &&
+          pd.targetAmount != null) {
+        results.add(validator.validateCurrencyConversion(
+          sourceAmount: pd.sourceAmount!,
+          exchangeRate: pd.exchangeRate!,
+          providedTargetAmount: pd.targetAmount!,
+          sourceCurrencyPolicy: validationContext?.sourceCurrencyPolicy,
+        ));
+      }
+
+      if (results.isNotEmpty) {
+        final combined = validator.combineResults(results);
+        if (!combined.isValid) return GeniusPdfFailure.fromValidation(combined);
+      }
+    }
+
+    try {
+      return GeniusPdfSuccess(
+        bytes: Uint8List.fromList(generate()),
+        fileName: 'voucher_${data.voucherNumber}.pdf',
+      );
+    } catch (e, st) {
+      return GeniusPdfFailure.fromException(e, st);
+    }
+  }
 
   // ── Header ──
 

@@ -1,14 +1,14 @@
+import 'dart:typed_data';
 import 'dart:ui';
-
-
-
 
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
+import '../core/financial/financial.dart';
 import '../core/pdf_config.dart';
+import '../models/pdf_result.dart';
 
 /// Purchase order line item.
 class PurchaseOrderItem {
@@ -188,6 +188,61 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
     }
 
     _drawSignatureSection();
+  }
+
+  /// Validates financial totals then generates the PDF.
+  ///
+  /// Returns [GeniusPdfFailure] if subtotal, VAT, or grand total validation
+  /// fails. Pass `validateFinancials: false` to skip validation.
+  Future<GeniusPdfResult> generateResult({
+    bool validateFinancials = true,
+    GeniusFinancialValidationContext? validationContext,
+  }) async {
+    if (validateFinancials) {
+      final policy =
+          validationContext?.roundingPolicy ?? GeniusRoundingPolicy.defaults();
+      final validator = GeniusFinancialValidator(policy);
+
+      final lineTotals =
+          purchaseOrder.items.map((i) => i.lineTotal).toList();
+      final subtotalResult = validator.validateSubtotal(
+        lineTotals: lineTotals,
+        providedSubtotal: purchaseOrder.subtotal,
+      );
+
+      final vatResults = purchaseOrder.taxes
+          .map((tax) => validator.validateVat(
+                vatBase: purchaseOrder.subtotal,
+                vatRate: tax.rate,
+                providedVatAmount: purchaseOrder.subtotal * tax.rate / 100,
+              ))
+          .toList();
+
+      final grandTotalResult = validator.validateGrandTotal(
+        subtotal: purchaseOrder.subtotal,
+        discounts: 0.0,
+        vatAmount: purchaseOrder.totalTax,
+        fees: 0.0,
+        providedGrandTotal: purchaseOrder.grandTotal,
+      );
+
+      final combined = validator.combineResults([
+        subtotalResult,
+        ...vatResults,
+        grandTotalResult,
+      ]);
+
+      if (!combined.isValid) return GeniusPdfFailure.fromValidation(combined);
+    }
+
+    try {
+      return GeniusPdfSuccess(
+        bytes: Uint8List.fromList(generate()),
+        fileName: 'po_${purchaseOrder.poNumber}.pdf',
+      );
+    } catch (e, st) {
+      return GeniusPdfFailure.fromException(e, st);
+    }
   }
 
   void _drawHeader() {

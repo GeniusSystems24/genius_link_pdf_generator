@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart'
@@ -5,7 +6,9 @@ import 'package:syncfusion_flutter_pdf/pdf.dart'
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
+import '../core/financial/financial.dart';
 import '../core/pdf_config.dart';
+import '../models/pdf_result.dart';
 
 /// Employee information for payslip.
 class PayslipEmployee {
@@ -183,6 +186,55 @@ class PayslipTemplate extends GeniusPdfDocumentBuilder {
       _drawSignatures();
     } else {
       _drawDigitalDisclaimer();
+    }
+  }
+
+  /// Validates that net pay = total earnings − total deductions, then generates.
+  ///
+  /// Returns [GeniusPdfFailure] if the net pay validation fails.
+  /// Pass `validateFinancials: false` to skip validation.
+  Future<GeniusPdfResult> generateResult({
+    bool validateFinancials = true,
+    GeniusFinancialValidationContext? validationContext,
+  }) async {
+    if (validateFinancials) {
+      final policy =
+          validationContext?.roundingPolicy ?? GeniusRoundingPolicy.defaults();
+      final validator = GeniusFinancialValidator(policy);
+
+      final earningTotals =
+          payslip.earnings.map((e) => e.amount).toList();
+      final deductionTotals =
+          payslip.deductions.map((d) => d.amount).toList();
+
+      final earningsResult = validator.validateSubtotal(
+        lineTotals: earningTotals,
+        providedSubtotal: payslip.totalEarnings,
+      );
+      final deductionsResult = validator.validateSubtotal(
+        lineTotals: deductionTotals,
+        providedSubtotal: payslip.totalDeductions,
+      );
+      final netPayResult = validator.validateTransferNet(
+        sourceAmount: payslip.totalEarnings,
+        fee: payslip.totalDeductions,
+        commission: 0.0,
+        providedNetAmount: payslip.netPay,
+      );
+
+      final combined = validator.combineResults(
+          [earningsResult, deductionsResult, netPayResult]);
+
+      if (!combined.isValid) return GeniusPdfFailure.fromValidation(combined);
+    }
+
+    try {
+      return GeniusPdfSuccess(
+        bytes: Uint8List.fromList(generate()),
+        fileName: 'payslip_${payslip.payPeriod.replaceAll(' ', '_')}.pdf',
+      );
+    } catch (e, st) {
+      return GeniusPdfFailure.fromException(e, st);
     }
   }
 

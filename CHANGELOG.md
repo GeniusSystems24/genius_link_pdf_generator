@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.0] - 2026-05-08
+
+### Added — Financial Calculation Validation Layer
+
+New package `lib/src/core/financial/` with full financial validation support:
+
+- **`GeniusRoundingPolicy`** — configurable rounding (halfUp, halfEven, truncate, floor, ceiling), per-currency decimal places (KWD 3dp, JPY 0dp, SAR 2dp), dual absolute+relative tolerance
+- **`GeniusMoney`** — immutable minor-unit value type; exact integer arithmetic; `isWithinTolerance` uses integer comparison (IEEE 754 safe)
+- **`GeniusFinancialValidator`** — stateless validator: subtotal, VAT (post-discount ZATCA), grand total, transfer net, currency conversion (two-stage), accounting balance (strict), grid column sums, averages, budget variance; all errors bilingual (EN/AR)
+- **`GeniusFinancialValidationResult`** / **`GeniusFinancialValidationError`** — sealed result with `combine()` for multi-field validation
+- **`GeniusFinancialValidationContext`** — rounding policy + optional source-currency policy for multi-currency flows
+- **`GeniusPdfFailure.fromValidation()`** factory and **`validationResult`** getter on `GeniusPdfFailure`
+- **`generateResult({validateFinancials, validationContext})`** on `TaxInvoiceTemplate`, `CreditNoteTemplate`, `PurchaseOrderTemplate`, `QuotationTemplate`, `PayslipTemplate`, `CustomerStatementTemplate`, and `GeniusPdfVoucherTemplate`; `validateFinancials: false` preserves backward compatibility
+- 98 unit tests: rounding modes, zero/negative/large amounts, ZATCA VAT, accumulation, multi-currency
+
+**Zero breaking changes** — existing `generate()` calls are untouched; `generateResult()` is additive.
+
+---
+
 ## [3.5.0] - 2026-02-06
 
 ### Added

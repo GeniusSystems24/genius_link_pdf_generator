@@ -62,6 +62,10 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
   Balance sheet, income statement, cash flow, budget reports
 
+### ✅ **Financial Calculation Validation** (v3.6.0)
+
+  Pre-generation validation of subtotals, VAT (ZATCA post-discount), grand totals, accounting balance, currency conversion, and payslip net pay — with bilingual EN/AR error messages and IEEE 754-safe integer arithmetic
+
 ### 🛒 **Sales Templates**
 
   Quotations, purchase orders, delivery notes, credit/debit notes

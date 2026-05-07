@@ -1,11 +1,14 @@
+import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart' as m;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
+import '../core/financial/financial.dart';
 import '../core/pdf_config.dart';
 import '../models/pdf_image.dart';
+import '../models/pdf_result.dart';
 
 /// Invoice line item data.
 class InvoiceLineItem {
@@ -151,6 +154,61 @@ class TaxInvoiceTemplate extends GeniusPdfDocumentBuilder {
     _drawVatBreakdown();
     _drawFooterSection();
     _drawSignature();
+  }
+
+  /// Validates financial totals then generates the PDF.
+  ///
+  /// Returns [GeniusPdfFailure] if validation fails (subtotal, VAT, grand total),
+  /// or [GeniusPdfSuccess] with the PDF bytes on success.
+  /// Pass `validateFinancials: false` to skip validation (backward-compatible opt-out).
+  Future<GeniusPdfResult> generateResult({
+    bool validateFinancials = true,
+    GeniusFinancialValidationContext? validationContext,
+  }) async {
+    if (validateFinancials) {
+      final policy =
+          validationContext?.roundingPolicy ?? GeniusRoundingPolicy.defaults();
+      final validator = GeniusFinancialValidator(policy);
+
+      final lineTotals = invoice.items.map((i) => i.lineTotal).toList();
+      final subtotalResult = validator.validateSubtotal(
+        lineTotals: lineTotals,
+        providedSubtotal: invoice.subtotal,
+      );
+
+      final vatResults = invoice.taxes
+          .map((tax) => validator.validateVat(
+                vatBase: invoice.subtotal,
+                vatRate: tax.rate,
+                providedVatAmount: tax.calculate(invoice.subtotal),
+              ))
+          .toList();
+
+      final grandTotalResult = validator.validateGrandTotal(
+        subtotal: invoice.subtotal,
+        discounts: 0.0,
+        vatAmount: invoice.totalTax,
+        fees: 0.0,
+        providedGrandTotal: invoice.grandTotal,
+      );
+
+      final combined = validator.combineResults([
+        subtotalResult,
+        ...vatResults,
+        grandTotalResult,
+      ]);
+
+      if (!combined.isValid) return GeniusPdfFailure.fromValidation(combined);
+    }
+
+    try {
+      return GeniusPdfSuccess(
+        bytes: Uint8List.fromList(generate()),
+        fileName: 'invoice_${invoice.invoiceNumber}.pdf',
+      );
+    } catch (e, st) {
+      return GeniusPdfFailure.fromException(e, st);
+    }
   }
 
   // ──────────────────────────────────────────────────────────
