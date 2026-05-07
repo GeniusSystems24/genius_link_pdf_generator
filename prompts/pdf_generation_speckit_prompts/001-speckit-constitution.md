@@ -25,6 +25,9 @@ Core engineering principles for this feature:
    - file byte generation
    - export/save failure handling
 
+   Templates and their supporting files must be separated under `lib/templates`.
+   `lib/src` must remain reserved for the core document-generation library components only.
+
    Do not validate, correct, or reinterpret user-provided business data.
    Do not check whether financial totals, tax values, voucher amounts, or report data are semantically correct.
    User-provided content is outside this feature scope.
@@ -54,6 +57,7 @@ Core engineering principles for this feature:
 
 10. Documentation Discipline
    Update README.md and CHANGELOG.md only for behavior, API, or migration-relevant changes.
+   Any library modification or addition must also update the relevant `example/` usage so examples stay aligned with the current package behavior and public surface.
 
 11. Regression Protection
    Any previously fixed PDF layout behavior must be covered by regression tests before related code is changed again.
