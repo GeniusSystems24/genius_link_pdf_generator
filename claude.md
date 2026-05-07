@@ -940,6 +940,5 @@ final columns = calculator.calculateBilingualColumns(
 *آخر تحديث: فبراير 2026*
 
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+Active feature plan: specs/001-financial-calc-validation/plan.md
 <!-- SPECKIT END -->

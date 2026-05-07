@@ -31,17 +31,34 @@ bilingual behavior, public API compatibility, and same-change doc/example sync
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **Config scope**: Does the feature preserve per-document `GeniusPdfConfig`
-  ownership and avoid hidden mutable generation state?
-- **Directional correctness**: What Arabic/English text, labels, status
-  messages, alignment rules, or RTL/LTR layout calculations are affected?
-- **Layer ownership**: Which package layer owns each change:
+- **I. Library-first**: Is all new behavior in `lib/src/`? Is any logic
+  currently only in `example/` that must be promoted to the library?
+- **II. Financial correctness**: Does this feature touch monetary calculations?
+  If yes, what rounding strategy is used, and what unit tests cover the totals?
+- **III. Rendering correctness**: What layout, Y-position, column-width, or
+  page-break logic is affected? What single-page and multi-page verification
+  steps are planned in both RTL and LTR modes?
+- **IV. Test-driven bug fixing**: If this is a bug fix, what regression test or
+  documented reproduction script ships in the same change?
+- **V. Backward compatibility**: Does this change any public API, factory
+  constructor, enum value, or behavioral contract? What is the SemVer impact
+  and where is the migration guidance?
+- **VI. Separation of concerns**: Which package layer owns each change:
   `components`, `builders`, `services`, `printing`, `sharing`, `templates`,
-  `widgets`, or `core`? Why is that the narrowest valid layer?
-- **Contract sync**: Which public barrels, `README.md`, `CHANGELOG.md`, and
-  `example/` files must change with this work?
-- **Validation**: What targeted `flutter analyze`, tests, and manual/example
-  checks will prove the change without relying on assumptions?
+  `widgets`, or `core`? Why is that the narrowest valid layer? Does any module
+  import across a concern boundary?
+- **VII. RTL/LTR parity**: What Arabic/English text, labels, alignment rules,
+  column order, or RTL/LTR layout calculations are affected? Which example
+  screen or manual verification step exercises both directions?
+- **VIII. Documentation consistency**: Which public barrels, `README.md`,
+  `CHANGELOG.md`, and `example/` files must change with this work? Are all
+  README code examples compilable or marked pseudo-code?
+- **IX. Deterministic outputs**: Does the feature introduce wall-clock time,
+  random seeds, locale-sensitive defaults, or mutable global state that could
+  cause output to vary between calls with identical inputs?
+- **X. Performance safety**: Does the feature process more than one page of
+  content? If yes, is it off the UI thread, and does it provide a progress
+  callback?
 
 ## Project Structure
 
