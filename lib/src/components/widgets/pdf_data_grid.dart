@@ -102,6 +102,10 @@ class GeniusPdfDataGrid {
   /// Auto-calculated total rows appended after data rows (before footerRows).
   final List<GeniusPdfAutoTotal>? autoTotals;
 
+  /// Running counter of rendered data rows. Used to keep alternating-row
+  /// colors consistent across groups and special rows in a single draw pass.
+  int _dataRowCounter = 0;
+
   static GeniusPdfGridStyle _resolveGridStyle(
     GeniusPdfGridStyle? style,
     GeniusPdfConfig config,
@@ -258,7 +262,11 @@ class GeniusPdfDataGrid {
     final grid = PdfGrid();
     final cols = visibleColumns;
 
-    // Calculate column widths with improved algorithm (v2.12.0)
+    // Reset render state (v2.12.9): counter is shared across groups so
+    // alternating-row colors stay consistent throughout the entire grid.
+    _dataRowCounter = 0;
+
+    // Calculate column widths with improved algorithm (v2.12.9)
     final gridWidth = availableWidth ?? page.getClientSize().width;
     final columnWidths = _calculateColumnWidths(cols, gridWidth);
 
@@ -336,30 +344,32 @@ class GeniusPdfDataGrid {
       groupHeaderRow.cells[0].value = group.getTitle(isArabic: config.isRTL);
       groupHeaderRow.cells[0].columnSpan = cols.length;
 
-      final groupStyle =
+      final baseStyle =
           group.headerStyle ?? group.style ?? style.groupHeaderStyle;
-      if (groupStyle != null) {
-        _applyRowStyle(groupHeaderRow, groupStyle);
-        _applyCellStyle(groupHeaderRow.cells[0], groupStyle, cols[0]);
-      } else {
-        // Default group header style with level-based indent
-        final defaultGroupStyle = GeniusPdfCellStyle(
-          textStyle: const GeniusPdfTextStyle(
-            fontSize: 11,
-            fontWeight: material.FontWeight.bold,
-          ),
-          backgroundColor: const Color(0xFFE0E0E0),
-          border: const GeniusPdfBorderStyle.all(),
-          padding: GeniusPdfCellPadding(
-            left: 4 + (group.level * style.groupIndentPerLevel),
-            right: 4,
-            top: 4,
-            bottom: 4,
-          ),
-        );
-        _applyRowStyle(groupHeaderRow, defaultGroupStyle);
-        _applyCellStyle(groupHeaderRow.cells[0], defaultGroupStyle, cols[0]);
-      }
+      // v2.12.9: derive a level-aware style — deeper groups get a lighter
+      // tint and proportional left indent, regardless of which base style
+      // is in use, so nested groups read as a clear visual hierarchy.
+      final resolvedStyle = _withGroupLevelDecoration(
+        baseStyle ??
+            const GeniusPdfCellStyle(
+              textStyle: GeniusPdfTextStyle(
+                fontSize: 11,
+                fontWeight: material.FontWeight.bold,
+              ),
+              backgroundColor: Color(0xFFE0E0E0),
+              border: GeniusPdfBorderStyle.all(),
+              padding: GeniusPdfCellPadding.all(4),
+            ),
+        group.level,
+      );
+      _applyRowStyle(groupHeaderRow, resolvedStyle, isGroupHeader: true);
+      _applyCellStyle(
+        groupHeaderRow.cells[0],
+        resolvedStyle,
+        cols[0],
+        isFirstColumn: true,
+        isLastColumn: true,
+      );
     }
 
     // Add subgroups recursively if present
@@ -436,9 +446,12 @@ class GeniusPdfDataGrid {
     List<GeniusPdfGridColumn> cols,
     List<GeniusPdfGridRow> dataRows,
   ) {
-    for (int rowIndex = 0; rowIndex < dataRows.length; rowIndex++) {
-      final rowData = dataRows[rowIndex];
-      _addSingleRow(grid, cols, rowData, rowIndex);
+    for (final rowData in dataRows) {
+      // Pass the running counter so stripe alternation stays consistent
+      // across groups. Special rows (totals, headers) reuse the index but
+      // their cell-style branch wins before the alternation check.
+      _addSingleRow(grid, cols, rowData, _dataRowCounter);
+      if (!rowData.isSpecialRow) _dataRowCounter++;
     }
   }
 
@@ -480,17 +493,24 @@ class GeniusPdfDataGrid {
       rowStyle = rowData.style ?? style.cellStyle;
     }
 
-    _applyRowStyle(row, rowStyle);
+    _applyRowStyle(row, rowStyle, isGroupHeader: rowData.isGroupHeader);
 
     // Handle group header spanning
     if (rowData.isGroupHeader) {
       row.cells[0].value = rowData.cells['_group'] ?? '';
       row.cells[0].columnSpan = cols.length;
-      _applyCellStyle(row.cells[0], rowStyle, cols[0]);
+      _applyCellStyle(
+        row.cells[0],
+        _withGroupLevelDecoration(rowStyle, rowData.groupLevel),
+        cols[0],
+        isFirstColumn: true,
+        isLastColumn: true,
+      );
       return;
     }
 
     // Populate cells
+    final lastIdx = cols.length - 1;
     for (int i = 0; i < cols.length; i++) {
       final colIndex = config.isRTL ? cols.length - 1 - i : i;
       final column = cols[colIndex];
@@ -504,14 +524,19 @@ class GeniusPdfDataGrid {
       // Get formatted value
       cell.value = rowData.getFormattedValue(column);
 
-      // Apply cell style
-      var effectiveCellStyle = column.cellStyle ?? rowStyle;
+      // v2.12.9: merge column.cellStyle on top of the row style instead of
+      // replacing it outright, so column-level styling no longer wipes
+      // alternate-row backgrounds or special-row visual cues.
+      var effectiveCellStyle = column.cellStyle == null
+          ? rowStyle
+          : _mergeColumnOverRow(column.cellStyle!, rowStyle);
 
       if (column.cellStyleBuilder != null) {
         final rawValue = rowData.getValue(column.id);
         final builtStyle = column.cellStyleBuilder!(rawValue);
         if (builtStyle != null) {
-          effectiveCellStyle = builtStyle;
+          // Builder result also merges over the row style for consistency.
+          effectiveCellStyle = _mergeColumnOverRow(builtStyle, rowStyle);
         }
       }
 
@@ -520,21 +545,47 @@ class GeniusPdfDataGrid {
         effectiveCellStyle,
         column,
         isTotal: rowData.isTotal || rowData.isSubtotal,
+        isFirstColumn: i == 0,
+        isLastColumn: i == lastIdx,
       );
     }
   }
 
   void _applyRowStyle(
     PdfGridRow row,
-    GeniusPdfCellStyle style, {
+    GeniusPdfCellStyle cellStyle, {
     bool isHeader = false,
+    bool isGroupHeader = false,
   }) {
-    if (this.style.rowHeight != null && !isHeader) {
-      row.height = this.style.rowHeight!;
+    final s = style;
+
+    // Explicit configured heights take priority (v2.12.9 — added
+    // groupHeaderHeight which was previously declared but ignored).
+    if (isHeader && s.headerHeight != null) {
+      row.height = s.headerHeight!;
+      return;
     }
-    if (isHeader && this.style.headerHeight != null) {
-      row.height = this.style.headerHeight!;
+    if (isGroupHeader && s.groupHeaderHeight != null) {
+      row.height = s.groupHeaderHeight!;
+      return;
     }
+    if (!isHeader && !isGroupHeader && s.rowHeight != null) {
+      row.height = s.rowHeight!;
+      return;
+    }
+
+    // v2.12.9: when no explicit height is configured, derive a sensible
+    // minimum from font size + padding so small font/padding combinations
+    // don't crop ascenders/descenders. minRowHeight from the style is
+    // honored as the lower bound; maxRowHeight (if set) caps it.
+    final lineHeight = cellStyle.textStyle.fontSize * 1.4;
+    final padded =
+        lineHeight + cellStyle.padding.top + cellStyle.padding.bottom;
+    var auto = math.max(padded, s.minRowHeight);
+    if (s.maxRowHeight != null) {
+      auto = math.min(auto, s.maxRowHeight!);
+    }
+    row.height = auto;
   }
 
   void _applyCellStyle(
@@ -543,6 +594,8 @@ class GeniusPdfDataGrid {
     GeniusPdfGridColumn column, {
     bool isHeader = false,
     bool isTotal = false,
+    bool isFirstColumn = false,
+    bool isLastColumn = false,
   }) {
     // Background color
     if (cellStyle.backgroundColor != null) {
@@ -550,8 +603,11 @@ class GeniusPdfDataGrid {
           PdfSolidBrush(cellStyle.backgroundColor!.toPdfColor());
     }
 
-    // Border
-    cell.style.borders = cellStyle.border.toPdfBorders();
+    // Border — v2.12.9: outerBorderStyle (when configured) overrides the
+    // outermost left/right edges so the grid can sport a distinct frame
+    // without disturbing internal cell borders.
+    cell.style.borders =
+        _resolveCellBorders(cellStyle.border, isFirstColumn, isLastColumn);
 
     // Padding
     cell.style.cellPadding = cellStyle.padding.toPdfPaddings();
@@ -568,117 +624,216 @@ class GeniusPdfDataGrid {
     // Text color
     cell.style.textBrush = cellStyle.textStyle.toBrush();
 
-    // String format (alignment)
-    final alignment = column.alignment;
+    // String format (alignment) — v2.12.9: column.verticalAlignment now
+    // takes precedence over the cellStyle's textStyle vertical alignment
+    // because column-level vertical alignment is a column-wide invariant.
+    final verticalAlign = column.verticalAlignment != GeniusPdfVerticalAlign.top
+        ? column.verticalAlignment
+        : cellStyle.textStyle.verticalAlignment;
     cell.style.stringFormat = PdfStringFormat(
-      alignment: alignment.toPdfTextAlignment(config.isRTL),
-      lineAlignment:
-          cellStyle.textStyle.verticalAlignment.toPdfVerticalAlignment(),
-      textDirection: config.pdfTextDirection
+      alignment: column.alignment.toPdfTextAlignment(config.isRTL),
+      lineAlignment: verticalAlign.toPdfVerticalAlignment(),
+      textDirection: config.pdfTextDirection,
     );
   }
 
-  /// Improved column width calculation with multi-pass constraint
-  /// redistribution, percentage support, and padding awareness (v2.12.0).
+  /// Combines the cell's own border with [GeniusPdfGridStyle.outerBorderStyle]
+  /// so the grid's outer frame is rendered without overriding internal edges.
+  PdfBorders _resolveCellBorders(
+    GeniusPdfBorderStyle base,
+    bool isFirstColumn,
+    bool isLastColumn,
+  ) {
+    final outer = style.outerBorderStyle;
+    if (outer == null || (!isFirstColumn && !isLastColumn)) {
+      return base.toPdfBorders();
+    }
+    final basePen = base.toPen();
+    final noPen = PdfPen(PdfColor(0, 0, 0, 0), width: 0);
+    final outerPen = outer.toPen();
+
+    PdfPen sidePen(bool baseSide) => baseSide ? basePen : noPen;
+    final leftIsOuter = isFirstColumn && outer.left;
+    final rightIsOuter = isLastColumn && outer.right;
+    return PdfBorders(
+      left: leftIsOuter ? outerPen : sidePen(base.left),
+      right: rightIsOuter ? outerPen : sidePen(base.right),
+      top: base.top ? basePen : noPen,
+      bottom: base.bottom ? basePen : noPen,
+    );
+  }
+
+  /// Returns a copy of [columnStyle] that adopts the row-level background
+  /// (e.g. alternate / total / subtotal tints) when the column did not
+  /// explicitly opt in to its own background. Border and text styling from
+  /// the column are otherwise preserved.
+  GeniusPdfCellStyle _mergeColumnOverRow(
+    GeniusPdfCellStyle columnStyle,
+    GeniusPdfCellStyle rowStyle,
+  ) {
+    if (columnStyle.backgroundColor != null) return columnStyle;
+    if (rowStyle.backgroundColor == null) return columnStyle;
+    return columnStyle.copyWith(backgroundColor: rowStyle.backgroundColor);
+  }
+
+  /// Decorates a group-header cell style with level-based tinting and
+  /// horizontal indent so nested groups produce a clear visual hierarchy.
+  ///
+  /// The lightening factor scales by `level * 0.06` (capped at 0.5) and is
+  /// applied only when the source style already has a background color so
+  /// border-only group styles stay untouched.
+  GeniusPdfCellStyle _withGroupLevelDecoration(
+    GeniusPdfCellStyle source,
+    int level,
+  ) {
+    if (level <= 0) return source;
+
+    final indent = level * style.groupIndentPerLevel.toDouble();
+    final paddedLeft = source.padding.left + indent;
+    final newPadding = GeniusPdfCellPadding(
+      left: paddedLeft,
+      right: source.padding.right,
+      top: source.padding.top,
+      bottom: source.padding.bottom,
+    );
+
+    Color? newBg = source.backgroundColor;
+    if (newBg != null) {
+      final lighten = math.min(0.06 * level, 0.5);
+      newBg = Color.lerp(newBg, const Color(0xFFFFFFFF), lighten);
+    }
+
+    return source.copyWith(backgroundColor: newBg, padding: newPadding);
+  }
+
+  /// Column width calculation with multi-pass constraint redistribution,
+  /// percentage support, padding awareness, and tiered fit-to-width
+  /// reconciliation (v2.12.9).
+  ///
+  /// **Pass 1** classifies columns as fixed (`col.width`), percent
+  /// (`col.widthPercent`), or flex (default), and resolves the first two
+  /// against the column's min/max constraints.
+  ///
+  /// **Pass 2** distributes the remaining width across flex columns up to
+  /// four iterations. Columns clamped by min/max release their excess
+  /// back into a pool that's redistributed across still-unclamped flex
+  /// columns until the pool is stable.
+  ///
+  /// **Pass 3** reconciles total width with the available width. When the
+  /// totals diverge it scales — but tiered: flex columns absorb the delta
+  /// first, then percent columns, and only fixed columns as a last resort.
+  /// This protects user-authored fixed widths from being silently scaled.
   List<double> _calculateColumnWidths(
     List<GeniusPdfGridColumn> cols,
     double availableWidth,
   ) {
+    if (cols.isEmpty || availableWidth <= 0) {
+      return List<double>.filled(cols.length, 0);
+    }
+
     final widths = List<double>.filled(cols.length, 0);
-    // Use a consistent column list, reversed for RTL so width logic
-    // aligns with visual order in RTL layouts.
+    // RTL keeps the same logical→visual column ordering as before so
+    // existing layouts render unchanged.
     final orderedCols = config.isRTL ? cols.reversed.toList() : cols;
+
+    final fixedIndices = <int>[];
+    final percentIndices = <int>[];
+    final flexIndices = <int>[];
 
     double usedWidth = 0;
     int totalFlex = 0;
-    final flexIndices = <int>[];
 
-    // --- Pass 1: Resolve fixed and percentage-based widths ---
+    // --- Pass 1: classify columns and resolve fixed + percentage widths ---
     for (int i = 0; i < orderedCols.length; i++) {
       final col = orderedCols[i];
       if (col.width != null) {
-        // Fixed pixel width
-        widths[i] = col.width!;
-        usedWidth += col.width!;
-      } else if (col.widthPercent != null) {
-        // Percentage-based width
-        final percentWidth = availableWidth * col.widthPercent!.clamp(0.0, 1.0);
-        // Apply min/max constraints immediately
-        widths[i] = _clampWidth(percentWidth, col);
+        widths[i] = _clampWidth(col.width!, col);
         usedWidth += widths[i];
+        fixedIndices.add(i);
+      } else if (col.widthPercent != null) {
+        final raw = availableWidth * col.widthPercent!.clamp(0.0, 1.0);
+        widths[i] = _clampWidth(raw, col);
+        usedWidth += widths[i];
+        percentIndices.add(i);
       } else {
-        // Flex column — accumulate flex factor
         flexIndices.add(i);
         totalFlex += col.flexFactor ?? 1;
       }
     }
 
-    // --- Pass 2: Distribute remaining width to flex columns ---
-    var remainingWidth = availableWidth - usedWidth;
+    // --- Pass 2: distribute remaining width to flex columns ---
+    final remaining = availableWidth - usedWidth;
 
-    if (flexIndices.isNotEmpty && remainingWidth > 0) {
-      // Multi-pass redistribution: iterate up to 3 times to handle
-      // cases where min/max constraints cause excess/deficit.
-      var unclampedIndices = List<int>.from(flexIndices);
-      var currentFlex = totalFlex;
+    if (flexIndices.isEmpty) {
+      // Nothing to distribute — total may still drift from availableWidth,
+      // which Pass 3 will reconcile across percent/fixed pools.
+    } else if (remaining <= 0) {
+      // No room to grow flex columns: fall back to defaultColumnWidth so
+      // they still render. Pass 3 will then shrink everything to fit.
+      for (final idx in flexIndices) {
+        widths[idx] = _clampWidth(style.defaultColumnWidth, orderedCols[idx]);
+      }
+    } else {
+      var unclamped = List<int>.from(flexIndices);
+      var poolFlex = totalFlex;
+      var pool = remaining;
 
-      for (int pass = 0; pass < 3 && unclampedIndices.isNotEmpty; pass++) {
-        final flexUnit =
-            currentFlex > 0 ? remainingWidth / currentFlex : remainingWidth;
-        final newUnclamped = <int>[];
-        double clampedExcess = 0;
+      for (int pass = 0; pass < 4 && unclamped.isNotEmpty && pool > 0; pass++) {
+        final unit =
+            poolFlex > 0 ? pool / poolFlex : pool / unclamped.length;
+        final stillUnclamped = <int>[];
+        var leftover = 0.0;
+        var nextFlex = 0;
 
-        for (final idx in unclampedIndices) {
+        for (final idx in unclamped) {
           final col = orderedCols[idx];
           final flex = col.flexFactor ?? 1;
-          final raw = flexUnit * flex;
+          final raw = poolFlex > 0 ? unit * flex : unit;
           final clamped = _clampWidth(raw, col);
-
           widths[idx] = clamped;
-
-          if (clamped != raw) {
-            // This column was constrained — its excess goes back to the pool
-            clampedExcess += raw - clamped;
+          if ((clamped - raw).abs() > 0.5) {
+            leftover += raw - clamped;
           } else {
-            newUnclamped.add(idx);
+            stillUnclamped.add(idx);
+            nextFlex += flex;
           }
         }
 
-        if (clampedExcess.abs() < 0.5 || newUnclamped.isEmpty) {
-          break; // Stable — no significant redistribution needed
-        }
-
-        // Redistribute excess to unclamped columns
-        remainingWidth = clampedExcess;
-        currentFlex = 0;
-        for (final idx in newUnclamped) {
-          currentFlex += orderedCols[idx].flexFactor ?? 1;
-          // Reset width so it can be recalculated
-          remainingWidth += widths[idx];
-          widths[idx] = 0;
-        }
-        unclampedIndices = newUnclamped;
-      }
-    } else if (flexIndices.isNotEmpty) {
-      // No remaining space — use style's defaultColumnWidth
-      for (final idx in flexIndices) {
-        widths[idx] = style.defaultColumnWidth;
+        if (leftover.abs() < 0.5 || stillUnclamped.isEmpty) break;
+        pool = leftover;
+        poolFlex = nextFlex;
+        unclamped = stillUnclamped;
       }
     }
 
-    // --- Pass 3: Ensure minimum total width matches available width ---
-    final totalWidth = widths.fold<double>(0, (a, b) => a + b);
-    if (totalWidth > 0 && (totalWidth - availableWidth).abs() > 1.0) {
-      // Scale proportionally to fit available width
-      final scale = availableWidth / totalWidth;
-      for (int i = 0; i < widths.length; i++) {
-        widths[i] = (widths[i] * scale).roundToDouble();
+    // --- Pass 3: reconcile total with availableWidth, tier by tier ---
+    final delta = availableWidth - widths.fold<double>(0, (a, b) => a + b);
+    if (delta.abs() > 1.0) {
+      // Try absorbing the delta in: flex first, then percent, then fixed.
+      // This protects fixed-width columns from silent scaling while still
+      // keeping the grid flush with the available width.
+      for (final pool in [flexIndices, percentIndices, fixedIndices]) {
+        final remainingDelta =
+            availableWidth - widths.fold<double>(0, (a, b) => a + b);
+        if (remainingDelta.abs() <= 1.0 || pool.isEmpty) continue;
+
+        final poolTotal = pool.fold<double>(0, (a, b) => a + widths[b]);
+        if (poolTotal <= 0) continue;
+
+        final scale = (poolTotal + remainingDelta) / poolTotal;
+        if (scale <= 0) continue;
+        for (final idx in pool) {
+          widths[idx] = _clampWidth(widths[idx] * scale, orderedCols[idx]);
+        }
       }
-      // Fix rounding error on the last column
-      final roundedTotal = widths.fold<double>(0, (a, b) => a + b);
-      if (widths.isNotEmpty) {
-        widths[widths.length - 1] += availableWidth - roundedTotal;
-      }
+    }
+
+    // Final residual goes to the last column to guarantee the row fills
+    // the available width exactly (sub-pixel rounding correction).
+    final residual =
+        availableWidth - widths.fold<double>(0, (a, b) => a + b);
+    if (residual.abs() > 0 && widths.isNotEmpty) {
+      widths[widths.length - 1] += residual;
     }
 
     return widths;

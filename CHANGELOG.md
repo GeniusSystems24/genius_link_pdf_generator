@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.2] - 2026-05-08
+
+### Added — Built-in grid style preset classes
+
+- New `sealed class GeniusPdfGridStylePreset` exposing every built-in `GeniusPdfGridStyle` factory as a `const`-constructible value object: `ClassicGridStylePreset`, `ModernGridStylePreset`, `CorporateGridStylePreset`, `MinimalGridStylePreset`, `SaudiGridStylePreset`, `InvoiceGridStylePreset`, `StripedGridStylePreset`, `DarkGridStylePreset`, `ElegantGridStylePreset`, `PastelGridStylePreset`, `BorderedGridStylePreset`
+- Each preset captures its own customization parameters (e.g. `primaryColor`, `borderWidth`) and materializes a `GeniusPdfGridStyle` via `build()`
+- `GeniusPdfGridStylePreset.all` provides canonical defaults for every preset; `GeniusPdfGridStylePreset.byName(String)` does case-insensitive lookup
+- Sealed-class semantics enable exhaustive `switch` on presets
+
+### Changed — `GeniusPdfDataGrid` styling and layout polish (no public API changes)
+
+- `_calculateColumnWidths` now reconciles total width with available width in tiers (flex → percent → fixed) so author-supplied `column.width` values are no longer silently scaled when flex/percent room is available
+- Pass 2 flex distribution iterates up to four times (previously three) and reuses constraint-aware redistribution to converge on stable widths
+- Stripe alternation is driven by a single counter for the entire draw pass, so alternating-row colors stay consistent across groups; group headers and total/subtotal rows no longer count toward alternation
+- Column-level `cellStyle` (and `cellStyleBuilder`) no longer wipes out the row-level background — text/border/padding from the column are preserved while alternate/total/subtotal tints from the row are inherited when the column did not explicitly set a background
+- `GeniusPdfGridColumn.verticalAlignment` is now honored at cell render time (previously only the cell-style text style's vertical alignment was applied)
+- Nested group headers receive automatic level-based decoration: each deeper level lightens the source background by `min(0.06 * level, 0.5)` toward white and indents by `style.groupIndentPerLevel`, regardless of whether a custom group-header style is in use
+- Row height now derives a sensible minimum from `fontSize * 1.4 + padding.top + padding.bottom` clamped by `style.minRowHeight` and `style.maxRowHeight` when no explicit `rowHeight` / `headerHeight` / `groupHeaderHeight` is configured
+
+### Fixed — Previously-declared but unapplied `GeniusPdfGridStyle` fields
+
+- `outerBorderStyle` is now rendered as a distinct outer frame on the grid's left/right edge cells without overriding internal cell borders
+- `groupHeaderHeight` is now applied to group-header rows when set
+- `minRowHeight` and `maxRowHeight` are now respected by the auto row-height computation
+
 ## [3.6.1] - 2026-05-08
 
 ### Fixed — PDF Engine Stability and Layout Correctness

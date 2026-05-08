@@ -510,6 +510,10 @@ All 16 voucher template classes (64 subtypes) in one batch PDF
 
 Page-flow, header/footer boundary, multi-page grid continuation, RTL/LTR layout, media placement, and service/export reliability fixes; full regression test suite under `test/pdf_stability/`
 
+### 📊 **Grid Styling & Layout Polish** (v2.12.9)
+
+Tiered fit-to-width reconciliation, consistent stripe alternation across groups, column-over-row cell-style merging, level-based nested-group tinting + indent, font-aware auto row height, honored `column.verticalAlignment`, and previously-declared style fields (`outerBorderStyle`, `groupHeaderHeight`, `minRowHeight`, `maxRowHeight`) are now applied — see *Grid Styling & Layout (v2.12.9)* below
+
 ---
 
 ## Installation
@@ -994,6 +998,59 @@ grid.draw(page: page, bounds: bounds);
 - `GeniusPdfGridStyle.pastel()` - Soft pastel tints (v2.12.2)
 - `GeniusPdfGridStyle.bordered()` - Strong borders, filled header (v2.12.2)
 
+#### Built-in Style Preset Classes (v2.12.10)
+
+Every factory above is also exposed as a sealed-class preset. Each preset is a `const` value object that captures its parameters and materializes a `GeniusPdfGridStyle` via `build()` — useful when you want to pass presets around as data (config files, catalog UIs, exhaustive `switch`):
+
+```dart
+// Direct construction
+const preset = ModernGridStylePreset(primaryColor: Color(0xFF00897B));
+final grid = GeniusPdfDataGrid(
+  columns: columns,
+  rows: rows,
+  style: preset.build(),
+  config: config,
+);
+
+// Lookup by name (case-insensitive)
+final preset = GeniusPdfGridStylePreset.byName('saudi');
+final style = preset?.build();
+
+// Iterate the catalog (e.g. preview gallery)
+for (final p in GeniusPdfGridStylePreset.all) {
+  print('${p.name} -> ${p.build()}');
+}
+
+// Exhaustive switch
+String describe(GeniusPdfGridStylePreset p) => switch (p) {
+      ClassicGridStylePreset() => 'Traditional bordered',
+      ModernGridStylePreset() => 'Minimal accent',
+      CorporateGridStylePreset() => 'Professional blue',
+      MinimalGridStylePreset() => 'Clean minimal',
+      SaudiGridStylePreset() => 'Saudi green',
+      InvoiceGridStylePreset() => 'Invoice optimized',
+      StripedGridStylePreset() => 'Zebra rows',
+      DarkGridStylePreset() => 'Dark theme',
+      ElegantGridStylePreset() => 'Refined rules',
+      PastelGridStylePreset() => 'Soft tints',
+      BorderedGridStylePreset() => 'Strong borders',
+    };
+```
+
+| Preset class                 | Wraps         | Extra parameters                                                                                          |
+|------------------------------|---------------|-----------------------------------------------------------------------------------------------------------|
+| `ClassicGridStylePreset`     | `.classic()`  | `primaryColor`                                                                                            |
+| `ModernGridStylePreset`      | `.modern()`   | `primaryColor`                                                                                            |
+| `CorporateGridStylePreset`   | `.corporate()`| `primaryColor`, `headerBackground`, `headerTextColor`, `alternateRowColor`, `totalRowColor`, `borderWidth`|
+| `MinimalGridStylePreset`     | `.minimal()`  | `primaryColor`, `headerBorderWidth`                                                                       |
+| `SaudiGridStylePreset`       | `.saudi()`    | `primaryColor`, `accentColor`                                                                             |
+| `InvoiceGridStylePreset`     | `.invoice()`  | `primaryColor`, `showAlternateRows`                                                                       |
+| `StripedGridStylePreset`     | `.striped()`  | `primaryColor`                                                                                            |
+| `DarkGridStylePreset`        | `.dark()`     | `primaryColor`                                                                                            |
+| `ElegantGridStylePreset`     | `.elegant()`  | `primaryColor`                                                                                            |
+| `PastelGridStylePreset`      | `.pastel()`   | `primaryColor`                                                                                            |
+| `BorderedGridStylePreset`    | `.bordered()` | `primaryColor`, `borderWidth`                                                                             |
+
 **Advanced Column Features:**
 
 ```dart
@@ -1008,7 +1065,52 @@ GeniusPdfGridColumn(
   prefix: '\$',              // Value prefix
   suffix: ' USD',            // Value suffix
   valueFormatter: (val) => formatCurrency(val), // Custom formatter
+  verticalAlignment: GeniusPdfVerticalAlign.middle, // Honored in v2.12.9
 )
+```
+
+### Grid Styling & Layout (v2.12.9)
+
+Several layout and styling refinements were made to `GeniusPdfDataGrid` without changing its public API. New behavior is opt-in by virtue of which `GeniusPdfGridStyle` fields you populate:
+
+**Tiered fit-to-width reconciliation.** When the sum of column widths drifts from the grid's available width, the reconciliation now happens in tiers — flex columns absorb the delta first, then percent columns, and only fixed columns as a last resort. Author-supplied `width:` values are no longer silently scaled when flex/percent space is available.
+
+**Auto row heights.** When `style.rowHeight` / `headerHeight` / `groupHeaderHeight` are not set, row height is now derived from `fontSize * 1.4 + padding.top + padding.bottom` and clamped by `style.minRowHeight` (lower bound) and `style.maxRowHeight` (upper bound). Small fonts no longer crop ascenders/descenders.
+
+**Outer-frame border.** Setting `style.outerBorderStyle` now actually renders — the grid's outer left/right edges adopt the outer style while inner cells continue to use `cellStyle.border`.
+
+```dart
+GeniusPdfGridStyle(
+  borderStyle: const GeniusPdfBorderStyle.all(width: 0.4),
+  outerBorderStyle: GeniusPdfBorderStyle.all(width: 1.5, color: Colors.black),
+  minRowHeight: 22,
+  maxRowHeight: 60,
+  groupHeaderHeight: 28,
+);
+```
+
+**Consistent stripe alternation.** Alternating row colors are now driven by a single counter that runs through the entire grid, so groups no longer reset the stripe pattern. Group headers and total/subtotal rows do not consume a counter slot.
+
+**Column over row style merging.** A column-level `cellStyle` no longer wipes out row-level backgrounds (alternate / total / subtotal tints). The column style is preserved for text/border/padding while inheriting the row's background when the column did not explicitly set one. The same merge applies to `cellStyleBuilder` results.
+
+**Column vertical alignment.** `GeniusPdfGridColumn.verticalAlignment` is now honored at the cell level (previously only the cell-style's textStyle vertical alignment was applied).
+
+**Nested-group visual hierarchy.** Group headers at deeper `level`s are automatically lightened (`min(0.06 * level, 0.5)` toward white) and indented by `style.groupIndentPerLevel`, regardless of which group-header style is in use. Border-only group styles stay untouched.
+
+```dart
+final groups = [
+  GeniusPdfGridGroup(
+    title: 'Region',
+    subgroups: [
+      GeniusPdfGridGroup.withSummary(
+        title: 'City',
+        rows: cityRows,
+        sumColumns: ['amount'],
+      ),
+    ],
+  ),
+];
+// Region header → full tint; City header (level 1) → lighter tint + indent
 ```
 
 ### GeniusPdfRichText
