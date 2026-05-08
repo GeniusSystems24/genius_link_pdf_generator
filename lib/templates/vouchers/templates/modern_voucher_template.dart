@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' as m;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../../components/components.dart';
+import '../../../src/components/components.dart';
 import '../models/amount_to_words.dart';
 import '../models/voucher_models.dart';
 import '../models/voucher_style.dart';

@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../core/pdf_config.dart';
+import '../../src/core/pdf_config.dart';
 import 'template_definition.dart';
 import 'template_elements.dart';
 import 'template_models.dart';

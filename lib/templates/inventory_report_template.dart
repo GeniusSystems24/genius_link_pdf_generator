@@ -4,48 +4,68 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import 'package:intl/intl.dart';
 
-import '../builders/pdf_document_builder.dart';
-import '../components/components.dart';
-import '../core/pdf_config.dart';
+import '../src/builders/pdf_document_builder.dart';
+import '../src/components/components.dart';
+import '../src/core/pdf_config.dart';
 
-/// Account entry for trial balance.
-class TrialBalanceEntry {
-  const TrialBalanceEntry({
-    required this.accountName,
-    this.accountNameAr,
-    this.accountCode,
-    this.debit = 0,
-    this.credit = 0,
-    this.isCategory = false,
-    this.categoryLevel = 0,
+/// Inventory item data.
+class InventoryItem {
+  const InventoryItem({
+    required this.itemCode,
+    required this.itemName,
+    this.itemNameAr,
+    required this.warehouse,
+    this.warehouseAr,
+    required this.quantityOnHand,
+    required this.averageCost,
+    this.unit,
+    this.category,
+    this.categoryAr,
   });
 
-  final String accountName;
-  final String? accountNameAr;
-  final String? accountCode;
-  final double debit;
-  final double credit;
-  final bool isCategory;
-  final int categoryLevel;
+  final String itemCode;
+  final String itemName;
+  final String? itemNameAr;
+  final String warehouse;
+  final String? warehouseAr;
+  final double quantityOnHand;
+  final double averageCost;
+  final String? unit;
+  final String? category;
+  final String? categoryAr;
+
+  double get totalValue => quantityOnHand * averageCost;
 
   /// Gets the display name based on locale.
   String getName({bool isArabic = false}) {
-    if (isArabic && accountNameAr != null) return accountNameAr!;
-    return accountName;
+    if (isArabic && itemNameAr != null) return itemNameAr!;
+    return itemName;
+  }
+
+  /// Gets the display warehouse based on locale.
+  String getWarehouse({bool isArabic = false}) {
+    if (isArabic && warehouseAr != null) return warehouseAr!;
+    return warehouse;
+  }
+
+  /// Gets the display category based on locale.
+  String? getCategory({bool isArabic = false}) {
+    if (isArabic && categoryAr != null) return categoryAr;
+    return category;
   }
 }
 
-/// Trial balance category with entries.
-class TrialBalanceCategory {
-  const TrialBalanceCategory({
+/// Inventory category with items.
+class InventoryCategory {
+  const InventoryCategory({
     required this.name,
-    required this.entries,
+    required this.items,
     this.nameAr,
   });
 
   final String name;
   final String? nameAr;
-  final List<TrialBalanceEntry> entries;
+  final List<InventoryItem> items;
 
   /// Gets the display name based on locale.
   String getName({bool isArabic = false}) {
@@ -53,51 +73,50 @@ class TrialBalanceCategory {
     return name;
   }
 
-  double get totalDebit => entries.fold(0, (sum, e) => sum + e.debit);
-  double get totalCredit => entries.fold(0, (sum, e) => sum + e.credit);
+  double get totalValue => items.fold(0, (sum, item) => sum + item.totalValue);
+  double get totalQuantity =>
+      items.fold(0, (sum, item) => sum + item.quantityOnHand);
 }
 
-/// Trial balance report data.
-class TrialBalanceData {
-  const TrialBalanceData({
+/// Inventory report data.
+class InventoryReportData {
+  const InventoryReportData({
     required this.asOfDate,
     required this.categories,
     this.currency = 'SAR',
   });
 
   final DateTime asOfDate;
-  final List<TrialBalanceCategory> categories;
+  final List<InventoryCategory> categories;
   final String currency;
 
-  List<TrialBalanceEntry> get allEntries =>
-      categories.expand((c) => c.entries).toList();
+  List<InventoryItem> get allItems =>
+      categories.expand((c) => c.items).toList();
 
-  double get totalDebit => categories.fold(0, (sum, c) => sum + c.totalDebit);
-
-  double get totalCredit => categories.fold(0, (sum, c) => sum + c.totalCredit);
+  double get totalValue => categories.fold(0, (sum, c) => sum + c.totalValue);
+  double get totalQuantity =>
+      categories.fold(0, (sum, c) => sum + c.totalQuantity);
 }
 
-/// A trial balance report template.
+/// An inventory valuation report template.
 ///
-/// Creates a professional trial balance report with:
-/// - Bilingual header (Arabic/English)
-/// - Categorized account listings
-/// - Debit and credit columns
-/// - Category subtotals
-/// - Grand total row
+/// Creates a detailed inventory report with:
+/// - Item listing by category
+/// - Quantity and cost information
+/// - Total valuations
 ///
 /// ## Example
 /// ```dart
-/// final report = TrialBalanceTemplate(
+/// final report = InventoryReportTemplate(
 ///   config: pdfConfig,
 ///   company: companyInfo,
-///   data: trialBalanceData,
+///   data: inventoryData,
 /// );
 ///
 /// final bytes = report.generate();
 /// ```
-class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
-  TrialBalanceTemplate({
+class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
+  InventoryReportTemplate({
     required GeniusPdfConfig config,
     required this.company,
     required this.data,
@@ -113,11 +132,11 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
   }) : super(config);
 
   final GeniusPdfCompanyInfo company;
-  final TrialBalanceData data;
+  final InventoryReportData data;
   final bool showCategories;
   final bool showCategorySubtotals;
 
-  /// Report ID for QR code URL
+  /// Report ID for QR code URL (e.g., "INV-2024-001")
   final String? reportId;
 
   /// User who printed the report
@@ -138,8 +157,8 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
 
   @override
   void build() {
-    // Add repeating footer with QR code and user info on all pages
-    if (showQRCode || printedBy != null) {
+    // Add repeating footer with user info on all pages
+    if (printedBy != null || showQRCode) {
       addFooter(
         userName: printedBy,
         printTime: _formatDate(DateTime.now()),
@@ -152,19 +171,19 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     // Header
     _drawHeader();
 
-    // Trial balance table
+    // Inventory table
     _drawTable();
 
-    // Footer totals
-    _drawTotals();
+    // Grand total
+    _drawGrandTotal();
 
-    // Summary section
+    // Summary section with report info
     _drawSummary();
 
-    // Footer Section (Notes + QR Code)
+    // Draw Footer Section (Notes + QR Code)
     _drawFooterSection();
 
-    // Signatures section
+    // Signatures section (without QR code since it's in footer)
     if (showSignatures) {
       _drawSignatures();
     }
@@ -172,11 +191,9 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
 
   void _drawHeader() {
     final header = GeniusPdfReportHeader(
-      title: 'Trial Balance',
-      titleAr: 'ميزان المراجعة',
-      subtitle: config.isLTR ? 'As of ${_formatDateLong(data.asOfDate)}' : null,
-      subtitleAr:
-          !config.isLTR ? 'كما في ${_formatDateArabic(data.asOfDate)}' : null,
+      title: config.isLTR
+          ? 'Inventory Valuation Report As of ${_formatDateLong(data.asOfDate)}'
+          : 'تقرير تقييم المخزون كما في ${_formatDateArabic(data.asOfDate)}',
       company: company,
       config: config.copyWith(textDirection: m.TextDirection.ltr),
       style: const GeniusPdfReportHeaderStyle.classic(),
@@ -185,32 +202,53 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
 
     final height = header.draw(
       page: currentPage,
-      bounds: Rect.fromLTWH(0, 0, pageWidth, 120),
+      bounds: Rect.fromLTWH(0, 0, pageWidth, 100),
     );
 
-    addSpace(height + 15);
+    addSpace(height + 10);
   }
 
   void _drawTable() {
     final columns = [
       const GeniusPdfGridColumn(
-        id: 'account',
-        title: 'Account Name',
-        titleAr: 'اسم الحساب',
+        id: 'code',
+        title: 'Item Code',
+        titleAr: 'رمز الصنف',
+        width: 70,
+      ),
+      const GeniusPdfGridColumn(
+        id: 'name',
+        title: 'Item Name',
+        titleAr: 'اسم الصنف',
+      ),
+      const GeniusPdfGridColumn(
+        id: 'warehouse',
+        title: 'Warehouse',
+        titleAr: 'المستودع',
+        width: 90,
+      ),
+      GeniusPdfGridColumn.numeric(
+        id: 'qty',
+        title: 'Qty on Hand',
+        titleAr: 'الكمية المتوفرة',
+        width: 70,
+        alignment: GeniusPdfTextAlign.end,
       ),
       GeniusPdfGridColumn.currency(
-        id: 'debit',
-        title: 'Debit',
-        titleAr: 'مدين',
-        width: 100,
+        id: 'avgCost',
+        title: 'Avg Cost',
+        titleAr: 'متوسط التكلفة',
+        width: 80,
         currencySymbol: '',
+        alignment: GeniusPdfTextAlign.end,
       ),
       GeniusPdfGridColumn.currency(
-        id: 'credit',
-        title: 'Credit',
-        titleAr: 'دائن',
-        width: 100,
+        id: 'totalValue',
+        title: 'Total Value',
+        titleAr: 'إجمالي القيمة',
+        width: 90,
         currencySymbol: '',
+        alignment: GeniusPdfTextAlign.end,
       ),
     ];
 
@@ -234,22 +272,28 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
         ));
       }
 
-      // Add entries
-      for (final entry in category.entries) {
+      // Add items
+      for (final item in category.items) {
         rows.add(GeniusPdfGridRow(cells: {
-          'account': entry.getName(isArabic: config.isRTL),
-          'debit': entry.debit > 0 ? entry.debit : null,
-          'credit': entry.credit > 0 ? entry.credit : null,
+          'code': item.itemCode,
+          'name': item.getName(isArabic: config.isRTL),
+          'warehouse': item.getWarehouse(isArabic: config.isRTL),
+          'qty': item.quantityOnHand.toInt(),
+          'avgCost': item.averageCost,
+          'totalValue': item.totalValue,
         }));
       }
 
       // Add category subtotal
-      if (showCategorySubtotals && category.entries.length > 1) {
+      if (showCategorySubtotals && category.items.length > 1) {
         rows.add(GeniusPdfGridRow(
           cells: {
-            'account': '',
-            'debit': category.totalDebit,
-            'credit': category.totalCredit,
+            'code': '',
+            'name': '',
+            'warehouse': '',
+            'qty': '',
+            'avgCost': '',
+            'totalValue': category.totalValue,
           },
           style: const GeniusPdfCellStyle(
             textStyle: GeniusPdfTextStyle(
@@ -280,27 +324,27 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
 
     if (result != null) {
       // Update current page and Y position from the grid result
-      // This handles multi-page grids correctly in both RTL and LTR modes
+      // This handles multi-page grids correctly by synchronizing the builder's
+      // state with where the grid actually ended
       updateFromLayoutResult(result, spacing: 10);
     }
   }
 
-  void _drawTotals() {
+  void _drawGrandTotal() {
     // Grand total bar
     final totalBar = GeniusPdfTotalBar(
       config: config,
-      label: 'Total',
-      labelAr: 'الإجمالي',
-      value:
-          '${_formatNumber(data.totalDebit)} ${data.currency}    |    ${_formatNumber(data.totalCredit)} ${data.currency}',
-      backgroundColor: const Color(0xFF424242),
-      textColor: const Color(0xFFFFFFFF),
-      fontSize: 11,
+      label: 'Total Inventory Value',
+      labelAr: 'إجمالي قيمة المخزون',
+      value: _formatCurrency(data.totalValue),
+      backgroundColor: const Color.fromARGB(255, 147, 197, 255),
+      textColor: const Color.fromARGB(255, 0, 0, 0),
+      fontSize: 12,
     );
 
     totalBar.draw(
       page: currentPage,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 35),
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 40),
     );
 
     addSpace(50);
@@ -346,47 +390,41 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     return months[month - 1];
   }
 
-  String _formatNumber(double value) {
-    return value.toStringAsFixed(2).replaceAllMapped(
+  String _formatDate(DateTime date) {
+    return DateFormat('dd/MM/yyyy').format(date);
+  }
+
+  String _formatCurrency(double value) {
+    final formatted = value.toStringAsFixed(2).replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
         );
-  }
-
-  String _formatDate(DateTime date) {
-    return DateFormat('dd/MM/yyyy').format(date);
+    return '$formatted ${data.currency}';
   }
 
   void _drawSummary() {
     // Summary section with key metrics
     final summaryItems = <GeniusPdfSummaryItem>[
       GeniusPdfSummaryItem(
-        label: 'Total Accounts',
-        labelAr: 'إجمالي الحسابات',
-        value: '${data.allEntries.length}',
+        label: 'Total Items',
+        labelAr: 'إجمالي الأصناف',
+        value: '${data.allItems.length}',
+      ),
+      GeniusPdfSummaryItem(
+        label: 'Total Quantity',
+        labelAr: 'إجمالي الكميات',
+        value: _formatNumber(data.totalQuantity),
       ),
       GeniusPdfSummaryItem(
         label: 'Categories',
         labelAr: 'التصنيفات',
         value: '${data.categories.length}',
       ),
-      GeniusPdfSummaryItem.negative(
-        label: 'Total Debit',
-        labelAr: 'إجمالي المدين',
-        value: '${_formatNumber(data.totalDebit)} ${data.currency}',
+      GeniusPdfSummaryItem.total(
+        label: 'Total Value',
+        labelAr: 'إجمالي القيمة',
+        value: _formatCurrency(data.totalValue),
       ),
-      GeniusPdfSummaryItem.positive(
-        label: 'Total Credit',
-        labelAr: 'إجمالي الدائن',
-        value: '${_formatNumber(data.totalCredit)} ${data.currency}',
-      ),
-      if (data.totalDebit != data.totalCredit)
-        GeniusPdfSummaryItem.total(
-          label: 'Difference',
-          labelAr: 'الفرق',
-          value:
-              '${_formatNumber(data.totalDebit - data.totalCredit)} ${data.currency}',
-        ),
     ];
 
     final summary = GeniusPdfSummarySection(
@@ -424,7 +462,11 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     }
 
     // Draw side-by-side if both are present
+    // RTL: QR (Left/End) - Notes (Right/Start) -> distinct from standard LTR
+    // But addTwoColumns lays out Left then Right.
     // LTR: Notes (2/3) | QR (1/3)
+    // RTL: QR (1/3)    | Notes (2/3)
+
     addTwoColumns(
       spacing: 10,
       leftFlex: config.isLTR ? 2 : 1,
@@ -449,24 +491,29 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
   }
 
   void _drawNotes({required double width}) {
+    // Legacy single column drawer wrapper
     _drawNotesContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
   }
 
   double _drawNotesContent(PdfPage page, Rect bounds) {
+    // Notes section with benefits
     final displayNotes = notes ?? (config.isRTL ? notesAr : notes);
     final defaultNotes = config.isRTL
         ? '''ملاحظات:
-• ميزان المراجعة يعرض أرصدة جميع الحسابات كما في تاريخ التقرير
-• يجب أن يتساوى إجمالي الجانب المدين مع إجمالي الجانب الدائن
-• أي فرق يشير إلى وجود خطأ في القيود المحاسبية
-• للاستفسارات، يرجى التواصل مع قسم المحاسبة'''
+• هذا التقرير يعرض حالة المخزون الفعلية كما في تاريخ التقرير
+• القيم المعروضة تستند إلى متوسط التكلفة المرجحة
+• يرجى مراجعة الجرد الفعلي للتأكد من دقة البيانات
+• للاستفسارات، يرجى التواصل مع إدارة المخازن'''
         : '''Notes:
-• Trial Balance shows all account balances as of the report date
-• Total Debit must equal Total Credit
-• Any difference indicates errors in accounting entries
-• For inquiries, contact the Accounting Department''';
+• This report reflects the actual inventory status as of the report date
+• Values are based on weighted average cost method
+• Please verify with physical count for data accuracy
+• For inquiries, contact the Warehouse Department''';
 
     final notesText = displayNotes ?? defaultNotes;
+
+    // We can't use addLine here because it modifies _currentY of the builder
+    // We must use PdfTextElement directly with the provided bounds
 
     final font = config.baseFont;
     final element = PdfTextElement(
@@ -495,11 +542,12 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     if (reportId == null) return 0;
 
     final qrUrl = 'https://localhost:443/report/$reportId';
-    final caption = 'ID: $reportId';
-
+    final qrId = 'ID: $reportId';
     final captionFont = config.baseFont;
+
+    // Draw Caption
     final captionLayout = PdfTextElement(
-      text: caption,
+      text: qrId,
       font: captionFont,
       format: PdfStringFormat(
         alignment: PdfTextAlignment.center,
@@ -510,13 +558,17 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
         bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
 
     final captionHeight = captionLayout?.bounds.height ?? 0;
+
+    // Draw QR Code
     const qrSize = 80.0; // Reduced size
+    // Center it in the available bounds
     final x = bounds.left + (bounds.width - qrSize) / 2;
     final y = bounds.top + captionHeight + 5;
 
     final urlQR = GeniusPdfQRCodeGenerator.url(
       url: qrUrl,
       config: config,
+      // We draw caption manually to control layout better in the column
       caption: null,
     );
 
@@ -547,35 +599,16 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       title: 'Prepared By',
       titleAr: 'أعده',
-      lineWidth: 100,
+      lineWidth: 120,
       showDate: false,
     );
 
     preparedBy.draw(
       page: currentPage,
       bounds: Rect.fromLTWH(
-        config.isRTL ? pageWidth - 110 : 0,
+        config.isRTL ? pageWidth - 150 : 0,
         signatureY,
-        110,
-        60,
-      ),
-    );
-
-    // Reviewed by signature
-    final reviewedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Reviewed By',
-      titleAr: 'راجعه',
-      lineWidth: 100,
-      showDate: false,
-    );
-
-    reviewedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        (pageWidth - 110) / 2,
-        signatureY,
-        110,
+        150,
         60,
       ),
     );
@@ -585,20 +618,27 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
       config: config,
       title: 'Approved By',
       titleAr: 'اعتمده',
-      lineWidth: 100,
+      lineWidth: 120,
       showDate: false,
     );
 
     approvedBy.draw(
       page: currentPage,
       bounds: Rect.fromLTWH(
-        config.isRTL ? 0 : pageWidth - 110,
+        config.isRTL ? 0 : pageWidth - 150,
         signatureY,
-        110,
+        150,
         60,
       ),
     );
 
     addSpace(70);
+  }
+
+  String _formatNumber(double value) {
+    return value.toStringAsFixed(0).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
   }
 }

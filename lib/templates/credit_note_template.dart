@@ -4,11 +4,11 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
-import '../builders/pdf_document_builder.dart';
-import '../components/components.dart';
-import '../core/financial/financial.dart';
-import '../core/pdf_config.dart';
-import '../models/pdf_result.dart';
+import '../src/builders/pdf_document_builder.dart';
+import '../src/components/components.dart';
+import '../src/core/financial/financial.dart';
+import '../src/core/pdf_config.dart';
+import '../src/models/pdf_result.dart';
 
 /// Note type enum for credit/debit notes.
 enum NoteType {
