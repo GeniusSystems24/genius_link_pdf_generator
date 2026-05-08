@@ -113,10 +113,10 @@ export 'src/extensions/datetime_extensions.dart';
 export 'src/components/components.dart';
 
 // Templates
-export 'src/templates/templates.dart';
+export 'templates/templates.dart';
 
 // Template Engine
-export 'src/templates/engine/engine.dart';
+export 'templates/engine/engine.dart';
 
 // V2 Architecture
 export 'src/core/v2/v2.dart';

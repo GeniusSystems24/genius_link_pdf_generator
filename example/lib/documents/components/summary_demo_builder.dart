@@ -547,5 +547,27 @@ class SummaryDemoBuilder extends GeniusPdfDocumentBuilder {
       ),
       spacing: 10,
     );
+
+    final footerEdgeGap = remainingHeight > 18 ? remainingHeight - 18 : 0.0;
+    addSpace(footerEdgeGap);
+
+    addReportSummary(
+      summary: GeniusPdfSummarySection(
+        config: config,
+        items: [
+          GeniusPdfSummaryItem(
+            label: 'Footer Edge Metric',
+            value: '84,250.00',
+          ),
+          GeniusPdfSummaryItem.total(
+            label: 'Move Together',
+            value: 'Required',
+          ),
+        ],
+        style: GeniusPdfSummaryStyle.card(),
+        width: 240,
+      ),
+      spacing: 6,
+    );
   }
 }

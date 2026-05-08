@@ -17,10 +17,10 @@
 
 **Purpose**: Confirm the exact package surfaces, baseline defects, and verification fixtures before edits begin.
 
-- [ ] T001 Audit builder state transitions, pagination helpers, and absolute-position paths in `lib/src/builders/pdf_document_builder.dart`
-- [ ] T002 [P] Audit generation/export failure handling in `lib/src/services/pdf_service.dart`, `lib/src/services/pdf_generation_manager.dart`, `lib/src/services/export/pdf_export_service.dart`, and `lib/src/services/export/batch_exporter.dart`
-- [ ] T003 [P] Audit paginated/media component behavior in `lib/src/components/widgets/pdf_data_grid.dart`, `lib/src/components/widgets/pdf_rich_text.dart`, `lib/src/components/widgets/pdf_summary.dart`, `lib/src/components/widgets/pdf_info_box.dart`, `lib/src/components/widgets/pdf_report_header.dart`, `lib/src/components/widgets/pdf_barcode.dart`, `lib/src/components/widgets/summary/genius_pdf_q_r_code.dart`, and `lib/src/components/widgets/pdf_watermark.dart`
-- [ ] T004 [P] Confirm high-risk reproduction fixtures in `example/lib/documents/smart_space_demo_document.dart`, `example/lib/documents/multi_grid_summary_demo_document.dart`, `example/lib/documents/qr_attachments_demo_document.dart`, `example/lib/documents/components/grid_watermark_demo_builder.dart`, `example/lib/documents/components/info_box_demo_builder.dart`, `example/lib/documents/components/rich_text_demo_builder.dart`, and `example/lib/documents/components/summary_demo_builder.dart`
+- [X] T001 Audit builder state transitions, pagination helpers, and absolute-position paths in `lib/src/builders/pdf_document_builder.dart`
+- [X] T002 [P] Audit generation/export failure handling in `lib/src/services/pdf_service.dart`, `lib/src/services/pdf_generation_manager.dart`, `lib/src/services/export/pdf_export_service.dart`, and `lib/src/services/export/batch_exporter.dart`
+- [X] T003 [P] Audit paginated/media component behavior in `lib/src/components/widgets/pdf_data_grid.dart`, `lib/src/components/widgets/pdf_rich_text.dart`, `lib/src/components/widgets/pdf_summary.dart`, `lib/src/components/widgets/pdf_info_box.dart`, `lib/src/components/widgets/pdf_report_header.dart`, `lib/src/components/widgets/pdf_barcode.dart`, `lib/src/components/widgets/summary/genius_pdf_q_r_code.dart`, and `lib/src/components/widgets/pdf_watermark.dart`
+- [X] T004 [P] Confirm high-risk reproduction fixtures in `example/lib/documents/smart_space_demo_document.dart`, `example/lib/documents/multi_grid_summary_demo_document.dart`, `example/lib/documents/qr_attachments_demo_document.dart`, `example/lib/documents/components/grid_watermark_demo_builder.dart`, `example/lib/documents/components/info_box_demo_builder.dart`, `example/lib/documents/components/rich_text_demo_builder.dart`, and `example/lib/documents/components/summary_demo_builder.dart`
 
 ---
 
@@ -28,9 +28,9 @@
 
 **Purpose**: Create the shared regression scaffolding used by all stories.
 
-- [ ] T005 Create shared PDF openability and page-count assertions in `test/pdf_stability/support/pdf_openability_assertions.dart`
-- [ ] T006 [P] Create reusable builder/layout fixtures in `test/pdf_stability/support/pdf_stability_fixtures.dart`
-- [ ] T007 [P] Create reusable invalid-media and batch-failure fixtures in `test/pdf_stability/support/pdf_failure_scenarios.dart`
+- [X] T005 Create shared PDF openability and page-count assertions in `test/pdf_stability/support/pdf_openability_assertions.dart`
+- [X] T006 [P] Create reusable builder/layout fixtures in `test/pdf_stability/support/pdf_stability_fixtures.dart`
+- [X] T007 [P] Create reusable invalid-media and batch-failure fixtures in `test/pdf_stability/support/pdf_failure_scenarios.dart`
 
 **Checkpoint**: Shared test helpers exist and all story work can build on the same structural validation pattern.
 
@@ -44,14 +44,14 @@
 
 ### Validation for User Story 1
 
-- [ ] T008 [P] [US1] Add builder state regression coverage for `currentY`, `remainingHeight`, `newPage()`, `resetY()`, `reserveHeaderSpace()`, `reserveFooterSpace()`, and `generate()` in `test/pdf_stability/builder_state_test.dart`
-- [ ] T009 [P] [US1] Add general page-break regressions for long text, rich text, section dividers, large spacing, and content near the footer in `test/pdf_stability/layout_flow_test.dart`
+- [X] T008 [P] [US1] Add builder state regression coverage for `currentY`, `remainingHeight`, `newPage()`, `resetY()`, `reserveHeaderSpace()`, `reserveFooterSpace()`, and `generate()` in `test/pdf_stability/builder_state_test.dart`
+- [X] T009 [P] [US1] Add general page-break regressions for long text, rich text, section dividers, large spacing, and content near the footer in `test/pdf_stability/layout_flow_test.dart`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Refactor shared builder state transitions in `lib/src/builders/pdf_document_builder.dart` so `newPage()`, `resetY()`, `reserveHeaderSpace()`, `reserveFooterSpace()`, and `generate()` keep page state consistent
-- [ ] T011 [US1] Fix pre-break coordinate ordering in `lib/src/builders/pdf_document_builder.dart` for `addSpace()`, `addHorizontalLine()`, flowing text paths, and any helper that computes draw positions before `_ensureSpace()`
-- [ ] T012 [US1] Update manual regression fixtures in `example/lib/documents/smart_space_demo_document.dart` and `example/lib/documents/components/rich_text_demo_builder.dart` to exercise forced multi-page flow safely
+- [X] T010 [US1] Refactor shared builder state transitions in `lib/src/builders/pdf_document_builder.dart` so `newPage()`, `resetY()`, `reserveHeaderSpace()`, `reserveFooterSpace()`, and `generate()` keep page state consistent
+- [X] T011 [US1] Fix pre-break coordinate ordering in `lib/src/builders/pdf_document_builder.dart` for `addSpace()`, `addHorizontalLine()`, flowing text paths, and any helper that computes draw positions before `_ensureSpace()`
+- [X] T012 [US1] Update manual regression fixtures in `example/lib/documents/smart_space_demo_document.dart` and `example/lib/documents/components/rich_text_demo_builder.dart` to exercise forced multi-page flow safely
 
 **Checkpoint**: User Story 1 is functional and verifiable on its own.
 
@@ -65,13 +65,13 @@
 
 ### Validation for User Story 2
 
-- [ ] T013 [US2] Add header/footer boundary and keep-together regressions for summaries, info boxes, report headers, and near-footer content in `test/pdf_stability/layout_flow_test.dart`
+- [X] T013 [US2] Add header/footer boundary and keep-together regressions for summaries, info boxes, report headers, and near-footer content in `test/pdf_stability/layout_flow_test.dart`
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Make content-zone start and footer-aware remaining-height calculations authoritative in `lib/src/builders/pdf_document_builder.dart`
-- [ ] T015 [US2] Fix near-footer keep-together behavior in `lib/src/components/widgets/pdf_summary.dart`, `lib/src/components/widgets/pdf_info_box.dart`, and `lib/src/components/widgets/pdf_report_header.dart`
-- [ ] T016 [US2] Update header/footer verification fixtures in `example/lib/documents/report_composer_demo_document.dart`, `example/lib/documents/components/info_box_demo_builder.dart`, and `example/lib/documents/components/summary_demo_builder.dart`
+- [X] T014 [US2] Make content-zone start and footer-aware remaining-height calculations authoritative in `lib/src/builders/pdf_document_builder.dart`
+- [X] T015 [US2] Fix near-footer keep-together behavior in `lib/src/components/widgets/pdf_summary.dart`, `lib/src/components/widgets/pdf_info_box.dart`, and `lib/src/components/widgets/pdf_report_header.dart`
+- [X] T016 [US2] Update header/footer verification fixtures in `example/lib/documents/report_composer_demo_document.dart`, `example/lib/documents/components/info_box_demo_builder.dart`, and `example/lib/documents/components/summary_demo_builder.dart`
 
 **Checkpoint**: User Stories 1 and 2 both work independently.
 
@@ -85,13 +85,13 @@
 
 ### Validation for User Story 3
 
-- [ ] T017 [US3] Add grid pagination, repeated grid-plus-summary, and final page-state regressions in `test/pdf_stability/grid_summary_sync_test.dart`
+- [X] T017 [US3] Add grid pagination, repeated grid-plus-summary, and final page-state regressions in `test/pdf_stability/grid_summary_sync_test.dart`
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] Synchronize `currentPage`, page index, `currentY`, and layout result from `PdfLayoutResult` in `lib/src/builders/pdf_document_builder.dart`
-- [ ] T019 [US3] Keep grid draw results authoritative in `lib/src/components/widgets/pdf_data_grid.dart` and the summary follow-up flows in `lib/src/builders/pdf_document_builder.dart`
-- [ ] T020 [US3] Update `example/lib/documents/multi_grid_summary_demo_document.dart` to remain the canonical manual reproduction fixture for grid-summary continuation
+- [X] T018 [US3] Synchronize `currentPage`, page index, `currentY`, and layout result from `PdfLayoutResult` in `lib/src/builders/pdf_document_builder.dart`
+- [X] T019 [US3] Keep grid draw results authoritative in `lib/src/components/widgets/pdf_data_grid.dart` and the summary follow-up flows in `lib/src/builders/pdf_document_builder.dart`
+- [X] T020 [US3] Update `example/lib/documents/multi_grid_summary_demo_document.dart` to remain the canonical manual reproduction fixture for grid-summary continuation
 
 **Checkpoint**: All P1 continuation and pagination defects are reproducible and fixable through the shared builder flow.
 
@@ -105,13 +105,13 @@
 
 ### Validation for User Story 4
 
-- [ ] T021 [US4] Add RTL/LTR, portrait/landscape, and bilingual non-overlap regressions in `test/pdf_stability/media_and_rtl_test.dart`
+- [X] T021 [US4] Add RTL/LTR, portrait/landscape, and bilingual non-overlap regressions in `test/pdf_stability/media_and_rtl_test.dart`
 
 ### Implementation for User Story 4
 
-- [ ] T022 [US4] Fix direction-aware layout defaults and mirrored positioning in `lib/src/builders/pdf_document_builder.dart` and `lib/src/components/widgets/pdf_rich_text.dart`
-- [ ] T023 [US4] Fix bilingual alignment and non-overlap behavior in `lib/src/components/widgets/pdf_report_header.dart`, `lib/src/components/widgets/pdf_summary.dart`, and `lib/src/components/widgets/pdf_info_box.dart`
-- [ ] T024 [US4] Update RTL/LTR verification fixtures in `example/lib/documents/report_document.dart` and `example/lib/documents/components/rich_text_demo_builder.dart`
+- [X] T022 [US4] Fix direction-aware layout defaults and mirrored positioning in `lib/src/builders/pdf_document_builder.dart` and `lib/src/components/widgets/pdf_rich_text.dart`
+- [X] T023 [US4] Fix bilingual alignment and non-overlap behavior in `lib/src/components/widgets/pdf_report_header.dart`, `lib/src/components/widgets/pdf_summary.dart`, and `lib/src/components/widgets/pdf_info_box.dart`
+- [X] T024 [US4] Update RTL/LTR verification fixtures in `example/lib/documents/report_document.dart` and `example/lib/documents/components/rich_text_demo_builder.dart`
 
 **Checkpoint**: User Story 4 is independently testable in both directions and orientations.
 
@@ -125,14 +125,14 @@
 
 ### Validation for User Story 5
 
-- [ ] T025 [US5] Add oversized image, QR/barcode failure, and watermark coexistence regressions in `test/pdf_stability/media_and_rtl_test.dart`
+- [X] T025 [US5] Add oversized image, QR/barcode failure, and watermark coexistence regressions in `test/pdf_stability/media_and_rtl_test.dart`
 
 ### Implementation for User Story 5
 
-- [ ] T026 [US5] Fix image page-break ordering and scale-or-fail placement behavior in `lib/src/builders/pdf_document_builder.dart`
-- [ ] T027 [US5] Harden barcode validation and render-failure handling in `lib/src/components/widgets/pdf_barcode.dart`
-- [ ] T028 [US5] Harden QR, full-page media, and watermark bounds behavior in `lib/src/components/widgets/summary/genius_pdf_q_r_code.dart` and `lib/src/components/widgets/pdf_watermark.dart`
-- [ ] T029 [US5] Update `example/lib/documents/qr_attachments_demo_document.dart` and `example/lib/documents/components/grid_watermark_demo_builder.dart` to verify safe media placement manually
+- [X] T026 [US5] Fix image page-break ordering and scale-or-fail placement behavior in `lib/src/builders/pdf_document_builder.dart`
+- [X] T027 [US5] Harden barcode validation and render-failure handling in `lib/src/components/widgets/pdf_barcode.dart`
+- [X] T028 [US5] Harden QR, full-page media, and watermark bounds behavior in `lib/src/components/widgets/summary/genius_pdf_q_r_code.dart` and `lib/src/components/widgets/pdf_watermark.dart`
+- [X] T029 [US5] Update `example/lib/documents/qr_attachments_demo_document.dart` and `example/lib/documents/components/grid_watermark_demo_builder.dart` to verify safe media placement manually
 
 **Checkpoint**: User Story 5 handles deterministic media placement and explicit render failures without corrupting the surrounding PDF.
 
@@ -146,14 +146,14 @@
 
 ### Validation for User Story 6
 
-- [ ] T030 [US6] Add generation, wrapper-failure, batch mapping, `stopOnError`, and disposal regressions in `test/pdf_stability/service_reliability_test.dart`
+- [X] T030 [US6] Add generation, wrapper-failure, batch mapping, `stopOnError`, and disposal regressions in `test/pdf_stability/service_reliability_test.dart`
 
 ### Implementation for User Story 6
 
-- [ ] T031 [US6] Fix canonical raw-byte generation and wrapper failure propagation in `lib/src/services/pdf_service.dart`
-- [ ] T032 [US6] Fix per-job result, status, progress, and error synchronization in `lib/src/services/pdf_generation_manager.dart`
-- [ ] T033 [US6] Fix export failure propagation and input-result mapping in `lib/src/services/export/pdf_export_service.dart` and `lib/src/services/export/batch_exporter.dart`
-- [ ] T034 [US6] Apply additive-only failure surface changes in `lib/src/models/pdf_result.dart` and `lib/genius_link_pdf_generator.dart` only if the validated defects cannot be explained through existing public result shapes
+- [X] T031 [US6] Fix canonical raw-byte generation and wrapper failure propagation in `lib/src/services/pdf_service.dart`
+- [X] T032 [US6] Fix per-job result, status, progress, and error synchronization in `lib/src/services/pdf_generation_manager.dart`
+- [X] T033 [US6] Fix export failure propagation and input-result mapping in `lib/src/services/export/pdf_export_service.dart` and `lib/src/services/export/batch_exporter.dart`
+- [X] T034 [US6] Apply additive-only failure surface changes in `lib/src/models/pdf_result.dart` and `lib/genius_link_pdf_generator.dart` only if the validated defects cannot be explained through existing public result shapes
 
 **Checkpoint**: User Story 6 preserves explicit per-job and per-batch outcomes over the same validated raw-byte generation path.
 
@@ -163,11 +163,11 @@
 
 **Purpose**: Close the loop on docs, release notes, and final validation without expanding scope into business-data validation.
 
-- [ ] T035 Update `README.md` only if a user-visible generation behavior or additive public API change needs guidance, and explicitly note that business-data validation remains out of scope
-- [ ] T036 Update `CHANGELOG.md` with concise `Fixed` and `Changed` entries for PDF generation stability, layout safety, and any additive API surface
-- [ ] T037 Update `specs/002-pdf-engine-stability/quickstart.md` if final validation commands or manual fixtures change during implementation
-- [ ] T038 Run `flutter analyze lib test example` from the package root and resolve issues in touched files
-- [ ] T039 Run `flutter test test/pdf_stability` plus Windows example verification against `example/lib/documents/smart_space_demo_document.dart`, `example/lib/documents/multi_grid_summary_demo_document.dart`, and `example/lib/documents/qr_attachments_demo_document.dart`, confirming no empty or corrupted PDFs and no business-calculation semantic changes
+- [X] T035 Update `README.md` only if a user-visible generation behavior or additive public API change needs guidance, and explicitly note that business-data validation remains out of scope
+- [X] T036 Update `CHANGELOG.md` with concise `Fixed` and `Changed` entries for PDF generation stability, layout safety, and any additive API surface
+- [X] T037 Update `specs/002-pdf-engine-stability/quickstart.md` if final validation commands or manual fixtures change during implementation
+- [X] T038 Run `flutter analyze lib test example` from the package root and resolve issues in touched files
+- [X] T039 Run `flutter test test/pdf_stability` plus Windows example verification against `example/lib/documents/smart_space_demo_document.dart`, `example/lib/documents/multi_grid_summary_demo_document.dart`, and `example/lib/documents/qr_attachments_demo_document.dart`, confirming no empty or corrupted PDFs and no business-calculation semantic changes
 
 ---
 
@@ -252,4 +252,3 @@
 ### Final Validation Gate
 
 - Do not mark the feature complete until `flutter analyze lib test example`, `flutter test test/pdf_stability`, and the Windows example verification from `specs/002-pdf-engine-stability/quickstart.md` all pass.
-

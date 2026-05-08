@@ -225,6 +225,13 @@ class GeniusPdfWatermark {
     double width = settings.width ?? image.width.toDouble();
     double height = settings.height ?? image.height.toDouble();
 
+    if (settings.position == GeniusWatermarkPosition.fill &&
+        settings.width == null &&
+        settings.height == null) {
+      width = pageSize.width;
+      height = pageSize.height;
+    }
+
     if (settings.maintainAspectRatio &&
         (settings.width != null || settings.height != null)) {
       final aspectRatio = image.width / image.height;
@@ -235,9 +242,23 @@ class GeniusPdfWatermark {
       }
     }
 
+    if (width > pageSize.width || height > pageSize.height) {
+      final widthScale = pageSize.width / width;
+      final heightScale = pageSize.height / height;
+      final scale = widthScale < heightScale ? widthScale : heightScale;
+      width *= scale;
+      height *= scale;
+    }
+
     // Calculate position
-    final position =
+    final rawPosition =
         _calculatePosition(settings.position, pageSize, Size(width, height));
+    final maxX = pageSize.width - width;
+    final maxY = pageSize.height - height;
+    final position = Offset(
+      rawPosition.dx.clamp(0.0, maxX < 0 ? 0.0 : maxX),
+      rawPosition.dy.clamp(0.0, maxY < 0 ? 0.0 : maxY),
+    );
 
     // Save graphics state
     graphics.save();

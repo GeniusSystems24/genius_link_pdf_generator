@@ -17,6 +17,17 @@ import '../models/pdf_result.dart';
 typedef GeniusPdfProgressCallback = void Function(
     double progress, String? message);
 
+typedef GeniusPdfDirectoryProvider = Future<Directory> Function();
+typedef GeniusPdfOpenFileAction = Future<void> Function(String path);
+typedef GeniusPdfSharePdfAction = Future<void> Function(
+  Uint8List bytes,
+  String fileName,
+);
+typedef GeniusPdfPrintPdfAction = Future<bool> Function(
+  Uint8List bytes,
+  String documentName,
+);
+
 /// Cancellation token for PDF operations
 class GeniusPdfCancellationToken {
   bool _isCancelled = false;
@@ -200,7 +211,90 @@ class GeniusPdfInfo {
 /// ```
 class GeniusPdfService {
   /// Creates a new [GeniusPdfService] instance.
-  const GeniusPdfService();
+  const GeniusPdfService({
+    GeniusPdfDirectoryProvider? documentsDirectoryProvider,
+    GeniusPdfDirectoryProvider? temporaryDirectoryProvider,
+    GeniusPdfOpenFileAction? openFileAction,
+    GeniusPdfSharePdfAction? sharePdfAction,
+    GeniusPdfPrintPdfAction? printPdfAction,
+  })  : _documentsDirectoryProvider = documentsDirectoryProvider,
+        _temporaryDirectoryProvider = temporaryDirectoryProvider,
+        _openFileAction = openFileAction,
+        _sharePdfAction = sharePdfAction,
+        _printPdfAction = printPdfAction;
+
+  final GeniusPdfDirectoryProvider? _documentsDirectoryProvider;
+  final GeniusPdfDirectoryProvider? _temporaryDirectoryProvider;
+  final GeniusPdfOpenFileAction? _openFileAction;
+  final GeniusPdfSharePdfAction? _sharePdfAction;
+  final GeniusPdfPrintPdfAction? _printPdfAction;
+
+  Future<Directory> _resolveDocumentsDirectory() {
+    return _documentsDirectoryProvider?.call() ??
+        getApplicationDocumentsDirectory();
+  }
+
+  Future<Directory> _resolveTemporaryDirectory() {
+    return _temporaryDirectoryProvider?.call() ?? getTemporaryDirectory();
+  }
+
+  Future<void> _openFile(String path) async {
+    if (_openFileAction != null) {
+      await _openFileAction!(path);
+      return;
+    }
+
+    await OpenFile.open(path);
+  }
+
+  Future<void> _sharePdf(Uint8List bytes, String fileName) async {
+    if (_sharePdfAction != null) {
+      await _sharePdfAction!(bytes, fileName);
+      return;
+    }
+
+    await Printing.sharePdf(bytes: bytes, filename: fileName);
+  }
+
+  Future<bool> _printPdf(Uint8List bytes, String documentName) {
+    return _printPdfAction?.call(bytes, documentName) ??
+        Printing.layoutPdf(
+          onLayout: (_) => bytes,
+          name: documentName,
+        );
+  }
+
+  Future<Uint8List> _generateBytes(
+    GeniusPdfDocumentBuilder builder, {
+    required bool runInBackground,
+  }) async {
+    final bytes = runInBackground
+        ? await compute(_generatePdfBytes, builder)
+        : builder.generate();
+    return Uint8List.fromList(bytes);
+  }
+
+  Future<String> _saveGeneratedBytes({
+    required Uint8List bytes,
+    required GeniusPdfDocumentBuilder builder,
+    required String fileName,
+  }) async {
+    final configuredPath = builder.config.defaultOutputPath;
+    final Directory dir;
+    if (configuredPath != null && configuredPath.isNotEmpty) {
+      dir = Directory(configuredPath);
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+      }
+    } else {
+      dir = await _resolveDocumentsDirectory();
+    }
+
+    final filePath = '${dir.path}/$fileName.pdf';
+    final file = File(filePath);
+    await file.writeAsBytes(bytes);
+    return filePath;
+  }
 
   /// Generates a PDF from the given builder and returns the bytes.
   ///
@@ -217,16 +311,22 @@ class GeniusPdfService {
   }) async {
     try {
       GeniusPdfLogger.info('Generating PDF: "$fileName"', tag: 'PdfService');
-      List<int> bytes;
+      final bytes = await _generateBytes(
+        builder,
+        runInBackground: runInBackground,
+      );
 
-      if (runInBackground) {
-        bytes = await compute(_generatePdfBytes, builder);
-      } else {
-        bytes = builder.generate();
+      if (bytes.isEmpty) {
+        GeniusPdfLogger.error('PDF generation produced empty output',
+            tag: 'PdfService');
+        return const GeniusPdfFailure(
+          error: 'Empty PDF output',
+          message: 'PDF generation produced empty output',
+        );
       }
 
       return GeniusPdfSuccess(
-        bytes: Uint8List.fromList(bytes),
+        bytes: bytes,
         fileName: fileName,
       );
     } catch (e, st) {
@@ -255,30 +355,18 @@ class GeniusPdfService {
     try {
       GeniusPdfLogger.info('Generating and saving PDF: "$fileName"',
           tag: 'PdfService');
-      List<int> bytes;
-
-      if (runInBackground) {
-        bytes = await compute(_generatePdfBytes, builder);
-      } else {
-        bytes = builder.generate();
-      }
-
-      final configuredPath = builder.config.defaultOutputPath;
-      final Directory dir;
-      if (configuredPath != null && configuredPath.isNotEmpty) {
-        dir = Directory(configuredPath);
-        if (!await dir.exists()) {
-          await dir.create(recursive: true);
-        }
-      } else {
-        dir = await getApplicationDocumentsDirectory();
-      }
-      final filePath = '${dir.path}/$fileName.pdf';
-      final file = File(filePath);
-      await file.writeAsBytes(bytes);
+      final bytes = await _generateBytes(
+        builder,
+        runInBackground: runInBackground,
+      );
+      final filePath = await _saveGeneratedBytes(
+        bytes: bytes,
+        builder: builder,
+        fileName: fileName,
+      );
 
       return GeniusPdfSuccess(
-        bytes: Uint8List.fromList(bytes),
+        bytes: bytes,
         fileName: fileName,
         filePath: filePath,
       );
@@ -324,7 +412,7 @@ class GeniusPdfService {
 
       return result.when(
         onSuccess: (success) async {
-          await OpenFile.open(success.filePath!);
+          await _openFile(success.filePath!);
           onComplete?.call(success);
           return success;
         },
@@ -375,10 +463,7 @@ class GeniusPdfService {
 
       return result.when(
         onSuccess: (success) async {
-          await Printing.sharePdf(
-            bytes: success.bytes,
-            filename: '$fileName.pdf',
-          );
+          await _sharePdf(success.bytes, '$fileName.pdf');
           onComplete?.call(success);
           return success;
         },
@@ -411,10 +496,7 @@ class GeniusPdfService {
       return false;
     }
 
-    return Printing.layoutPdf(
-      onLayout: (_) => bytes,
-      name: documentName,
-    );
+    return _printPdf(bytes, documentName);
   }
 
   /// Saves PDF bytes to a specific path.
@@ -445,10 +527,10 @@ class GeniusPdfService {
     String? text,
   }) async {
     try {
-      final dir = await getTemporaryDirectory();
+      final resolvedDir = await _resolveTemporaryDirectory();
       final effectiveFileName =
           fileName.endsWith('.pdf') ? fileName : '$fileName.pdf';
-      final file = File('${dir.path}/$effectiveFileName');
+      final file = File('${resolvedDir.path}/$effectiveFileName');
       await file.writeAsBytes(bytes);
 
       final result = await SharePlus.instance.share(

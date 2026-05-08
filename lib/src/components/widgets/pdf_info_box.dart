@@ -1138,6 +1138,24 @@ class GeniusPdfInfoBox {
   PdfFont get baseFont => config.baseFont;
   PdfFont get boldFont => config.boldFont;
 
+  /// Estimates the rendered height of the info box.
+  ///
+  /// This is used by the document builder and dual-box layouts to keep the
+  /// whole box inside the content area when the remaining space is tight.
+  double estimateHeight([double? availableWidth]) {
+    var boxHeight =
+        _calculateHeight(availableWidth) + style.padding.top + style.padding.bottom;
+
+    if (style.minHeight != null && boxHeight < style.minHeight!) {
+      boxHeight = style.minHeight!;
+    }
+    if (style.maxHeight != null && boxHeight > style.maxHeight!) {
+      boxHeight = style.maxHeight!;
+    }
+
+    return boxHeight;
+  }
+
   /// Draws the info box on a PDF page.
   ///
   /// Returns the actual bounds of the drawn content.
@@ -1153,16 +1171,7 @@ class GeniusPdfInfoBox {
     double currentY = bounds.top;
 
     // Calculate content height for background
-    final contentHeight = _calculateHeight(bounds.width);
-    var boxHeight = contentHeight + style.padding.top + style.padding.bottom;
-
-    // Apply height constraints
-    if (style.minHeight != null && boxHeight < style.minHeight!) {
-      boxHeight = style.minHeight!;
-    }
-    if (style.maxHeight != null && boxHeight > style.maxHeight!) {
-      boxHeight = style.maxHeight!;
-    }
+    final boxHeight = estimateHeight(bounds.width);
 
     final boxBounds = Rect.fromLTWH(
       bounds.left,
@@ -1309,14 +1318,15 @@ class GeniusPdfInfoBox {
             col++) {
           final item = filteredItems[itemIndex];
           final itemLeft = contentLeft + col * (columnWidth + columnSpacing);
-
-          final labeledValue = _createLabeledValue(item);
-          labeledValue.draw(
-            page: page,
-            bounds: Rect.fromLTWH(itemLeft, rowY, columnWidth, 20),
+          final drawnHeight = _drawItemValue(
+            graphics,
+            item,
+            Rect.fromLTWH(itemLeft, rowY, columnWidth, 20),
           );
-
-          maxRowHeight = _getItemHeight() + style.itemSpacing;
+          final rowHeight = drawnHeight + style.itemSpacing;
+          if (rowHeight > maxRowHeight) {
+            maxRowHeight = rowHeight;
+          }
           itemIndex++;
         }
         rowY += maxRowHeight;
@@ -1326,14 +1336,12 @@ class GeniusPdfInfoBox {
       // Single column layout
       for (int i = 0; i < filteredItems.length; i++) {
         final item = filteredItems[i];
-        final labeledValue = _createLabeledValue(item);
-
-        labeledValue.draw(
-          page: page,
-          bounds: Rect.fromLTWH(contentLeft, currentY, contentWidth, 20),
+        final drawnHeight = _drawItemValue(
+          graphics,
+          item,
+          Rect.fromLTWH(contentLeft, currentY, contentWidth, 20),
         );
-
-        currentY += _getItemHeight() + style.itemSpacing;
+        currentY += drawnHeight + style.itemSpacing;
 
         // Draw item separator
         if (style.showItemSeparators && i < filteredItems.length - 1) {
@@ -1384,16 +1392,145 @@ class GeniusPdfInfoBox {
     return Rect.fromLTWH(bounds.left, bounds.top, bounds.width, finalHeight);
   }
 
-  GeniusPdfLabeledValue _createLabeledValue(GeniusPdfLabeledValue item) {
-    return GeniusPdfLabeledValue(
-      config: config,
-      label: item.label,
-      labelAr: item.labelAr,
-      value: item.value.isEmpty ? emptyItemPlaceholder : item.value,
-      labelStyle: style.labelStyle ?? item.labelStyle,
-      valueStyle: style.valueStyle ?? item.valueStyle,
-      separator: item.separator,
+  double _drawItemValue(
+    PdfGraphics graphics,
+    GeniusPdfLabeledValue item,
+    Rect bounds,
+  ) {
+    final labelText = config.isRTL && item.labelAr != null
+        ? item.labelAr!
+        : item.label;
+    final valueText = item.value.isEmpty ? emptyItemPlaceholder : item.value;
+    final labelStyle = style.labelStyle ??
+        item.labelStyle ??
+        style.contentStyle.copyWith(fontWeight: FontWeight.w600);
+    final valueStyle =
+        style.valueStyle ?? item.valueStyle ?? style.contentStyle;
+    final labelFont = labelStyle.isBold ? boldFont : baseFont;
+    final valueFont = valueStyle.isBold ? boldFont : baseFont;
+    final labelFormat = PdfStringFormat(
+      alignment: labelStyle.alignment.toPdfTextAlignment(config.isRTL),
+      textDirection: config.pdfTextDirection,
     );
+    final valueFormat = PdfStringFormat(
+      alignment: valueStyle.alignment.toPdfTextAlignment(config.isRTL),
+      textDirection: config.pdfTextDirection,
+    );
+    final labelHeight = labelStyle.fontSize * 1.2;
+    final valueHeight = valueStyle.fontSize * 1.2;
+    final gap = style.labelValueGap;
+
+    if (style.labelValueLayout == GeniusPdfLabelValueLayout.stacked) {
+      var currentItemY = bounds.top;
+      if (labelText.isNotEmpty) {
+        graphics.drawString(
+          labelText,
+          labelFont,
+          brush: labelStyle.toBrush(),
+          bounds: Rect.fromLTWH(bounds.left, currentItemY, bounds.width, 0),
+          format: labelFormat,
+        );
+        currentItemY += labelHeight;
+      }
+
+      graphics.drawString(
+        valueText,
+        valueFont,
+        brush: item.valueColor != null
+            ? PdfSolidBrush(item.valueColor!.toPdfColor())
+            : valueStyle.toBrush(),
+        bounds: Rect.fromLTWH(bounds.left, currentItemY, bounds.width, 0),
+        format: valueFormat,
+      );
+      return (currentItemY - bounds.top) + valueHeight;
+    }
+
+    final clampedLabelWidth =
+        (style.labelWidth ?? (bounds.width * 0.42)).clamp(0.0, bounds.width);
+    final valueWidth = bounds.width - clampedLabelWidth - gap;
+    if (valueWidth <= 0) {
+      graphics.drawString(
+        valueText,
+        valueFont,
+        brush: item.valueColor != null
+            ? PdfSolidBrush(item.valueColor!.toPdfColor())
+            : valueStyle.toBrush(),
+        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0),
+        format: valueFormat,
+      );
+      return valueHeight;
+    }
+
+    Rect labelBounds;
+    Rect valueBounds;
+    if (style.labelValueLayout == GeniusPdfLabelValueLayout.valueFirst) {
+      if (config.isRTL) {
+        valueBounds = Rect.fromLTWH(
+          bounds.left + clampedLabelWidth + gap,
+          bounds.top,
+          valueWidth,
+          0,
+        );
+        labelBounds = Rect.fromLTWH(
+          bounds.left,
+          bounds.top,
+          clampedLabelWidth,
+          0,
+        );
+      } else {
+        valueBounds =
+            Rect.fromLTWH(bounds.left, bounds.top, valueWidth, 0);
+        labelBounds = Rect.fromLTWH(
+          bounds.left + valueWidth + gap,
+          bounds.top,
+          clampedLabelWidth,
+          0,
+        );
+      }
+    } else if (config.isRTL) {
+      valueBounds =
+          Rect.fromLTWH(bounds.left, bounds.top, valueWidth, 0);
+      labelBounds = Rect.fromLTWH(
+        bounds.left + valueWidth + gap,
+        bounds.top,
+        clampedLabelWidth,
+        0,
+      );
+    } else {
+      labelBounds = Rect.fromLTWH(
+        bounds.left,
+        bounds.top,
+        clampedLabelWidth,
+        0,
+      );
+      valueBounds = Rect.fromLTWH(
+        bounds.left + clampedLabelWidth + gap,
+        bounds.top,
+        valueWidth,
+        0,
+      );
+    }
+
+    if (labelText.isNotEmpty) {
+      graphics.drawString(
+        labelText,
+        labelFont,
+        brush: labelStyle.toBrush(),
+        bounds: labelBounds,
+        format: labelFormat,
+      );
+    }
+    graphics.drawString(
+      valueText,
+      valueFont,
+      brush: item.valueColor != null
+          ? PdfSolidBrush(item.valueColor!.toPdfColor())
+          : valueStyle.toBrush(),
+      bounds: valueBounds,
+      format: valueFormat,
+    );
+
+    return labelHeight > valueHeight ? labelHeight : valueHeight;
   }
 
   double _calculateHeight([double? availableWidth]) {
@@ -1731,12 +1868,8 @@ class GeniusPdfDualInfoBox {
     // When equalHeight is enabled, pre-calculate heights and use the max
     double? forcedHeight;
     if (equalHeight) {
-      final leftH = effectiveLeft._calculateHeight(leftW) +
-          effectiveLeft.style.padding.top +
-          effectiveLeft.style.padding.bottom;
-      final rightH = effectiveRight._calculateHeight(rightW) +
-          effectiveRight.style.padding.top +
-          effectiveRight.style.padding.bottom;
+      final leftH = effectiveLeft.estimateHeight(leftW);
+      final rightH = effectiveRight.estimateHeight(rightW);
       forcedHeight = leftH > rightH ? leftH : rightH;
 
       // Apply minHeight from styles

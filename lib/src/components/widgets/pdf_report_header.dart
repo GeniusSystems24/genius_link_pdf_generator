@@ -1710,6 +1710,95 @@ class GeniusPdfReportHeader {
     return isRTL ? 'صفحة $pageNumber' : 'Page $pageNumber';
   }
 
+  /// Estimates the rendered height of this header.
+  ///
+  /// The document builder uses this to keep the full header together when
+  /// the current page no longer has enough remaining content height.
+  double estimateHeight({double? availableWidth}) {
+    var estimated = style.padding.top;
+
+    switch (layout) {
+      case GeniusPdfReportHeaderLayout.compact:
+        final logoHeight = _estimateLogoHeight(scale: 0.7);
+        final titleBlockHeight =
+            _estimateTitleBlockHeight() + _estimateSubtitleBlockHeight();
+        estimated +=
+            logoHeight > titleBlockHeight ? logoHeight : titleBlockHeight;
+        break;
+      case GeniusPdfReportHeaderLayout.centered:
+        final logoHeight = _estimateLogoHeight();
+        if (logoHeight > 0) {
+          estimated += logoHeight + style.logoSpacing;
+        }
+        if (showCompanyInfo && company != null) {
+          estimated += style.companyNameStyle.fontSize + style.spacing;
+        }
+        estimated += _estimateTitleBlockHeight();
+        estimated += _estimateSubtitleBlockHeight();
+        break;
+      case GeniusPdfReportHeaderLayout.bilingualSplit:
+        final englishHeight = _estimateCompanyInfoHeight(isArabic: false);
+        final arabicHeight = _estimateCompanyInfoHeight(isArabic: true);
+        final logoHeight = _estimateLogoHeight();
+        var topRowHeight = englishHeight;
+        if (arabicHeight > topRowHeight) {
+          topRowHeight = arabicHeight;
+        }
+        if (logoHeight > topRowHeight) {
+          topRowHeight = logoHeight;
+        }
+        if (topRowHeight > 0) {
+          estimated += topRowHeight + style.spacing;
+        }
+        estimated += _estimateTitleBlockHeight();
+        estimated += _estimateSubtitleBlockHeight();
+        estimated += _estimateDocumentInfoHeight();
+        break;
+      case GeniusPdfReportHeaderLayout.invoice:
+      case GeniusPdfReportHeaderLayout.standard:
+      case GeniusPdfReportHeaderLayout.letterhead:
+      case GeniusPdfReportHeaderLayout.reportCard:
+      case GeniusPdfReportHeaderLayout.minimal:
+      case GeniusPdfReportHeaderLayout.fullWidth:
+        var topRowHeight = _estimateCompanyInfoHeight(isArabic: isRTL);
+        final logoHeight = _estimateLogoHeight();
+        if (style.logoPosition == GeniusPdfLogoPosition.centerTop &&
+            logoHeight > 0) {
+          topRowHeight += logoHeight + style.logoSpacing;
+        } else if (logoHeight > topRowHeight) {
+          topRowHeight = logoHeight;
+        }
+        if (topRowHeight > 0) {
+          estimated += topRowHeight + style.spacing;
+        }
+        estimated += _estimateTitleBlockHeight();
+        estimated += _estimateSubtitleBlockHeight();
+        estimated += _estimateDocumentInfoHeight();
+        if (layout == GeniusPdfReportHeaderLayout.standard &&
+            style.logoPosition == GeniusPdfLogoPosition.centerBottom &&
+            logoHeight > 0) {
+          estimated += logoHeight + style.logoSpacing;
+        }
+        break;
+    }
+
+    final dateHeight = _estimateDateSectionHeight();
+    if (dateHeight > 0) {
+      estimated += dateHeight + style.dateSpacing;
+    } else {
+      estimated += style.padding.bottom;
+    }
+
+    if (style.headerMinHeight != null && estimated < style.headerMinHeight!) {
+      estimated = style.headerMinHeight!;
+    }
+    if (style.headerMaxHeight != null && estimated > style.headerMaxHeight!) {
+      estimated = style.headerMaxHeight!;
+    }
+
+    return estimated;
+  }
+
   // -------------------------------------------------------------------------
   // Alignment helpers
   // -------------------------------------------------------------------------
@@ -1723,9 +1812,9 @@ class GeniusPdfReportHeader {
   ) {
     switch (position) {
       case GeniusPdfLogoPosition.end:
-        return isRTL ? contentRight - logoWidth : contentLeft;
-      case GeniusPdfLogoPosition.start:
         return isRTL ? contentLeft : contentRight - logoWidth;
+      case GeniusPdfLogoPosition.start:
+        return isRTL ? contentRight - logoWidth : contentLeft;
       case GeniusPdfLogoPosition.center:
       case GeniusPdfLogoPosition.centerTop:
       case GeniusPdfLogoPosition.centerBottom:
@@ -1817,6 +1906,118 @@ class GeniusPdfReportHeader {
 
   PdfTextDirection get textDirection =>
       isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
+
+  double _estimateLogoHeight({double scale = 1.0}) {
+    if (!showCompanyInfo || company?.logo == null) {
+      return 0;
+    }
+
+    final logo = company!.logo!.scaledToFit(
+      maxWidth: style.logoMaxWidth * scale,
+      maxHeight: style.logoMaxHeight * scale,
+    );
+    return logo.height;
+  }
+
+  double _estimateCompanyInfoHeight({required bool isArabic}) {
+    if (!showCompanyInfo || company == null) {
+      return 0;
+    }
+
+    var height = style.companyNameStyle.fontSize + 3;
+    final infoLineHeight = style.companyInfoStyle.fontSize + 2;
+
+    final address = company!.getAddress(isArabic: isArabic);
+    if (address != null && address.isNotEmpty) {
+      height += infoLineHeight;
+    }
+
+    final city = isArabic ? (company!.cityAr ?? company!.city) : company!.city;
+    final country =
+        isArabic ? (company!.countryAr ?? company!.country) : company!.country;
+    if ((city != null && city.isNotEmpty) ||
+        (country != null && country.isNotEmpty)) {
+      height += infoLineHeight;
+    }
+
+    if (company!.vatNumber != null && company!.vatNumber!.isNotEmpty) {
+      height += infoLineHeight;
+    }
+    if (company!.crNumber != null && company!.crNumber!.isNotEmpty) {
+      height += infoLineHeight;
+    }
+    if (company!.phone != null && company!.phone!.isNotEmpty) {
+      height += infoLineHeight;
+    }
+    if (company!.email != null && company!.email!.isNotEmpty) {
+      height += infoLineHeight;
+    }
+
+    final slogan = company!.getSlogan(isArabic: isArabic);
+    if (slogan != null &&
+        slogan.isNotEmpty &&
+        style.sloganStyle != null) {
+      height += style.sloganStyle!.fontSize + 2;
+    }
+
+    if (style.showCompanyDivider) {
+      height += 5;
+    }
+
+    return height;
+  }
+
+  double _estimateTitleBlockHeight() {
+    final titleLines = showBilingualTitle &&
+            titleAr != null &&
+            bilingualTitleOrder != GeniusPdfBilingualOrder.primaryOnly
+        ? 2
+        : 1;
+    var height = titleLines * (style.titleStyle.fontSize + style.titleSpacing);
+    if (style.showTitleUnderline) {
+      height += style.titleUnderlineSpacing;
+    }
+    return height;
+  }
+
+  double _estimateSubtitleBlockHeight() {
+    var height = 0.0;
+
+    if (subtitleAr != null) {
+      height += style.subtitleStyle.fontSize + 2;
+    }
+    if (subtitle != null) {
+      height += style.subtitleStyle.fontSize + 2;
+    }
+    if (getSecondarySubtitle() != null) {
+      height += style.subtitleStyle.fontSize + 2;
+    }
+
+    return height;
+  }
+
+  double _estimateDocumentInfoHeight() {
+    if (documentNumber == null && referenceNumber == null) {
+      return 0;
+    }
+
+    final fontSize = style.dateStyle?.fontSize ?? 9;
+    var height = 0.0;
+    if (documentNumber != null) {
+      height += fontSize + 2;
+    }
+    if (referenceNumber != null) {
+      height += fontSize + 2;
+    }
+    return height;
+  }
+
+  double _estimateDateSectionHeight() {
+    if ((!showPrintDate || printDate == null) && !showPageNumber) {
+      return 0;
+    }
+    return (style.dateStyle?.fontSize ?? 8) + 2;
+  }
 
   /// Draws date and page info, returns the height consumed.
   double _drawDateSection(
@@ -2613,9 +2814,11 @@ class GeniusPdfReportHeader {
     _drawBackground(graphics, bounds);
 
     double currentY = bounds.top + style.padding.top;
+    final topRowStartY = currentY;
 
     // Logo on one side, title on other
     double logoWidth = 0;
+    double logoHeight = 0;
     if (company?.logo != null) {
       final logo = company!.logo!.scaledToFit(
         maxWidth: style.logoMaxWidth * 0.7,
@@ -2629,6 +2832,7 @@ class GeniusPdfReportHeader {
         Rect.fromLTWH(logoX, currentY, logo.width, logo.height),
       );
       logoWidth = logo.width + style.logoSpacing;
+      logoHeight = logo.height;
     }
 
     // Title area (next to logo)
@@ -2671,6 +2875,11 @@ class GeniusPdfReportHeader {
       style.titleAlignment,
     );
     currentY += subtitleHeight;
+
+    final logoBottom = topRowStartY + logoHeight;
+    if (logoBottom > currentY) {
+      currentY = logoBottom;
+    }
 
     // Date
     final dateHeight =

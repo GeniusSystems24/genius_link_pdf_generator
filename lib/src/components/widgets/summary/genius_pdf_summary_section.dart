@@ -100,6 +100,15 @@ class GeniusPdfSummarySection {
   /// Fixed width (optional, uses default proportion if null).
   final double? width;
 
+  /// Estimates the rendered height of the summary box.
+  ///
+  /// This is used by the document builder to decide whether the summary
+  /// should stay on the current page or move to the next one intact.
+  double estimateHeight() {
+    final contentHeight = _calculateContentHeight();
+    return contentHeight + style.padding.top + style.padding.bottom;
+  }
+
   static GeniusPdfSummaryStyle _resolveSummaryStyle(
     GeniusPdfSummaryStyle? style,
     GeniusPdfConfig config,
@@ -164,8 +173,7 @@ class GeniusPdfSummarySection {
     double currentY = boxTop + style.padding.top;
 
     // Calculate total height
-    final contentHeight = _calculateContentHeight();
-    final boxHeight = contentHeight + style.padding.top + style.padding.bottom;
+    final boxHeight = estimateHeight();
 
     final boxBounds = Rect.fromLTWH(boxLeft, boxTop, actualWidth, boxHeight);
 
@@ -296,6 +304,14 @@ class GeniusPdfSummarySection {
     // Determine fonts
     final labelFont = item.isBold ? boldFont : baseFont;
     final valueFont = item.isBold ? boldFont : baseFont;
+    final effectiveLabelStyle = item.style ??
+        (item.isBold
+            ? (style.totalLabelStyle ?? style.labelStyle)
+            : style.labelStyle);
+    final effectiveValueStyle = item.style ??
+        (item.isBold
+            ? (style.totalValueStyle ?? style.valueStyle)
+            : style.valueStyle);
 
     // Determine brushes — use total styles for highlighted, item colors override
     PdfBrush labelBrush;
@@ -341,7 +357,7 @@ class GeniusPdfSummarySection {
       brush: labelBrush,
       bounds: Rect.fromLTWH(labelX, currentY, labelWidth, 0),
       format: PdfStringFormat(
-        alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        alignment: effectiveLabelStyle.alignment.toPdfTextAlignment(isRTL),
         textDirection: isRTL
             ? PdfTextDirection.rightToLeft
             : PdfTextDirection.leftToRight,
@@ -358,7 +374,7 @@ class GeniusPdfSummarySection {
       brush: valueBrush,
       bounds: Rect.fromLTWH(valueX, currentY, valueWidth, 0),
       format: PdfStringFormat(
-        alignment: isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
+        alignment: effectiveValueStyle.alignment.toPdfTextAlignment(isRTL),
         textDirection: isRTL
             ? PdfTextDirection.rightToLeft
             : PdfTextDirection.leftToRight,
@@ -405,7 +421,7 @@ class GeniusPdfSummarySection {
       brush: groupStyle.toBrush(),
       bounds: Rect.fromLTWH(contentLeft, currentY, contentWidth, 0),
       format: PdfStringFormat(
-        alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
+        alignment: groupStyle.alignment.toPdfTextAlignment(isRTL),
         textDirection: isRTL
             ? PdfTextDirection.rightToLeft
             : PdfTextDirection.leftToRight,

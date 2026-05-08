@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.1] - 2026-05-08
+
+### Fixed — PDF Engine Stability and Layout Correctness
+
+#### Builder and page-flow correctness
+
+- `GeniusPdfDocumentBuilder.addLine()` and `addInlineText()` now always pass an explicit `PdfStringFormat` with the correct `PdfTextDirection` for both LTR and RTL documents, eliminating auto-detection ambiguity
+- `newPage()`, `resetY()`, `reserveHeaderSpace()`, `reserveFooterSpace()`, and `generate()` now keep `currentY`, `remainingHeight`, and header/footer zones consistent across page transitions
+- Pre-break coordinate ordering fixed so `addSpace()`, `addHorizontalLine()`, and flowing-text helpers always call `_ensureSpace()` before computing draw positions
+
+#### Bilingual alignment
+
+- Fixed double RTL-swap in `GeniusPdfInfoBox._drawItemValue()`: `effectiveLabelAlign(isRTL:)` was applied before `toPdfTextAlignment(isRTL:)`, negating the RTL swap. Labels now correctly resolve `start→right` and `end→left` in RTL layouts
+
+#### Service and export reliability
+
+- `GeniusPdfService.generate()` now returns `GeniusPdfFailure` when the builder produces empty bytes instead of returning a `GeniusPdfSuccess` with empty data
+- `GeniusBatchExporter.exportBatch()` now uses a fixed-size indexed list so results are returned in the same order as the input items regardless of concurrent completion order
+- `GeniusPdfGenerationManager` auto-actions (`autoOpen`, `autoShare`, `autoPrint`) are now individually wrapped in `try/catch` so a single action failure does not mark the generation job as failed
+
+### Changed
+
+- Added regression test suite under `test/pdf_stability/` covering builder state, layout flow, grid-summary sync, RTL/LTR correctness, media safety, and service reliability
+
+---
+
 ## [3.6.0] - 2026-05-08
 
 ### Added — Financial Calculation Validation Layer

@@ -196,5 +196,24 @@ class RichTextDemoBuilder extends GeniusPdfDocumentBuilder {
       ),
       spacing: 10,
     );
+    addSpace(remainingHeight - 12);
+    addRichText(
+      GeniusPdfRichTextBuilder(
+        config: config,
+      )
+          .highlight(
+            config.isRTL
+                ? 'اختبار الاستمرار بعد أسفل الصفحة'
+                : 'Footer-edge continuation check',
+          )
+          .space()
+          .text(
+            config.isRTL
+                ? 'يجب أن ينتقل هذا السطر إلى صفحة جديدة بأمان عندما لا تتبقى مساحة كافية.'
+                : 'This line should move to a new page safely when the footer area is too close.',
+          )
+          .build(),
+      spacing: 6,
+    );
   }
 }

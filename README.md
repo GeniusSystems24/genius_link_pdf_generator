@@ -494,6 +494,22 @@ Multi-pass constraint redistribution algorithm
 
 striped, dark, elegant, pastel, bordered grid styles
 
+### 🏷️ **Header Info Groups** (v2.12.7)
+
+`GeniusPdfHeaderInfoGroup` for structured registration, contact, and address blocks in report headers; bilingual split layout RTL bug fixed
+
+### 📊 **Charts Removed** (v2.12.8)
+
+All chart components removed — embed pre-rendered chart images via `addImage()` instead (see Chart Migration Guide section below)
+
+### 📚 **Complete Voucher Demo** (v3.5.0)
+
+All 16 voucher template classes (64 subtypes) in one batch PDF
+
+### 🔒 **PDF Engine Stability** (v3.6.1)
+
+Page-flow, header/footer boundary, multi-page grid continuation, RTL/LTR layout, media placement, and service/export reliability fixes; full regression test suite under `test/pdf_stability/`
+
 ---
 
 ## Installation
@@ -1249,6 +1265,54 @@ GeniusPdfReportHeader(
   title: 'Report',
   titleAr: 'تقرير',
   bilingualOrder: GeniusPdfBilingualOrder.englishFirst,
+);
+```
+
+**Header Info Groups (v2.12.7):**
+
+Organize header content into structured blocks using `GeniusPdfHeaderInfoGroup`:
+
+```dart
+GeniusPdfReportHeader(
+  config: config,
+  title: 'Annual Report',
+  titleAr: 'التقرير السنوي',
+  company: companyInfo,
+  infoGroups: [
+    GeniusPdfHeaderInfoGroup.registration(
+      vatNumber: '300123456789003',
+      crNumber: '1010123456',
+      licenseNumber: 'LIC-001',
+    ),
+    GeniusPdfHeaderInfoGroup.contact(
+      phone: '+966 11 123 4567',
+      email: 'info@company.com',
+      website: 'www.company.com',
+    ),
+  ],
+);
+```
+
+**Info Group Factories:**
+
+| Factory | Fields |
+|---------|--------|
+| `.registration(vatNumber, crNumber, licenseNumber)` | Registration / tax data |
+| `.contact(phone, email, website, fax)` | Contact information |
+| `.address(street, city, country, postalCode)` | Address fields |
+| `.custom(title, items)` | Any label-value items |
+
+**Bilingual Split Layout (v2.12.7 — RTL fixed):**
+
+English column is always left-aligned LTR and Arabic column is always right-aligned RTL, regardless of the global `isRTL` setting:
+
+```dart
+GeniusPdfReportHeader.bilingualSplit(
+  config: config,  // works correctly in both RTL and LTR documents
+  title: 'Trial Balance',
+  titleAr: 'ميزان المراجعة',
+  company: companyInfo,
+  date: DateTime.now(),
 );
 ```
 
@@ -2814,6 +2878,180 @@ final voucher = InventoryVoucher(
   ),
 );
 ```
+
+---
+
+## Complete Voucher Demo (v3.5.0)
+
+Generate all 16 voucher template classes in a single batch PDF to verify the full system end-to-end.
+
+```dart
+final batch = GeniusPdfVoucherBatch(
+  config: pdfConfig,
+  vouchers: [
+    // one representative voucher from each of the 16 template classes
+    AccountingEntryVoucher(config: config, company: companyInfo, data: entryData),
+    ReceiptVoucher(config: config, company: companyInfo, data: receiptData),
+    PaymentVoucher(config: config, company: companyInfo, data: paymentData),
+    TaxVoucher(config: config, company: companyInfo, data: taxData, taxData: taxInfo),
+    BankDepositVoucher(config: config, company: companyInfo, data: depositData, bankInfo: bankInfo),
+    BankWithdrawalVoucher(config: config, company: companyInfo, data: withdrawalData, bankInfo: bankInfo),
+    TransferVoucher(config: config, company: companyInfo, data: transferData, transferData: transferInfo),
+    BillPaymentVoucher(config: config, company: companyInfo, data: billData, billData: billInfo),
+    RemittanceOutgoingVoucher(config: config, company: companyInfo, data: remittanceData, remittanceData: remInfo),
+    RemittanceIncomingVoucher(config: config, company: companyInfo, data: incomingData, remittanceData: incomingInfo),
+    PurchaseVoucher(config: config, company: companyInfo, data: purchaseData, tradeData: purchaseInfo),
+    SalesVoucher(config: config, company: companyInfo, data: salesData, tradeData: salesInfo),
+    PurchaseReturnVoucher(config: config, company: companyInfo, data: purRetData, tradeData: purRetInfo),
+    SalesReturnVoucher(config: config, company: companyInfo, data: salRetData, tradeData: salRetInfo),
+    GiftVoucher(config: config, company: companyInfo, data: giftData, giftData: giftInfo),
+    InventoryVoucher(config: config, company: companyInfo, data: invData, inventoryData: invInfo),
+  ],
+  options: GeniusPdfVoucherBatchOptions(
+    addPageBreakBetweenVouchers: true,
+    addBatchSummary: true,
+    batchTitle: 'Complete Voucher Demo — All 16 Types',
+    batchTitleAr: 'عرض شامل لجميع أنواع السندات',
+  ),
+);
+
+final bytes = batch.generate();
+batch.dispose();
+```
+
+**Coverage:**
+
+| Template Class | Service IDs | Category |
+|---|---|---|
+| `AccountingEntryVoucher` | 00001–00004 | Accounting Entries |
+| `ReceiptVoucher` | 00100–00103 | Receipt |
+| `PaymentVoucher` | 00200–00203 | Payment |
+| `TaxVoucher` | 00300–00304 | Tax |
+| `BankDepositVoucher` | 10000–10002 | Banking |
+| `BankWithdrawalVoucher` | 10100–10102 | Banking |
+| `TransferVoucher` | 10200–10203 | Banking |
+| `BillPaymentVoucher` | 10300–10305 | Banking |
+| `RemittanceOutgoingVoucher` | 10400–10501 | Remittance |
+| `RemittanceIncomingVoucher` | 10450–10551 | Remittance |
+| `PurchaseVoucher` | 20000–20003 | Trade |
+| `SalesVoucher` | 20200–20203 | Trade |
+| `PurchaseReturnVoucher` | 20400–20403 | Trade |
+| `SalesReturnVoucher` | 20450–20453 | Trade |
+| `GiftVoucher` | 20500–20501 | Auxiliary |
+| `InventoryVoucher` | 20600–20604 | Auxiliary |
+
+---
+
+## Financial Calculation Validation (v3.6.0)
+
+Pre-generation validation of financial totals to catch calculation errors before the PDF is built. All errors are bilingual (EN/AR). Uses integer arithmetic for IEEE 754 safety.
+
+### Core Types
+
+```dart
+// Immutable minor-unit value type (e.g., 15000 = 150.00 SAR)
+final price = GeniusMoney(15000, currency: 'SAR');
+final vat   = GeniusMoney(2250,  currency: 'SAR');
+final total = price + vat; // GeniusMoney(17250, 'SAR')
+
+// Rounding policy (configurable per currency)
+final policy = GeniusRoundingPolicy(
+  mode: GeniusRoundingMode.halfUp,
+  // KWD → 3 dp, JPY → 0 dp, SAR → 2 dp (built-in)
+);
+
+// Validation context
+final context = GeniusFinancialValidationContext(roundingPolicy: policy);
+```
+
+### Running Validations
+
+```dart
+final result = GeniusFinancialValidator.validateSubtotal(
+  lines: [
+    GeniusMoneyLine(quantity: 5, unitPrice: GeniusMoney(30000, currency: 'SAR')),
+    GeniusMoneyLine(quantity: 2, unitPrice: GeniusMoney(12000, currency: 'SAR')),
+  ],
+  declaredSubtotal: GeniusMoney(174000, currency: 'SAR'),
+  context: context,
+);
+
+if (result.isInvalid) {
+  print(result.errors.first.message);   // English
+  print(result.errors.first.messageAr); // Arabic
+}
+```
+
+**Available validators:**
+
+| Method | What it checks |
+| ------ | -------------- |
+| `validateSubtotal()` | Sum of line amounts |
+| `validateVat()` | VAT on post-discount amount (ZATCA rule) |
+| `validateGrandTotal()` | Subtotal + VAT = grand total |
+| `validateTransferNet()` | Amount − deductions = net |
+| `validateCurrencyConversion()` | Source × rate = target (two-stage rounding) |
+| `validateAccountingBalance()` | Total debits == total credits (strict) |
+| `validateGridColumnSum()` | Grid column sum matches declared total |
+| `validateBudgetVariance()` | Actual − budget = variance |
+
+### Using with Templates
+
+All financial templates expose an additive `generateResult()` method that runs validation before building the PDF:
+
+```dart
+final template = TaxInvoiceTemplate(config: pdfConfig, company: company, invoice: invoice);
+
+// Option 1 — validate then generate
+final pdfResult = template.generateResult(
+  validateFinancials: true,
+  validationContext: GeniusFinancialValidationContext(
+    roundingPolicy: GeniusRoundingPolicy(mode: GeniusRoundingMode.halfUp),
+  ),
+);
+
+switch (pdfResult) {
+  case GeniusPdfSuccess(:final bytes):
+    // use bytes
+  case GeniusPdfFailure(:final validationResult):
+    for (final err in validationResult!.errors) {
+      print('${err.field}: ${err.message}');
+    }
+}
+
+// Option 2 — existing generate() is untouched (no validation)
+final bytes = template.generate();
+```
+
+**Templates that support `generateResult()`:**
+
+`TaxInvoiceTemplate`, `CreditNoteTemplate`, `PurchaseOrderTemplate`, `QuotationTemplate`, `PayslipTemplate`, `CustomerStatementTemplate`, `GeniusPdfVoucherTemplate`
+
+---
+
+## Chart Migration Guide (v2.12.8)
+
+All chart components (`GeniusPdfBarChart`, `GeniusPdfLineChart`, `GeniusPdfPieChart`, `GeniusPdfAreaChart`) were removed in v2.12.8 due to stability issues. Use Flutter charting libraries and embed the result as an image:
+
+```dart
+// 1. Render the chart widget to an image
+final recorder = ui.PictureRecorder();
+final canvas = Canvas(recorder);
+// ... draw your chart on the canvas ...
+final picture = recorder.endRecording();
+final img = await picture.toImage(width.toInt(), height.toInt());
+final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+final chartBytes = byteData!.buffer.asUint8List();
+
+// 2. Embed in the PDF builder
+builder.addImageFromBytes(chartBytes, height: 200);
+
+// Or wrap in AppPdfImage and use addImage()
+final chartImage = AppPdfImage.fromBytes(chartBytes);
+builder.addImage(chartImage, height: 200);
+```
+
+Recommended Flutter chart packages: `fl_chart`, `syncfusion_flutter_charts`.
 
 ---
 

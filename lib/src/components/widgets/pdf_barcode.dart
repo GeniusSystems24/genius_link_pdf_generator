@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:convert';
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -124,11 +125,24 @@ class GeniusPdfBarcode {
         tag: 'Barcode');
     final graphics = page.graphics;
     final pad = style.padding;
+    final validation = GeniusBarcodeValidator.validate(data: data, type: type);
+    if (!validation.isValid) {
+      throw StateError(
+        validation.getErrorMessage(isRTL: config.isRTL) ??
+            'Invalid ${type.name} barcode data',
+      );
+    }
 
     // Calculate barcode dimensions
     final barcodeWidth = (width ?? bounds.width) - (pad * 2);
     final barcodeHeight =
         (height ?? (type.is2D ? barcodeWidth : 60)) - (pad * 2);
+    if (barcodeWidth <= 0 || barcodeHeight <= 0) {
+      throw StateError(
+        'Barcode bounds are too small for ${type.name}: '
+        '${barcodeWidth.toStringAsFixed(1)}x${barcodeHeight.toStringAsFixed(1)}',
+      );
+    }
 
     double currentY = bounds.top + pad;
 
@@ -184,41 +198,18 @@ class GeniusPdfBarcode {
       currentY += style.captionFontSize + style.textSpacing + 4;
     }
 
-    // Generate barcode image
-    try {
-      final barcodeImage = _generateBarcodeImage(
-        barcodeWidth.toInt(),
-        barcodeHeight.toInt(),
-      );
+    final barcodeImage = _generateBarcodeImage(
+      math.max(1, barcodeWidth.round()),
+      math.max(1, barcodeHeight.round()),
+    );
 
-      // Draw barcode image
-      final barcodeX = bounds.left + (bounds.width - barcodeWidth) / 2;
-      graphics.drawImage(
-        PdfBitmap(barcodeImage),
-        Rect.fromLTWH(barcodeX, currentY, barcodeWidth, barcodeHeight),
-      );
-      currentY += barcodeHeight;
-    } catch (e) {
-      // Draw error text if barcode generation fails
-      GeniusPdfLogger.error('Barcode generation failed: ${type.name}',
-          tag: 'Barcode', error: e);
-      graphics.drawString(
-        'Error: $e',
-        config.baseFont,
-        brush: PdfBrushes.red,
-        bounds: Rect.fromLTWH(
-          bounds.left + pad,
-          currentY,
-          barcodeWidth,
-          barcodeHeight,
-        ),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: config.pdfTextDirection
-        ),
-      );
-      currentY += barcodeHeight;
-    }
+    // Draw barcode image
+    final barcodeX = bounds.left + (bounds.width - barcodeWidth) / 2;
+    graphics.drawImage(
+      PdfBitmap(barcodeImage),
+      Rect.fromLTWH(barcodeX, currentY, barcodeWidth, barcodeHeight),
+    );
+    currentY += barcodeHeight;
 
     // Draw data text below barcode (for 1D barcodes)
     if (style.showText && type.is1D) {
@@ -285,48 +276,60 @@ class GeniusPdfBarcode {
 
   /// Generates barcode image as PNG bytes.
   Uint8List _generateBarcodeImage(int imageWidth, int imageHeight) {
-    final barcode = _getBarcodeInstance();
+    try {
+      final barcode = _getBarcodeInstance();
 
-    // Generate the barcode binary data
-    final barcodeData = barcode.make(data,
-        width: imageWidth.toDouble(), height: imageHeight.toDouble());
+      // Generate the barcode binary data
+      final barcodeData = barcode.make(data,
+          width: imageWidth.toDouble(), height: imageHeight.toDouble());
 
-    // Create image using image package
-    final image = img.Image(width: imageWidth, height: imageHeight);
+      // Create image using image package
+      final image = img.Image(width: imageWidth, height: imageHeight);
 
-    // Fill background
-    final bgColor = img.ColorRgba8(
-      style.backgroundColor.red,
-      style.backgroundColor.green,
-      style.backgroundColor.blue,
-      255,
-    );
-    img.fill(image, color: bgColor);
+      // Fill background
+      final bgColor = img.ColorRgba8(
+        style.backgroundColor.red,
+        style.backgroundColor.green,
+        style.backgroundColor.blue,
+        255,
+      );
+      img.fill(image, color: bgColor);
 
-    // Draw barcode bars
-    final fgColor = img.ColorRgba8(
-      style.barColor.red,
-      style.barColor.green,
-      style.barColor.blue,
-      255,
-    );
+      // Draw barcode bars
+      final fgColor = img.ColorRgba8(
+        style.barColor.red,
+        style.barColor.green,
+        style.barColor.blue,
+        255,
+      );
 
-    for (final element in barcodeData) {
-      if ((element is bc.BarcodeBar) && element.black) {
-        final x1 = element.left.clamp(0, imageWidth - 1).toInt();
-        final y1 = element.top.clamp(0, imageHeight - 1).toInt();
-        final x2 = (element.left + element.width).clamp(0, imageWidth).toInt();
-        final y2 = (element.top + element.height).clamp(0, imageHeight).toInt();
+      for (final element in barcodeData) {
+        if ((element is bc.BarcodeBar) && element.black) {
+          final x1 = element.left.clamp(0, imageWidth - 1).toInt();
+          final y1 = element.top.clamp(0, imageHeight - 1).toInt();
+          final x2 =
+              (element.left + element.width).clamp(0, imageWidth).toInt();
+          final y2 =
+              (element.top + element.height).clamp(0, imageHeight).toInt();
 
-        for (int y = y1; y < y2; y++) {
-          for (int x = x1; x < x2; x++) {
-            image.setPixel(x, y, fgColor);
+          for (int y = y1; y < y2; y++) {
+            for (int x = x1; x < x2; x++) {
+              image.setPixel(x, y, fgColor);
+            }
           }
         }
       }
-    }
 
-    return Uint8List.fromList(img.encodePng(image));
+      return Uint8List.fromList(img.encodePng(image));
+    } catch (error, stackTrace) {
+      GeniusPdfLogger.error(
+        'Barcode generation failed: ${type.name}',
+        tag: 'Barcode',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      throw StateError('Failed to render ${type.name} barcode: $error');
+    }
   }
 
   /// Gets the barcode instance for the type.
@@ -505,8 +508,22 @@ class GeniusPdfQRCodeGenerator {
         'Drawing QR code: data="${data.length > 30 ? '${data.substring(0, 30)}...' : data}"',
         tag: 'QRCode');
     final graphics = page.graphics;
-    final qrSize = style.size;
+    final qrValidation = GeniusBarcodeValidator.validate(
+      data: data,
+      type: GeniusBarcodeType.qrCode,
+    );
+    if (!qrValidation.isValid) {
+      throw StateError(
+        qrValidation.getErrorMessage(isRTL: config.isRTL) ??
+            'Invalid QR code data',
+      );
+    }
+
+    final qrSize = math.min(style.size, math.min(bounds.width, bounds.height));
     final pad = style.padding;
+    if (qrSize <= 0) {
+      throw StateError('QR code bounds are too small to render');
+    }
 
     double currentY = bounds.top + pad;
 
@@ -539,38 +556,15 @@ class GeniusPdfQRCodeGenerator {
       );
     }
 
-    // Generate QR code image
-    try {
-      final qrImage = _generateQRCodeImage(qrSize.toInt());
+    final qrImage = _generateQRCodeImage(math.max(1, qrSize.round()));
 
-      // Center QR code in bounds
-      final qrX = bounds.left + (bounds.width - qrSize) / 2;
-      graphics.drawImage(
-        PdfBitmap(qrImage),
-        Rect.fromLTWH(qrX, currentY, qrSize, qrSize),
-      );
-      currentY += qrSize;
-    } catch (e) {
-      // Draw error placeholder
-      GeniusPdfLogger.error('QR code generation failed',
-          tag: 'QRCode', error: e);
-      graphics.drawString(
-        'QR Error: $e',
-        config.baseFont,
-        brush: PdfBrushes.red,
-        bounds: Rect.fromLTWH(
-          bounds.left + pad,
-          currentY,
-          bounds.width - pad * 2,
-          qrSize,
-        ),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: config.pdfTextDirection
-        ),
-      );
-      currentY += qrSize;
-    }
+    // Center QR code in bounds
+    final qrX = bounds.left + (bounds.width - qrSize) / 2;
+    graphics.drawImage(
+      PdfBitmap(qrImage),
+      Rect.fromLTWH(qrX, currentY, qrSize, qrSize),
+    );
+    currentY += qrSize;
 
     // Draw caption
     if (displayCaption != null) {
@@ -610,46 +604,56 @@ class GeniusPdfQRCodeGenerator {
 
   /// Generates QR code image as PNG bytes.
   Uint8List _generateQRCodeImage(int size) {
-    final qrCode = bc.Barcode.qrCode();
-    final qrData =
-        qrCode.make(data, width: size.toDouble(), height: size.toDouble());
+    try {
+      final qrCode = bc.Barcode.qrCode();
+      final qrData =
+          qrCode.make(data, width: size.toDouble(), height: size.toDouble());
 
-    // Create image
-    final image = img.Image(width: size, height: size);
+      // Create image
+      final image = img.Image(width: size, height: size);
 
-    // Fill background
-    final bgColor = img.ColorRgba8(
-      style.backgroundColor.red,
-      style.backgroundColor.green,
-      style.backgroundColor.blue,
-      255,
-    );
-    img.fill(image, color: bgColor);
+      // Fill background
+      final bgColor = img.ColorRgba8(
+        style.backgroundColor.red,
+        style.backgroundColor.green,
+        style.backgroundColor.blue,
+        255,
+      );
+      img.fill(image, color: bgColor);
 
-    // Draw QR modules
-    final fgColor = img.ColorRgba8(
-      style.foregroundColor.red,
-      style.foregroundColor.green,
-      style.foregroundColor.blue,
-      255,
-    );
+      // Draw QR modules
+      final fgColor = img.ColorRgba8(
+        style.foregroundColor.red,
+        style.foregroundColor.green,
+        style.foregroundColor.blue,
+        255,
+      );
 
-    for (final element in qrData) {
-      if ((element is bc.BarcodeBar) && element.black) {
-        final x1 = element.left.clamp(0, size - 1).toInt();
-        final y1 = element.top.clamp(0, size - 1).toInt();
-        final x2 = (element.left + element.width).clamp(0, size).toInt();
-        final y2 = (element.top + element.height).clamp(0, size).toInt();
+      for (final element in qrData) {
+        if ((element is bc.BarcodeBar) && element.black) {
+          final x1 = element.left.clamp(0, size - 1).toInt();
+          final y1 = element.top.clamp(0, size - 1).toInt();
+          final x2 = (element.left + element.width).clamp(0, size).toInt();
+          final y2 = (element.top + element.height).clamp(0, size).toInt();
 
-        for (int y = y1; y < y2; y++) {
-          for (int x = x1; x < x2; x++) {
-            image.setPixel(x, y, fgColor);
+          for (int y = y1; y < y2; y++) {
+            for (int x = x1; x < x2; x++) {
+              image.setPixel(x, y, fgColor);
+            }
           }
         }
       }
-    }
 
-    return Uint8List.fromList(img.encodePng(image));
+      return Uint8List.fromList(img.encodePng(image));
+    } catch (error, stackTrace) {
+      GeniusPdfLogger.error(
+        'QR code generation failed',
+        tag: 'QRCode',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      throw StateError('Failed to render QR code: $error');
+    }
   }
 
   /// Encodes ZATCA TLV data as Base64.

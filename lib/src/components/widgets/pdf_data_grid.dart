@@ -219,7 +219,7 @@ class GeniusPdfDataGrid {
         '${totalAutoRows > 0 ? ', $totalAutoRows auto-totals' : ''}'
         '${totalFooterRows > 0 ? ', $totalFooterRows footer rows' : ''}',
         tag: 'DataGrid');
-    final grid = _buildGrid(page);
+    final grid = _buildGrid(page, availableWidth: bounds.width);
 
     return grid.draw(
       page: page,
@@ -254,13 +254,13 @@ class GeniusPdfDataGrid {
     );
   }
 
-  PdfGrid _buildGrid(PdfPage page) {
+  PdfGrid _buildGrid(PdfPage page, {double? availableWidth}) {
     final grid = PdfGrid();
     final cols = visibleColumns;
 
     // Calculate column widths with improved algorithm (v2.12.0)
-    final pageWidth = page.getClientSize().width;
-    final columnWidths = _calculateColumnWidths(cols, pageWidth);
+    final gridWidth = availableWidth ?? page.getClientSize().width;
+    final columnWidths = _calculateColumnWidths(cols, gridWidth);
 
     // Add columns
     grid.columns.add(count: cols.length);

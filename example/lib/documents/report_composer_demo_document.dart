@@ -1,23 +1,33 @@
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
-/// Demonstrates v2.9.0 [GeniusPdfReportComposer] fluent API.
+/// Demonstrates the fluent report composer with a paginated grid + summary.
 ///
-/// The report composer lets you build PDFs without subclassing by chaining
-/// method calls. This example builds a complete sales report using the
-/// fluent API.
-///
-/// ## Example
-/// ```dart
-/// final bytes = buildComposerDemoReport(config: myConfig);
-/// ```
+/// The data set is intentionally large enough to exercise the composer path
+/// for grid continuation and post-grid summary placement near page breaks.
 List<int> buildComposerDemoReport({
   required GeniusPdfConfig config,
   String userName = 'Demo User',
 }) {
   final isRTL = config.isRTL;
 
-  // ── Sales Data ──────────────────────────────────────────
+  final salesRows = List.generate(24, (index) {
+    final amount = 1800 + ((index % 6) * 375);
+    return GeniusPdfGridRow(
+      cells: {
+        'no': index + 1,
+        'product': 'Service Package ${index + 1}',
+        'amount': amount.toDouble(),
+      },
+    );
+  });
+
+  final subtotal = salesRows.fold<double>(
+    0,
+    (sum, row) => sum + (row.cells['amount'] as double),
+  );
+  final vat = subtotal * 0.15;
+  final grandTotal = subtotal + vat;
 
   final salesGrid = GeniusPdfDataGrid(
     config: config,
@@ -25,41 +35,22 @@ List<int> buildComposerDemoReport({
       const GeniusPdfGridColumn(
         id: 'no',
         title: '#',
-        titleAr: '#',
         width: 30,
         alignment: GeniusPdfTextAlign.center,
       ),
       const GeniusPdfGridColumn(
         id: 'product',
         title: 'Product',
-        titleAr: 'المنتج',
         flexFactor: 3,
       ),
       GeniusPdfGridColumn.currency(
         id: 'amount',
         title: 'Amount',
-        titleAr: 'المبلغ',
         width: 90,
         currencySymbol: '',
       ),
     ],
-    rows: [
-      GeniusPdfGridRow(cells: {
-        'no': 1,
-        'product': isRTL ? 'خدمات استشارية' : 'Consulting Services',
-        'amount': 25000.00,
-      }),
-      GeniusPdfGridRow(cells: {
-        'no': 2,
-        'product': isRTL ? 'تراخيص برمجيات' : 'Software Licenses',
-        'amount': 18000.00,
-      }),
-      GeniusPdfGridRow(cells: {
-        'no': 3,
-        'product': isRTL ? 'دعم فني' : 'Technical Support',
-        'amount': 7500.00,
-      }),
-    ],
+    rows: salesRows,
     style: GeniusPdfGridStyle.classic(),
   );
 
@@ -68,18 +59,15 @@ List<int> buildComposerDemoReport({
     items: [
       GeniusPdfSummaryItem.subtotal(
         label: 'Subtotal',
-        labelAr: 'المجموع الفرعي',
-        value: '50,500.00',
+        value: subtotal.toStringAsFixed(2),
       ),
       GeniusPdfSummaryItem(
         label: 'VAT (15%)',
-        labelAr: 'ضريبة (15%)',
-        value: '7,575.00',
+        value: vat.toStringAsFixed(2),
       ),
       GeniusPdfSummaryItem.total(
         label: 'Grand Total',
-        labelAr: 'الإجمالي',
-        value: '58,075.00',
+        value: grandTotal.toStringAsFixed(2),
       ),
     ],
     style: const GeniusPdfSummaryStyle.bordered(),
@@ -87,44 +75,42 @@ List<int> buildComposerDemoReport({
     width: 220,
   );
 
-  // ── Compose the Report ──────────────────────────────────
-
   final composer = GeniusPdfReportComposer(config: config);
   final bytes = composer
-      .withHeader(title: isRTL ? 'تقرير مبيعات — v2.9.0' : 'Sales Report — v2.9.0')
+      .withHeader(
+        title: isRTL ? 'RTL Sales Report Fixture' : 'Sales Report Fixture',
+      )
       .withFooter(
         userName: userName,
         showPageNumber: true,
         printTime: DateTime.now().toString().substring(0, 19),
       )
       .section(
-        isRTL ? 'ملخص المبيعات' : 'Sales Overview',
-        sectionAr: 'ملخص المبيعات',
+        isRTL ? 'RTL Sales Overview' : 'Sales Overview',
+        sectionAr: isRTL ? 'RTL Sales Overview' : 'Sales Overview',
       )
       .text(
-        isRTL
-            ? 'فيما يلي ملخص لإيرادات المبيعات للربع الأول من 2026.'
-            : 'Below is a summary of Q1 2026 sales revenue.',
+        'This composer example intentionally pushes the summary flow through a '
+        'larger grid so manual verification can confirm safe footer handling.',
       )
-      .space(5)
+      .space(8)
       .gridWithSummary(
         dataGrid: salesGrid,
         summarySection: salesSummary,
         gridSpacing: 5,
         summarySpacing: 10,
       )
-      .space(15)
+      .space(12)
       .section(
-        isRTL ? 'ملاحظات' : 'Notes',
-        sectionAr: 'ملاحظات',
+        isRTL ? 'RTL Notes' : 'Notes',
+        sectionAr: isRTL ? 'RTL Notes' : 'Notes',
       )
       .text(
-        isRTL
-            ? 'تم إنشاء هذا التقرير باستخدام واجهة GeniusPdfReportComposer الجديدة.'
-            : 'This report was generated using the new GeniusPdfReportComposer fluent API.',
+        'The summary above should remain attached to the final grid page or '
+        'move safely to a new page without overlapping the footer area.',
       )
       .boldText(
-        isRTL ? 'الحالة: مكتمل' : 'Status: Complete',
+        isRTL ? 'RTL Status: Complete' : 'Status: Complete',
         topMargin: 5,
       )
       .buildPdf();

@@ -118,6 +118,21 @@ class SmartSpaceDemoBuilder extends GeniusPdfDocumentBuilder {
       topMargin: 5,
     );
 
+    final overflowGap = remainingHeight + 20;
+    addLine(
+      isRTL
+          ? 'ط³ظ†ط®طھط¨ط± addSpace() بط‚ظٹظ…ط© $overflowGap ظ„ط¥ط¬ط¨ط§ط± ظƒط³ط± ط¢ظ…ظ† ظ‚ط¨ظ„ ط§ظ„طھط°ظٹظٹظ„.'
+          : 'Now forcing addSpace($overflowGap) to verify safe footer-aware page breaking.',
+      topMargin: 5,
+    );
+    addSpace(overflowGap);
+    addLine(
+      isRTL
+          ? 'طھظ…طھ ظ…طھط§ط¨ط¹ط© addSpace() ط¹ظ„ظ‰ طµظپط­ط© ط¬ط¯ظٹط¯ط© دون ط§ظ„ط¯ط®ظˆظ„ ظپظٹ ظ…ظ†ط·ظ‚ط© ط§ظ„طھط°ظٹظٹظ„.'
+          : 'addSpace() continued on a new page without entering the footer zone.',
+      topMargin: 5,
+    );
+
     // This section divider should auto page-break if it doesn't fit.
     addSectionDivider(
       title: isRTL

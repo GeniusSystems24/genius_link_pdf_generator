@@ -29,6 +29,23 @@ GeniusPdfTextStyle _resolveRichTextDefaultStyle(
   );
 }
 
+GeniusPdfParagraphAlignment _resolveRichTextParagraphAlignment(
+  GeniusPdfParagraphAlignment? paragraphAlignment,
+  GeniusPdfTextStyle defaultStyle,
+) {
+  if (paragraphAlignment != null) return paragraphAlignment;
+
+  switch (defaultStyle.alignment) {
+    case GeniusPdfTextAlign.center:
+      return GeniusPdfParagraphAlignment.center;
+    case GeniusPdfTextAlign.end:
+      return GeniusPdfParagraphAlignment.end;
+    case GeniusPdfTextAlign.start:
+    case GeniusPdfTextAlign.justify:
+      return GeniusPdfParagraphAlignment.start;
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Text Span
 // ─────────────────────────────────────────────────────────────────────────────
@@ -671,14 +688,18 @@ class GeniusPdfRichText {
     bool? isRTL,
     this.lineSpacing = 1.2,
     this.paragraphSpacing = 8,
-    this.paragraphAlignment = GeniusPdfParagraphAlignment.start,
+    GeniusPdfParagraphAlignment? paragraphAlignment,
     this.maxLines,
     this.overflow = GeniusPdfTextOverflow.clip,
     this.backgroundPadding = 1.5,
   })  : baseFont = _resolveRichTextBaseFont(baseFont, config),
         boldFont = _resolveRichTextBoldFont(boldFont, baseFont, config),
         defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config),
-        isRTL = isRTL ?? config.isRTL;
+        isRTL = isRTL ?? config.isRTL,
+        paragraphAlignment = _resolveRichTextParagraphAlignment(
+          paragraphAlignment,
+          _resolveRichTextDefaultStyle(defaultStyle, config),
+        );
 
   /// Text spans to render.
   final List<GeniusPdfTextSpan> spans;
@@ -724,6 +745,25 @@ class GeniusPdfRichText {
 
   /// Cache for sized fonts to avoid repeated PdfTrueTypeFont construction.
   final Map<String, PdfFont> _fontCache = {};
+
+  PdfTextDirection _resolveSpanDirection(GeniusPdfTextSpan span) {
+    switch (span.textDirectionOverride) {
+      case TextDirection.rtl:
+        return PdfTextDirection.rightToLeft;
+      case TextDirection.ltr:
+        return PdfTextDirection.leftToRight;
+      case null:
+        return isRTL
+            ? PdfTextDirection.rightToLeft
+            : PdfTextDirection.leftToRight;
+    }
+  }
+
+  PdfTextAlignment _resolveSpanAlignment(PdfTextDirection direction) {
+    return direction == PdfTextDirection.rightToLeft
+        ? PdfTextAlignment.right
+        : PdfTextAlignment.left;
+  }
 
   /// Gets the combined plain text of all spans.
   String get plainText => spans.map((s) => s.text).join();
@@ -831,8 +871,6 @@ class GeniusPdfRichText {
         tag: 'RichText');
 
     final graphics = page.graphics;
-    final textDirection =
-        isRTL ? PdfTextDirection.rightToLeft : PdfTextDirection.leftToRight;
 
     // ── Build line segments first (word-wrap aware) ──────────────────
     final lines = _buildLines(bounds.width);
@@ -905,6 +943,8 @@ class GeniusPdfRichText {
         final drawY = currentY + yOffset;
 
         final drawX = isRTL ? cursorX - drawWidth : cursorX;
+        final spanDirection = _resolveSpanDirection(span);
+        final spanAlignment = _resolveSpanAlignment(spanDirection);
 
         // ── Draw background ──────────────────────────────────────
         if (span.hasBackground) {
@@ -925,8 +965,8 @@ class GeniusPdfRichText {
         if (span.hasLink) {
           // Use PdfTextWebLink for proper clickable hyperlinks.
           final linkFormat = PdfStringFormat(
-            alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-            textDirection: textDirection,
+            alignment: spanAlignment,
+            textDirection: spanDirection,
             characterSpacing: span.letterSpacing ?? 0,
             wordSpacing: span.wordSpacing ?? 0,
           );
@@ -941,8 +981,8 @@ class GeniusPdfRichText {
           webLink.draw(page, Offset(drawX, drawY));
         } else {
           final format = PdfStringFormat(
-            alignment: isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-            textDirection: textDirection,
+            alignment: spanAlignment,
+            textDirection: spanDirection,
             characterSpacing: span.letterSpacing ?? 0,
             wordSpacing: span.wordSpacing ?? 0,
           );
@@ -1248,8 +1288,12 @@ class GeniusPdfRichTextBuilder {
   GeniusPdfRichTextBuilder({
     required this.config,
     GeniusPdfTextStyle? defaultStyle,
-    this.paragraphAlignment = GeniusPdfParagraphAlignment.start,
-  }) : defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config);
+    GeniusPdfParagraphAlignment? paragraphAlignment,
+  })  : defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config),
+        paragraphAlignment = _resolveRichTextParagraphAlignment(
+          paragraphAlignment,
+          _resolveRichTextDefaultStyle(defaultStyle, config),
+        );
 
   final GeniusPdfTextStyle defaultStyle;
   final GeniusPdfConfig config;
@@ -1586,18 +1630,48 @@ class GeniusPdfLabeledValue {
     PdfLayoutFormat? layoutFormat,
   }) {
     final labelText = getLabel();
+    final effectiveLabelStyle = labelStyle ??
+        GeniusPdfTextStyle(
+          fontSize: config.baseFont.size,
+          fontWeight: FontWeight.bold,
+          alignment: GeniusPdfTextAlign.start,
+        );
+    final effectiveValueStyle = valueStyle ??
+        GeniusPdfTextStyle(
+          fontSize: config.baseFont.size,
+          alignment: GeniusPdfTextAlign.start,
+        );
 
     final valueSpan = valueColor != null
-        ? GeniusPdfTextSpan.bold(value, color: valueColor)
-        : GeniusPdfTextSpan.plain(value);
+        ? GeniusPdfTextSpan(
+            text: value,
+            style: effectiveValueStyle,
+            color: valueColor,
+            isBold: effectiveValueStyle.isBold,
+          )
+        : GeniusPdfTextSpan(
+            text: value,
+            style: effectiveValueStyle,
+            isBold: effectiveValueStyle.isBold,
+          );
 
     final richText = GeniusPdfRichText(
       spans: [
-        GeniusPdfTextSpan.bold(labelText),
-        GeniusPdfTextSpan.plain(separator),
+        GeniusPdfTextSpan(
+          text: labelText,
+          style: effectiveLabelStyle,
+          isBold: effectiveLabelStyle.isBold,
+        ),
+        GeniusPdfTextSpan(
+          text: separator,
+          style: effectiveLabelStyle.copyWith(
+            fontWeight: FontWeight.normal,
+          ),
+        ),
         valueSpan,
       ],
       config: config,
+      defaultStyle: effectiveValueStyle,
       baseFont: config.baseFont,
       boldFont: config.boldFont,
       isRTL: config.isRTL,

@@ -149,5 +149,25 @@ class InfoBoxDemoBuilder extends GeniusPdfDocumentBuilder {
       boxSpacing: 20,
       spacing: 10,
     );
+
+    final footerEdgeGap = remainingHeight > 18 ? remainingHeight - 18 : 0.0;
+    addSpace(footerEdgeGap);
+
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        title: 'Footer Edge Keep-Together',
+        items: List.generate(
+          4,
+          (index) => GeniusPdfLabeledValue(
+            config: config,
+            label: 'Check ${index + 1}',
+            value: 'This box should move to a new page when needed.',
+          ),
+        ),
+        style: GeniusPdfInfoBoxStyle.card(),
+      ),
+      spacing: 6,
+    );
   }
 }

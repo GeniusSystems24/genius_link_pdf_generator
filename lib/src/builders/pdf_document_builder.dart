@@ -236,9 +236,10 @@ abstract class GeniusPdfDocumentBuilder {
   /// If the remaining height is insufficient, creates a new page and
   /// resets the Y position. Returns the page to draw on.
   PdfPage _ensureSpace(double needed) {
-    if (_currentPage == null || remainingHeight < needed) {
+    final requiredHeight = needed < 0 ? 0 : needed;
+    if (_currentPage == null || remainingHeight < requiredHeight) {
       GeniusPdfLogger.debug(
-        'Auto page-break: needed=$needed, remaining=$remainingHeight',
+        'Auto page-break: needed=$requiredHeight, remaining=$remainingHeight',
         tag: 'Builder',
       );
       return newPage();
@@ -298,7 +299,7 @@ abstract class GeniusPdfDocumentBuilder {
       }
     }
     if (y != null) {
-      _currentY = y;
+      _currentY = y < _headerHeight ? _headerHeight : y;
     }
     GeniusPdfLogger.debug(
       'Page set to index=$_currentIndex, Y=$_currentY',
@@ -313,6 +314,7 @@ abstract class GeniusPdfDocumentBuilder {
   /// and [currentY] is set to the bottom of the result's bounds plus
   /// optional [spacing].
   void updateFromLayoutResult(PdfLayoutResult result, {double spacing = 0}) {
+    _layoutResult = result;
     setCurrentPage(result.page, y: result.bounds.bottom + spacing);
   }
 
@@ -320,7 +322,27 @@ abstract class GeniusPdfDocumentBuilder {
   ///
   /// This advances [currentY] by [height] pixels.
   void addSpace(double height) {
-    _advanceY(height);
+    if (height <= 0) return;
+
+    currentPage;
+    var remainingSpacing = height;
+
+    while (remainingSpacing > 0) {
+      final available = remainingHeight;
+      if (available <= 0) {
+        newPage();
+        continue;
+      }
+
+      if (remainingSpacing <= available) {
+        _advanceY(remainingSpacing);
+        break;
+      }
+
+      _advanceY(available);
+      remainingSpacing -= available;
+      newPage();
+    }
   }
 
   // ============================================================
@@ -334,7 +356,7 @@ abstract class GeniusPdfDocumentBuilder {
   /// Returns the newly created [PdfPage].
   PdfPage newPage({PdfPen? borderPen}) {
     final page = _document.pages.add();
-    _currentIndex++;
+    _currentIndex = _document.pages.count - 1;
     _currentPage = page;
     _layoutResult = null;
     _currentY = _headerHeight;
@@ -401,7 +423,7 @@ abstract class GeniusPdfDocumentBuilder {
       font: effectiveFont,
       brush: brush ?? PdfBrushes.black,
       pen: pen,
-      format: isLTR ? null : _format,
+      format: _format,
     );
 
     final adjustedSpace = space * (isLTR ? 1 : -1);
@@ -420,7 +442,7 @@ abstract class GeniusPdfDocumentBuilder {
 
     // Update _currentY from the layout result.
     if (_layoutResult != null) {
-      _currentY = _layoutResult!.bounds.bottom;
+      updateFromLayoutResult(_layoutResult!);
     }
   }
 
@@ -464,7 +486,7 @@ abstract class GeniusPdfDocumentBuilder {
       font: font ?? baseFont,
       brush: brush ?? PdfBrushes.black,
       pen: pen,
-      format: isLTR ? null : _format,
+      format: _format,
     );
 
     final adjustedOffset = horizontalOffset * (isLTR ? 1 : -1);
@@ -483,7 +505,7 @@ abstract class GeniusPdfDocumentBuilder {
 
     // Update _currentY to the bottom of the inline text.
     if (_layoutResult != null) {
-      _currentY = _layoutResult!.bounds.bottom;
+      updateFromLayoutResult(_layoutResult!);
     }
   }
 
@@ -766,11 +788,11 @@ abstract class GeniusPdfDocumentBuilder {
     bool advancePosition = true,
   }) {
     final linePen = pen ?? PdfPen(PdfColor(0, 0, 0));
-    final yPos = y ?? (_currentY + spacing);
-
     if (advancePosition && y == null) {
       _ensureSpace(spacing * 2 + 1);
     }
+
+    final yPos = y ?? (_currentY + spacing);
 
     currentPage.graphics.drawLine(
       linePen,
@@ -808,13 +830,41 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     bool advancePosition = true,
   }) {
-    final drawWidth = width ?? image.width;
-    final drawHeight = height ?? image.height;
-    final drawY = y ?? (_currentY + spacing);
+    var drawableImage = image.copyWith(
+      width: width ?? image.width,
+      height: height ?? image.height,
+    );
+    if (drawableImage.width <= 0 || drawableImage.height <= 0) {
+      throw StateError(
+        'Image bounds must be positive: '
+        '${drawableImage.width}x${drawableImage.height}',
+      );
+    }
 
     if (advancePosition && y == null) {
-      _ensureSpace(drawHeight + spacing);
+      currentPage;
+      final requiredHeight = drawableImage.height + spacing;
+      final fullPageAvailableHeight = effectivePageHeight - spacing;
+      final currentAvailableHeight = remainingHeight - spacing;
+
+      if (currentAvailableHeight <= 0) {
+        newPage();
+      } else if (requiredHeight > currentAvailableHeight &&
+          fullPageAvailableHeight > currentAvailableHeight) {
+        newPage();
+      }
+
+      drawableImage = _scaleImageToFitContent(
+        drawableImage,
+        maxWidth: pageWidth,
+        maxHeight: remainingHeight - spacing,
+        context: 'image',
+      );
     }
+
+    final drawWidth = drawableImage.width;
+    final drawHeight = drawableImage.height;
+    final drawY = y ?? (_currentY + spacing);
 
     // Calculate X position based on alignment.
     final drawX = x ?? _resolveAlignment(alignment, drawWidth);
@@ -839,6 +889,34 @@ abstract class GeniusPdfDocumentBuilder {
       case GeniusPdfImageAlignment.end:
         return isRTL ? 0 : (pageWidth - width);
     }
+  }
+
+  GeniusPdfImage _scaleImageToFitContent(
+    GeniusPdfImage image, {
+    required double maxWidth,
+    required double maxHeight,
+    required String context,
+  }) {
+    if (maxWidth <= 0 || maxHeight <= 0) {
+      throw StateError(
+        'Not enough content space to place $context '
+        '(${maxWidth.toStringAsFixed(1)}x${maxHeight.toStringAsFixed(1)})',
+      );
+    }
+
+    if (image.width <= maxWidth && image.height <= maxHeight) {
+      return image;
+    }
+
+    final scaled = image.scaledToFit(
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+    );
+    if (scaled.width <= 0 || scaled.height <= 0) {
+      throw StateError('Failed to scale $context into the available bounds');
+    }
+
+    return scaled;
   }
 
   // ============================================================
@@ -884,7 +962,7 @@ abstract class GeniusPdfDocumentBuilder {
     );
 
     if (result != null) {
-      _currentY = result.bounds.bottom;
+      updateFromLayoutResult(result);
       GeniusPdfLogger.debug(
         'Grid drawn → Y=${_currentY.toStringAsFixed(1)}',
         tag: 'Builder',
@@ -916,8 +994,7 @@ abstract class GeniusPdfDocumentBuilder {
     GeniusPdfSummarySection summary, {
     double spacing = 0,
   }) {
-    // Estimate: each item ~20px + padding.
-    final estimatedHeight = summary.items.length * 20.0 + 20.0 + spacing;
+    final estimatedHeight = summary.estimateHeight() + spacing;
     final page = _ensureSpace(estimatedHeight);
     final drawY = _currentY + spacing;
 
@@ -1103,19 +1180,40 @@ abstract class GeniusPdfDocumentBuilder {
     GeniusPdfImageAlignment alignment = GeniusPdfImageAlignment.start,
     double spacing = 0,
   }) {
-    final drawY = _currentY + spacing;
-    _ensureSpace(size + spacing + 30); // +30 for caption
+    currentPage;
+    const captionAllowance = 30.0;
+    final maxDrawableSize =
+        pageWidth < (effectivePageHeight - captionAllowance)
+            ? pageWidth
+            : (effectivePageHeight - captionAllowance);
+    if (maxDrawableSize <= 0) {
+      throw StateError('Not enough content space to place QR code');
+    }
 
-    final x = _resolveAlignment(alignment, size);
+    final drawSize = size < maxDrawableSize ? size : maxDrawableSize;
+    final currentAvailableHeight = remainingHeight - spacing - captionAllowance;
+    final fullPageAvailableHeight =
+        effectivePageHeight - spacing - captionAllowance;
+    if (currentAvailableHeight <= 0) {
+      newPage();
+    } else if (drawSize > currentAvailableHeight &&
+        fullPageAvailableHeight > currentAvailableHeight) {
+      newPage();
+    }
+
+    final page = _ensureSpace(drawSize + spacing + captionAllowance);
+    final drawY = _currentY + spacing;
+
+    final x = _resolveAlignment(alignment, drawSize);
 
     GeniusPdfLogger.debug(
-      'Drawing QR code at Y=$drawY, X=$x (size=$size)',
+      'Drawing QR code at Y=$drawY, X=$x (size=$drawSize)',
       tag: 'Builder',
     );
 
     final bounds = qrCode.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(x, drawY, size, size),
+      page: page,
+      bounds: Rect.fromLTWH(x, drawY, drawSize, drawSize),
     );
 
     _currentY = bounds.bottom;
@@ -1210,7 +1308,12 @@ abstract class GeniusPdfDocumentBuilder {
     // Scale image to fit page content area.
     final maxWidth = pageWidth;
     final maxHeight = remainingHeight - 10;
-    final scaled = image.scaledToFit(maxWidth: maxWidth, maxHeight: maxHeight);
+    final scaled = _scaleImageToFitContent(
+      image,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      context: 'image attachment',
+    );
 
     addImage(
       scaled,
@@ -1283,7 +1386,7 @@ abstract class GeniusPdfDocumentBuilder {
     );
 
     if (result != null) {
-      _currentY = result.bounds.bottom;
+      updateFromLayoutResult(result);
     }
 
     return result;
@@ -1311,9 +1414,7 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     double? height,
   }) {
-    // Estimate: title (~20px) + items (~18px each) + padding.
-    final estimatedHeight =
-        height ?? (20.0 + infoBox.items.length * 18.0 + 10.0 + spacing);
+    final estimatedHeight = (height ?? infoBox.estimateHeight(pageWidth)) + spacing;
     final page = _ensureSpace(estimatedHeight);
     final drawY = _currentY + spacing;
 
@@ -1361,7 +1462,10 @@ abstract class GeniusPdfDocumentBuilder {
     double spacing = 0,
     double height = 100,
   }) {
-    final page = _ensureSpace(height + spacing);
+    final estimatedHeight = reportHeader.estimateHeight(availableWidth: pageWidth);
+    final page = _ensureSpace(
+      (estimatedHeight > height ? estimatedHeight : height) + spacing,
+    );
     final drawY = _currentY + spacing;
 
     GeniusPdfLogger.debug(
@@ -1625,6 +1729,7 @@ abstract class GeniusPdfDocumentBuilder {
   ///
   /// Calls [build] to populate the document, then serializes to bytes.
   List<int> generate() {
+    _layoutResult = null;
     _currentY = _headerHeight;
     build();
     final bytes = _document.saveSync();

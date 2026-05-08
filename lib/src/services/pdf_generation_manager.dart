@@ -742,23 +742,36 @@ class GeniusPdfGenerationManager {
         filePath: filePath,
       );
 
-      // Auto actions
+      // Auto actions — each wrapped individually so one failure doesn't
+      // abort the others or mark the generation job as failed.
       if (job.autoOpen) {
-        await OpenFile.open(filePath);
+        try {
+          await OpenFile.open(filePath);
+        } catch (e) {
+          GeniusPdfLogger.error('autoOpen failed', tag: 'JobManager', error: e);
+        }
       }
 
       if (job.autoShare) {
-        await Printing.sharePdf(
-          bytes: success.bytes,
-          filename: '${job.fileName}.pdf',
-        );
+        try {
+          await Printing.sharePdf(
+            bytes: success.bytes,
+            filename: '${job.fileName}.pdf',
+          );
+        } catch (e) {
+          GeniusPdfLogger.error('autoShare failed', tag: 'JobManager', error: e);
+        }
       }
 
       if (job.autoPrint) {
-        await Printing.layoutPdf(
-          onLayout: (_) => success.bytes,
-          name: job.fileName,
-        );
+        try {
+          await Printing.layoutPdf(
+            onLayout: (_) => success.bytes,
+            name: job.fileName,
+          );
+        } catch (e) {
+          GeniusPdfLogger.error('autoPrint failed', tag: 'JobManager', error: e);
+        }
       }
 
       if (job.cancelRequested == true) {

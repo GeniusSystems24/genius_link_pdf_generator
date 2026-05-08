@@ -86,7 +86,8 @@ class GeniusBatchExporter {
     bool stopOnError = false,
   }) async {
     final startTime = DateTime.now();
-    final results = <GeniusExportResult>[];
+    // Fixed-size list preserves input order even when tasks complete out of order.
+    final results = List<GeniusExportResult?>.filled(items.length, null);
     var successCount = 0;
     var failureCount = 0;
 
@@ -137,7 +138,7 @@ class GeniusBatchExporter {
           result = await _exportService.export(item.document, item.config);
         }
 
-        results.add(result);
+        results[index] = result;
 
         if (result is GeniusExportSuccess) {
           successCount++;
@@ -145,7 +146,7 @@ class GeniusBatchExporter {
           failureCount++;
         }
       } catch (e, stack) {
-        results.add(GeniusExportFailure(error: e, stackTrace: stack));
+        results[index] = GeniusExportFailure(error: e, stackTrace: stack);
         failureCount++;
       }
 
@@ -175,8 +176,9 @@ class GeniusBatchExporter {
       statusAr: 'اكتمل تصدير الدفعة',
     ));
 
+    // Filter nulls (items skipped due to stopOnError) while keeping order.
     return GeniusBatchExportResult(
-      results: results,
+      results: results.whereType<GeniusExportResult>().toList(),
       totalCount: items.length,
       successCount: successCount,
       failureCount: failureCount,
