@@ -1,0 +1,184 @@
+# Feature Specification: PDF Generation Engine Stability and Layout Correctness
+
+**Feature Branch**: `002-pdf-engine-stability`  
+**Created**: 2026-05-08  
+**Status**: Draft  
+**Input**: User description: "PDF Generation Engine Stability and Layout Correctness"
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - Safe Multi-Page Document Generation (Priority: P1)
+
+A developer uses the PDF document builder to generate a report that contains text blocks, info boxes, grids, and summaries. As content fills pages, the builder automatically handles page breaks, ensuring every component either fits on the current page or moves cleanly to a new one. The generated file is non-empty, structurally valid, and can be opened in any standard PDF viewer.
+
+**Why this priority**: This is the core contract of the library. If page layout breaks or the file is corrupt, no other feature can be trusted.
+
+**Independent Test**: Provide a document with enough content to fill more than one page; verify the file opens, shows the correct number of pages, and all content is visible without overlap.
+
+**Acceptance Scenarios**:
+
+1. **Given** a document builder is initialized with valid page settings, **When** content is added that exceeds a single page, **Then** new pages are created automatically and `currentY` on the builder reflects the position on the new page.
+2. **Given** a document is generated successfully, **When** the resulting bytes are inspected, **Then** they are non-empty and parse as a valid PDF structure.
+3. **Given** a document builder is initialized with small page dimensions that force immediate overflow, **When** any content is added, **Then** the builder still produces valid output without crashing.
+
+---
+
+### User Story 2 - Header and Footer Safety (Priority: P1)
+
+A developer configures a document with a header and footer. All content drawn on every page — including continuation pages created by multi-page components — must appear within the content zone between the header and footer. No content should overlap either reserved region.
+
+**Why this priority**: Overlapping headers/footers is a visible, user-facing defect that invalidates documents for business use (invoices, statements, reports).
+
+**Independent Test**: Open a generated multi-page PDF; measure visually and programmatically that no content pixel overlaps the header or footer band on any page.
+
+**Acceptance Scenarios**:
+
+1. **Given** a document has a header with a defined reserved height, **When** a new page is created, **Then** `currentY` starts at or below the header bottom boundary.
+2. **Given** a document has a footer with a defined reserved height, **When** remaining height is calculated, **Then** the footer space is subtracted from the usable area before any component draws.
+3. **Given** a ReportComposer is used, **When** content actions are queued and executed, **Then** the header and footer are applied before any content action runs on each page.
+
+---
+
+### User Story 3 - Multi-Page Grid and Summary Synchronization (Priority: P1)
+
+A developer draws a data grid that spans multiple pages. After the grid finishes rendering, any subsequent component (e.g., a summary section) must appear on the page where the grid ended, positioned below the last grid row — not on a previous page, not behind the footer.
+
+**Why this priority**: This is a known class of defect: the builder's page reference is not updated after a multi-page component. The result is summaries drawn in wrong locations, a critical correctness failure.
+
+**Independent Test**: Render a grid with enough rows to span two or more pages, then draw a summary. Verify the summary appears on the last page of the grid, below the final row.
+
+**Acceptance Scenarios**:
+
+1. **Given** a grid is drawn and its `PdfLayoutResult` reports a final page different from the starting page, **When** the draw call returns, **Then** the builder's `currentPage` and `currentY` match the values from the `PdfLayoutResult`.
+2. **Given** a summary is drawn immediately after a multi-page grid, **When** the document is generated, **Then** the summary appears on the same page as the last grid row and below it.
+3. **Given** a grid ends near the bottom of a page, **When** a summary is drawn next, **Then** if the summary does not fit, it moves to the next page and the header/footer on that page is respected.
+
+---
+
+### User Story 4 - RTL and LTR Layout Correctness (Priority: P2)
+
+A developer generates a PDF with RTL (Arabic) or LTR (English) configuration. Text direction is applied consistently: alignment, column order, and text flow all match the configured direction. Mixed bilingual layouts do not produce overlapping text due to direction mismatches.
+
+**Why this priority**: The library serves Arabic-language business documents. Direction errors produce unreadable output.
+
+**Independent Test**: Generate the same document in both RTL and LTR modes; verify text alignment and column order are mirrored correctly, and no text blocks overlap.
+
+**Acceptance Scenarios**:
+
+1. **Given** `isRtl` is `true`, **When** any text component is drawn, **Then** text alignment is right-to-left and the component does not overflow its bounds due to direction error.
+2. **Given** a bilingual layout has both Arabic and English columns, **When** drawn in RTL mode, **Then** column order is reversed and neither column overlaps the other.
+3. **Given** `isRtl` is `false`, **When** the same component is drawn, **Then** alignment is left-to-right and output matches the LTR expectation.
+
+---
+
+### User Story 5 - Image, QR, and Barcode Safety (Priority: P2)
+
+A developer adds images, QR codes, or barcodes to a document. If an image is too large for the content area, it is either scaled to fit or the operation fails with a clear error — never silently corrupting the document. If a QR/barcode render fails, the failure is reported and the rest of the document is not corrupted unless the component was marked as required.
+
+**Why this priority**: Silent failures in image/barcode rendering leave documents with missing critical data (e.g., payment QR codes) without any signal to the developer.
+
+**Independent Test**: Provide an oversized image and a deliberately invalid barcode payload; verify the document either scales correctly or surfaces a clear failure, and is always openable.
+
+**Acceptance Scenarios**:
+
+1. **Given** an image whose dimensions exceed the content bounds, **When** drawn, **Then** it is either scaled to fit or a clear error result is returned.
+2. **Given** a QR/barcode generator receives invalid input, **When** drawn, **Then** the failure is reported in the result and the surrounding PDF content remains intact.
+3. **Given** a full-page image page is drawn, **When** generated, **Then** the image respects header, footer, and margin boundaries.
+
+---
+
+### User Story 6 - Export, Save, and Batch Generation (Priority: P2)
+
+A developer uses the PDF generation manager or batch exporter to generate one or more documents. Each job either succeeds with non-empty bytes or fails with a clear per-job failure. No exception is swallowed silently. Batch runs report which jobs failed and which succeeded.
+
+**Why this priority**: Swallowed exceptions mean the caller assumes success when the file is missing or empty. This causes data loss in production.
+
+**Independent Test**: Submit a batch with one valid job and one intentionally failing job; verify the success is returned for the valid job and the failure is reported for the broken one, both surfaced in the batch result.
+
+**Acceptance Scenarios**:
+
+1. **Given** a generation manager receives a valid job, **When** generation completes, **Then** the result contains non-empty bytes and a success status.
+2. **Given** a generation manager receives a job that causes an internal error, **When** generation fails, **Then** the result contains a clear failure status and the error is not swallowed.
+3. **Given** a batch of mixed valid and invalid jobs, **When** all jobs are processed, **Then** the batch result contains individual statuses — successes and failures — reported separately.
+
+---
+
+### Edge Cases
+
+- What happens when a PDF is generated with zero content (empty document)?
+- What happens when margins are set so large that no content area remains?
+- What happens when `newPage()` is called after `generate()` has already been called?
+- What happens when an image file path is valid but the image data is corrupt?
+- How does the builder behave when both portrait and landscape orientations are used across pages?
+- What happens when a component near the bottom of a page has height equal to exactly the remaining space?
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-001**: The document builder MUST initialize with the configured page size, orientation, and margins before any content is drawn.
+- **FR-002**: The builder MUST track `currentPage`, `currentPageIndex`, `pageCount`, and `currentY` accurately after every operation including `newPage()`, multi-page component draws, and `generate()`.
+- **FR-003**: Every component MUST check remaining height — accounting for footer reserved space — before drawing, and trigger a page break if the component does not fit.
+- **FR-004**: New pages created by the builder or any component MUST start `currentY` at or below the header reserved height.
+- **FR-005**: After a multi-page component (e.g., grid) completes drawing, the builder MUST update `currentPage` and `currentY` to match the `PdfLayoutResult` final page and final bottom bound.
+- **FR-006**: ReportComposer MUST apply the configured header and footer to each page before any queued content action executes on that page.
+- **FR-007**: Images MUST be scaled to fit the available content bounds, or the draw operation MUST return a clear failure result when the image cannot be placed safely.
+- **FR-008**: QR/barcode render failures MUST be caught and reported without corrupting the surrounding document, unless the component is configured as required.
+- **FR-009**: `PdfGenerationManager` job handlers MUST NOT swallow exceptions; every failure MUST surface in the job result.
+- **FR-010**: Batch generation MUST report per-job success or failure in the result, not a single aggregate status.
+- **FR-011**: Successful PDF generation MUST produce non-empty bytes that are structurally valid.
+- **FR-012**: Export and save operations MUST propagate failures clearly rather than silently succeeding with empty or partial output.
+- **FR-013**: RTL direction MUST be applied consistently to text alignment, column ordering, and component layout — not only to individual text strings.
+- **FR-014**: Tests MUST exist for both LTR and RTL configurations, both portrait and landscape orientations, and for small page sizes that force multiple page breaks.
+
+### Key Entities
+
+- **PdfDocument**: The top-level document object, owns page settings (size, orientation, margins, compression), and controls save/generate/dispose lifecycle.
+- **PdfDocumentBuilder**: Stateful builder that tracks the active page, current Y position, and delegates drawing to components.
+- **PdfLayoutResult**: The return value of any component draw call, carrying the final page reference and bounding rectangle after rendering.
+- **PageState**: The logical state on the builder (currentPage, currentPageIndex, pageCount, currentY) that must be synchronized with `PdfLayoutResult` after multi-page operations.
+- **HeaderFooterConfig**: The reserved height and content for headers and footers, which constrain the usable content area on every page.
+- **PdfComponent**: Any drawable element (grid, summary, info box, report header, rich text, image, barcode) that accepts a page and bounds and returns a `PdfLayoutResult`.
+- **GenerationJob**: A single unit of work in the generation manager, carrying input data and producing a result (bytes + status).
+- **BatchResult**: The aggregate of all job results from a batch generation run, reporting per-job success and failure.
+
+## Contract Impact *(mandatory)*
+
+### Public Surface
+
+- **Exports/barrels affected**: `lib/genius_link_pdf_generator.dart` — any builder, manager, or service whose observable behavior or result model changes.
+- **Constructors/factories/enums/models affected**: `PdfDocumentBuilder`, `PdfGenerationManager`, `PdfService`, `PdfExportService`, `BatchExporter`, all PDF widget components — behavior fixes only; no new public API unless a result model needs a new field to surface errors.
+- **Backward compatibility impact**: Additive — fixes must not remove or rename existing public APIs. If a result model gains a new field, it must have a default value to remain compatible.
+
+### Direction & Language
+
+- **Arabic/English text affected**: RTL/LTR layout correctness affects all bilingual text components; error messages from result models should follow the project bilingual pattern (`errorMessage` / `errorMessageAr`).
+- **RTL/LTR layout impact**: Alignment, column ordering, and component positioning must be corrected for both directions in all affected components.
+
+### Documentation & Examples
+
+- **README impact**: None unless a public API surface changes (behavior fixes are not documented in README).
+- **CHANGELOG impact**: `Fixed` entries for each defect category addressed; version bump follows semver (patch for fixes, minor if any additive API change).
+- **Example impact**: Existing example documents may be updated to demonstrate correct multi-page grid + summary flow and RTL/LTR configuration; no new screens unless an existing scenario was unrepresented.
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-001**: Every successful PDF generation call produces a non-empty, structurally valid file that opens in at least two standard PDF viewers without error.
+- **SC-002**: No content — text, table row, image, or summary — overlaps the header or footer band on any page of any generated document, verified across both RTL and LTR configurations.
+- **SC-003**: A summary drawn after a multi-page grid always appears on the final page of the grid and below the last grid row, regardless of how many pages the grid spans.
+- **SC-004**: A batch generation run with a mix of valid and invalid jobs reports individual job results; no failure is hidden behind a silent success, and the caller can identify exactly which jobs failed.
+- **SC-005**: All layout-related tests pass for both LTR and RTL text directions, both portrait and landscape orientations, and constrained page sizes that force at least two page breaks.
+- **SC-006**: A QR/barcode render failure or an image overflow scenario does not corrupt the surrounding document; the rest of the document remains openable and readable.
+- **SC-007**: Remaining height calculations always account for footer reserved space; no component draws below the footer boundary on any page.
+
+## Assumptions
+
+- This feature covers PDF generation mechanics only. User-provided data, financial calculations, business logic, and report content accuracy are explicitly out of scope.
+- The Syncfusion Flutter PDF library is the rendering engine; its internal behavior is trusted. Fixes target the wrapper layer (builders, composers, managers, services, and components) not Syncfusion internals.
+- Visual identity and template designs are not changed unless a layout fix requires a geometry adjustment.
+- The test suite uses unit tests and integration tests that produce actual PDF bytes; PDF correctness is verified by inspecting the generated bytes and page structure, not by visual screenshots.
+- Example project updates are limited to demonstrating already-existing components with corrected behavior; no new example screens are added unless a scenario is entirely unrepresented.
+- README and CHANGELOG are updated only if a public API surface changes or a user-facing behavior change requires documentation — not for internal fixes.
+- Bilingual error messages in result models follow the project convention: `errorMessage` (English) and `errorMessageAr` (Arabic) with a `getErrorMessage({bool isRTL})` helper.
