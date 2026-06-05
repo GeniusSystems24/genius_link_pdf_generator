@@ -25,7 +25,7 @@ implementation and verification.
 
 ## Path Conventions
 
-- **Public entrypoints**: `lib/genius_link_pdf_generator.dart` and package
+- **Public entrypoints**: `lib/pdf_generator.dart` and package
   barrel files under `lib/src/**`
 - **Core library layers**: `lib/src/components/`, `lib/src/builders/`,
   `lib/src/services/`, `lib/src/printing/`, `lib/src/sharing/`,

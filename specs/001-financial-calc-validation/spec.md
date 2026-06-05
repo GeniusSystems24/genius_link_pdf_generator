@@ -134,7 +134,7 @@ Whenever the library converts a monetary amount to words (e.g., "One Thousand Fi
 
 ### Public Surface
 
-- **Exports/barrels affected**: `lib/genius_link_pdf_generator.dart` — new validation types will be exported.
+- **Exports/barrels affected**: `lib/pdf_generator.dart` — new validation types will be exported.
 - **Constructors/factories/enums/models affected**: All financial template `generate()` methods gain an optional `validateFinancials` boolean parameter (default: `true`); existing calls without it are unaffected and receive validation enabled. New classes `MoneyAmount`, `RoundingPolicy`, `FinancialValidationContext`, `FinancialValidationResult`, and `FinancialValidationError` are added for callers who want fine-grained control.
 - **Backward compatibility impact**: Additive for callers with consistent data. Behaviorally breaking for callers that previously supplied inconsistent totals (they now receive a validation error rather than a wrong PDF). This is intentional and documented.
 

@@ -232,4 +232,4 @@ validateFinancials == true?
 - `genius_validation_result.dart`
 - `genius_validation_context.dart`
 
-`lib/genius_link_pdf_generator.dart` re-exports `src/core/financial/financial.dart`.
+`lib/pdf_generator.dart` re-exports `src/core/financial/financial.dart`.

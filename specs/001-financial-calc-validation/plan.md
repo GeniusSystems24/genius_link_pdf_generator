@@ -21,7 +21,7 @@ Add a deterministic financial calculation and validation layer (`lib/src/core/fi
 **Project Type**: Flutter package / library  
 **Performance Goals**: Validation is synchronous pure-arithmetic (sub-millisecond for any realistic document). No progress callback required (Principle X — single-page-equivalent computation). No UI thread impact since `generate()` is already `async`.  
 **Constraints**: No new pub.dev dependencies. No rendering code changes unless required by validation hook. Public API additive only (no removals, no renames). Bilingual errors (EN + AR). RTL/LTR not affected (calculation layer, no layout).  
-**Scale/Scope**: New `lib/src/core/financial/` module (5 files + barrel). Modified: `lib/genius_link_pdf_generator.dart`, `lib/src/models/pdf_result.dart`, 12 main templates + `GeniusPdfVoucherTemplate` base (covers 16 vouchers). New: `test/financial/` (4 test files).
+**Scale/Scope**: New `lib/src/core/financial/` module (5 files + barrel). Modified: `lib/pdf_generator.dart`, `lib/src/models/pdf_result.dart`, 12 main templates + `GeniusPdfVoucherTemplate` base (covers 16 vouchers). New: `test/financial/` (4 test files).
 
 ---
 

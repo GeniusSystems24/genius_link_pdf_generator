@@ -2,7 +2,7 @@
 
 **Feature**: `001-financial-calc-validation`  
 **Date**: 2026-05-07  
-**Barrel**: `lib/genius_link_pdf_generator.dart`  
+**Barrel**: `lib/pdf_generator.dart`  
 **SemVer Impact**: MINOR (additive new exports + optional parameter) + documented behavioral change
 
 ---

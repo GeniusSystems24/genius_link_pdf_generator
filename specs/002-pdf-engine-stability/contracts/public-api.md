@@ -2,7 +2,7 @@
 
 **Feature**: `002-pdf-engine-stability`  
 **Date**: 2026-05-08  
-**Barrel**: `lib/genius_link_pdf_generator.dart`
+**Barrel**: `lib/pdf_generator.dart`
 
 ---
 

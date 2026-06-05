@@ -159,7 +159,7 @@ A developer uses the PDF generation manager or batch exporter to generate one or
 
 ### Public Surface
 
-- **Exports/barrels affected**: `lib/genius_link_pdf_generator.dart` - any builder, manager, or service whose observable behavior or result model changes.
+- **Exports/barrels affected**: `lib/pdf_generator.dart` - any builder, manager, or service whose observable behavior or result model changes.
 - **Constructors/factories/enums/models affected**: `PdfDocumentBuilder`, `PdfGenerationManager`, `PdfService`, `PdfExportService`, `BatchExporter`, all PDF widget components - behavior fixes only; no new public API unless a result model needs a new field to surface errors.
 - **Backward compatibility impact**: Additive - fixes must not remove or rename existing public APIs. If a result model gains a new field, it must have a default value to remain compatible. Absolute-position helpers remain supported; any new placement validation must be opt-in or otherwise non-breaking for existing templates.
 

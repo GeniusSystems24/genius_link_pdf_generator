@@ -2890,7 +2890,7 @@ final grid = GeniusPdfDataGrid(
 ### Breaking Changes
 
 - This is a major version with new architecture. The v1.x API remains available.
-- New imports available: `import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'` now includes v2.
+- New imports available: `import 'package:genius_link_pdf_generator/pdf_generator.dart'` now includes v2.
 
 ---
 

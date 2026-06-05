@@ -75,7 +75,7 @@
 
 ### Public Surface
 
-- **Exports/barrels affected**: [e.g., `lib/genius_link_pdf_generator.dart`, `components.dart`, none]
+- **Exports/barrels affected**: [e.g., `lib/pdf_generator.dart`, `components.dart`, none]
 - **Constructors/factories/enums/models affected**: [list or "none"]
 - **Backward compatibility impact**: [compatible / additive / breaking, with why]
 

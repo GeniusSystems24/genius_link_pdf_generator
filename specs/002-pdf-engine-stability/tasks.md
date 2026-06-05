@@ -153,7 +153,7 @@
 - [X] T031 [US6] Fix canonical raw-byte generation and wrapper failure propagation in `lib/src/services/pdf_service.dart`
 - [X] T032 [US6] Fix per-job result, status, progress, and error synchronization in `lib/src/services/pdf_generation_manager.dart`
 - [X] T033 [US6] Fix export failure propagation and input-result mapping in `lib/src/services/export/pdf_export_service.dart` and `lib/src/services/export/batch_exporter.dart`
-- [X] T034 [US6] Apply additive-only failure surface changes in `lib/src/models/pdf_result.dart` and `lib/genius_link_pdf_generator.dart` only if the validated defects cannot be explained through existing public result shapes
+- [X] T034 [US6] Apply additive-only failure surface changes in `lib/src/models/pdf_result.dart` and `lib/pdf_generator.dart` only if the validated defects cannot be explained through existing public result shapes
 
 **Checkpoint**: User Story 6 preserves explicit per-job and per-batch outcomes over the same validated raw-byte generation path.
 

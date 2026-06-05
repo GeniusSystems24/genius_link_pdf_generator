@@ -523,13 +523,13 @@ Add the package to your `pubspec.yaml`:
 ```yaml
 dependencies:
   genius_link_pdf_generator:
-    path: ../packages/genius_link_pdf_generator
+    path: ../packages/pdf_generator
 ```
 
 Then import:
 
 ```dart
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import 'package:genius_link_pdf_generator/pdf_generator.dart';
 ```
 
 ---
