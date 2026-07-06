@@ -8,7 +8,7 @@
 /// - **20604** Inventory Damage/Write-off — recording damaged or lost items
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates an inventory voucher PDF page.
 ///

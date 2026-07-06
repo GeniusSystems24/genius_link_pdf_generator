@@ -10,7 +10,7 @@
 library;
 
 import 'package:flutter/material.dart' as m;
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a bill payment voucher PDF page.
 ///

@@ -5,7 +5,7 @@
 /// - **20501** Given Gift — items/services given as gift to customer/partner
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a gift/grant voucher PDF page.
 ///

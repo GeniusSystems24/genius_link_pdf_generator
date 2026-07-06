@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import 'template_definition.dart';
+import 'template_elements.dart';
+import 'template_models.dart';
 
 
 /// Registry for managing and storing templates.

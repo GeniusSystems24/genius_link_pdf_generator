@@ -587,7 +587,7 @@ class GeniusSmartLayoutEngine {
       totalHeight += element.bounds.height + 10; // +10 for spacing
     }
 
-    return (totalHeight / contentHeight).ceil().clamp(1, 100);
+    return (totalHeight / contentHeight).ceil().clamp(1, 100).toInt();
   }
 
   /// Suggests color scheme based on document type.

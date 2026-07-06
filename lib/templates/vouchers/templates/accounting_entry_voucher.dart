@@ -7,7 +7,7 @@
 /// - **00004** Adjusting Entry — end-of-period corrections
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates an accounting entry voucher PDF page.
 ///

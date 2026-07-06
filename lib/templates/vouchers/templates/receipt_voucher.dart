@@ -7,7 +7,7 @@
 /// - **00103** Electronic Receipt — received via electronic payment
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a receipt voucher PDF page.
 ///

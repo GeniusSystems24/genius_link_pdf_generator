@@ -7,7 +7,7 @@
 /// - **20403** Installment Purchase Return — return of installment-purchased goods
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a purchase return voucher PDF page.
 ///

@@ -8,7 +8,7 @@
 /// - **00304** Tax Settlement — audit/correction differences
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a tax voucher PDF page.
 ///

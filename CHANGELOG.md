@@ -5,6 +5,64 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.0] - 2026-07-06
+
+### Architecture
+
+- Added explicit `GeniusPdfCompositionRoot` and reusable `GeniusPdfRuntime`.
+- Removed Presentation-to-Infrastructure construction from preview controllers.
+- Added a stable package-owned entrypoint and `GeniusPdfClient` that do not
+  re-export third-party packages or depend on the legacy service facade.
+- Added a clean MVC boundary for print-preview actions.
+- Split generation manager concerns into queue, executor, scheduling,
+  statistics, streams and chain modules.
+- Split large builder, grid, header, rich-text, info-box, logger, theme and
+  printing libraries into cohesive part files while preserving import paths.
+
+### Reliability
+
+- Added builder-owned isolate-safe background generation with safe fallback for
+  unsendable legacy builder graphs.
+- Fixed watermark font handling; PDF bytes are no longer interpreted as TTF
+  data, and RTL watermarks accept explicitly injected TrueType font bytes.
+- Added fresh-builder factories for retries and recurring scheduled jobs.
+- Added application-boundary validation for PDF document operations.
+- Prevented duplicate `.pdf` extensions and empty-batch division errors.
+- Corrected explicit numeric types after `clamp()` in layout and processing code.
+
+### Example application
+
+- Reorganized the example into feature-first MVC modules.
+- Added a dedicated bootstrap, dependency composition, routing and theme layer.
+- Isolated file-system plugins behind `DemoFileGateway`.
+- Extracted export, printing, sharing and job-manager controllers from Views.
+- Preserved all previous example import paths through compatibility exports.
+- Added example architecture, controller, routing and compatibility tests.
+
+### Compatibility and tests
+
+- Preserved all baseline public types and all existing `GeniusPdfService`
+  method signatures.
+- Added architecture, composition-root, background-generation, application
+  validation, print-preview and complete public-type snapshot tests.
+
+## [3.6.3] - 2026-07-06
+
+### Changed — Clean Architecture, SOLID and MVC refactor
+
+- Preserved the existing `GeniusPdfService` constructor and all existing public method signatures.
+- Split PDF results, operation models and financial rules into a framework-independent Domain layer.
+- Added Application ports for generation, file access, platform interaction, logging and document processing.
+- Moved Flutter plugins and Syncfusion implementations into Infrastructure adapters.
+- Added `GeniusPdfController` and `GeniusPdfPreviewController`; preview views no longer perform file or platform actions directly.
+- Updated `GeniusPdfGenerationManager` to reuse the public service facade rather than duplicating generation and platform logic.
+- Kept legacy source paths as compatibility exports.
+- Added architecture-boundary and public-API compatibility tests.
+
+### Fixed
+
+- Removed the import cycle between `pdf_config.dart` and `pdf_logger.dart`.
+
 ## [3.6.2] - 2026-05-08
 
 ### Added — Built-in grid style preset classes

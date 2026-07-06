@@ -256,8 +256,8 @@ class GeniusPdfWatermark {
     final maxX = pageSize.width - width;
     final maxY = pageSize.height - height;
     final position = Offset(
-      rawPosition.dx.clamp(0.0, maxX < 0 ? 0.0 : maxX),
-      rawPosition.dy.clamp(0.0, maxY < 0 ? 0.0 : maxY),
+      rawPosition.dx.clamp(0.0, maxX < 0 ? 0.0 : maxX).toDouble(),
+      rawPosition.dy.clamp(0.0, maxY < 0 ? 0.0 : maxY).toDouble(),
     );
 
     // Save graphics state

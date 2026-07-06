@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:genius_link_pdf_generator/src/core/pdf_assets.dart';
-import 'package:genius_link_pdf_generator/src/core/pdf_logger.dart';
-import 'package:genius_link_pdf_generator/src/core/pdf_print_theme.dart';
+import 'pdf_assets.dart';
+import 'pdf_logger.dart';
+import 'pdf_print_theme.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 /// Configuration for PDF document settings.

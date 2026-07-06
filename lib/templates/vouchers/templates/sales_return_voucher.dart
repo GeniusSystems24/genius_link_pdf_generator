@@ -7,7 +7,7 @@
 /// - **20453** Installment Sales Return — return of installment-sold goods
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a sales return voucher PDF page.
 ///

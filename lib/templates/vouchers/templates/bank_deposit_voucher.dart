@@ -6,7 +6,7 @@
 /// - **10002** Electronic Deposit — electronic transfer deposit
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a bank deposit voucher PDF page.
 ///

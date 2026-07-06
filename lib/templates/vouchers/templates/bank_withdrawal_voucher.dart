@@ -6,7 +6,7 @@
 /// - **10102** ATM Withdrawal — withdrawal from ATM machine
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a bank withdrawal voucher PDF page.
 ///

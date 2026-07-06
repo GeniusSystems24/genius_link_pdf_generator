@@ -77,7 +77,8 @@
 /// See the [README.md] for complete documentation.
 library;
 
-// libraries
+// Legacy convenience re-export. New code should import Syncfusion directly or
+// use `genius_link_pdf_generator_api.dart` for the stable package-owned API.
 export 'package:syncfusion_flutter_pdf/pdf.dart';
 
 // Core
@@ -87,12 +88,22 @@ export 'src/core/pdf_logger.dart';
 export 'src/core/pdf_print_theme.dart';
 export 'src/core/financial/financial.dart';
 
-// Models
+// Domain models
 export 'src/models/pdf_image.dart';
 export 'src/models/pdf_result.dart';
+export 'src/domain/models/pdf_operations.dart';
+export 'src/domain/models/pdf_delivery.dart';
+
+// Composition and application contracts (optional advanced injection)
+export 'src/composition/genius_pdf_composition_root.dart';
+export 'src/application/contracts/pdf_generation_ports.dart';
+export 'src/application/contracts/pdf_document_processor.dart';
 
 // Builders
 export 'src/builders/pdf_document_builder.dart';
+
+// Stable package-owned facade
+export 'src/public/genius_pdf_client.dart';
 
 // Services
 export 'src/services/pdf_service.dart';
@@ -102,8 +113,10 @@ export 'src/services/pdf_security_service.dart';
 // Export
 export 'src/services/export/export.dart';
 
-// Widgets
+// MVC presentation
 export 'src/widgets/pdf_preview.dart';
+export 'src/presentation/controllers/genius_pdf_controller.dart';
+export 'src/presentation/controllers/genius_pdf_preview_controller.dart';
 
 // Extensions
 export 'src/extensions/color_extensions.dart';

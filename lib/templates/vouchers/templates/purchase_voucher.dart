@@ -7,7 +7,7 @@
 /// - **20003** Installment Purchase — payment in scheduled installments
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a purchase voucher PDF page.
 ///

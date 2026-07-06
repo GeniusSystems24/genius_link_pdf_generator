@@ -7,7 +7,7 @@
 /// - **00203** Electronic Payment — paid via electronic method
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 import 'package:flutter/material.dart' as m;
 
 /// Generates a payment voucher PDF page using the Modern B5 template.

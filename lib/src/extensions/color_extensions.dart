@@ -46,7 +46,7 @@ extension PdfColorUtilities on material.Color {
   PdfColor toPdfLightColor([double amount = 0.1]) {
     final hsl = material.HSLColor.fromColor(this);
     final lightened = hsl.withLightness(
-      (hsl.lightness + amount).clamp(0.0, 1.0),
+      (hsl.lightness + amount).clamp(0.0, 1.0).toDouble(),
     );
     return lightened.toColor().toPdfColor();
   }
@@ -55,7 +55,7 @@ extension PdfColorUtilities on material.Color {
   PdfColor toPdfDarkColor([double amount = 0.1]) {
     final hsl = material.HSLColor.fromColor(this);
     final darkened = hsl.withLightness(
-      (hsl.lightness - amount).clamp(0.0, 1.0),
+      (hsl.lightness - amount).clamp(0.0, 1.0).toDouble(),
     );
     return darkened.toColor().toPdfColor();
   }

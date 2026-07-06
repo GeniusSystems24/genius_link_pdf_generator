@@ -25,3 +25,6 @@ export 'printer_discovery.dart';
 export 'printer_service.dart';
 export 'print_preview.dart';
 export 'print_settings_manager.dart';
+export 'application/print_preview_gateway.dart';
+export 'application/print_preview_result.dart';
+export 'presentation/print_preview_controller.dart';

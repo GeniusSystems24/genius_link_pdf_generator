@@ -1,14 +1,2 @@
-import 'dart:typed_data';
-
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
-    hide EdgeInsets, Colors;
-
-class TemplateBuildResult {
-  final Uint8List bytes;
-  final TemplateDefinition template;
-
-  const TemplateBuildResult({
-    required this.bytes,
-    required this.template,
-  });
-}
+// Compatibility export. Prefer the feature-first path.
+export 'package:genius_pdf_example/features/template_engine/models/documents/template_build_result.dart';

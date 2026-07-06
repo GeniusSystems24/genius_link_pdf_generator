@@ -8,6 +8,69 @@ A comprehensive PDF generation and preview library for Flutter applications with
 
 ---
 
+
+## Architecture
+
+The existing API remains available, while the operational core follows a
+strict dependency rule:
+
+```text
+Flutter Views / MVC Controllers / Public Facades
+                         ↓
+                 Application Use Cases
+                         ↓
+                       Domain
+                         ↑
+Infrastructure implements Application ports
+Composition Roots wire concrete implementations
+```
+
+Two entrypoints are available:
+
+```dart
+// Existing projects — full backward compatibility.
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+
+// New integrations — package-owned API without third-party re-exports.
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator_api.dart';
+```
+
+Existing usage continues unchanged:
+
+```dart
+final service = GeniusPdfService();
+final result = await service.generate(
+  builder: builder,
+  fileName: 'report',
+);
+```
+
+New code can use the stable facade:
+
+```dart
+const client = GeniusPdfClient();
+final result = await client.generate(
+  builder: builder,
+  fileName: 'report',
+);
+```
+
+Highlights of the 3.7 architecture:
+
+- Domain and Application are framework/plugin independent.
+- Controllers do not construct Infrastructure adapters.
+- Explicit composition roots own dependency wiring.
+- Preview and print-preview widgets delegate platform actions to controllers.
+- Background generation supports builder-owned isolate-safe strategies and a
+  safe fallback for legacy builders.
+- Retries and recurring jobs use fresh builder factories.
+- Legacy source paths and public service signatures are preserved.
+
+See [ARCHITECTURE.md](ARCHITECTURE.md), [MIGRATION.md](MIGRATION.md), and
+[ARCHITECTURE_EVALUATION_FINAL_AR.md](ARCHITECTURE_EVALUATION_FINAL_AR).
+
+---
+
 ## Features
 
 ### ✨ **Clean Architecture**

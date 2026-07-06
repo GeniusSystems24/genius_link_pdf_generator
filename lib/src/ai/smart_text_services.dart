@@ -253,7 +253,7 @@ class GeniusSmartTextServices {
 
       // Length score (prefer medium-length sentences)
       final lengthScore = 1.0 - (sentence.length - 100).abs() / 200;
-      score += lengthScore.clamp(0.0, 0.3);
+      score += lengthScore.clamp(0.0, 0.3).toDouble();
 
       // Keywords indicator score
       if (_containsImportantKeywords(sentence)) {

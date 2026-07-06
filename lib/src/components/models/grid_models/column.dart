@@ -1,0 +1,417 @@
+part of '../grid_models.dart';
+
+/// Represents a column definition for [GeniusPdfDataGrid].
+///
+/// Enhanced column with support for:
+/// - Bilingual titles (English/Arabic)
+/// - Multiple alignment options
+/// - Custom styling for header and cells
+/// - Value formatting functions
+/// - Width constraints
+/// - Sorting indicators
+///
+/// ## Example
+/// ```dart
+/// GeniusPdfGridColumn(
+///   id: 'total',
+///   title: 'Total',
+///   titleAr: 'الإجمالي',
+///   alignment: GeniusPdfTextAlign.end,
+///   isNumeric: true,
+///   valueFormatter: (v) => '\$${v.toStringAsFixed(2)}',
+/// )
+/// ```
+class GeniusPdfGridColumn {
+  const GeniusPdfGridColumn({
+    required this.id,
+    required this.title,
+    this.titleAr,
+    this.subtitle,
+    this.subtitleAr,
+    this.width,
+    this.widthPercent,
+    this.minWidth,
+    this.maxWidth,
+    this.flexFactor,
+    this.alignment = GeniusPdfTextAlign.start,
+    this.verticalAlignment = GeniusPdfVerticalAlign.top,
+    this.headerAlignment,
+    this.headerStyle,
+    this.cellStyle,
+    this.cellStyleBuilder,
+    this.valueFormatter,
+    this.isNumeric = false,
+    this.isVisible = true,
+    this.isSortable = false,
+    this.sortDirection,
+    this.wrapText = false,
+    this.maxLines,
+    this.ellipsis = '...',
+    this.tooltip,
+    this.tooltipAr,
+  });
+
+  /// Creates a numeric column with right alignment.
+  factory GeniusPdfGridColumn.numeric(
+      {required String id,
+      required String title,
+      String? titleAr,
+      double? width,
+      double? widthPercent,
+      double? minWidth,
+      bool isNumeric = true,
+      GeniusPdfCellStyle? headerStyle,
+      GeniusPdfCellStyle? cellStyle,
+      String Function(dynamic value)? valueFormatter,
+      int decimalPlaces = 2,
+      bool showThousandSeparator = true,
+      GeniusPdfTextAlign alignment = GeniusPdfTextAlign.start}) {
+    return GeniusPdfGridColumn(
+      id: id,
+      title: title,
+      titleAr: titleAr,
+      width: width,
+      widthPercent: widthPercent,
+      minWidth: minWidth ?? 60,
+      alignment: alignment,
+      headerStyle: headerStyle,
+      cellStyle: cellStyle,
+      isNumeric: isNumeric,
+      valueFormatter: valueFormatter ??
+          (value) {
+            if (value == null) return '';
+            final number =
+                value is num ? value : double.tryParse(value.toString());
+            if (number == null) return value.toString();
+            final formatted = number.toStringAsFixed(decimalPlaces);
+            if (showThousandSeparator) {
+              return _formatWithThousandSeparator(formatted);
+            }
+            return formatted;
+          },
+    );
+  }
+
+  /// Creates a currency column with formatting.
+  factory GeniusPdfGridColumn.currency({
+    required String id,
+    required String title,
+    String? titleAr,
+    double? width,
+    double? widthPercent,
+    double? minWidth,
+    String currencySymbol = 'SAR',
+    int decimalPlaces = 2,
+    bool currencyBefore = false,
+    bool showThousandSeparator = true,
+    bool isNumeric = true,
+    GeniusPdfCellStyle? headerStyle,
+    GeniusPdfCellStyle? cellStyle,
+    GeniusPdfCellStyle? Function(dynamic value)? cellStyleBuilder,
+    GeniusPdfTextAlign alignment = GeniusPdfTextAlign.end,
+  }) {
+    return GeniusPdfGridColumn(
+      id: id,
+      title: title,
+      titleAr: titleAr,
+      width: width,
+      widthPercent: widthPercent,
+      minWidth: minWidth ?? 80,
+      alignment: alignment,
+      headerStyle: headerStyle,
+      cellStyle: cellStyle,
+      cellStyleBuilder: cellStyleBuilder,
+      isNumeric: isNumeric,
+      valueFormatter: (value) {
+        if (value == null) return '';
+        final number = value is num ? value : double.tryParse(value.toString());
+        if (number == null) return value.toString();
+        var formatted = number.toStringAsFixed(decimalPlaces);
+        if (showThousandSeparator) {
+          formatted = _formatWithThousandSeparator(formatted);
+        }
+        return currencyBefore
+            ? '$currencySymbol $formatted'
+            : '$formatted $currencySymbol';
+      },
+    );
+  }
+
+  /// Creates a percentage column.
+  factory GeniusPdfGridColumn.percentage({
+    required String id,
+    required String title,
+    String? titleAr,
+    double? width,
+    int decimalPlaces = 1,
+    GeniusPdfCellStyle? headerStyle,
+    GeniusPdfCellStyle? cellStyle,
+  }) {
+    return GeniusPdfGridColumn(
+      id: id,
+      title: title,
+      titleAr: titleAr,
+      width: width,
+      minWidth: 50,
+      alignment: GeniusPdfTextAlign.center,
+      headerStyle: headerStyle,
+      cellStyle: cellStyle,
+      isNumeric: true,
+      valueFormatter: (value) {
+        if (value == null) return '';
+        final number = value is num ? value : double.tryParse(value.toString());
+        if (number == null) return value.toString();
+        return '${number.toStringAsFixed(decimalPlaces)}%';
+      },
+    );
+  }
+
+  /// Creates a date column.
+  factory GeniusPdfGridColumn.date({
+    required String id,
+    required String title,
+    String? titleAr,
+    double? width,
+    String dateFormat = 'dd/MM/yyyy',
+    GeniusPdfCellStyle? headerStyle,
+    GeniusPdfCellStyle? cellStyle,
+    GeniusPdfTextAlign alignment = GeniusPdfTextAlign.start,
+  }) {
+    return GeniusPdfGridColumn(
+      id: id,
+      title: title,
+      titleAr: titleAr,
+      width: width ?? 80,
+      alignment: alignment,
+      headerStyle: headerStyle,
+      cellStyle: cellStyle,
+      valueFormatter: (value) {
+        if (value == null) return '';
+        if (value is DateTime) {
+          return _formatDate(value, dateFormat);
+        }
+        if (value is String) {
+          final parsed = DateTime.tryParse(value);
+          if (parsed != null) {
+            return _formatDate(parsed, dateFormat);
+          }
+        }
+        return value.toString();
+      },
+    );
+  }
+
+  /// Creates a status/badge column with conditional formatting.
+  factory GeniusPdfGridColumn.status(
+      {required String id,
+      required String title,
+      String? titleAr,
+      double? width,
+      Map<String, Color>? statusColors,
+      GeniusPdfCellStyle? headerStyle,
+      GeniusPdfTextAlign alignment = GeniusPdfTextAlign.center}) {
+    return GeniusPdfGridColumn(
+      id: id,
+      title: title,
+      titleAr: titleAr,
+      width: width ?? 80,
+      alignment: alignment,
+      headerStyle: headerStyle,
+      cellStyle: statusColors != null
+          ? GeniusPdfCellStyle(
+              textStyle: GeniusPdfTextStyle(
+                fontSize: 9,
+                alignment: alignment,
+              ),
+            )
+          : null,
+    );
+  }
+
+  /// Unique identifier for this column.
+  final String id;
+
+  /// Display title (English or default).
+  final String title;
+
+  /// Arabic title (optional).
+  final String? titleAr;
+
+  /// Subtitle under the main title.
+  final String? subtitle;
+
+  /// Arabic subtitle.
+  final String? subtitleAr;
+
+  /// Fixed width for this column.
+  final double? width;
+
+  /// Percentage-based width (0.0 to 1.0). Takes priority over flexFactor.
+  /// Example: 0.3 means 30% of available width.
+  final double? widthPercent;
+
+  /// Minimum width constraint.
+  final double? minWidth;
+
+  /// Maximum width constraint.
+  final double? maxWidth;
+
+  /// Flex factor for proportional sizing.
+  final int? flexFactor;
+
+  /// Text alignment for cell content.
+  final GeniusPdfTextAlign alignment;
+
+  /// Vertical alignment for cell content.
+  final GeniusPdfVerticalAlign verticalAlignment;
+
+  /// Header-specific alignment (falls back to alignment if null).
+  final GeniusPdfTextAlign? headerAlignment;
+
+  /// Custom header style.
+  final GeniusPdfCellStyle? headerStyle;
+
+  /// Custom cell style for data rows.
+  final GeniusPdfCellStyle? cellStyle;
+
+  /// Function to dynamically determine cell style based on value.
+  final GeniusPdfCellStyle? Function(dynamic value)? cellStyleBuilder;
+
+  /// Function to format cell values.
+  final String Function(dynamic value)? valueFormatter;
+
+  /// Whether this column contains numeric data.
+  final bool isNumeric;
+
+  /// Whether this column is visible.
+  final bool isVisible;
+
+  /// Whether this column is sortable.
+  final bool isSortable;
+
+  /// Current sort direction (null = not sorted, true = ascending, false = descending).
+  final bool? sortDirection;
+
+  /// Whether to wrap text in cells.
+  final bool wrapText;
+
+  /// Maximum number of lines when wrapping.
+  final int? maxLines;
+
+  /// Ellipsis text for truncated content.
+  final String ellipsis;
+
+  /// Tooltip for header (English).
+  final String? tooltip;
+
+  /// Tooltip for header (Arabic).
+  final String? tooltipAr;
+
+  /// Gets the display title based on locale.
+  String getTitle({bool isArabic = false}) {
+    if (isArabic && titleAr != null) return titleAr!;
+    return title;
+  }
+
+  /// Gets the subtitle based on locale.
+  String? getSubtitle({bool isArabic = false}) {
+    if (isArabic && subtitleAr != null) return subtitleAr;
+    return subtitle;
+  }
+
+  /// Gets the effective header alignment.
+  GeniusPdfTextAlign get effectiveHeaderAlignment =>
+      headerAlignment ?? alignment;
+
+  GeniusPdfGridColumn copyWith({
+    String? id,
+    String? title,
+    String? titleAr,
+    String? subtitle,
+    String? subtitleAr,
+    double? width,
+    double? widthPercent,
+    double? minWidth,
+    double? maxWidth,
+    int? flexFactor,
+    GeniusPdfTextAlign? alignment,
+    GeniusPdfVerticalAlign? verticalAlignment,
+    GeniusPdfTextAlign? headerAlignment,
+    GeniusPdfCellStyle? headerStyle,
+    GeniusPdfCellStyle? cellStyle,
+    GeniusPdfCellStyle? Function(dynamic value)? cellStyleBuilder,
+    String Function(dynamic value)? valueFormatter,
+    bool? isNumeric,
+    bool? isVisible,
+    bool? isSortable,
+    bool? sortDirection,
+    bool? wrapText,
+    int? maxLines,
+    String? ellipsis,
+    String? tooltip,
+    String? tooltipAr,
+  }) {
+    return GeniusPdfGridColumn(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      titleAr: titleAr ?? this.titleAr,
+      subtitle: subtitle ?? this.subtitle,
+      subtitleAr: subtitleAr ?? this.subtitleAr,
+      width: width ?? this.width,
+      widthPercent: widthPercent ?? this.widthPercent,
+      minWidth: minWidth ?? this.minWidth,
+      maxWidth: maxWidth ?? this.maxWidth,
+      flexFactor: flexFactor ?? this.flexFactor,
+      alignment: alignment ?? this.alignment,
+      verticalAlignment: verticalAlignment ?? this.verticalAlignment,
+      headerAlignment: headerAlignment ?? this.headerAlignment,
+      headerStyle: headerStyle ?? this.headerStyle,
+      cellStyle: cellStyle ?? this.cellStyle,
+      cellStyleBuilder: cellStyleBuilder ?? this.cellStyleBuilder,
+      valueFormatter: valueFormatter ?? this.valueFormatter,
+      isNumeric: isNumeric ?? this.isNumeric,
+      isVisible: isVisible ?? this.isVisible,
+      isSortable: isSortable ?? this.isSortable,
+      sortDirection: sortDirection ?? this.sortDirection,
+      wrapText: wrapText ?? this.wrapText,
+      maxLines: maxLines ?? this.maxLines,
+      ellipsis: ellipsis ?? this.ellipsis,
+      tooltip: tooltip ?? this.tooltip,
+      tooltipAr: tooltipAr ?? this.tooltipAr,
+    );
+  }
+
+  /// Helper to format numbers with thousand separators.
+  static String _formatWithThousandSeparator(String number) {
+    final parts = number.split('.');
+    final intPart = parts[0];
+    final decPart = parts.length > 1 ? '.${parts[1]}' : '';
+    final buffer = StringBuffer();
+    int count = 0;
+    for (int i = intPart.length - 1; i >= 0; i--) {
+      if (count > 0 && count % 3 == 0 && intPart[i] != '-') {
+        buffer.write(',');
+      }
+      buffer.write(intPart[i]);
+      count++;
+    }
+    return buffer.toString().split('').reversed.join() + decPart;
+  }
+
+  /// Helper to format dates.
+  static String _formatDate(DateTime date, String format) {
+    var result = format;
+    result = result.replaceAll('yyyy', date.year.toString());
+    result =
+        result.replaceAll('yy', (date.year % 100).toString().padLeft(2, '0'));
+    result = result.replaceAll('MM', date.month.toString().padLeft(2, '0'));
+    result = result.replaceAll('M', date.month.toString());
+    result = result.replaceAll('dd', date.day.toString().padLeft(2, '0'));
+    result = result.replaceAll('d', date.day.toString());
+    result = result.replaceAll('HH', date.hour.toString().padLeft(2, '0'));
+    result = result.replaceAll('H', date.hour.toString());
+    result = result.replaceAll('mm', date.minute.toString().padLeft(2, '0'));
+    result = result.replaceAll('ss', date.second.toString().padLeft(2, '0'));
+    return result;
+  }
+}

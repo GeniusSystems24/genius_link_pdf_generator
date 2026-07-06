@@ -8,7 +8,7 @@
 library;
 
 import 'package:flutter/material.dart' as m;
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates an incoming remittance voucher PDF page.
 ///

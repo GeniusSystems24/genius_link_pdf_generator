@@ -7,7 +7,7 @@
 /// - **20203** Installment Sale — payment received in scheduled installments
 library;
 
-import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import '../voucher_support.dart';
 
 /// Generates a sales voucher PDF page.
 ///
@@ -96,7 +96,7 @@ class SalesVoucher extends GeniusPdfVoucherTemplate {
       labelAr: 'مرجع أمر البيع',
       labelEn: 'Sales Order Reference',
       items: items,
-      columns: items.length.clamp(1, 3),
+      columns: items.length.clamp(1, 3).toInt(),
     );
   }
 

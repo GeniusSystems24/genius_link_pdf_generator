@@ -1,5 +1,2 @@
-export 'genius_rounding_policy.dart';
-export 'genius_money.dart';
-export 'genius_validation_result.dart';
-export 'genius_validation_context.dart';
-export 'genius_financial_validator.dart';
+// Compatibility export. The canonical implementation lives in the domain layer.
+export '../../domain/financial/financial.dart';

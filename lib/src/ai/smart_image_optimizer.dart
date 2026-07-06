@@ -264,7 +264,8 @@ class GeniusSmartImageOptimizer {
     // Estimate quality based on file size and dimensions
     final pixelCount = width * height;
     final bytesPerPixel = imageBytes.length / pixelCount;
-    final estimatedQuality = (bytesPerPixel / 4).clamp(0.0, 1.0);
+    final estimatedQuality =
+        (bytesPerPixel / 4).clamp(0.0, 1.0).toDouble();
 
     // Check if image is too large
     if (width > 4096 || height > 4096) {
