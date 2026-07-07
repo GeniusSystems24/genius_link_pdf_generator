@@ -12,7 +12,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../src/builders/pdf_document_builder.dart';
 import '../../../src/components/components.dart';
-import '../../../src/core/financial/financial.dart';
+import '../../../src/domain/financial/financial.dart';
 import '../../../src/core/pdf_config.dart';
 import '../../../src/extensions/color_extensions.dart';
 import '../../../src/models/pdf_result.dart';

@@ -1,7 +1,7 @@
 # Example Architecture
 
 The example application uses a feature-first structure with explicit MVC and
-Clean Architecture boundaries while keeping the previous import paths working.
+Clean Architecture boundaries.
 
 ## Dependency direction
 
@@ -42,8 +42,6 @@ lib/
 │   ├── infrastructure/platform/
 │   ├── presentation/controllers/
 │   └── presentation/widgets/
-└── screens/, documents/, widgets/, theme/, data/
-    └── Compatibility exports only
 ```
 
 ## MVC mapping
@@ -61,15 +59,11 @@ owns the shared runtime dependencies, including `DemoFileGateway` and
 `DemoDocumentController`. Views do not instantiate `path_provider`,
 `open_file`, or `dart:io` services.
 
-## Compatibility
+## Import policy
 
-The original paths remain available as export shims. For example:
-
-```dart
-import 'package:genius_pdf_example/screens/printing_demo_screen.dart';
-```
-
-The preferred feature path is:
+The feature-first paths are the only supported paths for pages, documents,
+widgets, theme, and sample data. Export-only legacy folders were removed to
+keep the example tree explicit and prevent duplicate import paths.
 
 ```dart
 import 'package:genius_pdf_example/features/printing/presentation/pages/printing_demo_screen.dart';

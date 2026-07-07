@@ -100,6 +100,19 @@ void main() {
     expect(violations, isEmpty, reason: violations.join('\n'));
   });
 
+  test('export-only legacy source directories are not reintroduced', () {
+    final legacyDirectories = [
+      Directory('${packageRoot.path}/lib/src/core/financial'),
+      Directory('${packageRoot.path}/lib/src/widgets'),
+    ];
+
+    final existing = legacyDirectories
+        .where((directory) => directory.existsSync())
+        .map((directory) => directory.path)
+        .toList();
+
+    expect(existing, isEmpty, reason: existing.join('\n'));
+  });
 
   test('stable public facade does not depend on the legacy service facade', () {
     final client = File(

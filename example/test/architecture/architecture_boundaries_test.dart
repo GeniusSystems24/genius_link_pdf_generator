@@ -74,29 +74,21 @@ void main() {
     expect(violations, isEmpty, reason: violations.join('\n'));
   });
 
-  test('legacy folders contain compatibility exports only', () {
-    final violations = <String>[];
-    for (final directory in [
+  test('legacy export-only folders are not reintroduced', () {
+    final legacyDirectories = [
       Directory('lib/screens'),
       Directory('lib/documents'),
       Directory('lib/widgets'),
       Directory('lib/theme'),
       Directory('lib/data'),
-    ]) {
-      for (final file in _dartFiles(directory)) {
-        final lines = file
-            .readAsLinesSync()
-            .where(
-              (line) =>
-                  line.trim().isNotEmpty && !line.trim().startsWith('//'),
-            )
-            .toList();
-        if (lines.any((line) => !line.trimLeft().startsWith('export '))) {
-          violations.add(file.path);
-        }
-      }
-    }
-    expect(violations, isEmpty, reason: violations.join('\n'));
+    ];
+
+    final existing = legacyDirectories
+        .where((directory) => directory.existsSync())
+        .map((directory) => directory.path)
+        .toList();
+
+    expect(existing, isEmpty, reason: existing.join('\n'));
   });
 }
 

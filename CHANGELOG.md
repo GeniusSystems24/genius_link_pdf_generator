@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Removed
+
+- Removed export-only legacy directories from the package and example app.
+- Canonical financial imports now use `src/domain/financial/`.
+- Canonical preview exports now use `src/presentation/`.
+- Removed the example compatibility-import test and added an architecture guard
+  that prevents the legacy folders from being reintroduced.
+
+### Migration
+
+- Replace example imports under `screens/`, `documents/`, `widgets/`, `theme/`,
+  and `data/` with their feature-first, `app`, or `shared` equivalents.
+
 ## [3.7.0] - 2026-07-06
 
 ### Architecture
@@ -36,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a dedicated bootstrap, dependency composition, routing and theme layer.
 - Isolated file-system plugins behind `DemoFileGateway`.
 - Extracted export, printing, sharing and job-manager controllers from Views.
-- Preserved all previous example import paths through compatibility exports.
+- Initially preserved previous example import paths through compatibility exports.
 - Added example architecture, controller, routing and compatibility tests.
 
 ### Compatibility and tests

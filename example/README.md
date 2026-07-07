@@ -22,6 +22,5 @@ flutter test
 - `app`: bootstrap, dependency composition, theme and routing.
 - `features`: feature-owned models, controllers, pages and widgets.
 - `shared`: contracts, platform adapters and reusable UI.
-- legacy folders: compatibility exports for existing imports.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) and [MIGRATION.md](MIGRATION.md).

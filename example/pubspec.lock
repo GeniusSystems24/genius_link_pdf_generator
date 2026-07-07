@@ -166,7 +166,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "3.5.0"
+    version: "3.7.0"
   http:
     dependency: transitive
     description:
@@ -272,7 +272,7 @@ packages:
     source: hosted
     version: "2.0.0"
   open_file:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: open_file
       sha256: b22decdae85b459eac24aeece48f33845c6f16d278a9c63d75c5355345ca236b
@@ -352,7 +352,7 @@ packages:
     source: hosted
     version: "1.1.0"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
@@ -400,7 +400,7 @@ packages:
     source: hosted
     version: "2.3.0"
   pdf:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: pdf
       sha256: "28eacad99bffcce2e05bba24e50153890ad0255294f4dd78a17075a2ba5c8416"
@@ -581,7 +581,7 @@ packages:
     source: hosted
     version: "32.2.9"
   syncfusion_flutter_pdf:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: syncfusion_flutter_pdf
       sha256: f61f1cd074fa3a66404795665db2763c79ccae2414492964db62f6cf6224ac2a

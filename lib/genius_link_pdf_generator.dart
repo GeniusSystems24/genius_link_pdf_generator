@@ -86,7 +86,7 @@ export 'src/core/pdf_config.dart';
 export 'src/core/pdf_assets.dart';
 export 'src/core/pdf_logger.dart';
 export 'src/core/pdf_print_theme.dart';
-export 'src/core/financial/financial.dart';
+export 'src/domain/financial/financial.dart';
 
 // Domain models
 export 'src/models/pdf_image.dart';
@@ -114,7 +114,7 @@ export 'src/services/pdf_security_service.dart';
 export 'src/services/export/export.dart';
 
 // MVC presentation
-export 'src/widgets/pdf_preview.dart';
+export 'src/presentation/views/pdf_preview.dart';
 export 'src/presentation/controllers/genius_pdf_controller.dart';
 export 'src/presentation/controllers/genius_pdf_preview_controller.dart';
 

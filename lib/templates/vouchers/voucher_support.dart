@@ -6,7 +6,7 @@ export 'package:syncfusion_flutter_pdf/pdf.dart';
 
 export '../../src/builders/pdf_document_builder.dart';
 export '../../src/components/components.dart';
-export '../../src/core/financial/financial.dart';
+export '../../src/domain/financial/financial.dart';
 export '../../src/core/pdf_assets.dart';
 export '../../src/core/pdf_config.dart';
 export '../../src/core/pdf_logger.dart';
