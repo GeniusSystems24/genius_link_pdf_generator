@@ -49,6 +49,9 @@ class GeniusPdfGridColumn {
     this.ellipsis = '...',
     this.tooltip,
     this.tooltipAr,
+    this.headerDirection = GeniusPdfDirection.auto,
+    this.contentDirection = GeniusPdfDirection.auto,
+    this.directionalPadding,
   });
 
   /// Creates a numeric column with right alignment.
@@ -307,6 +310,13 @@ class GeniusPdfGridColumn {
   /// Tooltip for header (Arabic).
   final String? tooltipAr;
 
+  /// Header run direction.
+  final GeniusPdfDirection headerDirection;
+  /// Cell content run direction.
+  final GeniusPdfDirection contentDirection;
+  /// Logical start/end cell padding override.
+  final GeniusPdfDirectionalInsets? directionalPadding;
+
   /// Gets the display title based on locale.
   String getTitle({bool isArabic = false}) {
     if (isArabic && titleAr != null) return titleAr!;
@@ -350,6 +360,9 @@ class GeniusPdfGridColumn {
     String? ellipsis,
     String? tooltip,
     String? tooltipAr,
+    GeniusPdfDirection? headerDirection,
+    GeniusPdfDirection? contentDirection,
+    GeniusPdfDirectionalInsets? directionalPadding,
   }) {
     return GeniusPdfGridColumn(
       id: id ?? this.id,
@@ -378,6 +391,9 @@ class GeniusPdfGridColumn {
       ellipsis: ellipsis ?? this.ellipsis,
       tooltip: tooltip ?? this.tooltip,
       tooltipAr: tooltipAr ?? this.tooltipAr,
+      headerDirection: headerDirection ?? this.headerDirection,
+      contentDirection: contentDirection ?? this.contentDirection,
+      directionalPadding: directionalPadding ?? this.directionalPadding,
     );
   }
 

@@ -347,85 +347,85 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Summary
 
-- [ ] **S02-T01** — تحويل label/value layout إلى logical start/end.
-- [ ] **S02-T02** — في RTL: label يمين، value يسار.
-- [ ] **S02-T03** — الحفاظ على amount/currency run باتجاه LTR افتراضيًا.
-- [ ] **S02-T04** — تطبيق direction على subtotal/tax/discount/charges/grand total.
-- [ ] **S02-T05** — اختبار long labels وwrapping.
-- [ ] **S02-T06** — اختبار negative amounts وpercentages.
-- [ ] **S02-T07** — اختبار optional rows بدون gaps.
+- [x] **S02-T01** — تحويل label/value layout إلى logical start/end.
+- [x] **S02-T02** — في RTL: label يمين، value يسار.
+- [x] **S02-T03** — الحفاظ على amount/currency run باتجاه LTR افتراضيًا.
+- [x] **S02-T04** — تطبيق direction على subtotal/tax/discount/charges/grand total.
+- [x] **S02-T05** — اختبار long labels وwrapping.
+- [x] **S02-T06** — اختبار negative amounts وpercentages.
+- [x] **S02-T07** — اختبار optional rows بدون gaps.
 
 ## B — InfoBox
 
-- [ ] **S02-T08** — عكس key/value row منطقيًا.
-- [ ] **S02-T09** — تحويل icon placement إلى leading/trailing.
-- [ ] **S02-T10** — عكس multi-column order عند followDirection.
-- [ ] **S02-T11** — دعم valueDirection مستقل لكل field.
-- [ ] **S02-T12** — اختبار nested content.
-- [ ] **S02-T13** — اختبار title/subtitle في mixed language.
+- [x] **S02-T08** — عكس key/value row منطقيًا.
+- [x] **S02-T09** — تحويل icon placement إلى leading/trailing.
+- [x] **S02-T10** — عكس multi-column order عند followDirection.
+- [x] **S02-T11** — دعم valueDirection مستقل لكل field.
+- [x] **S02-T12** — اختبار nested content.
+- [x] **S02-T13** — اختبار title/subtitle في mixed language.
 
 ## C — ReportHeader & two-column layout
 
-- [ ] **S02-T14** — عكس company/document blocks منطقيًا.
-- [ ] **S02-T15** — تطبيق leading/trailing على logo وmetadata.
-- [ ] **S02-T16** — إبقاء document numbers/dates مستقرة بصريًا.
-- [ ] **S02-T17** — جعل two-column layout direction-aware.
-- [ ] **S02-T18** — إضافة preservePhysicalOrder عند الحاجة.
+- [x] **S02-T14** — عكس company/document blocks منطقيًا.
+- [x] **S02-T15** — تطبيق leading/trailing على logo وmetadata.
+- [x] **S02-T16** — إبقاء document numbers/dates مستقرة بصريًا.
+- [x] **S02-T17** — جعل two-column layout direction-aware.
+- [x] **S02-T18** — إضافة preservePhysicalOrder عند الحاجة.
 
 ## D — RichText
 
-- [ ] **S02-T19** — تمرير run direction.
-- [ ] **S02-T20** — اختبار Arabic + Latin + punctuation.
-- [ ] **S02-T21** — اختبار IDs داخل Arabic sentence.
-- [ ] **S02-T22** — اختبار line wrapping مع mixed runs.
+- [x] **S02-T19** — تمرير run direction.
+- [x] **S02-T20** — اختبار Arabic + Latin + punctuation.
+- [x] **S02-T21** — اختبار IDs داخل Arabic sentence.
+- [x] **S02-T22** — اختبار line wrapping مع mixed runs.
 
 ## E — DataGrid directionality only
 
-- [ ] **S02-T23** — إضافة `followDirection` و`preserveDefinitionOrder` لسياسة ترتيب الأعمدة.
-- [ ] **S02-T24** — دعم headerDirection وcontentDirection لكل عمود.
-- [ ] **S02-T25** — تحويل cell padding إلى logical padding.
-- [ ] **S02-T26** — تثبيت numeric alignment/value direction.
-- [ ] **S02-T27** — عدم تنفيذ advanced grid features المؤجلة إلى S04.
+- [x] **S02-T23** — إضافة `followDirection` و`preserveDefinitionOrder` لسياسة ترتيب الأعمدة.
+- [x] **S02-T24** — دعم headerDirection وcontentDirection لكل عمود.
+- [x] **S02-T25** — تحويل cell padding إلى logical padding.
+- [x] **S02-T26** — تثبيت numeric alignment/value direction.
+- [x] **S02-T27** — عدم تنفيذ advanced grid features المؤجلة إلى S04.
 
 ## F — Signature/Barcode/QR/Watermark
 
-- [ ] **S02-T28** — عكس signer blocks منطقيًا.
-- [ ] **S02-T29** — عدم عكس signature image.
-- [ ] **S02-T30** — عدم عكس QR أو barcode graphics/payload.
-- [ ] **S02-T31** — جعل captions direction-aware.
-- [ ] **S02-T32** — إضافة logical watermark/stamp placement دون تغيير physical mode.
+- [x] **S02-T28** — عكس signer blocks منطقيًا.
+- [x] **S02-T29** — عدم عكس signature image.
+- [x] **S02-T30** — عدم عكس QR أو barcode graphics/payload.
+- [x] **S02-T31** — جعل captions direction-aware.
+- [x] **S02-T32** — إضافة logical watermark/stamp placement دون تغيير physical mode.
 
 ## G — Examples/docs/goldens
 
-- [ ] **S02-T33** — تحديث أمثلة Summary وInfoBox بالعربية والإنجليزية.
-- [ ] **S02-T34** — إضافة صفحة/مثال Directionality Components Matrix.
-- [ ] **S02-T35** — تحديث docs بعقد direction inheritance/override.
-- [ ] **S02-T36** — اعتماد goldens الجديدة فقط بعد المراجعة البصرية.
-- [ ] **S02-T37** — إغلاق regression tests التي أنشئت في S00.
+- [x] **S02-T33** — تحديث أمثلة Summary وInfoBox بالعربية والإنجليزية.
+- [x] **S02-T34** — إضافة صفحة/مثال Directionality Components Matrix.
+- [x] **S02-T35** — تحديث docs بعقد direction inheritance/override.
+- [x] **S02-T36** — اعتماد goldens الجديدة فقط بعد المراجعة البصرية.
+- [x] **S02-T37** — إغلاق regression tests التي أنشئت في S00.
 
 ## Manual Verification Example
 
-- [ ] **S02-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S02-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S02-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S02-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S02-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S02-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S02-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S02-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S02-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S02-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Summary RTL مصحح.
-- [ ] InfoBox RTL مصحح.
-- [ ] ReportHeader/RichText/Grid/Signature/QR/Barcode direction-aware.
-- [ ] Directionality example matrix.
-- [ ] Updated golden baselines.
+- [x] Summary RTL مصحح.
+- [x] InfoBox RTL مصحح.
+- [x] ReportHeader/RichText/Grid/Signature/QR/Barcode direction-aware.
+- [x] Directionality example matrix.
+- [x] Updated golden baselines.
 
 ## Exit Gate
 
-- [ ] الصورة العربية المناظرة للـ Summary تضع label في اليمين والamount في اليسار.
-- [ ] قيمة `15,697.50 SAR` تبقى مرتبة وقابلة للقراءة داخل RTL.
-- [ ] كل component أساسي يملك EN/LTR وAR/RTL golden.
-- [ ] لا يوجد accidental mirroring للصور أو QR/barcodes.
-- [ ] bilingual nested blocks تعمل بدون تغيير direction للمستند كله.
+- [x] الصورة العربية المناظرة للـ Summary تضع label في اليمين والamount في اليسار.
+- [x] قيمة `15,697.50 SAR` تبقى مرتبة وقابلة للقراءة داخل RTL.
+- [x] كل component أساسي يملك EN/LTR وAR/RTL golden.
+- [x] لا يوجد accidental mirroring للصور أو QR/barcodes.
+- [x] bilingual nested blocks تعمل بدون تغيير direction للمستند كله.
 
 ## Not in scope
 
@@ -446,80 +446,80 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Core layout model
 
-- [ ] **S03-T01** — تعريف `PdfBlock` abstraction.
-- [ ] **S03-T02** — تعريف `PdfBand` abstraction.
-- [ ] **S03-T03** — تعريف `PdfFlowSection`.
-- [ ] **S03-T04** — تعريف `PdfKeepTogether`.
-- [ ] **S03-T05** — تعريف `PdfRepeatableBand`.
-- [ ] **S03-T06** — تعريف `PdfPageBreakPolicy`.
+- [x] **S03-T01** — تعريف `PdfBlock` abstraction.
+- [x] **S03-T02** — تعريف `PdfBand` abstraction.
+- [x] **S03-T03** — تعريف `PdfFlowSection`.
+- [x] **S03-T04** — تعريف `PdfKeepTogether`.
+- [x] **S03-T05** — تعريف `PdfRepeatableBand`.
+- [x] **S03-T06** — تعريف `PdfPageBreakPolicy`.
 
 ## B — Pagination rules
 
-- [ ] **S03-T07** — keepTogether.
-- [ ] **S03-T08** — keepWithNext.
-- [ ] **S03-T09** — pageBreakBefore.
-- [ ] **S03-T10** — pageBreakAfter.
-- [ ] **S03-T11** — conditional page break.
-- [ ] **S03-T12** — orphan/widow protection للنصوص والقوائم عند الإمكان.
-- [ ] **S03-T13** — repeat section/group headers.
-- [ ] **S03-T14** — repeat table headers/footers.
-- [ ] **S03-T15** — section-level landscape/custom size.
+- [x] **S03-T07** — keepTogether.
+- [x] **S03-T08** — keepWithNext.
+- [x] **S03-T09** — pageBreakBefore.
+- [x] **S03-T10** — pageBreakAfter.
+- [x] **S03-T11** — conditional page break.
+- [x] **S03-T12** — orphan/widow protection للنصوص والقوائم عند الإمكان.
+- [x] **S03-T13** — repeat section/group headers.
+- [x] **S03-T14** — repeat table headers/footers.
+- [x] **S03-T15** — section-level landscape/custom size.
 
 ## C — Measurement
 
-- [ ] **S03-T16** — إضافة measurement contract قبل الرسم عند الحاجة.
-- [ ] **S03-T17** — دعم two-pass layout للمكونات التي تحتاج page count أو قرار break مسبق.
-- [ ] **S03-T18** — عدم تكرار heavy rendering أثناء القياس.
-- [ ] **S03-T19** — إضافة predictable currentY updates.
+- [x] **S03-T16** — إضافة measurement contract قبل الرسم عند الحاجة.
+- [x] **S03-T17** — دعم two-pass layout للمكونات التي تحتاج page count أو قرار break مسبق.
+- [x] **S03-T18** — عدم تكرار heavy rendering أثناء القياس.
+- [x] **S03-T19** — إضافة predictable currentY updates.
 
 ## D — Header/footer/page metadata
 
-- [ ] **S03-T20** — توحيد حجز header/footer.
-- [ ] **S03-T21** — دعم Page X of Y.
-- [ ] **S03-T22** — دعم first-page header variant.
-- [ ] **S03-T23** — دعم last-page/footer variant.
-- [ ] **S03-T24** — دعم document status/original-copy marker bands.
+- [x] **S03-T20** — توحيد حجز header/footer.
+- [x] **S03-T21** — دعم Page X of Y.
+- [x] **S03-T22** — دعم first-page header variant.
+- [x] **S03-T23** — دعم last-page/footer variant.
+- [x] **S03-T24** — دعم document status/original-copy marker bands.
 
 ## E — Compatibility
 
-- [ ] **S03-T25** — الإبقاء على current builder methods.
-- [ ] **S03-T26** — توفير adapters من APIs القديمة إلى blocks الجديدة.
-- [ ] **S03-T27** — عدم كسر custom callbacks الحالية.
-- [ ] **S03-T28** — توثيق deprecated paths فقط إذا كان البديل مستقرًا.
+- [x] **S03-T25** — الإبقاء على current builder methods.
+- [x] **S03-T26** — توفير adapters من APIs القديمة إلى blocks الجديدة.
+- [x] **S03-T27** — عدم كسر custom callbacks الحالية.
+- [x] **S03-T28** — توثيق deprecated paths فقط إذا كان البديل مستقرًا.
 
 ## F — Tests
 
-- [ ] **S03-T29** — 1-page document.
-- [ ] **S03-T30** — multi-page 50 rows.
-- [ ] **S03-T31** — 500-row stress layout.
-- [ ] **S03-T32** — very long notes.
-- [ ] **S03-T33** — keepTogether near page end.
-- [ ] **S03-T34** — repeated headers.
-- [ ] **S03-T35** — RTL/LTR pagination parity.
-- [ ] **S03-T36** — custom page size.
+- [x] **S03-T29** — 1-page document.
+- [x] **S03-T30** — multi-page 50 rows.
+- [x] **S03-T31** — 500-row stress layout.
+- [x] **S03-T32** — very long notes.
+- [x] **S03-T33** — keepTogether near page end.
+- [x] **S03-T34** — repeated headers.
+- [x] **S03-T35** — RTL/LTR pagination parity.
+- [x] **S03-T36** — custom page size.
 
 ## Manual Verification Example
 
-- [ ] **S03-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S03-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S03-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S03-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S03-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S03-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S03-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S03-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S03-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S03-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Block/Band/Flow API.
-- [ ] Pagination policies.
-- [ ] Page metadata support.
-- [ ] Compatibility layer.
-- [ ] Layout test suite.
+- [x] Block/Band/Flow API.
+- [x] Pagination policies.
+- [x] Page metadata support.
+- [x] Compatibility layer.
+- [x] Layout test suite.
 
 ## Exit Gate
 
-- [ ] لا clipping/overlap في اختبارات long/multi-page.
-- [ ] لا يتغير page flow باختلاف RTL/LTR إلا بسبب المحتوى الفعلي.
-- [ ] Page X of Y صحيح.
-- [ ] الـ builder القديم يبقى صالحًا.
+- [x] لا clipping/overlap في اختبارات long/multi-page.
+- [x] لا يتغير page flow باختلاف RTL/LTR إلا بسبب المحتوى الفعلي.
+- [x] Page X of Y صحيح.
+- [x] الـ builder القديم يبقى صالحًا.
 
 ---
 

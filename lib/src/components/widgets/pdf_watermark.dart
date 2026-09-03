@@ -5,6 +5,8 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../core/pdf_config.dart';
+import '../../core/directionality.dart';
+import '../../core/component_directionality.dart';
 import '../models/security_models.dart';
 
 /// مكون العلامة المائية للـ PDF
@@ -13,7 +15,25 @@ class GeniusPdfWatermark {
   GeniusPdfWatermark({
     required this.settings,
     required this.config,
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
+    this.followDirection = false,
   });
+
+  /// Opts a watermark into logical horizontal placement.
+  factory GeniusPdfWatermark.directional(
+    GeniusWatermarkSettings settings, {
+    required GeniusPdfConfig config,
+    GeniusPdfDirectionality? directionality,
+    GeniusPdfDirection direction = GeniusPdfDirection.auto,
+  }) =>
+      GeniusPdfWatermark(
+        settings: settings,
+        config: config,
+        directionality: directionality,
+        direction: direction,
+        followDirection: true,
+      );
 
   /// إنشاء علامة مائية نصية
   factory GeniusPdfWatermark.text(
@@ -109,6 +129,18 @@ class GeniusPdfWatermark {
   /// PDF configuration.
   final GeniusPdfConfig config;
 
+  final GeniusPdfDirectionality? directionality;
+  final GeniusPdfDirection direction;
+  /// False preserves the legacy physical placement mode.
+  final bool followDirection;
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+  bool get _isRtl => _effectiveDirectionality.resolve().direction == GeniusPdfResolvedDirection.rtl;
+
   /// الخط الأساسي (مطلوب للنصوص العربية)
   PdfFont get baseFont => config.baseFont;
 
@@ -175,7 +207,7 @@ class GeniusPdfWatermark {
     final textSize = font.measureString(settings.text);
 
     // Calculate position
-    final position = _calculatePosition(settings.position, pageSize, textSize);
+    final position = _calculatePosition(_logicalPosition(settings.position), pageSize, textSize);
 
     // Save graphics state
     graphics.save();
@@ -207,7 +239,7 @@ class GeniusPdfWatermark {
       format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
           lineAlignment: PdfVerticalAlignment.middle,
-          textDirection: config.pdfTextDirection),
+          textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)),
     );
 
     // Restore graphics state
@@ -252,7 +284,7 @@ class GeniusPdfWatermark {
 
     // Calculate position
     final rawPosition =
-        _calculatePosition(settings.position, pageSize, Size(width, height));
+        _calculatePosition(_logicalPosition(settings.position), pageSize, Size(width, height));
     final maxX = pageSize.width - width;
     final maxY = pageSize.height - height;
     final position = Offset(
@@ -330,7 +362,7 @@ class GeniusPdfWatermark {
       format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
           lineAlignment: PdfVerticalAlignment.middle,
-          textDirection: config.pdfTextDirection),
+          textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)),
     );
 
     // Restore graphics state
@@ -399,7 +431,7 @@ class GeniusPdfWatermark {
           format: PdfStringFormat(
               alignment: PdfTextAlignment.center,
               lineAlignment: PdfVerticalAlignment.middle,
-              textDirection: config.pdfTextDirection),
+              textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)),
         );
 
         graphics.restore();
@@ -408,6 +440,24 @@ class GeniusPdfWatermark {
 
     // Restore graphics state
     graphics.restore();
+  }
+
+  GeniusWatermarkPosition _logicalPosition(
+    GeniusWatermarkPosition position,
+  ) {
+    if (!followDirection || !_isRtl) return position;
+    return switch (position) {
+      GeniusWatermarkPosition.topLeft => GeniusWatermarkPosition.topRight,
+      GeniusWatermarkPosition.topRight => GeniusWatermarkPosition.topLeft,
+      GeniusWatermarkPosition.bottomLeft => GeniusWatermarkPosition.bottomRight,
+      GeniusWatermarkPosition.bottomRight => GeniusWatermarkPosition.bottomLeft,
+      GeniusWatermarkPosition.centerLeft => GeniusWatermarkPosition.centerRight,
+      GeniusWatermarkPosition.centerRight => GeniusWatermarkPosition.centerLeft,
+      GeniusWatermarkPosition.center => GeniusWatermarkPosition.center,
+      GeniusWatermarkPosition.topCenter => GeniusWatermarkPosition.topCenter,
+      GeniusWatermarkPosition.bottomCenter => GeniusWatermarkPosition.bottomCenter,
+      GeniusWatermarkPosition.fill => GeniusWatermarkPosition.fill,
+    };
   }
 
   Offset _calculatePosition(

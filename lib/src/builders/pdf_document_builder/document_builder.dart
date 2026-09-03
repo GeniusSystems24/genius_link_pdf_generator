@@ -172,6 +172,7 @@ abstract class GeniusPdfDocumentBuilder implements GeniusPdfBuildSource {
   /// The base font for this document.
   PdfFont get baseFont => config.baseFont;
 
+
   /// The string format for this document (RTL/LTR).
   PdfStringFormat get format => _format;
 
@@ -1025,7 +1026,7 @@ abstract class GeniusPdfDocumentBuilder implements GeniusPdfBuildSource {
     GeniusPdfSummarySection summary, {
     double spacing = 0,
   }) {
-    final estimatedHeight = summary.estimateHeight() + spacing;
+    final estimatedHeight = summary.estimateHeight(pageWidth) + spacing;
     final page = _ensureSpace(estimatedHeight);
     final drawY = _currentY + spacing;
 
@@ -1540,6 +1541,7 @@ abstract class GeniusPdfDocumentBuilder implements GeniusPdfBuildSource {
   ///   gap: 15,
   /// );
   /// ```
+
   void addTwoColumns({
     required double Function(PdfPage page, Rect bounds) leftContent,
     required double Function(PdfPage page, Rect bounds) rightContent,
@@ -1547,20 +1549,52 @@ abstract class GeniusPdfDocumentBuilder implements GeniusPdfBuildSource {
     double gap = 10,
     double leftFlex = 1,
     double rightFlex = 1,
+    bool followDirection = true,
+    bool preservePhysicalOrder = false,
   }) {
     final drawY = _currentY + spacing;
     final page = currentPage;
-    final totalFlex = leftFlex + rightFlex;
-    final leftWidth = (pageWidth - gap) * (leftFlex / totalFlex);
-    final rightWidth = (pageWidth - gap) * (rightFlex / totalFlex);
+
+    final mirrorColumns =
+        followDirection &&
+        !preservePhysicalOrder &&
+        resolvedLayoutDirection == GeniusPdfResolvedDirection.rtl;
+
+    // `leftContent` and `rightContent` describe the logical definition order.
+    // In RTL, followDirection mirrors that order unless the caller explicitly
+    // requests preservation of the physical left/right arrangement.
+    final physicalLeftFlex = mirrorColumns ? rightFlex : leftFlex;
+    final physicalRightFlex = mirrorColumns ? leftFlex : rightFlex;
+    final totalFlex = physicalLeftFlex + physicalRightFlex;
+
+    if (totalFlex <= 0) {
+      throw ArgumentError.value(
+        totalFlex,
+        'leftFlex/rightFlex',
+        'The sum of column flex values must be greater than zero.',
+      );
+    }
+
+    final leftWidth =
+        (pageWidth - gap) * (physicalLeftFlex / totalFlex);
+    final rightWidth =
+        (pageWidth - gap) * (physicalRightFlex / totalFlex);
     final availHeight = remainingHeight - spacing;
 
     GeniusPdfLogger.debug(
-      'Drawing two columns at Y=$drawY (left=${leftWidth.toStringAsFixed(0)}, right=${rightWidth.toStringAsFixed(0)})',
+      'Drawing two columns at Y=$drawY '
+      '(left=${leftWidth.toStringAsFixed(0)}, '
+      'right=${rightWidth.toStringAsFixed(0)}, '
+      'mirrored=$mirrorColumns)',
       tag: 'Builder',
     );
 
-    final leftBounds = Rect.fromLTWH(0, drawY, leftWidth, availHeight);
+    final leftBounds = Rect.fromLTWH(
+      0,
+      drawY,
+      leftWidth,
+      availHeight,
+    );
     final rightBounds = Rect.fromLTWH(
       leftWidth + gap,
       drawY,
@@ -1568,14 +1602,21 @@ abstract class GeniusPdfDocumentBuilder implements GeniusPdfBuildSource {
       availHeight,
     );
 
-    final leftHeight = leftContent(page, leftBounds);
-    final rightHeight = rightContent(page, rightBounds);
+    final physicalLeftContent =
+        mirrorColumns ? rightContent : leftContent;
+    final physicalRightContent =
+        mirrorColumns ? leftContent : rightContent;
 
-    final maxHeight = leftHeight > rightHeight ? leftHeight : rightHeight;
+    final leftHeight = physicalLeftContent(page, leftBounds);
+    final rightHeight = physicalRightContent(page, rightBounds);
+
+    final maxHeight =
+        leftHeight > rightHeight ? leftHeight : rightHeight;
     _currentY = drawY + maxHeight;
 
     GeniusPdfLogger.debug(
-      'Two columns drawn → Y=${_currentY.toStringAsFixed(1)} (left=$leftHeight, right=$rightHeight)',
+      'Two columns drawn → Y=${_currentY.toStringAsFixed(1)} '
+      '(left=$leftHeight, right=$rightHeight)',
       tag: 'Builder',
     );
   }

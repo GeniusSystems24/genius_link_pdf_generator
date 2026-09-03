@@ -94,6 +94,22 @@ class DashboardHome extends StatelessWidget {
 
           Row(
             children: [
+              _QuickActionCard(
+                label: 'S03 Flow Layout',
+                icon: Icons.view_stream_rounded,
+                color: AppColors.info,
+                onTap: () => onNavigate('s03_flow_layout'),
+                isDark: isDark,
+              ),
+              const SizedBox(width: 16),
+              _QuickActionCard(
+                label: 'S02 Components RTL',
+                icon: Icons.compare_arrows_rounded,
+                color: AppColors.info,
+                onTap: () => onNavigate('s02_components_rtl'),
+                isDark: isDark,
+              ),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

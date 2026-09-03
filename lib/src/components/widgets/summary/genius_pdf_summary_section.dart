@@ -65,6 +65,9 @@ class GeniusPdfSummarySection {
     GeniusPdfSummaryStyle? style,
     this.alignment = GeniusPdfSummaryAlignment.right,
     this.width,
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
+    this.hideEmptyValues = false,
   }) : style = _resolveSummaryStyle(style, config);
 
   /// Summary items to display (rendered after all groups).
@@ -85,6 +88,25 @@ class GeniusPdfSummarySection {
   /// PDF configuration.
   final GeniusPdfConfig config;
 
+  /// Inherited S01 context.
+  final GeniusPdfDirectionality? directionality;
+
+  /// Summary-level direction override.
+  final GeniusPdfDirection direction;
+
+  /// Collapse empty optional rows without layout gaps.
+  final bool hideEmptyValues;
+
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+
+  GeniusPdfResolvedDirection get _layoutDirection =>
+      _effectiveDirectionality.resolve().direction;
+
   /// Base font for text.
   PdfFont get baseFont => config.baseFont;
 
@@ -92,7 +114,7 @@ class GeniusPdfSummarySection {
   PdfFont get boldFont => config.boldFont;
 
   /// Whether to use RTL layout.
-  bool get isRTL => config.isRTL;
+  bool get isRTL => _layoutDirection == GeniusPdfResolvedDirection.rtl;
 
   /// Horizontal alignment of the summary box.
   final GeniusPdfSummaryAlignment alignment;
@@ -104,8 +126,8 @@ class GeniusPdfSummarySection {
   ///
   /// This is used by the document builder to decide whether the summary
   /// should stay on the current page or move to the next one intact.
-  double estimateHeight() {
-    final contentHeight = _calculateContentHeight();
+  double estimateHeight([double? availableWidth]) {
+    final contentHeight = _calculateContentHeight(availableWidth);
     return contentHeight + style.padding.top + style.padding.bottom;
   }
 
@@ -115,6 +137,14 @@ class GeniusPdfSummarySection {
   ) {
     if (style != null) return style;
     return GeniusPdfSummaryStyle.fromTheme(config.printTheme);
+  }
+
+  bool _shouldRenderItem(GeniusPdfSummaryItem item) {
+    if (!hideEmptyValues) return true;
+    if (item.customHeight != null && item.label.isEmpty && item.value.isEmpty) {
+      return true;
+    }
+    return item.value.trim().isNotEmpty;
   }
 
   /// Collects all items in order: groups first, then top-level items.
@@ -128,7 +158,7 @@ class GeniusPdfSummarySection {
         result.add(_RenderableItem.groupHeader(group));
         // Group items
         for (final item in group.items) {
-          result.add(_RenderableItem.item(item));
+          if (_shouldRenderItem(item)) result.add(_RenderableItem.item(item));
         }
         // Group separator (space after group, except the last one before items)
         if (gi < groups!.length - 1 || items.isNotEmpty) {
@@ -138,7 +168,7 @@ class GeniusPdfSummarySection {
     }
 
     for (final item in items) {
-      result.add(_RenderableItem.item(item));
+      if (_shouldRenderItem(item)) result.add(_RenderableItem.item(item));
     }
 
     return result;
@@ -173,7 +203,7 @@ class GeniusPdfSummarySection {
     double currentY = boxTop + style.padding.top;
 
     // Calculate total height
-    final boxHeight = estimateHeight();
+    final boxHeight = estimateHeight(bounds.width);
 
     final boxBounds = Rect.fromLTWH(boxLeft, boxTop, actualWidth, boxHeight);
 
@@ -285,7 +315,7 @@ class GeniusPdfSummarySection {
       return currentY + item.customHeight!;
     }
 
-    final itemH = _itemHeight(item);
+    final itemH = _itemHeight(item, contentWidth: contentWidth);
     final indentOffset = item.indent * style.indentWidth;
 
     // Draw highlight background if needed
@@ -348,14 +378,18 @@ class GeniusPdfSummarySection {
     final valueWidth = effectiveContentWidth - labelWidth;
 
     // Draw label
-    final labelX = isRTL
-        ? contentLeft + valueWidth + style.labelValueGap
-        : contentLeft + indentOffset;
+    final labelX = GeniusPdfComponentDirectionality.startX(
+      left: contentLeft,
+      width: contentWidth,
+      itemWidth: labelWidth,
+      direction: _layoutDirection,
+      inset: indentOffset,
+    );
     graphics.drawString(
       item.getLabel(isArabic: isRTL),
       labelFont,
       brush: labelBrush,
-      bounds: Rect.fromLTWH(labelX, currentY, labelWidth, 0),
+      bounds: Rect.fromLTWH(labelX, currentY, labelWidth, itemH),
       format: PdfStringFormat(
         alignment: effectiveLabelStyle.alignment.toPdfTextAlignment(isRTL),
         textDirection: isRTL
@@ -365,19 +399,23 @@ class GeniusPdfSummarySection {
     );
 
     // Draw value
-    final valueX = isRTL
-        ? contentLeft
-        : contentLeft + indentOffset + labelWidth + style.labelValueGap;
+    final valueX = GeniusPdfComponentDirectionality.endX(
+      left: contentLeft,
+      width: contentWidth,
+      itemWidth: valueWidth,
+      direction: _layoutDirection,
+    );
     graphics.drawString(
       item.getFormattedValue(),
       valueFont,
       brush: valueBrush,
-      bounds: Rect.fromLTWH(valueX, currentY, valueWidth, 0),
+      bounds: Rect.fromLTWH(valueX, currentY, valueWidth, itemH),
       format: PdfStringFormat(
         alignment: effectiveValueStyle.alignment.toPdfTextAlignment(isRTL),
-        textDirection: isRTL
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight,
+        textDirection: GeniusPdfComponentDirectionality.valuePdfDirection(
+          context: _effectiveDirectionality,
+          text: item.getFormattedValue(),
+        ),
       ),
     );
 
@@ -477,8 +515,10 @@ class GeniusPdfSummarySection {
   }
 
   /// Calculates the total content height with per-item accuracy (v2.12.5).
-  double _calculateContentHeight() {
+  double _calculateContentHeight([double? availableWidth]) {
     double height = 0;
+    final boxWidth = width ?? ((availableWidth ?? 600) * 0.4);
+    final estimatedContentWidth = boxWidth - style.padding.left - style.padding.right;
 
     // Title height
     if (title != null || titleAr != null) {
@@ -524,14 +564,36 @@ class GeniusPdfSummarySection {
   }
 
   /// Height for a single item, respecting customHeight and per-item fontSize.
-  double _itemHeight(GeniusPdfSummaryItem item) {
+  double _itemHeight(
+    GeniusPdfSummaryItem item, {
+    double? contentWidth,
+  }) {
     if (item.customHeight != null) return item.customHeight!;
-    // Use the larger of label or value font size
     final labelSize = item.labelFontSize ?? style.labelStyle.fontSize;
     final valueSize = item.valueFontSize ?? style.valueStyle.fontSize;
-    final effectiveSize =
-        labelSize > valueSize ? labelSize : valueSize;
-    return effectiveSize * 1.4;
+    final effectiveSize = labelSize > valueSize ? labelSize : valueSize;
+    final lineHeight = effectiveSize * 1.4;
+    if (contentWidth == null || contentWidth <= 0) return lineHeight;
+
+    final indent = item.indent * style.indentWidth;
+    final usable = contentWidth - indent - style.labelValueGap;
+    if (usable <= 0) return lineHeight;
+    final labelWidth = usable * style.labelWidth;
+    final valueWidth = usable - labelWidth;
+
+    int lines(String value, double width, double fontSize) {
+      if (value.isEmpty || width <= 0) return 1;
+      final result = ((value.runes.length * fontSize * 0.55) / width).ceil();
+      return result < 1 ? 1 : result;
+    }
+
+    final labelLines = lines(
+      item.getLabel(isArabic: isRTL),
+      labelWidth,
+      labelSize,
+    );
+    final valueLines = lines(item.getFormattedValue(), valueWidth, valueSize);
+    return lineHeight * (labelLines > valueLines ? labelLines : valueLines);
   }
 }
 

@@ -169,6 +169,22 @@ class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
   // Layout
   // ────────────────────────────────────────────────────────
 
+  /// Queues a deterministic S03 flow section.
+  ///
+  /// The section is measured and paginated only when the composer builds.
+  GeniusPdfReportComposer flowSection(
+    PdfFlowSection section, {
+    PdfFlowPlan? plan,
+  }) {
+    _actions.add(
+      () => addFlowSection(
+        section,
+        plan: plan,
+      ),
+    );
+    return this;
+  }
+
   /// Adds vertical spacing.
   GeniusPdfReportComposer space(double height) {
     _actions.add(() => addSpace(height));
@@ -263,19 +279,33 @@ class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
     return this;
   }
 
+
   /// Adds a two-column layout.
+  ///
+  /// By default the logical column order follows the document direction.
+  /// In RTL, [rightContent] is rendered on the physical left and
+  /// [leftContent] on the physical right.
+  ///
+  /// Set [preservePhysicalOrder] to `true` for legacy/pre-printed layouts
+  /// where the physical left/right order must remain unchanged.
   GeniusPdfReportComposer twoColumns({
     required double Function(PdfPage page, Rect bounds) leftContent,
     required double Function(PdfPage page, Rect bounds) rightContent,
     double spacing = 0,
     double gap = 10,
+    bool followDirection = true,
+    bool preservePhysicalOrder = false,
   }) {
-    _actions.add(() => addTwoColumns(
-          leftContent: leftContent,
-          rightContent: rightContent,
-          spacing: spacing,
-          gap: gap,
-        ));
+    _actions.add(
+      () => addTwoColumns(
+        leftContent: leftContent,
+        rightContent: rightContent,
+        spacing: spacing,
+        gap: gap,
+        followDirection: followDirection,
+        preservePhysicalOrder: preservePhysicalOrder,
+      ),
+    );
     return this;
   }
 

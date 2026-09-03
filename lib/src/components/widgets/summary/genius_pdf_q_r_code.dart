@@ -10,6 +10,8 @@ class GeniusPdfQRCode {
     this.size = 80,
     this.caption,
     this.captionAr,
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
   });
 
   final GeniusPdfConfig config;
@@ -18,9 +20,19 @@ class GeniusPdfQRCode {
   final String? caption;
   final String? captionAr;
 
+  final GeniusPdfDirectionality? directionality;
+  final GeniusPdfDirection direction;
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+  bool get _isRtl => _effectiveDirectionality.resolve().direction == GeniusPdfResolvedDirection.rtl;
+
   /// Gets the display caption based on locale.
   String? getCaption() {
-    if (config.isRTL && captionAr != null) return captionAr;
+    if (_isRtl && captionAr != null) return captionAr;
     return caption;
   }
 
@@ -62,7 +74,7 @@ class GeniusPdfQRCode {
         ),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.pdfTextDirection
+          textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)
         ),
       );
       totalHeight += 16;

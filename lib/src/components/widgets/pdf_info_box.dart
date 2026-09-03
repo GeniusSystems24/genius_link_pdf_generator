@@ -4,6 +4,8 @@ import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfBorderStyle, PdfTextStyle;
 
 import '../../core/pdf_config.dart';
+import '../../core/directionality.dart';
+import '../../core/component_directionality.dart';
 import '../../core/pdf_print_theme.dart';
 import '../../core/pdf_logger.dart';
 import '../../extensions/color_extensions.dart';

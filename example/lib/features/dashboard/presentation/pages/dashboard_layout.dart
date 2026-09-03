@@ -231,6 +231,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   Widget _buildMobileDrawer(bool isDark) {
     final items = [
       _DrawerItem('dashboard', 'Dashboard', Icons.dashboard_rounded),
+      _DrawerItem('s02_components_rtl', 'S02 Components RTL', Icons.compare_arrows_rounded),
+      _DrawerItem('s03_flow_layout', 'S03 Flow Layout', Icons.view_stream_rounded),
       _DrawerItem('s01_directionality', 'S01 Directionality', Icons.swap_horiz_rounded),
       _DrawerItem('s00_baseline', 'S00 Baseline', Icons.fact_check_rounded),
       _DrawerItem('components', 'Components', Icons.widgets_rounded),

@@ -18,6 +18,10 @@ class GeniusPdfInfoBox {
     this.columns = 1,
     this.columnSpacing = 16,
     this.tag,
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
+    this.iconPosition = GeniusPdfLogicalPosition.leading,
+    this.followDirection = true,
   }) : style = _resolveInfoBoxStyle(style, config);
 
   /// Creates an info box from a map of key-value pairs.
@@ -350,21 +354,37 @@ class GeniusPdfInfoBox {
   /// Custom tag for identification.
   final String? tag;
 
+  final GeniusPdfDirectionality? directionality;
+  final GeniusPdfDirection direction;
+  /// Logical leading/trailing header icon placement.
+  final GeniusPdfLogicalPosition iconPosition;
+  /// Mirrors multi-column order when true.
+  final bool followDirection;
+
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+
+  bool get isRTL => _effectiveDirectionality.resolve().direction == GeniusPdfResolvedDirection.rtl;
+
   /// Gets the display title based on locale.
   String? getTitle() {
-    if (config.isRTL && titleAr != null) return titleAr;
+    if (isRTL && titleAr != null) return titleAr;
     return title;
   }
 
   /// Gets the subtitle based on locale.
   String? getSubtitle() {
-    if (config.isRTL && subtitleAr != null) return subtitleAr;
+    if (isRTL && subtitleAr != null) return subtitleAr;
     return subtitle;
   }
 
   /// Gets the footer text based on locale.
   String? getFooter() {
-    if (config.isRTL && footerAr != null) return footerAr;
+    if (isRTL && footerAr != null) return footerAr;
     return footer;
   }
 
@@ -394,6 +414,10 @@ class GeniusPdfInfoBox {
     int? columns,
     double? columnSpacing,
     String? tag,
+    GeniusPdfDirectionality? directionality,
+    GeniusPdfDirection? direction,
+    GeniusPdfLogicalPosition? iconPosition,
+    bool? followDirection,
   }) {
     return GeniusPdfInfoBox(
       config: config,
@@ -412,6 +436,10 @@ class GeniusPdfInfoBox {
       columns: columns ?? this.columns,
       columnSpacing: columnSpacing ?? this.columnSpacing,
       tag: tag ?? this.tag,
+      directionality: directionality ?? this.directionality,
+      direction: direction ?? this.direction,
+      iconPosition: iconPosition ?? this.iconPosition,
+      followDirection: followDirection ?? this.followDirection,
     );
   }
 
@@ -510,7 +538,10 @@ class GeniusPdfInfoBox {
       // Draw icon if present
       if (icon != null) {
         final iconY = currentY + (_getTitleHeight() - style.iconSize) / 2;
-        final iconX = config.isRTL
+        final iconOnRight =
+            (iconPosition == GeniusPdfLogicalPosition.leading && isRTL) ||
+            (iconPosition == GeniusPdfLogicalPosition.trailing && !isRTL);
+        final iconX = iconOnRight
             ? (titleLeft + titleWidth - style.iconSize)
             : titleLeft;
 
@@ -519,7 +550,7 @@ class GeniusPdfInfoBox {
           Rect.fromLTWH(iconX, iconY, style.iconSize, style.iconSize),
         );
 
-        if (config.isRTL) {
+        if (iconOnRight) {
           titleWidth -= style.iconSize + style.iconSpacing;
         } else {
           titleLeft += style.iconSize + style.iconSpacing;
@@ -528,8 +559,8 @@ class GeniusPdfInfoBox {
       }
 
       final titleFormat = PdfStringFormat(
-        alignment: style.titleStyle.alignment.toPdfTextAlignment(config.isRTL),
-        textDirection: config.pdfTextDirection
+        alignment: style.titleStyle.alignment.toPdfTextAlignment(isRTL),
+        textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)
       );
 
       graphics.drawString(
@@ -597,7 +628,8 @@ class GeniusPdfInfoBox {
             col < columns && itemIndex < filteredItems.length;
             col++) {
           final item = filteredItems[itemIndex];
-          final itemLeft = contentLeft + col * (columnWidth + columnSpacing);
+          final physicalColumn = followDirection && isRTL ? columns - 1 - col : col;
+          final itemLeft = contentLeft + physicalColumn * (columnWidth + columnSpacing);
           final drawnHeight = _drawItemValue(
             graphics,
             item,
@@ -652,8 +684,8 @@ class GeniusPdfInfoBox {
 
       final footerFormat = PdfStringFormat(
         alignment:
-            effectiveFooterStyle.alignment.toPdfTextAlignment(config.isRTL),
-        textDirection: config.pdfTextDirection
+            effectiveFooterStyle.alignment.toPdfTextAlignment(isRTL),
+        textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)
       );
 
       graphics.drawString(
@@ -677,7 +709,7 @@ class GeniusPdfInfoBox {
     GeniusPdfLabeledValue item,
     Rect bounds,
   ) {
-    final labelText = config.isRTL && item.labelAr != null
+    final labelText = isRTL && item.labelAr != null
         ? item.labelAr!
         : item.label;
     final valueText = item.value.isEmpty ? emptyItemPlaceholder : item.value;
@@ -689,12 +721,16 @@ class GeniusPdfInfoBox {
     final labelFont = labelStyle.isBold ? boldFont : baseFont;
     final valueFont = valueStyle.isBold ? boldFont : baseFont;
     final labelFormat = PdfStringFormat(
-      alignment: labelStyle.alignment.toPdfTextAlignment(config.isRTL),
-      textDirection: config.pdfTextDirection,
+      alignment: labelStyle.alignment.toPdfTextAlignment(isRTL),
+      textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction),
     );
     final valueFormat = PdfStringFormat(
-      alignment: valueStyle.alignment.toPdfTextAlignment(config.isRTL),
-      textDirection: config.pdfTextDirection,
+      alignment: valueStyle.alignment.toPdfTextAlignment(isRTL),
+      textDirection: GeniusPdfComponentDirectionality.valuePdfDirection(
+        context: _effectiveDirectionality,
+        text: valueText,
+        explicitDirection: item.valueDirection,
+      ),
     );
     final labelHeight = labelStyle.fontSize * 1.2;
     final valueHeight = valueStyle.fontSize * 1.2;
@@ -746,7 +782,7 @@ class GeniusPdfInfoBox {
     Rect labelBounds;
     Rect valueBounds;
     if (style.labelValueLayout == GeniusPdfLabelValueLayout.valueFirst) {
-      if (config.isRTL) {
+      if (isRTL) {
         valueBounds = Rect.fromLTWH(
           bounds.left + clampedLabelWidth + gap,
           bounds.top,
@@ -769,7 +805,7 @@ class GeniusPdfInfoBox {
           0,
         );
       }
-    } else if (config.isRTL) {
+    } else if (isRTL) {
       valueBounds =
           Rect.fromLTWH(bounds.left, bounds.top, valueWidth, 0);
       labelBounds = Rect.fromLTWH(

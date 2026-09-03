@@ -23,6 +23,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.0] - 2026-09-03
 
+### S03 — Flow Layout, Blocks, Bands & Pagination Engine
+
+#### Added
+
+- Added `PdfBlock`, `PdfBand`, `PdfFlowSection`, `PdfKeepTogether`,
+  `PdfRepeatableBand`, and `PdfPageBreakPolicy`.
+- Added deterministic two-pass `planFlowSection()` / `addFlowSection()`.
+- Added measurement caching and strict measurement/render-height validation.
+- Added `keepTogether`, `keepWithNext`, before/after and conditional page
+  breaks.
+- Added orphan/widow-aware `PdfTextBlock` and `PdfListBlock` splitting.
+- Added repeatable section/group/table header/footer band semantics.
+- Added `PdfFlowPageSpec` for section-level landscape/custom page sizes.
+- Added unified page-chrome reservation using both existing builder
+  header/footer heights and flow bands.
+- Added `PdfPageNumberBand`, first-page header, last-page footer and
+  `PdfDocumentMarkerBand` support.
+- Added `PdfLegacyCallbackBlock` for existing `(PdfPage, Rect)` callbacks.
+- Added `GeniusPdfReportComposer.flowSection()`.
+
+#### Compatibility
+
+- Existing builder methods remain available and are not deprecated in S03.
+- Existing custom callback signatures remain valid.
+- Custom section page settings are restored after the flow section.
+
+#### Tests and example
+
+- Added 1-page, 50-row, 500-row, long-note, keep-together,
+  repeatable-header, RTL/LTR parity, custom-page-size, two-pass and legacy
+  adapter tests.
+- Added `S03FlowLayoutVerificationPage` and registered it in Dashboard,
+  desktop sidebar, mobile drawer and Dashboard Home.
+- Added `docs/sprints/s03/FLOW_LAYOUT_CONTRACT.md`.
+- Added `docs/sprints/s03/S03_IMPLEMENTATION_STATUS.md`.
+
+
+
+#### S03 analyzer repair
+
+- Flow-layout bands use the existing `GeniusPdfConfig` font getters directly,
+  preserving template classes that already define nullable font fields.
+- Removed the unused local from the S03 page render pass.
+- Migrated `PdfLegacyCallbackBlock` and `PdfListBlock` forwarding parameters
+  to Dart super parameters.
+- Added `PdfSpacerBlock`, `PdfPageBreakBlock`, `PdfSectionHeaderBand`,
+  `PdfGroupHeaderBand`, `PdfTableHeaderBand`, `PdfTableFooterBand`,
+  `PdfStatusMarkerBand`, and `PdfOriginalCopyBand`.
+
+
+#### S03 font override compatibility fix
+
+- Removed S03-added `boldFont`, `headerFont`, and `smallFont` getters from
+  `GeniusPdfDocumentBuilder`.
+- Updated flow bands to use `builder.config.boldFont`,
+  `builder.config.headerFont`, and `builder.config.smallFont`.
+- Preserved existing nullable template fields such as `PdfFont? boldFont`
+  without forcing mass template API changes.
+
+### S02 — Directionality Migration for Existing Components
+
+- Fixed Summary RTL logical label/value geometry and kept structured
+  amounts/percentages/IDs LTR without reversing strings.
+- Added long-label sizing and optional empty-row collapse to Summary.
+- Migrated InfoBox key/value geometry, leading/trailing icons, directional
+  multi-column order and independent field `valueDirection`.
+- Migrated ReportHeader block/logo/metadata direction and isolated
+  document/reference/date values inside RTL labels.
+- Made builder/composer two-column layouts direction-aware with
+  `preservePhysicalOrder`.
+- Added package-owned per-run RichText direction while retaining legacy
+  direction override compatibility.
+- Added DataGrid `followDirection`, `preserveDefinitionOrder`,
+  per-column `headerDirection`/`contentDirection`, logical padding and stable
+  numeric direction/alignment; advanced S04 grid work is intentionally excluded.
+- Kept signature/QR/barcode pixels and payloads unmirrored; captions follow
+  component direction.
+- Added opt-in logical watermark placement while keeping legacy physical mode.
+- Added S02 semantic/source-contract tests, golden candidate manifest,
+  Dashboard verification matrix and S02 directionality docs.
+
 #### S01 completion audit
 
 - Added logical API guards for start/end and leading/trailing semantics.

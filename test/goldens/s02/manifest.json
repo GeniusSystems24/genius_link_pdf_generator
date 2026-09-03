@@ -1,0 +1,41 @@
+{
+  "sprint": "S02",
+  "version": "4.0.0",
+  "status": "pending_visual_approval",
+  "components": {
+    "summary": [
+      "en_ltr",
+      "ar_rtl",
+      "rtl_long",
+      "rtl_negative",
+      "rtl_optional"
+    ],
+    "info_box": [
+      "en_ltr",
+      "ar_rtl",
+      "rtl_multicolumn",
+      "mixed_value_direction"
+    ],
+    "report_header": [
+      "en_ltr",
+      "ar_rtl",
+      "bilingual_ids_dates"
+    ],
+    "rich_text": [
+      "mixed_punctuation",
+      "id_in_arabic",
+      "mixed_wrapping"
+    ],
+    "data_grid": [
+      "ltr",
+      "rtl_follow_direction",
+      "rtl_preserve_order",
+      "rtl_numeric"
+    ],
+    "media": [
+      "signature",
+      "qr_barcode",
+      "logical_watermark"
+    ]
+  }
+}

@@ -10,6 +10,8 @@ class GeniusPdfRichText {
     this.boldItalicFont,
     GeniusPdfTextStyle? defaultStyle,
     bool? isRTL,
+    GeniusPdfDirectionality? directionality,
+    GeniusPdfDirection direction = GeniusPdfDirection.auto,
     this.lineSpacing = 1.2,
     this.paragraphSpacing = 8,
     GeniusPdfParagraphAlignment? paragraphAlignment,
@@ -19,7 +21,23 @@ class GeniusPdfRichText {
   })  : baseFont = _resolveRichTextBaseFont(baseFont, config),
         boldFont = _resolveRichTextBoldFont(boldFont, baseFont, config),
         defaultStyle = _resolveRichTextDefaultStyle(defaultStyle, config),
-        isRTL = isRTL ?? config.isRTL,
+        _directionality = GeniusPdfComponentDirectionality.context(
+          config: config,
+          inherited: directionality,
+          componentDirection: isRTL == null
+              ? direction
+              : (isRTL ? GeniusPdfDirection.rtl : GeniusPdfDirection.ltr),
+        ),
+        isRTL = GeniusPdfComponentDirectionality.context(
+                  config: config,
+                  inherited: directionality,
+                  componentDirection: isRTL == null
+                      ? direction
+                      : (isRTL
+                          ? GeniusPdfDirection.rtl
+                          : GeniusPdfDirection.ltr),
+                ).resolve().direction ==
+            GeniusPdfResolvedDirection.rtl,
         paragraphAlignment = _resolveRichTextParagraphAlignment(
           paragraphAlignment,
           _resolveRichTextDefaultStyle(defaultStyle, config),
@@ -33,6 +51,9 @@ class GeniusPdfRichText {
 
   /// PDF configuration.
   final GeniusPdfConfig config;
+
+  final GeniusPdfDirectionality _directionality;
+  GeniusPdfDirectionality get directionality => _directionality;
 
   /// Base font for normal text.
   final PdfFont baseFont;
@@ -71,15 +92,24 @@ class GeniusPdfRichText {
   final Map<String, PdfFont> _fontCache = {};
 
   PdfTextDirection _resolveSpanDirection(GeniusPdfTextSpan span) {
+    switch (span.direction) {
+      case GeniusPdfDirection.rtl:
+        return PdfTextDirection.rightToLeft;
+      case GeniusPdfDirection.ltr:
+        return PdfTextDirection.leftToRight;
+      case GeniusPdfDirection.auto:
+        break;
+    }
     switch (span.textDirectionOverride) {
       case TextDirection.rtl:
         return PdfTextDirection.rightToLeft;
       case TextDirection.ltr:
         return PdfTextDirection.leftToRight;
       case null:
-        return isRTL
-            ? PdfTextDirection.rightToLeft
-            : PdfTextDirection.leftToRight;
+        return GeniusPdfComponentDirectionality.valuePdfDirection(
+          context: _directionality,
+          text: span.text,
+        );
     }
   }
 

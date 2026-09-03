@@ -11,6 +11,10 @@ class GeniusPdfSignatureArea {
     this.showDate = true,
     this.dateLabel = 'Date',
     this.dateLabelAr = 'التاريخ',
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
+    this.signatureImage,
+    this.signatureImageHeight = 36,
   });
 
   final GeniusPdfConfig config;
@@ -22,15 +26,29 @@ class GeniusPdfSignatureArea {
   final String dateLabel;
   final String dateLabelAr;
 
+  final GeniusPdfDirectionality? directionality;
+  final GeniusPdfDirection direction;
+  /// Optional signature image; pixels are never mirrored.
+  final GeniusPdfImage? signatureImage;
+  final double signatureImageHeight;
+
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+  bool get _isRtl => _effectiveDirectionality.resolve().direction == GeniusPdfResolvedDirection.rtl;
+
   /// Gets the display title based on locale.
   String? getTitle() {
-    if (config.isRTL && titleAr != null) return titleAr;
+    if (_isRtl && titleAr != null) return titleAr;
     return title;
   }
 
   /// Gets the date label based on locale.
   String getDateLabel() {
-    return config.isRTL ? dateLabelAr : dateLabel;
+    return _isRtl ? dateLabelAr : dateLabel;
   }
 
   /// Draws the signature area on a PDF page.
@@ -54,8 +72,8 @@ class GeniusPdfSignatureArea {
         bounds: Rect.fromLTWH(bounds.left, currentY, bounds.width, 0),
         format: PdfStringFormat(
           alignment:
-              config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-          textDirection: config.pdfTextDirection
+              _isRtl ? PdfTextAlignment.right : PdfTextAlignment.left,
+          textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)
         ),
       );
       currentY += 20;
@@ -63,7 +81,7 @@ class GeniusPdfSignatureArea {
 
     // Draw signature line
     final signatureY = lineY ?? currentY + 30;
-    final lineX = config.isRTL ? bounds.right - lineWidth : bounds.left;
+    final lineX = _isRtl ? bounds.right - lineWidth : bounds.left;
 
     graphics.drawLine(
       PdfPen(const Color(0xFF000000).toPdfColor(), width: 0.5),
@@ -71,9 +89,22 @@ class GeniusPdfSignatureArea {
       Offset(lineX + lineWidth, signatureY),
     );
 
+    if (signatureImage != null) {
+      final image = signatureImage!.scaledToFit(
+        maxWidth: lineWidth,
+        maxHeight: signatureImageHeight,
+      );
+      final imageX = lineX + (lineWidth - image.width) / 2;
+      final imageY = signatureY - image.height - 4;
+      graphics.drawImage(
+        PdfBitmap(image.data),
+        Rect.fromLTWH(imageX, imageY, image.width, image.height),
+      );
+    }
+
     // Draw date line if needed
     if (showDate) {
-      final dateLineX = config.isRTL ? bounds.left : bounds.right - 100;
+      final dateLineX = _isRtl ? bounds.left : bounds.right - 100;
       graphics.drawLine(
         PdfPen(const Color(0xFF000000).toPdfColor(), width: 0.5),
         Offset(dateLineX, signatureY),
@@ -87,7 +118,7 @@ class GeniusPdfSignatureArea {
         bounds: Rect.fromLTWH(dateLineX, signatureY + 2, 100, 0),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.pdfTextDirection
+          textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)
         ),
       );
     }

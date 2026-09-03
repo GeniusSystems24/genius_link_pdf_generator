@@ -31,6 +31,9 @@ class GeniusPdfReportHeader {
     this.tag,
     this.infoGroups,
     this.layoutCalculator = const GeniusPdfHeaderLayoutCalculator(),
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
+    this.preservePhysicalOrder = false,
   }) : style = _resolveHeaderStyle(style, config);
 
   /// Creates a report header for invoices/receipts.
@@ -197,7 +200,7 @@ class GeniusPdfReportHeader {
   PdfFont get boldFont => config.boldFont;
 
   /// Whether to use RTL layout.
-  bool get isRTL => config.isRTL;
+  bool get isRTL => _layoutDirection == GeniusPdfResolvedDirection.rtl;
 
   /// Whether to show print date.
   final bool showPrintDate;
@@ -234,6 +237,21 @@ class GeniusPdfReportHeader {
 
   /// Layout calculator for precise positioning.
   final GeniusPdfHeaderLayoutCalculator layoutCalculator;
+
+  final GeniusPdfDirectionality? directionality;
+  final GeniusPdfDirection direction;
+  /// Preserve physical left/right block order when true.
+  final bool preservePhysicalOrder;
+
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+
+  GeniusPdfResolvedDirection get _layoutDirection =>
+      _effectiveDirectionality.resolve().direction;
 
   static GeniusPdfReportHeaderStyle _resolveHeaderStyle(
     GeniusPdfReportHeaderStyle? style,
@@ -389,11 +407,12 @@ class GeniusPdfReportHeader {
     double contentRight,
     double logoWidth,
   ) {
+    final mirror = isRTL && !preservePhysicalOrder;
     switch (position) {
       case GeniusPdfLogoPosition.end:
-        return isRTL ? contentLeft : contentRight - logoWidth;
+        return mirror ? contentLeft : contentRight - logoWidth;
       case GeniusPdfLogoPosition.start:
-        return isRTL ? contentRight - logoWidth : contentLeft;
+        return mirror ? contentRight - logoWidth : contentLeft;
       case GeniusPdfLogoPosition.center:
       case GeniusPdfLogoPosition.centerTop:
       case GeniusPdfLogoPosition.centerBottom:
@@ -613,8 +632,8 @@ class GeniusPdfReportHeader {
 
     if (showPrintDate && printDate != null) {
       final dateText = isRTL
-          ? 'تاريخ الطباعة: ${_formatDate(printDate!)}'
-          : 'Printed: ${_formatDate(printDate!)}';
+          ? 'تاريخ الطباعة: ${GeniusPdfComponentDirectionality.isolateLtr(_formatDate(printDate!))}'
+          : 'Printed: ${GeniusPdfComponentDirectionality.isolateLtr(_formatDate(printDate!))}';
 
       final dateAlignment = style.showDateOnRight
           ? PdfTextAlignment.right
@@ -983,7 +1002,7 @@ class GeniusPdfReportHeader {
     if (documentNumber != null) {
       final label = getDocumentNumberLabel() ?? 'Doc No';
       graphics.drawString(
-        '$label: $documentNumber',
+        '$label: ${GeniusPdfComponentDirectionality.isolateLtr(documentNumber!)}',
         baseFont,
         brush: dateBrush,
         bounds: Rect.fromLTWH(contentLeft, docY, contentWidth, 0),
@@ -997,7 +1016,7 @@ class GeniusPdfReportHeader {
     if (referenceNumber != null) {
       final label = getReferenceLabel() ?? 'Ref';
       graphics.drawString(
-        '$label: $referenceNumber',
+        '$label: ${GeniusPdfComponentDirectionality.isolateLtr(referenceNumber!)}',
         baseFont,
         brush: dateBrush,
         bounds: Rect.fromLTWH(contentLeft, docY, contentWidth, 0),

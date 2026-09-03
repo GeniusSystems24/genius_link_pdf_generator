@@ -5,6 +5,8 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../core/pdf_config.dart';
+import '../../core/directionality.dart';
+import '../../core/component_directionality.dart';
 import '../../core/pdf_logger.dart';
 import '../../extensions/color_extensions.dart';
 import '../models/pdf_styles.dart';

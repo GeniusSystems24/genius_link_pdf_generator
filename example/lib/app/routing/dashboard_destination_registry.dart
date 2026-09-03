@@ -10,6 +10,8 @@ import 'package:genius_pdf_example/features/dashboard/domain/models/dashboard_de
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/dashboard_home.dart';
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/s00_baseline_regression_verification_page.dart';
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/s01_directionality_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s02_components_rtl_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s03_flow_layout_verification_page.dart';
 import 'package:genius_pdf_example/features/export/presentation/pages/export_demo_screen.dart';
 import 'package:genius_pdf_example/features/job_manager/presentation/pages/job_manager_demo_screen.dart';
 import 'package:genius_pdf_example/features/modern_vouchers/presentation/pages/modern_vouchers_demo_screen.dart';
@@ -27,6 +29,8 @@ final class DashboardDestinationRegistry {
     DashboardDestination(id: 'dashboard', title: 'Dashboard'),
     DashboardDestination(id: 's00_baseline', title: 'S00 Baseline'),
     DashboardDestination(id: 's01_directionality', title: 'S01 Directionality'),
+    DashboardDestination(id: 's02_components_rtl', title: 'S02 Components RTL'),
+    DashboardDestination(id: 's03_flow_layout', title: 'S03 Flow Layout'),
     DashboardDestination(id: 'components', title: 'Components'),
     DashboardDestination(id: 'templates', title: 'Templates'),
     DashboardDestination(id: 'new_templates', title: 'Business Templates'),
@@ -46,6 +50,8 @@ final class DashboardDestinationRegistry {
 
   static String titleFor(String id) => switch (id) {
         'dashboard' => 'Dashboard',
+        's02_components_rtl' => 'S02 Components RTL',
+        's03_flow_layout' => 'S03 Flow Layout',
         's00_baseline' => 'S00 Baseline',
         's01_directionality' => 'S01 Directionality',
         'components' || 'data_grid' || 'rich_text' || 'info_box' ||
@@ -75,6 +81,8 @@ final class DashboardDestinationRegistry {
   }) =>
       switch (id) {
         'dashboard' => DashboardHome(onNavigate: onNavigate),
+        's02_components_rtl' => const S02ComponentsRtlVerificationPage(),
+        's03_flow_layout' => const S03FlowLayoutVerificationPage(),
         's00_baseline' => const S00BaselineRegressionVerificationPage(),
         's01_directionality' => const S01DirectionalityVerificationPage(),
         'components' || 'data_grid' =>

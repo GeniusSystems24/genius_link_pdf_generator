@@ -63,6 +63,18 @@ class _DashboardSidebarState extends State<DashboardSidebar>
       gradient: AppColors.primaryGradient,
     ),
     const NavItem(
+      id: 's02_components_rtl',
+      title: 'S02 Components RTL',
+      icon: Icons.compare_arrows_rounded,
+      gradient: AppColors.infoGradient,
+    ),
+    const NavItem(
+      id: 's03_flow_layout',
+      title: 'S03 Flow Layout',
+      icon: Icons.view_stream_rounded,
+      gradient: AppColors.infoGradient,
+    ),
+    const NavItem(
       id: 's01_directionality',
       title: 'S01 Directionality',
       icon: Icons.swap_horiz_rounded,

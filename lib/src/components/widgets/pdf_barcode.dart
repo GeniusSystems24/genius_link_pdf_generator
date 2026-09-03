@@ -11,6 +11,8 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../models/barcode_models.dart';
 import '../../core/pdf_config.dart';
+import '../../core/directionality.dart';
+import '../../core/component_directionality.dart';
 import '../../core/pdf_logger.dart';
 
 // ============================================================================
@@ -42,6 +44,8 @@ class GeniusPdfBarcode {
     this.caption,
     this.captionAr,
     required this.config,
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
     GeniusPdfBarcodeStyle? style,
     this.width,
     this.height,
@@ -106,12 +110,22 @@ class GeniusPdfBarcode {
   final String? captionAr;
   final GeniusPdfBarcodeStyle style;
   final GeniusPdfConfig config;
+
+  final GeniusPdfDirectionality? directionality;
+  final GeniusPdfDirection direction;
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+  bool get _isRtl => _effectiveDirectionality.resolve().direction == GeniusPdfResolvedDirection.rtl;
   final double? width;
   final double? height;
 
   /// Gets display caption based on locale.
   String? getCaption() {
-    if (config.isRTL && captionAr != null) return captionAr;
+    if (_isRtl && captionAr != null) return captionAr;
     return caption ?? captionAr;
   }
 
@@ -128,7 +142,7 @@ class GeniusPdfBarcode {
     final validation = GeniusBarcodeValidator.validate(data: data, type: type);
     if (!validation.isValid) {
       throw StateError(
-        validation.getErrorMessage(isRTL: config.isRTL) ??
+        validation.getErrorMessage(isRTL: _isRtl) ??
             'Invalid ${type.name} barcode data',
       );
     }
@@ -192,7 +206,7 @@ class GeniusPdfBarcode {
         ),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.pdfTextDirection
+          textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)
         ),
       );
       currentY += style.captionFontSize + style.textSpacing + 4;
@@ -231,7 +245,7 @@ class GeniusPdfBarcode {
         ),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.pdfTextDirection
+          textDirection: PdfTextDirection.leftToRight
         ),
       );
       currentY += style.captionFontSize + 4;
@@ -258,7 +272,7 @@ class GeniusPdfBarcode {
         ),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.pdfTextDirection
+          textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)
         ),
       );
       currentY += style.captionFontSize + 4;
@@ -389,6 +403,8 @@ class GeniusPdfQRCodeGenerator {
     this.caption,
     this.captionAr,
     required this.config,
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
     GeniusPdfQRCodeStyle? style,
   }) : style = style ?? const GeniusPdfQRCodeStyle();
 
@@ -493,9 +509,19 @@ class GeniusPdfQRCodeGenerator {
   final GeniusPdfQRCodeStyle style;
   final GeniusPdfConfig config;
 
+  final GeniusPdfDirectionality? directionality;
+  final GeniusPdfDirection direction;
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+  bool get _isRtl => _effectiveDirectionality.resolve().direction == GeniusPdfResolvedDirection.rtl;
+
   /// Gets display caption based on locale.
   String? getCaption() {
-    if (config.isRTL && captionAr != null) return captionAr;
+    if (_isRtl && captionAr != null) return captionAr;
     return caption ?? captionAr;
   }
 
@@ -514,7 +540,7 @@ class GeniusPdfQRCodeGenerator {
     );
     if (!qrValidation.isValid) {
       throw StateError(
-        qrValidation.getErrorMessage(isRTL: config.isRTL) ??
+        qrValidation.getErrorMessage(isRTL: _isRtl) ??
             'Invalid QR code data',
       );
     }
@@ -586,7 +612,7 @@ class GeniusPdfQRCodeGenerator {
         ),
         format: PdfStringFormat(
           alignment: PdfTextAlignment.center,
-          textDirection: config.pdfTextDirection
+          textDirection: GeniusPdfComponentDirectionality.pdfDirection(_effectiveDirectionality.resolve().direction)
         ),
       );
       currentY += style.captionFontSize + 4;

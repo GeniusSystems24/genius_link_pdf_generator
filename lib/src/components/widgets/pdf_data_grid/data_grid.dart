@@ -68,6 +68,10 @@ class GeniusPdfDataGrid {
     this.groups,
     this.footerRows,
     this.autoTotals,
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
+    this.followDirection = true,
+    this.preserveDefinitionOrder = false,
   }) : style = _resolveGridStyle(style, config);
 
   /// Column definitions.
@@ -90,6 +94,29 @@ class GeniusPdfDataGrid {
 
   /// Auto-calculated total rows appended after data rows (before footerRows).
   final List<GeniusPdfAutoTotal>? autoTotals;
+
+  final GeniusPdfDirectionality? directionality;
+  final GeniusPdfDirection direction;
+  final bool followDirection;
+  final bool preserveDefinitionOrder;
+
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+  GeniusPdfResolvedDirection get _layoutDirection =>
+      _effectiveDirectionality.resolve().direction;
+  bool get _isRtl => _layoutDirection == GeniusPdfResolvedDirection.rtl;
+  int _definitionIndex(int i, int count) =>
+      GeniusPdfComponentDirectionality.definitionIndex(
+        index: i,
+        count: count,
+        direction: _layoutDirection,
+        followDirection: followDirection,
+        preserveDefinitionOrder: preserveDefinitionOrder,
+      );
 
   /// Running counter of rendered data rows. Used to keep alternating-row
   /// colors consistent across groups and special rows in a single draw pass.
@@ -271,11 +298,11 @@ class GeniusPdfDataGrid {
       _applyRowStyle(headerRow, style.headerStyle, isHeader: true);
 
       for (int i = 0; i < cols.length; i++) {
-        final colIndex = config.isRTL ? cols.length - 1 - i : i;
+        final colIndex = _definitionIndex(i, cols.length);
         final column = cols[colIndex];
         final cell = headerRow.cells[i];
 
-        cell.value = column.getTitle(isArabic: config.isRTL);
+        cell.value = column.getTitle(isArabic: _isRtl);
         _applyCellStyle(
           cell,
           column.headerStyle ?? style.headerStyle,
@@ -330,7 +357,7 @@ class GeniusPdfDataGrid {
     // Add group header if enabled
     if (group.showHeader) {
       final groupHeaderRow = grid.rows.add();
-      groupHeaderRow.cells[0].value = group.getTitle(isArabic: config.isRTL);
+      groupHeaderRow.cells[0].value = group.getTitle(isArabic: _isRtl);
       groupHeaderRow.cells[0].columnSpan = cols.length;
 
       final baseStyle =
@@ -408,7 +435,7 @@ class GeniusPdfDataGrid {
       // Add label
       if (autoTotal.labelColumnId != null) {
         cells[autoTotal.labelColumnId!] =
-            autoTotal.getLabel(isArabic: config.isRTL) ?? '';
+            autoTotal.getLabel(isArabic: _isRtl) ?? '';
       }
 
       // Add extra static cells
@@ -501,7 +528,7 @@ class GeniusPdfDataGrid {
     // Populate cells
     final lastIdx = cols.length - 1;
     for (int i = 0; i < cols.length; i++) {
-      final colIndex = config.isRTL ? cols.length - 1 - i : i;
+      final colIndex = _definitionIndex(i, cols.length);
       final column = cols[colIndex];
       final cell = row.cells[i];
 
@@ -598,8 +625,18 @@ class GeniusPdfDataGrid {
     cell.style.borders =
         _resolveCellBorders(cellStyle.border, isFirstColumn, isLastColumn);
 
-    // Padding
-    cell.style.cellPadding = cellStyle.padding.toPdfPaddings();
+    // Resolve logical padding at the drawing boundary only.
+    if (column.directionalPadding != null) {
+      final p = column.directionalPadding!.resolve(_layoutDirection);
+      cell.style.cellPadding = PdfPaddings(
+        left: p.left,
+        right: p.right,
+        top: p.top,
+        bottom: p.bottom,
+      );
+    } else {
+      cell.style.cellPadding = cellStyle.padding.toPdfPaddings();
+    }
 
     // Font - baseFont and boldFont are required, no fallback to Helvetica
     PdfFont font;
@@ -619,10 +656,23 @@ class GeniusPdfDataGrid {
     final verticalAlign = column.verticalAlignment != GeniusPdfVerticalAlign.top
         ? column.verticalAlignment
         : cellStyle.textStyle.verticalAlignment;
+    final requestedDirection = isHeader
+        ? column.headerDirection
+        : (column.isNumeric &&
+                column.contentDirection == GeniusPdfDirection.auto
+            ? GeniusPdfDirection.ltr
+            : column.contentDirection);
+    final runDirection = switch (requestedDirection) {
+      GeniusPdfDirection.ltr => GeniusPdfResolvedDirection.ltr,
+      GeniusPdfDirection.rtl => GeniusPdfResolvedDirection.rtl,
+      GeniusPdfDirection.auto => _layoutDirection,
+    };
     cell.style.stringFormat = PdfStringFormat(
-      alignment: column.alignment.toPdfTextAlignment(config.isRTL),
+      alignment: !isHeader && column.isNumeric
+          ? PdfTextAlignment.right
+          : column.alignment.toPdfTextAlignment(_isRtl),
       lineAlignment: verticalAlign.toPdfVerticalAlignment(),
-      textDirection: config.pdfTextDirection,
+      textDirection: GeniusPdfComponentDirectionality.pdfDirection(runDirection),
     );
   }
 

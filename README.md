@@ -1059,6 +1059,197 @@ ERP values, mixed Arabic/Latin runs, nested overrides, long/multi-page output,
 `auto` inheritance, legacy JSON, and media policy with a real PDF preview. Each
 scenario includes an Expected Result.
 
+## 4.0.0 — S02 Existing Components Directionality
+
+S02 migrates Summary, InfoBox, ReportHeader, RichText, DataGrid, signatures,
+QR/barcodes and watermarks to the S01 package-owned directionality model.
+
+```dart
+final rtl = GeniusPdfDirectionality(
+  documentDirection: GeniusPdfDirection.rtl,
+);
+
+final summary = GeniusPdfSummarySection(
+  config: config,
+  directionality: rtl,
+  hideEmptyValues: true,
+  items: const [
+    GeniusPdfSummaryItem(
+      label: 'Subtotal',
+      labelAr: 'المجموع الفرعي',
+      value: '13,650.00 SAR',
+    ),
+    GeniusPdfSummaryItem(
+      label: 'Grand Total',
+      labelAr: 'الإجمالي النهائي',
+      value: '15,697.50 SAR',
+      isTotal: true,
+    ),
+  ],
+);
+```
+
+In RTL, Summary labels are at logical start (right) and values at logical end
+(left). Structured money, percentages, IDs, SKU, IBAN, phone, email and URLs
+remain LTR.
+
+Per-field InfoBox direction is independent:
+
+```dart
+GeniusPdfLabeledValue(
+  config: config,
+  directionality: rtl,
+  label: 'Document',
+  labelAr: 'المستند',
+  value: 'INV-2026-000123',
+  valueDirection: GeniusPdfDirection.ltr,
+);
+```
+
+DataGrid directionality uses `followDirection`, `preserveDefinitionOrder`,
+per-column `headerDirection` / `contentDirection`, and
+`directionalPadding`. Advanced grid behavior remains S04 scope.
+
+`addTwoColumns()` follows direction and supports `preservePhysicalOrder`.
+QR/barcode/signature pixels are never mirrored. Watermark physical placement
+remains the default; `GeniusPdfWatermark.directional(...)` opts into logical
+horizontal placement.
+
+Open **S02 Components RTL** in the example Dashboard for the manual acceptance
+matrix. Full contract:
+`docs/sprints/s02/DIRECTIONALITY_COMPONENT_CONTRACT.md`.
+
+## 4.0.0 — S03 Flow Layout & Pagination Engine
+
+Sprint S03 adds a deterministic two-pass page-flow engine for long ERP
+documents while keeping the current builder API compatible.
+
+The core model is:
+
+```dart
+final section = PdfFlowSection(
+  firstPageHeader: const PdfTextBand(
+    text: 'FIRST PAGE',
+    textAr: 'الصفحة الأولى',
+    placement: PdfBandPlacement.top,
+    kind: PdfBandKind.pageHeader,
+  ),
+  pageHeader: const PdfTextBand(
+    text: 'ERP REPORT',
+    textAr: 'تقرير ERP',
+    placement: PdfBandPlacement.top,
+    kind: PdfBandKind.pageHeader,
+  ),
+  pageFooter: const PdfPageNumberBand(),
+  repeatableBands: const [
+    PdfRepeatableBand(
+      id: 'table-header',
+      placement: PdfBandPlacement.top,
+      kind: PdfBandKind.tableHeader,
+      child: PdfFixedBlock(height: 24),
+    ),
+  ],
+  blocks: [
+    PdfTextBlock(
+      text: 'Long notes...',
+      minOrphanLines: 2,
+      minWidowLines: 2,
+    ),
+    PdfKeepTogether(
+      PdfFixedBlock(height: 120),
+    ),
+  ],
+);
+```
+
+Plan without rendering:
+
+```dart
+final plan = builder.planFlowSection(section);
+
+print(plan.pageCount);
+print(plan.pages.first.availableBodyHeight);
+```
+
+Then render the exact plan:
+
+```dart
+final result = builder.addFlowSection(
+  section,
+  plan: plan,
+);
+```
+
+The engine supports:
+
+- `keepTogether`;
+- `keepWithNext`;
+- `pageBreakBefore`;
+- `pageBreakAfter`;
+- conditional breaks;
+- orphan/widow-aware built-in text/list splitting;
+- repeated section/group/table headers and footers;
+- first-page header and last-page footer variants;
+- section-level landscape/custom page sizes;
+- Page X of Y bands;
+- document status/original-copy marker bands;
+- deterministic `currentY`;
+- measurement caching so drawing callbacks are not executed during planning.
+
+Existing `addLine`, `addHeader`, `addFooter`, `addTwoColumns`, component
+methods, and custom callbacks remain valid. Existing `(PdfPage, Rect)`
+callbacks can be wrapped with `PdfLegacyCallbackBlock`.
+
+`GeniusPdfReportComposer` also supports:
+
+```dart
+GeniusPdfReportComposer(config: config)
+    .flowSection(section)
+    .buildPdf();
+```
+
+The example Dashboard includes **S03 Flow Layout** with 1-page, 50-row,
+500-row, long-note, keep-together, repeated-band, metadata, custom-landscape
+and compatibility scenarios in both LTR and RTL.
+
+See `docs/sprints/s03/FLOW_LAYOUT_CONTRACT.md` for the complete contract.
+
+
+### S03 convenience flow components
+
+S03 also includes semantic wrappers for common ERP page-flow needs:
+
+```dart
+PdfFlowSection(
+  repeatableBands: [
+    PdfSectionHeaderBand(
+      child: PdfTextBand(
+        text: 'Section',
+        textAr: 'القسم',
+        placement: PdfBandPlacement.top,
+      ),
+    ),
+    PdfTableHeaderBand(
+      child: PdfTextBand(
+        text: 'Item | Qty | Amount',
+        textAr: 'الصنف | الكمية | المبلغ',
+        placement: PdfBandPlacement.top,
+      ),
+    ),
+  ],
+  blocks: const [
+    PdfSpacerBlock(8),
+    PdfPageBreakBlock(),
+  ],
+);
+```
+
+`PdfStatusMarkerBand` and `PdfOriginalCopyBand` are convenience forms of
+`PdfDocumentMarkerBand`.
+
+Flow components read `boldFont`, `headerFont`, and `smallFont` directly from
+`GeniusPdfConfig`, avoiding name collisions with existing template fields.
+
 ## Example application
 
 The `example/` project demonstrates the library through feature-focused screens,

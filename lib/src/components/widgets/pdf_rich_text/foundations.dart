@@ -86,6 +86,7 @@ class GeniusPdfTextSpan {
     this.tooltip,
     this.opacity = 1.0,
     this.textDirectionOverride,
+    this.direction = GeniusPdfDirection.auto,
   });
 
   // ─── Factory Constructors ───────────────────────────────────────────
@@ -109,7 +110,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a bold text span.
   const GeniusPdfTextSpan.bold(this.text,
@@ -128,7 +130,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates an italic text span.
   const GeniusPdfTextSpan.italic(this.text, {this.color, this.fontSize})
@@ -147,7 +150,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a bold-italic text span.
   const GeniusPdfTextSpan.boldItalic(this.text, {this.color, this.fontSize})
@@ -166,7 +170,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a link text span.
   const GeniusPdfTextSpan.link(
@@ -188,7 +193,8 @@ class GeniusPdfTextSpan {
         isSubscript = false,
         fontFamily = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a web link text span rendered via [PdfTextWebLink].
   ///
@@ -223,7 +229,8 @@ class GeniusPdfTextSpan {
         isSubscript = false,
         fontFamily = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a colored text span.
   const GeniusPdfTextSpan.colored(this.text, this.color, {this.backgroundColor})
@@ -242,7 +249,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a highlighted (positive amount) span — green bold.
   const GeniusPdfTextSpan.positive(this.text, {this.backgroundColor})
@@ -262,7 +270,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a highlighted (negative amount) span — red bold.
   const GeniusPdfTextSpan.negative(this.text, {this.backgroundColor})
@@ -282,7 +291,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a highlighted/marked text span.
   const GeniusPdfTextSpan.highlight(
@@ -304,7 +314,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a superscript text span (for footnotes, powers, etc.).
   const GeniusPdfTextSpan.superscript(this.text, {this.color})
@@ -324,7 +335,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a subscript text span (for chemical formulas, etc.).
   const GeniusPdfTextSpan.subscript(this.text, {this.color})
@@ -344,7 +356,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a strikethrough text span (for deleted/old values).
   const GeniusPdfTextSpan.strikethrough(this.text, {this.color})
@@ -364,7 +377,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a code/monospace text span.
   const GeniusPdfTextSpan.code(this.text)
@@ -385,7 +399,8 @@ class GeniusPdfTextSpan {
         fontFamily = 'monospace',
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a label-style span — bold, slightly larger, gray color.
   /// Useful for form field labels, section titles, etc.
@@ -406,7 +421,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a currency value span — bold, right-aligned friendly.
   ///
@@ -450,7 +466,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a small/caption text span — smaller font, gray.
   const GeniusPdfTextSpan.small(this.text,
@@ -471,7 +488,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   /// Creates a badge-style span — bold text with colored background.
   ///
@@ -497,7 +515,8 @@ class GeniusPdfTextSpan {
         fontFamily = null,
         tooltip = null,
         opacity = 1.0,
-        textDirectionOverride = null;
+        textDirectionOverride = null,
+        direction = GeniusPdfDirection.auto;
 
   // ─── Properties ─────────────────────────────────────────────────────
 
@@ -557,6 +576,9 @@ class GeniusPdfTextSpan {
 
   /// Explicit text direction override for this span.
   final TextDirection? textDirectionOverride;
+
+  /// Package-owned run direction override for S02.
+  final GeniusPdfDirection direction;
 
   // ─── Computed Properties ────────────────────────────────────────────
 

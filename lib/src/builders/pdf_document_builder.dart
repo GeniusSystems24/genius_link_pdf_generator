@@ -19,4 +19,5 @@ import '../models/pdf_image.dart';
 import '../extensions/color_extensions.dart';
 
 part 'pdf_document_builder/document_builder.dart';
+part 'pdf_document_builder/flow_layout.dart';
 part 'pdf_document_builder/report_composer.dart';

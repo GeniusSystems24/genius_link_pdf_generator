@@ -10,6 +10,9 @@ class GeniusPdfLabeledValue {
     this.valueStyle,
     this.valueColor,
     this.separator = ': ',
+    this.directionality,
+    this.direction = GeniusPdfDirection.auto,
+    this.valueDirection = GeniusPdfDirection.auto,
   });
 
   /// Creates a labeled value where the value is styled as positive (green).
@@ -55,9 +58,23 @@ class GeniusPdfLabeledValue {
   final Color? valueColor;
   final String separator;
 
+  final GeniusPdfDirectionality? directionality;
+  final GeniusPdfDirection direction;
+  /// Independent value run direction.
+  final GeniusPdfDirection valueDirection;
+
+  GeniusPdfDirectionality get _effectiveDirectionality =>
+      GeniusPdfComponentDirectionality.context(
+        config: config,
+        inherited: directionality,
+        componentDirection: direction,
+      );
+
+  bool get _isRtl => _effectiveDirectionality.resolve().direction == GeniusPdfResolvedDirection.rtl;
+
   /// Gets the display label based on locale.
   String getLabel() {
-    if (config.isRTL && labelAr != null) return labelAr!;
+    if (_isRtl && labelAr != null) return labelAr!;
     return label;
   }
 
@@ -86,11 +103,13 @@ class GeniusPdfLabeledValue {
             style: effectiveValueStyle,
             color: valueColor,
             isBold: effectiveValueStyle.isBold,
+          direction: valueDirection,
           )
         : GeniusPdfTextSpan(
             text: value,
             style: effectiveValueStyle,
             isBold: effectiveValueStyle.isBold,
+          direction: valueDirection,
           );
 
     final richText = GeniusPdfRichText(
@@ -112,7 +131,8 @@ class GeniusPdfLabeledValue {
       defaultStyle: effectiveValueStyle,
       baseFont: config.baseFont,
       boldFont: config.boldFont,
-      isRTL: config.isRTL,
+      directionality: _effectiveDirectionality,
+      direction: direction,
     );
 
     return richText.draw(
@@ -169,6 +189,9 @@ class GeniusPdfKeyValueList {
           valueStyle: item.valueStyle,
           valueColor: item.valueColor,
           separator: item.separator,
+          directionality: item.directionality,
+          direction: item.direction,
+          valueDirection: item.valueDirection,
         );
 
         lastResult = labeledValue.draw(
@@ -209,6 +232,9 @@ class GeniusPdfKeyValueList {
             labelAr: item.labelAr,
             value: item.value,
             valueColor: item.valueColor,
+            directionality: item.directionality,
+            direction: item.direction,
+            valueDirection: item.valueDirection,
           );
 
           lastResult = labeledValue.draw(

@@ -42,3 +42,10 @@ those outputs. S01/S02 introduce logical `start/end` and
 
 Do not modify production rendering to make these targets pass in S00.
 S00 makes the behavior visible, reproducible, and reviewable first.
+
+## S02 closure
+
+- Summary RTL geometry: fixed by S02.
+- Amount/identifier direction: fixed/guarded by S02.
+- InfoBox key/value and icon geometry: fixed by S02.
+- QR/Barcode payload preservation: guarded by S02 tests.
