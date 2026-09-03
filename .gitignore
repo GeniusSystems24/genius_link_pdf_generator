@@ -6,3 +6,5 @@
 
 .flutter-plugins
 .flutter-plugins-dependencies
+/*.py
+*.zip
