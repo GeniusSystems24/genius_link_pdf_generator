@@ -12,6 +12,7 @@ import '../components/widgets/pdf_info_box.dart';
 import '../components/widgets/pdf_report_header.dart';
 import '../components/widgets/pdf_rich_text.dart';
 import '../components/widgets/pdf_summary.dart';
+import '../core/directionality.dart';
 import '../core/pdf_config.dart';
 import '../core/pdf_logger.dart';
 import '../models/pdf_image.dart';

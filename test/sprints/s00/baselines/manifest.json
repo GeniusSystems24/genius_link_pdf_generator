@@ -1,0 +1,27 @@
+{
+  "sprint": "S00",
+  "version": "4.0.0",
+  "pageSize": {
+    "name": "A4",
+    "width": 595,
+    "height": 842
+  },
+  "captureEnv": "GENIUS_CAPTURE_S00=1",
+  "knownFailureEnv": "GENIUS_RUN_KNOWN_FAILURES=1",
+  "scenarios": [
+    "summary/en/ltr/money-mixed",
+    "summary/ar/rtl/money-mixed",
+    "info-box/en/ltr/identifiers",
+    "info-box/ar/rtl/identifiers",
+    "bilingual/en/ltr/arabic-latin-values",
+    "bilingual/ar/rtl/arabic-latin-values",
+    "long-content/en/ltr/multi-page",
+    "long-content/ar/rtl/multi-page",
+    "quotation/en/ltr/minimal",
+    "quotation/ar/rtl/minimal",
+    "purchase-order/en/ltr/minimal",
+    "purchase-order/ar/rtl/minimal",
+    "tax-invoice/en/ltr/minimal",
+    "tax-invoice/ar/rtl/minimal"
+  ]
+}

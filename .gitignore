@@ -8,3 +8,8 @@
 .flutter-plugins-dependencies
 /*.py
 *.zip
+
+# S00 generated baseline candidates
+test/sprints/s00/baselines/generated/*.pdf
+test/sprints/s00/baselines/generated/*.baseline.json
+test/sprints/s00/goldens/candidates/*.png

@@ -112,7 +112,7 @@ class DashboardHome extends StatelessWidget {
                               color: Colors.amber, size: 16),
                           SizedBox(width: 8),
                           Text(
-                            'v2.3.3+1 Now Available',
+                            'v4.0.0 — S00 Baseline',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -219,6 +219,14 @@ class DashboardHome extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             clipBehavior: Clip.none,
             children: [
+              _QuickActionCard(
+                label: 'S01 Directionality',
+                icon: Icons.swap_horiz_rounded,
+                color: AppColors.info,
+                onTap: () => onNavigate('s01_directionality'),
+                isDark: isDark,
+              ),
+              const SizedBox(width: 16),
               _QuickActionCard(
                 label: 'New Invoice',
                 icon: Icons.receipt_long_rounded,

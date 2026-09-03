@@ -6,6 +6,7 @@
 library;
 
 export 'src/core/pdf_config.dart';
+export 'src/core/directionality.dart';
 export 'src/core/pdf_assets.dart';
 export 'src/core/pdf_logger.dart';
 export 'src/domain/financial/financial.dart';

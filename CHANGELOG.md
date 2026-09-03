@@ -20,6 +20,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace example imports under `screens/`, `documents/`, `widgets/`, `theme/`,
   and `data/` with their feature-first, `app`, or `shared` equivalents.
 
+
+## [4.0.0] - 2026-09-03
+
+#### S01 completion audit
+
+- Added logical API guards for start/end and leading/trailing semantics.
+- Added legacy template/page direction JSON compatibility tests.
+- Added Builder/Composer/TemplateContext propagation guards.
+- Added full ERP value-string stability coverage.
+- Strengthened preserve-by-default media mirroring tests.
+- Expanded the S01 dashboard verification matrix with long/multi-page,
+  AUTO-inheritance, legacy JSON, nested override, mixed-text and media scenarios.
+- Ensured S01 is reachable from registry/sidebar/mobile drawer/Dashboard Home.
+- Added `docs/sprints/s01/S01_COMPLETION_AUDIT.md`.
+
+
+### Added — ERP printing Sprint S00 baseline
+
+- Added deterministic EN/LTR, AR/RTL, bilingual, mixed-value, null/empty,
+  long-content, and multi-page regression fixtures.
+- Added canonical Summary/InfoBox ERP cases with `13,650.00 SAR`,
+  `2,047.50 SAR`, `15,697.50 SAR`, document numbers, SKU, serial, IBAN,
+  phone, email, and URL values.
+- Added deterministic baseline fixtures for `QuotationTemplate`,
+  `PurchaseOrderTemplate`, and `TaxInvoiceTemplate`.
+- Added PDF artifact/page-metadata capture and canonical golden naming.
+- Added `tool/s00_render_goldens.py`; replacing accepted goldens requires an
+  explicit `--accept` step after manual review.
+
+### Regression protection
+
+- Added passing guards for current LTR/RTL generation, A4/page-count
+  baselines, current Summary/InfoBox physical placement branches, and
+  unchanged QR/barcode payload data.
+- Added opt-in known-target tests via `GENIUS_RUN_KNOWN_FAILURES=1`, keeping
+  documented RTL/BiDi targets separate from normal green CI.
+- Added optional artifact capture via `GENIUS_CAPTURE_S00=1`; normal tests
+  do not mutate baseline files.
+
+### Example application
+
+- Added `S00BaselineRegressionVerificationPage` in
+  `example/lib/features/dashboard/presentation/pages`.
+- Added it to dashboard routing, desktop sidebar, and mobile navigation.
+- The screen uses actual public PDF APIs/preview, exposes LTR/RTL scenarios,
+  and shows Expected Result guidance for manual acceptance.
+- Updated visible dashboard package-version labels to `v4.0.0`.
+
+### Documentation
+
+- Added S00 public API inventory, template baseline, known-failure register,
+  implementation status, and golden acceptance policy.
+- Updated README installation/version and the S00 verification workflow.
+
+### Known baseline — intentionally not fixed in S00
+
+- `GeniusPdfSummarySection` and `GeniusPdfInfoBox` still need an independent
+  value-direction/BiDi policy for numeric/Latin ERP values inside RTL docs.
+- Unified component/nested direction overrides and logical `start/end` /
+  `leading/trailing` primitives are deferred to S01/S02.
+- S00 contains **no intentional production RTL rendering correction**; it
+  makes the current behavior observable and reproducible before the fix.
+
 ## [3.7.0] - 2026-07-06
 
 ### Architecture

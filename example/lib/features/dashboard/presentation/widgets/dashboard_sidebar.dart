@@ -62,6 +62,18 @@ class _DashboardSidebarState extends State<DashboardSidebar>
       icon: Icons.dashboard_rounded,
       gradient: AppColors.primaryGradient,
     ),
+    const NavItem(
+      id: 's01_directionality',
+      title: 'S01 Directionality',
+      icon: Icons.swap_horiz_rounded,
+      gradient: AppColors.infoGradient,
+    ),
+    const NavItem(
+      id: 's00_baseline',
+      title: 'S00 Baseline',
+      icon: Icons.fact_check_rounded,
+      gradient: AppColors.warningGradient,
+    ),
     NavItem(
       id: 'components',
       title: 'Components',
@@ -338,7 +350,7 @@ class _DashboardSidebarState extends State<DashboardSidebar>
                     ),
                   ),
                   Text(
-                    'v2.3.3+1',
+                    'v4.0.0',
                     style: TextStyle(
                       fontSize: 11,
                       color: isDark

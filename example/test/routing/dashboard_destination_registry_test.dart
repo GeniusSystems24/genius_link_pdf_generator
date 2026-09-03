@@ -10,6 +10,7 @@ void main() {
     expect(ids.toSet().length, ids.length);
     expect(ids, containsAll(<String>[
       'dashboard',
+      's00_baseline',
       'components',
       'templates',
       'printing',
@@ -19,6 +20,7 @@ void main() {
   });
 
   test('nested destinations resolve to their parent title', () {
+    expect(DashboardDestinationRegistry.titleFor('s00_baseline'), 'S00 Baseline');
     expect(DashboardDestinationRegistry.titleFor('grid_qrcode'), 'Components');
     expect(DashboardDestinationRegistry.titleFor('sales'), 'Business Templates');
     expect(DashboardDestinationRegistry.titleFor('advanced'), 'Advanced Features');

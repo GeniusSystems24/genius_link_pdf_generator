@@ -36,6 +36,7 @@ builder, the fluent report composer, or your own application-specific layer.
 - [Architecture](#architecture)
 - [Optional modules](#optional-modules)
 - [Templates](#templates)
+- [4.0.0 S00 baseline verification](#400-s00-baseline-verification)
 - [Example application](#example-application)
 - [Troubleshooting](#troubleshooting)
 - [Migration and compatibility](#migration-and-compatibility)
@@ -130,7 +131,7 @@ When consumed from a hosted source, use the version required by your project:
 
 ```yaml
 dependencies:
-  genius_link_pdf_generator: ^3.7.0
+  genius_link_pdf_generator: ^4.0.0
 ```
 
 Run:
@@ -1013,6 +1014,50 @@ Available template families include invoices, financial reports, statements,
 HR documents, inventory reports, vouchers, remittances, and trade documents.
 Refer to the template source and the example application for constructors and
 data models, because template inputs vary by document type.
+
+
+## 4.0.0 S00 baseline verification
+
+Version 4.0.0 starts the ERP-printing roadmap with Sprint S00:
+**Baseline, Regression Harness & Directionality Bug Capture**.
+
+S00 intentionally does not change production directionality behavior.
+It establishes deterministic English/LTR, Arabic/RTL, bilingual,
+mixed-value, null/empty, long-content, and current-template baselines
+before directionality architecture changes in S01/S02.
+
+The example dashboard now includes **S00 Baseline**. It uses the real
+package APIs and the built-in PDF preview so current behavior can be
+reviewed manually in LTR and RTL. The canonical financial case is:
+
+```text
+Subtotal      13,650.00 SAR
+Tax (VAT)      2,047.50 SAR
+Grand Total   15,697.50 SAR
+```
+
+It also exercises document numbers, SKU, serial, IBAN, phone, email,
+URL, empty values, and long multi-page content.
+
+The current S00 baseline deliberately records known cases where
+numeric/Latin ERP values can still inherit the enclosing RTL text
+direction. Those are **known defects, not the desired final behavior**.
+Their implementation fixes belong to S01/S02.
+
+Baseline policy, API inventory, template baseline, and known failures
+are documented under `docs/sprints/s00/`. Capture/regression code lives
+under `test/sprints/s00/` and `tool/s00_render_goldens.py`.
+
+### S01 completion coverage
+
+S01 includes explicit guards for logical-only start/end APIs, legacy template
+JSON compatibility, Builder/Composer/TemplateContext propagation, the full ERP
+value-direction matrix, and preserve-by-default media mirroring.
+
+The **S01 Directionality** dashboard page verifies precedence, logical geometry,
+ERP values, mixed Arabic/Latin runs, nested overrides, long/multi-page output,
+`auto` inheritance, legacy JSON, and media policy with a real PDF preview. Each
+scenario includes an Expected Result.
 
 ## Example application
 

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../src/core/directionality.dart';
 import '../../src/core/pdf_config.dart';
 import 'template_definition.dart';
 import 'template_elements.dart';
@@ -63,7 +64,19 @@ class PdfTemplateEngine {
     bool? isRtl,
     void Function(RenderProgress)? onProgress,
   }) async {
-    final resolvedRtl = isRtl ?? config.textDirection == TextDirection.rtl;
+    final legacyDirection =
+        (isRtl ?? config.textDirection == TextDirection.rtl)
+            ? GeniusPdfDirection.rtl
+            : GeniusPdfDirection.ltr;
+
+    final directionality = GeniusPdfDirectionality(
+      localeDirection: legacyDirection,
+      documentDirection:
+          template.pageSettings?.direction ?? legacyDirection,
+      templateDirection: template.direction,
+    );
+
+    final resolvedRtl = directionality.resolve().direction.isRtl;
     // Validate data
     final validationErrors = template.validate(data);
     if (validationErrors.any((e) => !e.isValid)) {
@@ -80,7 +93,7 @@ class PdfTemplateEngine {
     // Create context
     final context = TemplateContext(
       data: mergedData,
-      isRtl: resolvedRtl,
+      directionality: directionality,
     );
 
     // Create document
@@ -385,6 +398,7 @@ class TemplateBuilder {
   String version = '1.0.0';
   String? author;
   String? category;
+  GeniusPdfDirection direction = GeniusPdfDirection.auto;
   final List<String> tags = [];
   final List<TemplateVariable> variables = [];
   final List<TemplateElement> content = [];
@@ -393,6 +407,12 @@ class TemplateBuilder {
   List<TemplateElement>? footer;
   final Map<String, ElementStyle> styles = {};
   final Map<String, dynamic> metadata = {};
+
+  /// Sets a template-level direction override.
+  TemplateBuilder setDirection(GeniusPdfDirection value) {
+    direction = value;
+    return this;
+  }
 
   /// Adds a variable to the template.
   TemplateBuilder addVariable(TemplateVariable variable) {
@@ -497,11 +517,13 @@ class TemplateBuilder {
   TemplateBuilder setPageSettings({
     Size pageSize = PdfPageSize.a4,
     PdfPageOrientation orientation = PdfPageOrientation.portrait,
+    GeniusPdfDirection direction = GeniusPdfDirection.auto,
     TemplateMargins? margins,
   }) {
     pageSettings = TemplatePageSettings(
       pageSize: pageSize,
       orientation: orientation,
+      direction: direction,
       margins: margins,
     );
     return this;
@@ -531,6 +553,7 @@ class TemplateBuilder {
       author: author,
       category: category,
       tags: tags,
+      direction: direction,
       variables: variables,
       content: content,
       pageSettings: pageSettings,

@@ -231,6 +231,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   Widget _buildMobileDrawer(bool isDark) {
     final items = [
       _DrawerItem('dashboard', 'Dashboard', Icons.dashboard_rounded),
+      _DrawerItem('s01_directionality', 'S01 Directionality', Icons.swap_horiz_rounded),
+      _DrawerItem('s00_baseline', 'S00 Baseline', Icons.fact_check_rounded),
       _DrawerItem('components', 'Components', Icons.widgets_rounded),
       _DrawerItem('grid_qrcode', 'Grid+QR', Icons.qr_code_rounded),
       _DrawerItem('grid_infobox', 'Grid+Info', Icons.view_agenda_rounded),
@@ -307,7 +309,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'v2.3.3+1',
+                      'v4.0.0',
                       style: TextStyle(
                         fontSize: 12,
                         color: isDark

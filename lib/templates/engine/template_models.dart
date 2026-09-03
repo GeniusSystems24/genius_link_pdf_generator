@@ -1,3 +1,4 @@
+import '../../src/core/directionality.dart';
 
 /// Represents a variable that can be used in templates.
 ///
@@ -788,14 +789,27 @@ class TemplateLoop {
 class TemplateContext {
   TemplateContext({
     required this.data,
-    this.isRtl = false,
+    bool? isRtl,
+    GeniusPdfDirectionality? directionality,
     Map<String, dynamic>? loopContext,
-  }) : _loopContext = loopContext ?? {};
+  })  : directionality = directionality ??
+            GeniusPdfDirectionality(
+              documentDirection: (isRtl ?? false)
+                  ? GeniusPdfDirection.rtl
+                  : GeniusPdfDirection.ltr,
+            ),
+        isRtl = directionality != null
+            ? directionality.resolve().direction.isRtl
+            : (isRtl ?? false),
+        _loopContext = loopContext ?? {};
 
   /// The main data for the template.
   final Map<String, dynamic> data;
 
-  /// Whether to use RTL formatting.
+  /// Package-owned directionality inherited through template content.
+  final GeniusPdfDirectionality directionality;
+
+  /// Legacy compatibility flag derived from [directionality].
   final bool isRtl;
 
   /// Current loop context (item, index, etc.).
@@ -822,7 +836,7 @@ class TemplateContext {
   ) {
     return TemplateContext(
       data: data,
-      isRtl: isRtl,
+      directionality: directionality,
       loopContext: {
         ..._loopContext,
         loop.itemName: item,

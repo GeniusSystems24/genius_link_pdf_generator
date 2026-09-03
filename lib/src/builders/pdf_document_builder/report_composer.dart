@@ -2,7 +2,10 @@ part of '../pdf_document_builder.dart';
 
 class GeniusPdfReportComposer extends GeniusPdfDocumentBuilder {
   /// Creates a new [GeniusPdfReportComposer].
-  GeniusPdfReportComposer({required GeniusPdfConfig config}) : super(config);
+  GeniusPdfReportComposer({
+    required GeniusPdfConfig config,
+    GeniusPdfDirectionality? directionality,
+  }) : super(config, directionality: directionality);
 
   /// Build actions queued by the fluent API.
   final List<void Function()> _actions = [];

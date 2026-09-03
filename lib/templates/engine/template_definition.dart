@@ -3,6 +3,8 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../src/core/directionality.dart';
+
 import 'template_elements.dart';
 import 'template_models.dart';
 
@@ -41,6 +43,7 @@ class TemplateDefinition {
     this.author,
     this.category,
     this.tags = const [],
+    this.direction = GeniusPdfDirection.auto,
     this.variables = const [],
     required this.content,
     this.pageSettings,
@@ -62,6 +65,9 @@ class TemplateDefinition {
       author: json['author'] as String?,
       category: json['category'] as String?,
       tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
+      direction: GeniusPdfDirectionResolver.parse(
+        json['direction'],
+      ),
       variables: (json['variables'] as List<dynamic>?)
               ?.map((e) => TemplateVariable.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -120,6 +126,11 @@ class TemplateDefinition {
 
   /// Tags for searching and filtering.
   final List<String> tags;
+
+  /// Template-level direction override.
+  ///
+  /// [GeniusPdfDirection.auto] inherits from lower scopes.
+  final GeniusPdfDirection direction;
 
   /// Variables used in this template.
   final List<TemplateVariable> variables;
@@ -202,6 +213,8 @@ class TemplateDefinition {
         if (author != null) 'author': author,
         if (category != null) 'category': category,
         'tags': tags,
+        if (direction != GeniusPdfDirection.auto)
+          'direction': direction.name,
         'variables': variables.map((v) => v.toJson()).toList(),
         'content': content.map((e) => e.toJson()).toList(),
         if (pageSettings != null) 'pageSettings': pageSettings!.toJson(),
@@ -231,6 +244,7 @@ class TemplateDefinition {
     String? author,
     String? category,
     List<String>? tags,
+    GeniusPdfDirection? direction,
     List<TemplateVariable>? variables,
     List<TemplateElement>? content,
     TemplatePageSettings? pageSettings,
@@ -249,6 +263,7 @@ class TemplateDefinition {
       author: author ?? this.author,
       category: category ?? this.category,
       tags: tags ?? this.tags,
+      direction: direction ?? this.direction,
       variables: variables ?? this.variables,
       content: content ?? this.content,
       pageSettings: pageSettings ?? this.pageSettings,
@@ -265,6 +280,7 @@ class TemplatePageSettings {
   const TemplatePageSettings({
     this.pageSize = PdfPageSize.a4,
     this.orientation = PdfPageOrientation.portrait,
+    this.direction = GeniusPdfDirection.auto,
     this.margins,
   });
 
@@ -277,6 +293,9 @@ class TemplatePageSettings {
               orElse: () => PdfPageOrientation.portrait,
             )
           : PdfPageOrientation.portrait,
+      direction: GeniusPdfDirectionResolver.parse(
+        json['direction'],
+      ),
       margins: json['margins'] != null
           ? TemplateMargins.fromJson(json['margins'] as Map<String, dynamic>)
           : null,
@@ -289,12 +308,17 @@ class TemplatePageSettings {
   /// Page orientation.
   final PdfPageOrientation orientation;
 
+  /// Document/page direction override for this template.
+  final GeniusPdfDirection direction;
+
   /// Page margins.
   final TemplateMargins? margins;
 
   Map<String, dynamic> toJson() => {
         'pageSize': _pageSizeToString(pageSize),
         'orientation': orientation.name,
+        if (direction != GeniusPdfDirection.auto)
+          'direction': direction.name,
         if (margins != null) 'margins': margins!.toJson(),
       };
 

@@ -51,7 +51,15 @@ enum GeniusPdfImageAlignment {
 /// ```
 abstract class GeniusPdfDocumentBuilder implements GeniusPdfBuildSource {
   /// Creates a new [GeniusPdfDocumentBuilder] with the given configuration.
-  GeniusPdfDocumentBuilder(this.config) {
+  GeniusPdfDocumentBuilder(
+    this.config, {
+    GeniusPdfDirectionality? directionality,
+  }) : _directionality = directionality ??
+            GeniusPdfDirectionality(
+              documentDirection: config.isRTL
+                  ? GeniusPdfDirection.rtl
+                  : GeniusPdfDirection.ltr,
+            ) {
     _document = PdfDocument();
     _applySettings();
     _setupFormat();
@@ -59,6 +67,42 @@ abstract class GeniusPdfDocumentBuilder implements GeniusPdfBuildSource {
 
   /// Configuration for this PDF document.
   final GeniusPdfConfig config;
+
+  /// Package-owned directionality context inherited by this document.
+  ///
+  /// Existing builders that do not pass an explicit context continue deriving
+  /// their document direction from [GeniusPdfConfig.textDirection].
+  final GeniusPdfDirectionality _directionality;
+
+  /// Package-owned directionality context for this document.
+  GeniusPdfDirectionality get directionality => _directionality;
+
+  /// Fully resolved package-owned layout direction.
+  GeniusPdfResolvedDirection get resolvedLayoutDirection =>
+      _directionality.resolve().direction;
+
+  /// Returns a component child context without mutating this document.
+  GeniusPdfDirectionality directionalityForComponent(
+    GeniusPdfDirection direction,
+  ) =>
+      _directionality.forComponent(direction);
+
+  /// Returns an element child context without mutating this document.
+  GeniusPdfDirectionality directionalityForElement(
+    GeniusPdfDirection direction,
+  ) =>
+      _directionality.forElement(direction);
+
+  /// Executes a callback with inherited component/element direction overrides.
+  T withDirectionality<T>(
+    T Function(GeniusPdfDirectionality context) action, {
+    GeniusPdfDirection componentDirection = GeniusPdfDirection.auto,
+    GeniusPdfDirection elementDirection = GeniusPdfDirection.auto,
+  }) {
+    final component = _directionality.forComponent(componentDirection);
+    final element = component.forElement(elementDirection);
+    return action(element);
+  }
 
   @override
   String? get defaultOutputPath => config.defaultOutputPath;

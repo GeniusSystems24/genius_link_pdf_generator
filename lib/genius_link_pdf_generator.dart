@@ -83,6 +83,7 @@ export 'package:syncfusion_flutter_pdf/pdf.dart';
 
 // Core
 export 'src/core/pdf_config.dart';
+export 'src/core/directionality.dart';
 export 'src/core/pdf_assets.dart';
 export 'src/core/pdf_logger.dart';
 export 'src/core/pdf_print_theme.dart';

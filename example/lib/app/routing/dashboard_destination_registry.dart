@@ -8,6 +8,8 @@ import 'package:genius_pdf_example/features/components/presentation/pages/compon
 import 'package:genius_pdf_example/features/custom_report/presentation/pages/custom_report_screen.dart';
 import 'package:genius_pdf_example/features/dashboard/domain/models/dashboard_destination.dart';
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/dashboard_home.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s00_baseline_regression_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s01_directionality_verification_page.dart';
 import 'package:genius_pdf_example/features/export/presentation/pages/export_demo_screen.dart';
 import 'package:genius_pdf_example/features/job_manager/presentation/pages/job_manager_demo_screen.dart';
 import 'package:genius_pdf_example/features/modern_vouchers/presentation/pages/modern_vouchers_demo_screen.dart';
@@ -23,6 +25,8 @@ final class DashboardDestinationRegistry {
 
   static const primaryDestinations = <DashboardDestination>[
     DashboardDestination(id: 'dashboard', title: 'Dashboard'),
+    DashboardDestination(id: 's00_baseline', title: 'S00 Baseline'),
+    DashboardDestination(id: 's01_directionality', title: 'S01 Directionality'),
     DashboardDestination(id: 'components', title: 'Components'),
     DashboardDestination(id: 'templates', title: 'Templates'),
     DashboardDestination(id: 'new_templates', title: 'Business Templates'),
@@ -42,6 +46,8 @@ final class DashboardDestinationRegistry {
 
   static String titleFor(String id) => switch (id) {
         'dashboard' => 'Dashboard',
+        's00_baseline' => 'S00 Baseline',
+        's01_directionality' => 'S01 Directionality',
         'components' || 'data_grid' || 'rich_text' || 'info_box' ||
         'headers' || 'summary' || 'grid_qrcode' || 'grid_infobox' ||
         'grid_watermark' || 'grid_richtext' => 'Components',
@@ -69,6 +75,8 @@ final class DashboardDestinationRegistry {
   }) =>
       switch (id) {
         'dashboard' => DashboardHome(onNavigate: onNavigate),
+        's00_baseline' => const S00BaselineRegressionVerificationPage(),
+        's01_directionality' => const S01DirectionalityVerificationPage(),
         'components' || 'data_grid' =>
           const ComponentsDemoScreen(initialTab: 0),
         'rich_text' => const ComponentsDemoScreen(initialTab: 1),
