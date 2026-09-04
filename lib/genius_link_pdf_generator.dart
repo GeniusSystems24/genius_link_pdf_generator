@@ -83,11 +83,14 @@ export 'package:syncfusion_flutter_pdf/pdf.dart';
 
 // Core
 export 'src/core/pdf_config.dart';
+export 'src/core/pdf_formatter.dart';
+export 'src/core/pdf_theme.dart';
 export 'src/core/directionality.dart';
 export 'src/core/pdf_assets.dart';
 export 'src/core/pdf_logger.dart';
 export 'src/core/pdf_print_theme.dart';
 export 'src/domain/financial/financial.dart';
+export 'src/domain/erp/erp.dart';
 
 // Domain models
 export 'src/models/pdf_image.dart';
@@ -126,6 +129,9 @@ export 'src/extensions/datetime_extensions.dart';
 // Components
 export 'src/components/components.dart';
 
+// ERP document families (S08)
+export 'src/families/erp/erp_families.dart';
+
 // Templates
 export 'templates/templates.dart';
 
@@ -143,3 +149,4 @@ export 'src/printing/printing.dart';
 
 // Sharing (v2.3.0)
 export 'src/sharing/sharing.dart';
+export 'src/packs/erp_packs.dart';

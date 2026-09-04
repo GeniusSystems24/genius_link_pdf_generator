@@ -127,7 +127,7 @@ class GeniusPdfDataGrid {
     GeniusPdfConfig config,
   ) {
     if (style != null) return style;
-    return _gridStyleFromTheme(config.printTheme);
+    return _gridStyleFromTheme(config.theme.printTheme);
   }
 
   static GeniusPdfGridStyle _gridStyleFromTheme(GeniusPdfPrintTheme theme) {
@@ -538,7 +538,11 @@ class GeniusPdfDataGrid {
       }
 
       // Get formatted value
-      cell.value = rowData.getFormattedValue(column);
+      cell.value = rowData.getFormattedValue(
+        column,
+        formatter: config.formatter,
+        isRtl: _isRtl,
+      );
 
       // v2.12.9: merge column.cellStyle on top of the row style instead of
       // replacing it outright, so column-level styling no longer wipes
@@ -728,10 +732,13 @@ class GeniusPdfDataGrid {
     if (level <= 0) return source;
 
     final indent = level * style.groupIndentPerLevel.toDouble();
-    final paddedLeft = source.padding.left + indent;
+    final paddedLeft =
+        config.isRTL ? source.padding.left : source.padding.left + indent;
+    final paddedRight =
+        config.isRTL ? source.padding.right + indent : source.padding.right;
     final newPadding = GeniusPdfCellPadding(
       left: paddedLeft,
-      right: source.padding.right,
+      right: paddedRight,
       top: source.padding.top,
       bottom: source.padding.bottom,
     );

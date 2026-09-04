@@ -64,3 +64,4 @@ export 'template_definition.dart';
 export 'template_elements.dart';
 export 'template_models.dart';
 export 'template_registry.dart';
+export 'erp_family_registry_extension.dart';

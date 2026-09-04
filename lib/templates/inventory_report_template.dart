@@ -4,10 +4,11 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import 'package:intl/intl.dart';
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/core/pdf_config.dart';
 
+import 'erp_shared_template_layout.dart';
+import '../src/families/erp/erp_families.dart';
 /// Inventory item data.
 class InventoryItem {
   const InventoryItem({
@@ -115,7 +116,7 @@ class InventoryReportData {
 ///
 /// final bytes = report.generate();
 /// ```
-class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
+class InventoryReportTemplate extends GeniusErpRegisterDocument {
   InventoryReportTemplate({
     required GeniusPdfConfig config,
     required this.company,
@@ -185,7 +186,20 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
 
     // Signatures section (without QR code since it's in footer)
     if (showSignatures) {
-      _drawSignatures();
+      drawErpSignatureRow(
+        signatures: const [
+          GeniusErpTemplateSignatureSpec(
+            title: 'Prepared By',
+            titleAr: 'أعده',
+          ),
+          GeniusErpTemplateSignatureSpec(
+            title: 'Approved By',
+            titleAr: 'اعتمده',
+          ),
+        ],
+        itemWidth: 150,
+        lineWidth: 120,
+      );
     }
   }
 
@@ -580,60 +594,6 @@ class InventoryReportTemplate extends GeniusPdfDocumentBuilder {
     return captionHeight + 5 + qrSize;
   }
 
-  void _drawSignatures() {
-    // Ensure enough space for signatures
-    if (currentY > pageHeight - 100) {
-      newPage();
-    }
-
-    addSpace(20);
-
-    // Draw separator line
-    addHorizontalLine(spacing: 10);
-
-    // Signature areas side by side
-    final signatureY = currentY;
-
-    // Prepared by signature
-    final preparedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Prepared By',
-      titleAr: 'أعده',
-      lineWidth: 120,
-      showDate: false,
-    );
-
-    preparedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? pageWidth - 150 : 0,
-        signatureY,
-        150,
-        60,
-      ),
-    );
-
-    // Approved by signature
-    final approvedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Approved By',
-      titleAr: 'اعتمده',
-      lineWidth: 120,
-      showDate: false,
-    );
-
-    approvedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? 0 : pageWidth - 150,
-        signatureY,
-        150,
-        60,
-      ),
-    );
-
-    addSpace(70);
-  }
 
   String _formatNumber(double value) {
     return value.toStringAsFixed(0).replaceAllMapped(

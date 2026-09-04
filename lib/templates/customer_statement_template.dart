@@ -4,12 +4,12 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridRow, PdfGridStyle, PdfGridColumn, PdfTextStyle;
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/domain/financial/financial.dart';
 import '../src/core/pdf_config.dart';
 import '../src/models/pdf_result.dart';
 
+import '../src/families/erp/erp_families.dart';
 /// Transaction entry for customer statement.
 class StatementTransaction {
   const StatementTransaction({
@@ -126,7 +126,7 @@ class CustomerStatementData {
 ///
 /// final bytes = statement.generate();
 /// ```
-class CustomerStatementTemplate extends GeniusPdfDocumentBuilder {
+class CustomerStatementTemplate extends GeniusErpStatementDocument {
   CustomerStatementTemplate({
     required GeniusPdfConfig config,
     required this.company,

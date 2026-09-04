@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'pdf_assets.dart';
 import 'pdf_logger.dart';
 import 'pdf_print_theme.dart';
+import 'pdf_formatter.dart';
+import 'pdf_theme.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 /// Configuration for PDF document settings.
@@ -95,6 +97,8 @@ class GeniusPdfConfig {
     this.defaultOutputPath,
     this.configAssets,
     GeniusPdfPrintTheme? printTheme,
+    GeniusPdfFormatter? formatter,
+    GeniusPdfTheme? theme,
   })  : boldFontBytes = boldFontBytes ?? baseFontBytes,
         headerFontBytes = headerFontBytes ?? boldFontBytes ?? baseFontBytes,
         smallFontBytes = smallFontBytes ?? baseFontBytes,
@@ -108,17 +112,37 @@ class GeniusPdfConfig {
               layoutType: PdfLayoutType.paginate,
               breakType: PdfLayoutBreakType.fitPage,
             ),
-        printTheme = printTheme ?? GeniusPdfPrintTheme.defaults(),
+        formatter = formatter ?? const GeniusPdfDefaultFormatter(),
+        theme = theme ??
+            GeniusPdfTheme.fromPrintTheme(
+              printTheme ?? GeniusPdfPrintTheme.defaults(),
+            ),
+        printTheme =
+            theme?.printTheme ?? printTheme ?? GeniusPdfPrintTheme.defaults(),
         baseFontSize = baseFontSize ??
-            (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.bodySize,
+            (theme?.printTheme ??
+                    printTheme ??
+                    GeniusPdfPrintTheme.defaults())
+                .typography
+                .bodySize,
         boldFontSize = boldFontSize ??
-            (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.bodySize,
+            (theme?.printTheme ??
+                    printTheme ??
+                    GeniusPdfPrintTheme.defaults())
+                .typography
+                .bodySize,
         headerFontSize = headerFontSize ??
-            (printTheme ?? GeniusPdfPrintTheme.defaults())
+            (theme?.printTheme ??
+                    printTheme ??
+                    GeniusPdfPrintTheme.defaults())
                 .typography
                 .headingSize,
         smallFontSize = smallFontSize ??
-            (printTheme ?? GeniusPdfPrintTheme.defaults()).typography.smallSize;
+            (theme?.printTheme ??
+                    printTheme ??
+                    GeniusPdfPrintTheme.defaults())
+                .typography
+                .smallSize;
 
   // ==================== Assets Access ====================
 
@@ -207,6 +231,9 @@ class GeniusPdfConfig {
     GeniusPdfLoggerConfig? loggerConfig,
     // Print theme configuration
     GeniusPdfPrintTheme? printTheme,
+    // S05 shared formatting/theme
+    GeniusPdfFormatter? formatter,
+    GeniusPdfTheme? theme,
   }) async {
     // Load assets if provided
     GeniusPdfAssets? loadedAssets;
@@ -252,6 +279,8 @@ class GeniusPdfConfig {
       defaultOutputPath: defaultOutputPath,
       configAssets: loadedAssets,
       printTheme: printTheme,
+      formatter: formatter,
+      theme: theme,
     );
   }
 
@@ -281,6 +310,9 @@ class GeniusPdfConfig {
     GeniusPdfLoggerConfig? loggerConfig,
     // Print theme configuration
     GeniusPdfPrintTheme? printTheme,
+    // S05 shared formatting/theme
+    GeniusPdfFormatter? formatter,
+    GeniusPdfTheme? theme,
   }) {
     // Build assets if provided
     GeniusPdfAssets? loadedAssets;
@@ -320,6 +352,8 @@ class GeniusPdfConfig {
       defaultOutputPath: defaultOutputPath,
       configAssets: loadedAssets,
       printTheme: printTheme,
+      formatter: formatter,
+      theme: theme,
     );
   }
 
@@ -446,6 +480,12 @@ class GeniusPdfConfig {
   /// ```
   final GeniusPdfPrintTheme printTheme;
 
+  /// Shared S05 value formatter.
+  final GeniusPdfFormatter formatter;
+
+  /// Shared S05 design-token facade.
+  final GeniusPdfTheme theme;
+
   /// Whether the document uses Left-to-Right text direction.
   bool get isLTR => textDirection == TextDirection.ltr;
 
@@ -475,6 +515,8 @@ class GeniusPdfConfig {
     String? defaultOutputPath,
     GeniusPdfAssets? configAssets,
     GeniusPdfPrintTheme? printTheme,
+    GeniusPdfFormatter? formatter,
+    GeniusPdfTheme? theme,
   }) {
     return GeniusPdfConfig(
       baseFontBytes: baseFontBytes ?? this.baseFontBytes,
@@ -497,7 +539,12 @@ class GeniusPdfConfig {
       compressionLevel: compressionLevel ?? this.compressionLevel,
       defaultOutputPath: defaultOutputPath ?? this.defaultOutputPath,
       configAssets: configAssets ?? this.configAssets,
-      printTheme: printTheme ?? this.printTheme,
+      printTheme: theme?.printTheme ?? printTheme ?? this.printTheme,
+      formatter: formatter ?? this.formatter,
+      theme: theme ??
+          (printTheme != null
+              ? GeniusPdfTheme.fromPrintTheme(printTheme)
+              : this.theme),
     );
   }
 }

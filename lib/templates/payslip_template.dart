@@ -4,12 +4,13 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/domain/financial/financial.dart';
 import '../src/core/pdf_config.dart';
 import '../src/models/pdf_result.dart';
 
+import 'erp_shared_template_layout.dart';
+import '../src/families/erp/erp_families.dart';
 /// Employee information for payslip.
 class PayslipEmployee {
   const PayslipEmployee({
@@ -116,7 +117,7 @@ class PayslipData {
 ///
 /// final bytes = payslip.generate();
 /// ```
-class PayslipTemplate extends GeniusPdfDocumentBuilder {
+class PayslipTemplate extends GeniusErpOperationalForm {
   PayslipTemplate({
     required GeniusPdfConfig config,
     required this.company,
@@ -183,7 +184,20 @@ class PayslipTemplate extends GeniusPdfDocumentBuilder {
     // Note: Payslips often don't need manual signatures if generated electronically,
     // but we support it if requested.
     if (showSignatures) {
-      _drawSignatures();
+      drawErpSignatureRow(
+        signatures: const [
+          GeniusErpTemplateSignatureSpec(
+            title: 'Prepared By',
+            titleAr: 'أعده',
+          ),
+          GeniusErpTemplateSignatureSpec(
+            title: 'Approved By',
+            titleAr: 'اعتمده',
+          ),
+        ],
+        itemWidth: 120,
+        lineWidth: 110,
+      );
     } else {
       _drawDigitalDisclaimer();
     }
@@ -645,55 +659,6 @@ class PayslipTemplate extends GeniusPdfDocumentBuilder {
     return captionHeight + 5 + qrSize;
   }
 
-  void _drawSignatures() {
-    if (currentY > pageHeight - 100) {
-      newPage();
-    }
-
-    addSpace(20);
-    addHorizontalLine(spacing: 10);
-    final signatureY = currentY;
-
-    // Prepared By
-    final preparedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Prepared By',
-      titleAr: 'أعده',
-      lineWidth: 110,
-      showDate: false,
-    );
-
-    preparedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? pageWidth - 120 : 0,
-        signatureY,
-        120,
-        60,
-      ),
-    );
-
-    // HR manager or Approved by
-    final approvedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Approved By',
-      titleAr: 'اعتمده',
-      lineWidth: 110,
-      showDate: false,
-    );
-
-    approvedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? 0 : pageWidth - 120,
-        signatureY,
-        120,
-        60,
-      ),
-    );
-
-    addSpace(70);
-  }
 
   void _drawDigitalDisclaimer() {
     final bottomY = pageHeight - 60;

@@ -4,10 +4,11 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import 'package:intl/intl.dart';
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/core/pdf_config.dart';
 
+import 'erp_shared_template_layout.dart';
+import '../src/families/erp/erp_families.dart';
 /// Account entry for trial balance.
 class TrialBalanceEntry {
   const TrialBalanceEntry({
@@ -96,7 +97,7 @@ class TrialBalanceData {
 ///
 /// final bytes = report.generate();
 /// ```
-class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
+class TrialBalanceTemplate extends GeniusErpRegisterDocument {
   TrialBalanceTemplate({
     required GeniusPdfConfig config,
     required this.company,
@@ -166,7 +167,24 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
 
     // Signatures section
     if (showSignatures) {
-      _drawSignatures();
+      drawErpSignatureRow(
+        signatures: const [
+          GeniusErpTemplateSignatureSpec(
+            title: 'Prepared By',
+            titleAr: 'أعده',
+          ),
+          GeniusErpTemplateSignatureSpec(
+            title: 'Reviewed By',
+            titleAr: 'راجعه',
+          ),
+          GeniusErpTemplateSignatureSpec(
+            title: 'Approved By',
+            titleAr: 'اعتمده',
+          ),
+        ],
+        itemWidth: 110,
+        lineWidth: 100,
+      );
     }
   }
 
@@ -528,77 +546,5 @@ class TrialBalanceTemplate extends GeniusPdfDocumentBuilder {
     return captionHeight + 5 + qrSize;
   }
 
-  void _drawSignatures() {
-    // Ensure enough space for signatures
-    if (currentY > pageHeight - 100) {
-      newPage();
-    }
 
-    addSpace(20);
-
-    // Draw separator line
-    addHorizontalLine(spacing: 10);
-
-    // Signature areas side by side
-    final signatureY = currentY;
-
-    // Prepared by signature
-    final preparedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Prepared By',
-      titleAr: 'أعده',
-      lineWidth: 100,
-      showDate: false,
-    );
-
-    preparedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? pageWidth - 110 : 0,
-        signatureY,
-        110,
-        60,
-      ),
-    );
-
-    // Reviewed by signature
-    final reviewedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Reviewed By',
-      titleAr: 'راجعه',
-      lineWidth: 100,
-      showDate: false,
-    );
-
-    reviewedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        (pageWidth - 110) / 2,
-        signatureY,
-        110,
-        60,
-      ),
-    );
-
-    // Approved by signature
-    final approvedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Approved By',
-      titleAr: 'اعتمده',
-      lineWidth: 100,
-      showDate: false,
-    );
-
-    approvedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? 0 : pageWidth - 110,
-        signatureY,
-        110,
-        60,
-      ),
-    );
-
-    addSpace(70);
-  }
 }

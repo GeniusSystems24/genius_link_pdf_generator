@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridRow, PdfGridColumn, PdfGridStyle, PdfTextStyle;
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/core/pdf_config.dart';
 
+import '../src/families/erp/erp_families.dart';
 /// Balance sheet account item.
 class BalanceSheetItem {
   const BalanceSheetItem({
@@ -93,7 +93,7 @@ class BalanceSheetData {
 ///
 /// final bytes = balanceSheet.generate();
 /// ```
-class BalanceSheetTemplate extends GeniusPdfDocumentBuilder {
+class BalanceSheetTemplate extends GeniusErpAnalyticalReport {
   BalanceSheetTemplate({
     required GeniusPdfConfig config,
     required this.company,

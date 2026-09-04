@@ -1,0 +1,36 @@
+# S10 template-family direction matrix
+# This semantic golden is intentionally byte-independent.
+QuotationTemplate|transaction|en=ltr|ar=rtl
+PurchaseOrderTemplate|transaction|en=ltr|ar=rtl
+TaxInvoiceTemplate|transaction|en=ltr|ar=rtl
+BalanceSheetTemplate|analyticalReport|en=ltr|ar=rtl
+BudgetReportTemplate|analyticalReport|en=ltr|ar=rtl
+CashFlowTemplate|analyticalReport|en=ltr|ar=rtl
+IncomeStatementTemplate|analyticalReport|en=ltr|ar=rtl
+TrialBalanceTemplate|register|en=ltr|ar=rtl
+CustomerStatementTemplate|statement|en=ltr|ar=rtl
+AttendanceReportTemplate|register|en=ltr|ar=rtl
+EmployeeReportTemplate|register|en=ltr|ar=rtl
+LeaveReportTemplate|register|en=ltr|ar=rtl
+PayslipTemplate|operationalForm|en=ltr|ar=rtl
+InventoryReportTemplate|register|en=ltr|ar=rtl
+DeliveryNoteTemplate|operationalForm|en=ltr|ar=rtl
+CreditNoteTemplate|transaction|en=ltr|ar=rtl
+DebitNoteTemplate|transaction|en=ltr|ar=rtl
+AccountingEntryVoucher|voucher|en=ltr|ar=rtl
+BankDepositVoucher|voucher|en=ltr|ar=rtl
+BankWithdrawalVoucher|voucher|en=ltr|ar=rtl
+BillPaymentVoucher|voucher|en=ltr|ar=rtl
+GiftVoucher|voucher|en=ltr|ar=rtl
+InventoryVoucher|voucher|en=ltr|ar=rtl
+ModernVoucherTemplate|voucher|en=ltr|ar=rtl
+PaymentVoucher|voucher|en=ltr|ar=rtl
+PurchaseReturnVoucher|voucher|en=ltr|ar=rtl
+PurchaseVoucher|voucher|en=ltr|ar=rtl
+ReceiptVoucher|voucher|en=ltr|ar=rtl
+RemittanceIncomingVoucher|voucher|en=ltr|ar=rtl
+RemittanceOutgoingVoucher|voucher|en=ltr|ar=rtl
+SalesReturnVoucher|voucher|en=ltr|ar=rtl
+SalesVoucher|voucher|en=ltr|ar=rtl
+TaxVoucher|voucher|en=ltr|ar=rtl
+TransferVoucher|voucher|en=ltr|ar=rtl

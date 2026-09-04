@@ -136,3 +136,143 @@ regression inventory only; S00 does not rename or redesign these APIs.
 - S00 may add tests, fixtures, docs, capture tools, and verification UI.
 - S00 must not intentionally change production rendering behavior.
 - Directionality architecture/fixes belong to S01 and S02.
+
+## S07 ERP semantic components
+
+Added in 4.0.0 Sprint S07:
+
+- `GeniusPdfDocumentIdentity`
+- `GeniusPdfPartyBlock`
+- `GeniusPdfAddressBlock`
+- `GeniusPdfReferenceBlock`
+- `GeniusPdfMoney`
+- `GeniusPdfAmountInWords`
+- `GeniusPdfTaxSummary`
+- `GeniusPdfAdjustmentSummary`
+- `GeniusPdfBalanceDueBlock`
+- `GeniusPdfTermsSection`
+- `GeniusPdfApprovalTrail`
+- `GeniusPdfStamp`
+- `GeniusPdfMetricCards`
+- `GeniusPdfLabel`
+- `GeniusPdfErpComponentGroup`
+- `GeniusPdfEmptySectionPolicy`
+
+## S08/S09 ERP family and migration APIs
+
+Added in 4.0.0:
+
+### S08 families
+
+- `GeniusErpTransactionDocument`
+- `GeniusErpStatementDocument`
+- `GeniusErpVoucherDocument`
+- `GeniusErpAnalyticalReport`
+- `GeniusErpOperationalForm`
+- `GeniusErpRegisterDocument`
+- `GeniusErpThermalReceipt`
+- `GeniusErpLabelDocument`
+- `GeniusErpCertificateDocument`
+- `GeniusErpFamilyPlan`
+- `GeniusErpFamilySlot`
+- `GeniusErpSlotPolicy`
+- `GeniusErpCustomSection`
+- `GeniusErpPrintProfile`
+- `GeniusErpDocumentAdapter<T>`
+
+### S09 compatibility
+
+- `QuotationErpAdapter`
+- `PurchaseOrderErpAdapter`
+- `TaxInvoiceErpAdapter`
+- `GeniusErpLegacyCompatibility`
+- `GeniusErpLegacyAmountInWords`
+
+## S10/S11 consolidation and print-profile APIs
+
+Added in 4.0.0:
+
+### S10
+
+- `GeniusErpExistingTemplateFamilyRegistration`
+- `GeniusErpExistingTemplateFamilyRegistry`
+- `GeniusErpTemplateRegistryExtension`
+
+### S11
+
+- `GeniusPdfPrintProfile`
+- `GeniusPdfPrintProfileKind`
+- `GeniusPdfPrintInsets`
+- `GeniusPdfPrintDensity`
+- `GeniusPdfHeaderFooterPolicy`
+- `GeniusPdfCopyMetadata`
+- `GeniusPdfLabelSheetSpec`
+- `GeniusPdfPrintCalibration`
+- `GeniusPdfThermalReceiptEngine`
+- `GeniusPdfThermalReceiptData`
+- `GeniusPdfThermalLineItem`
+- `GeniusPdfThermalPaymentLine`
+- `GeniusPdfLabelPrintDocument`
+- `GeniusPdfLabelData`
+- `GeniusPdfPreprintedFormDocument`
+- `GeniusPdfPreprintedField`
+- `GeniusPdfPreprintedFieldAnchor`
+- `GeniusPdfCalibrationTestDocument`
+
+## S12/S13 ERP pack APIs
+
+Added in 4.0.0:
+
+- `GeniusErpPackTaxMode`
+- `GeniusErpPackTransactionRequest`
+- `GeniusErpPackCalculationService`
+- `GeniusErpPackReportColumnKind`
+- `GeniusErpPackReportColumn`
+- `GeniusErpPackLocalizedValue`
+- `GeniusErpPackReportRow`
+- `GeniusErpPackReportData`
+- `GeniusErpOpenItem`
+- `GeniusErpAgingBucket`
+- `GeniusErpAgingResult`
+- `GeniusErpAgingService`
+- `GeniusSalesLedgerEntry`
+- `GeniusSalesBackorderLine`
+- `GeniusSalesPriceEntry`
+- `GeniusSalesAnalytics`
+- `GeniusSalesTransactionDocument`
+- `GeniusSalesOrderDocument`
+- `GeniusProformaInvoiceDocument`
+- `GeniusPosInvoiceDocument`
+- `GeniusSalesDebitNoteDocument`
+- `GeniusSalesReturnDocument`
+- `GeniusCustomerReceiptDocument`
+- `GeniusPickingListDocument`
+- `GeniusPackingListDocument`
+- `GeniusBackorderDocument`
+- `GeniusCustomerAgingDocument`
+- `GeniusSalesRegisterDocument`
+- `GeniusSalesByCustomerReport`
+- `GeniusSalesByItemReport`
+- `GeniusSalesBySalespersonReport`
+- `GeniusPriceListDocument`
+- `GeniusCommissionReport`
+- `GeniusPurchaseLedgerEntry`
+- `GeniusSupplierQuoteLine`
+- `GeniusPurchaseAdjustmentKind`
+- `GeniusPurchasingAnalytics`
+- `GeniusPurchasingLandedChargesHook`
+- `GeniusPurchasingTransactionDocument`
+- `GeniusPurchaseRequisitionDocument`
+- `GeniusRequestForQuotationDocument`
+- `GeniusSupplierQuotationDocument`
+- `GeniusQuotationComparisonDocument`
+- `GeniusPurchaseOrderDocument`
+- `GeniusGoodsReceiptNoteDocument`
+- `GeniusPurchaseInvoiceDocument`
+- `GeniusPurchaseAdjustmentDocument`
+- `GeniusSupplierReturnDocument`
+- `GeniusSupplierStatementDocument`
+- `GeniusSupplierAgingDocument`
+- `GeniusPurchaseRegisterDocument`
+- `GeniusPurchaseAnalysisReport`
+- `GeniusOutstandingPurchaseOrdersReport`

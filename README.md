@@ -1250,6 +1250,443 @@ PdfFlowSection(
 Flow components read `boldFont`, `headerFont`, and `smallFont` directly from
 `GeniusPdfConfig`, avoiding name collisions with existing template fields.
 
+## 4.0.0 — S04 DataGrid vNext for ERP Reports
+
+S04 adds an opt-in ERP-grade grid pipeline while preserving the established
+`GeniusPdfDataGrid`.
+
+```dart
+final grid = GeniusPdfDataGridVNext(
+  config: config,
+  columns: const [
+    GeniusPdfGridColumn(
+      id: 'sku',
+      title: 'SKU',
+      titleAr: 'رمز الصنف',
+    ),
+    GeniusPdfGridColumn(
+      id: 'description',
+      title: 'Description',
+      titleAr: 'الوصف',
+    ),
+    GeniusPdfGridColumn(
+      id: 'amount',
+      title: 'Amount',
+      titleAr: 'المبلغ',
+      isNumeric: true,
+    ),
+  ],
+  rows: rows,
+  columnPolicies: const {
+    'sku': GeniusPdfGridColumnPolicy(
+      widthMode: GeniusPdfGridWidthMode.fixed,
+      fixedWidth: 90,
+      contentDirection: GeniusPdfDirection.ltr,
+    ),
+    'description': GeniusPdfGridColumnPolicy(
+      widthMode: GeniusPdfGridWidthMode.flex,
+      flex: 3,
+      minWidth: 180,
+      overflow: GeniusPdfGridTextOverflow.wrap,
+    ),
+    'amount': GeniusPdfGridColumnPolicy(
+      widthMode: GeniusPdfGridWidthMode.fixed,
+      fixedWidth: 120,
+      valueKind: GeniusPdfGridValueKind.money,
+      currencyCode: 'SAR',
+      accountingNegative: true,
+    ),
+  },
+  repeatHeaderOnPages: true,
+  rowSplitPolicy: GeniusPdfGridRowSplitPolicy.keepTogether,
+);
+```
+
+Nested grouping and reusable subtotals/grand totals are available through
+`GeniusPdfGridGroupDefinition` and `GeniusPdfGridSummaryExpression`. Row and
+column spans use `GeniusPdfGridCellSpan`. Row/cell builders and conditional
+style builders are supported without replacing the low-level grid renderer.
+
+S04 also adds DataGrid-local ERP formatter hooks for money, percentage,
+quantity, date/time and identifiers, plus debit/credit styles, accounting
+negative values and per-row currency resolution. The shared package formatter
+engine remains S05 work.
+
+For large data:
+
+```dart
+rowSource: GeniusPdfGridLazyRowSource(
+  length: 10000,
+  builder: (index) => GeniusPdfGridRow(
+    cells: buildCells(index),
+  ),
+),
+performance: const GeniusPdfGridPerformanceOptions(
+  veryLargeDataMode: true,
+  autoFitSampleSize: 100,
+),
+```
+
+The example Dashboard contains **S04 DataGrid vNext** with sizing,
+long-content, multi-page, nested-group, span/builder, ERP formatting, RTL,
+empty-state and 1k-row scenarios.
+
+See `docs/sprints/s04/DATAGRID_VNEXT_CONTRACT.md`.
+
+## 4.0.0 — S05 Formatting Engine & Design Tokens
+
+S05 provides one shared formatting source for PDF components:
+
+```dart
+final formatter = GeniusPdfDefaultFormatter(
+  settings: const GeniusPdfFormatSettings(
+    locale: 'en_US',
+    digitPolicy: GeniusPdfDigitPolicy.latin,
+    currencyDisplay: GeniusPdfCurrencyDisplay.code,
+    currencyPosition: GeniusPdfCurrencyPosition.after,
+    nullPolicy: GeniusPdfNullPlaceholderPolicy.emDash(),
+  ),
+);
+
+final config = existingConfig.copyWith(formatter: formatter);
+```
+
+```dart
+config.formatter.formatMoney(15697.5, currencyCode: 'SAR');
+// 15,697.50 SAR
+
+config.formatter.formatPercentage(0.15, isFraction: true);
+// 15.00%
+
+config.formatter.formatIdentifier('INV-2026-000123');
+// identifier stays unchanged even with Arabic digit policy
+```
+
+Components can store a `GeniusPdfFormatSpec` instead of pre-formatting data:
+
+```dart
+const GeniusPdfGridColumn(
+  id: 'amount',
+  title: 'Amount',
+  titleAr: 'المبلغ',
+  isNumeric: true,
+  formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+);
+```
+
+`GeniusPdfSummaryItem.formatted(...)` and
+`GeniusPdfLabeledValue.formatted(...)` use the same formatter.
+
+### `GeniusPdfTheme`
+
+`GeniusPdfTheme` wraps `GeniusPdfPrintTheme` and adds S05 semantic/logical
+tokens:
+
+```dart
+final config = existingConfig.copyWith(
+  theme: GeniusPdfTheme.corporate(),
+);
+```
+
+It exposes typography, spacing, borders, table/document/summary tokens,
+semantic colors, logical start/end spacing, logical leading/trailing borders,
+and direction-aware alignment defaults. RTL/LTR never changes semantic colors
+or font weight.
+
+The example Dashboard includes **S05 Formatting & Theme** with component
+consistency, multi-currency, precision, accounting, Arabic/Latin digits,
+null/unit/exchange rate, theme customization, and long multi-page scenarios.
+
+See `docs/sprints/s05/FORMATTING_THEME_CONTRACT.md`.
+
+## 4.0.0 — S13 Purchasing ERP Pack
+
+The Purchasing pack adds Purchase Requisition, RFQ, Supplier Quotation,
+Quotation Comparison, Purchase Order, GRN, Purchase Invoice, Purchase
+Debit/Credit Note, Supplier Return, Supplier Statement/Aging, Purchase Register,
+Purchase Analysis and Outstanding Purchase Orders.
+
+The existing `PurchaseOrderTemplate` now inherits
+`GeniusPurchasingTransactionDocument`, avoiding a separate PO family path.
+
+`GeniusPurchasingLandedChargesHook` adds S06 charges before calculation, while
+`GeniusPurchasingAnalytics` owns quotation comparison, partial receipt,
+supplier aging, register and analytical calculations outside rendering.
+
+See `docs/sprints/s13/PURCHASING_ERP_PACK.md`.
+
+## 4.0.0 — S12 Sales ERP Pack
+
+The Sales pack adds public Sales Order, Proforma/POS Invoice, Debit Note, Sales
+Return, Customer Receipt, Picking/Packing/Backorder, Customer Aging, Sales
+Register, Sales-by dimensions, Price List and Commission documents.
+
+Transaction classes share `GeniusSalesTransactionDocument`, which is built on
+`GeniusErpTransactionDocument`. Existing `QuotationTemplate` and
+`TaxInvoiceTemplate` now use the same Sales pack base.
+
+`GeniusErpPackCalculationService` centralizes discounts, charges, taxes,
+inclusive/exclusive tax mode, multi-currency and negative-return arithmetic
+through S06. `GeniusSalesAnalytics` calculates aging/register/analysis results
+before rendering.
+
+See `docs/sprints/s12/SALES_ERP_PACK.md`.
+
+## 4.0.0 — S11 Print Profiles, Thermal & Labels
+
+Use `GeniusPdfPrintProfile` to target A4 portrait/landscape, A5, Letter, Legal,
+58mm/80mm thermal, continuous paper, custom labels, label sheets and
+pre-printed forms.
+
+```dart
+final profile = GeniusPdfPrintProfile.thermal80();
+
+final receipt = GeniusPdfThermalReceiptEngine(
+  config: config,
+  profile: profile,
+  data: receiptData,
+);
+```
+
+`GeniusPdfThermalReceiptEngine` provides compact variable-height receipts with
+totals, payment lines, RTL and QR/barcode support.
+
+`GeniusPdfLabelPrintDocument` supports single labels and calibrated label-sheet
+grids with SKU/batch/serial/expiry plus QR/barcode.
+
+`GeniusPdfPreprintedFormDocument` is the explicit physical-coordinate mode:
+field anchor x/y positions never mirror in RTL. Use
+`GeniusPdfCalibrationTestDocument` to measure printer drift.
+
+See `docs/sprints/s11/PRINT_PROFILES_THERMAL_LABELS.md`.
+
+## 4.0.0 — S10 Existing Template Consolidation
+
+The remaining package templates are now part of the S08 ERP family hierarchy.
+Financial analysis uses `GeniusErpAnalyticalReport`, statements use
+`GeniusErpStatementDocument`, tabular reports use `GeniusErpRegisterDocument`,
+operational documents use `GeniusErpOperationalForm`, and Credit/Debit Note
+uses `GeniusErpTransactionDocument`.
+
+All voucher classes now inherit the same `GeniusErpVoucherDocument` through
+`GeniusPdfVoucherTemplate`. Account entries, party/payment details, amount
+highlight, amount-in-words, notes, signatures, footer and page-border behavior
+remain centralized in the voucher base.
+
+Use `GeniusErpExistingTemplateFamilyRegistry` to inspect package mappings, or
+the non-breaking `GeniusErpTemplateRegistryExtension` on `TemplateRegistry`.
+
+See `docs/sprints/s10/TEMPLATE_FAMILY_CONSOLIDATION.md`.
+
+## 4.0.0 — S09 Transaction Template Migration
+
+`QuotationTemplate`, `PurchaseOrderTemplate`, and `TaxInvoiceTemplate` now
+extend the same `GeniusErpTransactionDocument` family.
+
+Their existing constructors remain available. Compatibility adapters translate
+legacy models to S06 domain/calculation objects:
+
+```dart
+final adapter = QuotationErpAdapter(company: company);
+final context = adapter.adapt(quotation);
+```
+
+The migrated templates use shared S07/S08 identity, party, item-grid, financial
+summary, terms, signature, QR and page-flow behavior. Aggregate calculations
+come from `ErpCalculationService`.
+
+Tax Invoice amount-in-words remains supported through the shared S09
+compatibility service. Purchase Order shipping details and Quotation QR/terms
+remain available.
+
+See:
+
+- `docs/sprints/s09/TRANSACTION_TEMPLATE_MIGRATION.md`
+- `docs/sprints/s09/GOLDEN_COMPARISON.md`
+- `docs/sprints/s09/DUPLICATION_AUDIT.md`
+
+## 4.0.0 — S08 Generic ERP Document Families
+
+S08 introduces reusable ERP document structures:
+
+```dart
+final document = GeniusErpTransactionDocument(
+  config,
+  plan: GeniusErpFamilyPlan(
+    document: context,
+    calculation: calculation,
+    company: company,
+    title: 'Transaction',
+    titleAr: 'معاملة',
+    primaryParty: context.recipient,
+  ),
+);
+```
+
+Available families are `GeniusErpTransactionDocument`,
+`GeniusErpStatementDocument`, `GeniusErpVoucherDocument`,
+`GeniusErpAnalyticalReport`, `GeniusErpOperationalForm`,
+`GeniusErpRegisterDocument`, `GeniusErpThermalReceipt`,
+`GeniusErpLabelDocument`, and `GeniusErpCertificateDocument`.
+
+The shared family plan provides header, identity, party, reference, body,
+summary, notes/terms, approvals/signatures, attachments/QR/barcode, and footer
+slots. Slot policies support null collapse, page breaks, start/end direction
+overrides, first/last-page variants, theme overrides, print-profile hooks,
+component replacement, custom section insertion and renderer-independent
+before/after hooks.
+
+See `docs/sprints/s08/ERP_DOCUMENT_FAMILIES.md`.
+
+## 4.0.0 — S07 ERP Semantic Components
+
+S07 adds reusable ERP PDF sections that consume the S06 domain layer instead
+of duplicating template-specific identity/party/tax/terms layout.
+
+```dart
+final components = GeniusPdfErpComponentGroup(
+  spacing: 12,
+  components: [
+    GeniusPdfDocumentIdentity(
+      config: config,
+      data: context.identity,
+      directionality: directionality,
+    ),
+    GeniusPdfPartyBlock(
+      config: config,
+      party: context.recipient,
+      title: 'Customer',
+      titleAr: 'العميل',
+      directionality: directionality,
+    ),
+    GeniusPdfAddressBlock(
+      config: config,
+      address: context.shippingAddress,
+      directionality: directionality,
+    ),
+    GeniusPdfTaxSummary(
+      config: config,
+      result: calculation,
+      directionality: directionality,
+    ),
+    GeniusPdfBalanceDueBlock(
+      config: config,
+      result: calculation,
+      directionality: directionality,
+    ),
+    GeniusPdfTermsSection(
+      config: config,
+      text: context.terms,
+      textAr: arabicTerms,
+      directionality: directionality,
+    ),
+  ],
+);
+```
+
+Available semantic components include:
+
+- `GeniusPdfDocumentIdentity`
+- `GeniusPdfPartyBlock`
+- `GeniusPdfAddressBlock`
+- `GeniusPdfReferenceBlock`
+- `GeniusPdfMoney`
+- `GeniusPdfAmountInWords`
+- `GeniusPdfTaxSummary`
+- `GeniusPdfAdjustmentSummary`
+- `GeniusPdfBalanceDueBlock`
+- `GeniusPdfTermsSection`
+- `GeniusPdfApprovalTrail`
+- `GeniusPdfStamp`
+- `GeniusPdfMetricCards`
+- `GeniusPdfLabel`
+
+Null data collapses by default. Empty collections have an explicit
+`GeniusPdfEmptySectionPolicy.hide` / `emptyState` policy.
+`GeniusPdfErpComponentGroup` adds spacing only between components that actually
+render, so hidden sections leave no residual gap.
+
+All new geometry uses logical start/end and inherited `GeniusPdfDirectionality`.
+Money, IDs, tax IDs, phone, email and date/time value runs resolve independently
+from the surrounding RTL/LTR prose.
+
+Financial components consume the typed S06 calculation result; they do not
+recalculate tax/discount/charge business rules.
+
+See:
+
+- `docs/sprints/s07/ERP_SEMANTIC_COMPONENTS.md`
+- `docs/sprints/s07/COMPOSITION_GUIDANCE.md`
+
+The example Dashboard includes **S07 ERP Semantic Components** for LTR/RTL,
+bilingual, null-collapse, empty-state and long/multi-page manual verification.
+
+## 4.0.0 — S06 ERP Shared Domain & Calculation Layer
+
+S06 introduces reusable ERP models for transaction documents:
+
+```dart
+final context = ErpDocumentContext(
+  organization: const ErpOrganization(
+    id: 'ORG-1',
+    legalName: 'Genius Systems',
+  ),
+  identity: ErpDocumentIdentity(
+    kind: ErpDocumentKind.invoice,
+    number: 'INV-2026-0001',
+    issueDate: DateTime(2026, 9, 4),
+  ),
+  documentCurrency: ErpCurrency.sar,
+  lineItems: [
+    ErpLineItem(
+      id: '1',
+      description: 'Consulting',
+      quantity: const ErpQuantity(
+        value: 2,
+        unit: ErpUnit.each,
+      ),
+      unitPrice: ErpMoney.fromAmount(
+        100,
+        currency: ErpCurrency.sar,
+      ),
+      taxes: const [
+        ErpTaxLine(code: 'VAT', ratePercent: 15),
+      ],
+    ),
+  ],
+);
+```
+
+Quotation, Purchase Order and Invoice use the same context and line model.
+
+```dart
+final result = const ErpCalculationService().calculate(
+  ErpCalculationRequest.fromContext(
+    context,
+    documentDiscounts: [
+      ErpDiscount.percentage(percentage: 10),
+    ],
+    config: const ErpCalculationConfig(
+      documentDiscountTaxPolicy:
+          ErpDocumentDiscountTaxPolicy.beforeTax,
+    ),
+  ),
+);
+```
+
+The result provides subtotal, line/document discounts, charges, taxable amount,
+tax totals, grand total, rounding adjustment and optional paid/due values.
+
+For multi-currency documents, set `documentCurrency`, `baseCurrency` and an
+explicit `ErpExchangeRate`; base-currency totals are returned separately.
+
+`ErpDomainValidator` validates zero/negative policies, currencies, adjustments,
+taxes and exchange rates. Optional metadata remains nullable. Serialization is
+kept in the explicit `ErpDomainSerialization` boundary adapter.
+
+See `docs/sprints/s06/ERP_DOMAIN_CALCULATION_CONTRACT.md`. The example Dashboard
+contains **S06 ERP Domain & Calculations**.
+
 ## Example application
 
 The `example/` project demonstrates the library through feature-focused screens,

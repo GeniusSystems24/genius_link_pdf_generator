@@ -534,82 +534,82 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Column sizing
 
-- [ ] **S04-T01** — fixed width.
-- [ ] **S04-T02** — weighted/flex width.
-- [ ] **S04-T03** — min/max width.
-- [ ] **S04-T04** — auto-fit.
-- [ ] **S04-T05** — text wrapping.
-- [ ] **S04-T06** — ellipsis/clip policies.
-- [ ] **S04-T07** — decimal/numeric alignment.
+- [x] **S04-T01** — fixed width.
+- [x] **S04-T02** — weighted/flex width.
+- [x] **S04-T03** — min/max width.
+- [x] **S04-T04** — auto-fit.
+- [x] **S04-T05** — text wrapping.
+- [x] **S04-T06** — ellipsis/clip policies.
+- [x] **S04-T07** — decimal/numeric alignment.
 
 ## B — Pagination
 
-- [ ] **S04-T08** — repeated headers.
-- [ ] **S04-T09** — keepRowTogether.
-- [ ] **S04-T10** — controlled row split policy.
-- [ ] **S04-T11** — group header repetition.
-- [ ] **S04-T12** — group footer/subtotal placement.
-- [ ] **S04-T13** — grand total placement.
+- [x] **S04-T08** — repeated headers.
+- [x] **S04-T09** — keepRowTogether.
+- [x] **S04-T10** — controlled row split policy.
+- [x] **S04-T11** — group header repetition.
+- [x] **S04-T12** — group footer/subtotal placement.
+- [x] **S04-T13** — grand total placement.
 
 ## C — Grouping
 
-- [ ] **S04-T14** — group headers.
-- [ ] **S04-T15** — group footers.
-- [ ] **S04-T16** — subtotals.
-- [ ] **S04-T17** — grand totals.
-- [ ] **S04-T18** — nested groups.
-- [ ] **S04-T19** — tree/hierarchical indentation.
-- [ ] **S04-T20** — summary expressions contract.
+- [x] **S04-T14** — group headers.
+- [x] **S04-T15** — group footers.
+- [x] **S04-T16** — subtotals.
+- [x] **S04-T17** — grand totals.
+- [x] **S04-T18** — nested groups.
+- [x] **S04-T19** — tree/hierarchical indentation.
+- [x] **S04-T20** — summary expressions contract.
 
 ## D — Cell structure
 
-- [ ] **S04-T21** — row span.
-- [ ] **S04-T22** — column span.
-- [ ] **S04-T23** — conditional row style.
-- [ ] **S04-T24** — conditional cell style.
-- [ ] **S04-T25** — row builder.
-- [ ] **S04-T26** — cell builder.
-- [ ] **S04-T27** — empty state.
+- [x] **S04-T21** — row span.
+- [x] **S04-T22** — column span.
+- [x] **S04-T23** — conditional row style.
+- [x] **S04-T24** — conditional cell style.
+- [x] **S04-T25** — row builder.
+- [x] **S04-T26** — cell builder.
+- [x] **S04-T27** — empty state.
 
 ## E — ERP format integration
 
-- [ ] **S04-T28** — money formatter hook.
-- [ ] **S04-T29** — percentage formatter hook.
-- [ ] **S04-T30** — quantity formatter hook.
-- [ ] **S04-T31** — date/time formatter hook.
-- [ ] **S04-T32** — debit/credit semantic style.
-- [ ] **S04-T33** — negative accounting values.
-- [ ] **S04-T34** — multi-currency display.
+- [x] **S04-T28** — money formatter hook.
+- [x] **S04-T29** — percentage formatter hook.
+- [x] **S04-T30** — quantity formatter hook.
+- [x] **S04-T31** — date/time formatter hook.
+- [x] **S04-T32** — debit/credit semantic style.
+- [x] **S04-T33** — negative accounting values.
+- [x] **S04-T34** — multi-currency display.
 
 ## F — Directionality
 
-- [ ] **S04-T35** — تثبيت followDirection/preserveDefinitionOrder.
-- [ ] **S04-T36** — per-column direction.
-- [ ] **S04-T37** — RTL grouping indentation.
-- [ ] **S04-T38** — RTL header/cell padding.
+- [x] **S04-T35** — تثبيت followDirection/preserveDefinitionOrder.
+- [x] **S04-T36** — per-column direction.
+- [x] **S04-T37** — RTL grouping indentation.
+- [x] **S04-T38** — RTL header/cell padding.
 - [ ] **S04-T39** — mixed numeric/text rows.
 
 ## G — Performance
 
-- [ ] **S04-T40** — very-large-data mode.
-- [ ] **S04-T41** — lazy row preparation where possible.
-- [ ] **S04-T42** — cache measured widths.
-- [ ] **S04-T43** — avoid rebuilding repeated styles.
+- [x] **S04-T40** — very-large-data mode.
+- [x] **S04-T41** — lazy row preparation where possible.
+- [x] **S04-T42** — cache measured widths.
+- [x] **S04-T43** — avoid rebuilding repeated styles.
 - [ ] **S04-T44** — benchmark 1k/10k rows حسب حدود البيئة.
 
 ## Manual Verification Example
 
-- [ ] **S04-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S04-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S04-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S04-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S04-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S04-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S04-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S04-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
 - [ ] **S04-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Advanced DataGrid.
-- [ ] ERP formatter hooks.
-- [ ] Grouping/subtotals.
+- [x] Advanced DataGrid.
+- [x] ERP formatter hooks.
+- [x] Grouping/subtotals.
 - [ ] Large-data benchmark.
 
 ## Exit Gate
@@ -633,73 +633,73 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Formatting API
 
-- [ ] **S05-T01** — إضافة `GeniusPdfFormatter` contract.
-- [ ] **S05-T02** — money formatter.
-- [ ] **S05-T03** — number formatter.
-- [ ] **S05-T04** — quantity formatter.
-- [ ] **S05-T05** — percentage formatter.
-- [ ] **S05-T06** — date formatter.
-- [ ] **S05-T07** — time formatter.
-- [ ] **S05-T08** — identifier formatter.
-- [ ] **S05-T09** — null placeholder policy.
+- [x] **S05-T01** — إضافة `GeniusPdfFormatter` contract.
+- [x] **S05-T02** — money formatter.
+- [x] **S05-T03** — number formatter.
+- [x] **S05-T04** — quantity formatter.
+- [x] **S05-T05** — percentage formatter.
+- [x] **S05-T06** — date formatter.
+- [x] **S05-T07** — time formatter.
+- [x] **S05-T08** — identifier formatter.
+- [x] **S05-T09** — null placeholder policy.
 
 ## B — Locale & accounting
 
-- [ ] **S05-T10** — locale-aware separators.
-- [ ] **S05-T11** — decimal precision rules.
-- [ ] **S05-T12** — currency code/symbol policy.
-- [ ] **S05-T13** — accounting negative format.
-- [ ] **S05-T14** — Arabic/English digit policy.
-- [ ] **S05-T15** — exchange rate formatting.
-- [ ] **S05-T16** — unit formatting.
+- [x] **S05-T10** — locale-aware separators.
+- [x] **S05-T11** — decimal precision rules.
+- [x] **S05-T12** — currency code/symbol policy.
+- [x] **S05-T13** — accounting negative format.
+- [x] **S05-T14** — Arabic/English digit policy.
+- [x] **S05-T15** — exchange rate formatting.
+- [x] **S05-T16** — unit formatting.
 
 ## C — Theme
 
-- [ ] **S05-T17** — إضافة `GeniusPdfTheme`.
-- [ ] **S05-T18** — typography tokens.
-- [ ] **S05-T19** — spacing tokens.
-- [ ] **S05-T20** — border tokens.
-- [ ] **S05-T21** — table theme.
-- [ ] **S05-T22** — document theme.
-- [ ] **S05-T23** — semantic colors.
-- [ ] **S05-T24** — summary/highlight styles.
+- [x] **S05-T17** — إضافة `GeniusPdfTheme`.
+- [x] **S05-T18** — typography tokens.
+- [x] **S05-T19** — spacing tokens.
+- [x] **S05-T20** — border tokens.
+- [x] **S05-T21** — table theme.
+- [x] **S05-T22** — document theme.
+- [x] **S05-T23** — semantic colors.
+- [x] **S05-T24** — summary/highlight styles.
 
 ## D — Directionality-aware styling
 
-- [ ] **S05-T25** — logical spacing tokens.
-- [ ] **S05-T26** — leading/trailing borders عندما يكون ذلك semantic.
-- [ ] **S05-T27** — RTL/LTR typography alignment defaults.
-- [ ] **S05-T28** — عدم ربط اللون أو الوزن بالاتجاه.
+- [x] **S05-T25** — logical spacing tokens.
+- [x] **S05-T26** — leading/trailing borders عندما يكون ذلك semantic.
+- [x] **S05-T27** — RTL/LTR typography alignment defaults.
+- [x] **S05-T28** — عدم ربط اللون أو الوزن بالاتجاه.
 
 ## E — Migration
 
-- [ ] **S05-T29** — إزالة format snippets المكررة من components الأساسية.
-- [ ] **S05-T30** — إزالة hardcoded amount strings من examples.
-- [ ] **S05-T31** — توصيل DataGrid وSummary بالـ formatter/theme.
-- [ ] **S05-T32** — توفير backward-compatible defaults.
+- [x] **S05-T29** — إزالة format snippets المكررة من components الأساسية.
+- [x] **S05-T30** — إزالة hardcoded amount strings من examples.
+- [x] **S05-T31** — توصيل DataGrid وSummary بالـ formatter/theme.
+- [x] **S05-T32** — توفير backward-compatible defaults.
 
 ## F — Tests/docs
 
-- [ ] **S05-T33** — goldens لعملات متعددة.
-- [ ] **S05-T34** — اختبارات decimal precision.
-- [ ] **S05-T35** — اختبارات negative/accounting formats.
-- [ ] **S05-T36** — اختبارات Arabic digits policy.
-- [ ] **S05-T37** — توثيق أمثلة formatter/theme.
+- [x] **S05-T33** — goldens لعملات متعددة.
+- [x] **S05-T34** — اختبارات decimal precision.
+- [x] **S05-T35** — اختبارات negative/accounting formats.
+- [x] **S05-T36** — اختبارات Arabic digits policy.
+- [x] **S05-T37** — توثيق أمثلة formatter/theme.
 
 ## Manual Verification Example
 
-- [ ] **S05-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S05-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S05-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S05-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S05-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S05-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S05-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S05-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S05-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S05-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Formatting engine.
-- [ ] Theme/design token model.
-- [ ] Component integration.
-- [ ] Formatting test matrix.
+- [x] Formatting engine.
+- [x] Theme/design token model.
+- [x] Component integration.
+- [x] Formatting test matrix.
 
 ## Exit Gate
 
@@ -721,84 +721,84 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Context & identity
 
-- [ ] **S06-T01** — `ErpDocumentContext`.
-- [ ] **S06-T02** — `ErpOrganization`.
-- [ ] **S06-T03** — `ErpBranch`.
-- [ ] **S06-T04** — `ErpDocumentIdentity`.
-- [ ] **S06-T05** — `ErpDocumentReference`.
-- [ ] **S06-T06** — `ErpPrintMetadata`.
-- [ ] **S06-T07** — `ErpDocumentStatus`.
+- [x] **S06-T01** — `ErpDocumentContext`.
+- [x] **S06-T02** — `ErpOrganization`.
+- [x] **S06-T03** — `ErpBranch`.
+- [x] **S06-T04** — `ErpDocumentIdentity`.
+- [x] **S06-T05** — `ErpDocumentReference`.
+- [x] **S06-T06** — `ErpPrintMetadata`.
+- [x] **S06-T07** — `ErpDocumentStatus`.
 
 ## B — Parties & addresses
 
-- [ ] **S06-T08** — `ErpParty`.
-- [ ] **S06-T09** — `ErpAddress`.
-- [ ] **S06-T10** — `ErpTaxIdentity`.
-- [ ] **S06-T11** — optional contact metadata.
-- [ ] **S06-T12** — billing/shipping/address roles.
+- [x] **S06-T08** — `ErpParty`.
+- [x] **S06-T09** — `ErpAddress`.
+- [x] **S06-T10** — `ErpTaxIdentity`.
+- [x] **S06-T11** — optional contact metadata.
+- [x] **S06-T12** — billing/shipping/address roles.
 
 ## C — Monetary model
 
-- [ ] **S06-T13** — `ErpMoney`.
-- [ ] **S06-T14** — `ErpCurrency`.
-- [ ] **S06-T15** — `ErpExchangeRate`.
-- [ ] **S06-T16** — rounding strategy.
-- [ ] **S06-T17** — currency precision.
-- [ ] **S06-T18** — base/document currency separation.
+- [x] **S06-T13** — `ErpMoney`.
+- [x] **S06-T14** — `ErpCurrency`.
+- [x] **S06-T15** — `ErpExchangeRate`.
+- [x] **S06-T16** — rounding strategy.
+- [x] **S06-T17** — currency precision.
+- [x] **S06-T18** — base/document currency separation.
 
 ## D — Transaction details
 
-- [ ] **S06-T19** — `ErpQuantity`.
-- [ ] **S06-T20** — `ErpUnit`.
-- [ ] **S06-T21** — `ErpLineItem`.
-- [ ] **S06-T22** — `ErpTaxLine`.
-- [ ] **S06-T23** — `ErpDiscount`.
-- [ ] **S06-T24** — `ErpCharge`.
-- [ ] **S06-T25** — `ErpBatchInfo`.
-- [ ] **S06-T26** — `ErpSerialInfo`.
+- [x] **S06-T19** — `ErpQuantity`.
+- [x] **S06-T20** — `ErpUnit`.
+- [x] **S06-T21** — `ErpLineItem`.
+- [x] **S06-T22** — `ErpTaxLine`.
+- [x] **S06-T23** — `ErpDiscount`.
+- [x] **S06-T24** — `ErpCharge`.
+- [x] **S06-T25** — `ErpBatchInfo`.
+- [x] **S06-T26** — `ErpSerialInfo`.
 
 ## E — Approval & attachment
 
-- [ ] **S06-T27** — `ErpApproval`.
-- [ ] **S06-T28** — `ErpSignature`.
-- [ ] **S06-T29** — `ErpAttachment`.
+- [x] **S06-T27** — `ErpApproval`.
+- [x] **S06-T28** — `ErpSignature`.
+- [x] **S06-T29** — `ErpAttachment`.
 
 ## F — Calculation service
 
-- [ ] **S06-T30** — subtotal calculation.
-- [ ] **S06-T31** — line discount.
-- [ ] **S06-T32** — document discount.
-- [ ] **S06-T33** — charges.
-- [ ] **S06-T34** — taxable amount.
-- [ ] **S06-T35** — tax totals.
-- [ ] **S06-T36** — grand total.
-- [ ] **S06-T37** — rounding adjustment.
-- [ ] **S06-T38** — paid/due where applicable.
-- [ ] **S06-T39** — multi-currency conversion contract.
+- [x] **S06-T30** — subtotal calculation.
+- [x] **S06-T31** — line discount.
+- [x] **S06-T32** — document discount.
+- [x] **S06-T33** — charges.
+- [x] **S06-T34** — taxable amount.
+- [x] **S06-T35** — tax totals.
+- [x] **S06-T36** — grand total.
+- [x] **S06-T37** — rounding adjustment.
+- [x] **S06-T38** — paid/due where applicable.
+- [x] **S06-T39** — multi-currency conversion contract.
 
 ## G — Validation/tests
 
-- [ ] **S06-T40** — immutable/value semantics where appropriate.
-- [ ] **S06-T41** — input validation.
-- [ ] **S06-T42** — rounding edge cases.
-- [ ] **S06-T43** — zero/negative lines where allowed.
-- [ ] **S06-T44** — multi-tax scenarios.
-- [ ] **S06-T45** — discount-before/after-tax policies عبر explicit configuration.
-- [ ] **S06-T46** — serialization only where needed; لا تفرض JSON على domain بلا سبب.
+- [x] **S06-T40** — immutable/value semantics where appropriate.
+- [x] **S06-T41** — input validation.
+- [x] **S06-T42** — rounding edge cases.
+- [x] **S06-T43** — zero/negative lines where allowed.
+- [x] **S06-T44** — multi-tax scenarios.
+- [x] **S06-T45** — discount-before/after-tax policies عبر explicit configuration.
+- [x] **S06-T46** — serialization only where needed; لا تفرض JSON على domain بلا سبب.
 
 ## Manual Verification Example
 
-- [ ] **S06-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S06-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S06-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S06-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S06-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S06-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S06-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S06-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S06-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S06-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] ERP shared domain package layer.
-- [ ] Typed calculation service.
-- [ ] Comprehensive calculation tests.
+- [x] ERP shared domain package layer.
+- [x] Typed calculation service.
+- [x] Comprehensive calculation tests.
 
 ## Exit Gate
 
@@ -820,62 +820,62 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Identity & party
 
-- [ ] **S07-T01** — `GeniusPdfDocumentIdentity`.
-- [ ] **S07-T02** — `GeniusPdfPartyBlock`.
-- [ ] **S07-T03** — `GeniusPdfAddressBlock`.
-- [ ] **S07-T04** — `GeniusPdfReferenceBlock`.
+- [x] **S07-T01** — `GeniusPdfDocumentIdentity`.
+- [x] **S07-T02** — `GeniusPdfPartyBlock`.
+- [x] **S07-T03** — `GeniusPdfAddressBlock`.
+- [x] **S07-T04** — `GeniusPdfReferenceBlock`.
 
 ## B — Financial
 
-- [ ] **S07-T05** — `GeniusPdfMoney`.
-- [ ] **S07-T06** — `GeniusPdfAmountInWords`.
-- [ ] **S07-T07** — `GeniusPdfTaxSummary`.
-- [ ] **S07-T08** — discount/charge summary block.
-- [ ] **S07-T09** — balance/due block.
+- [x] **S07-T05** — `GeniusPdfMoney`.
+- [x] **S07-T06** — `GeniusPdfAmountInWords`.
+- [x] **S07-T07** — `GeniusPdfTaxSummary`.
+- [x] **S07-T08** — discount/charge summary block.
+- [x] **S07-T09** — balance/due block.
 
 ## C — Operational
 
-- [ ] **S07-T10** — `GeniusPdfTermsSection`.
-- [ ] **S07-T11** — `GeniusPdfApprovalTrail`.
-- [ ] **S07-T12** — `GeniusPdfStamp`.
-- [ ] **S07-T13** — `GeniusPdfMetricCards`.
-- [ ] **S07-T14** — `GeniusPdfLabel`.
+- [x] **S07-T10** — `GeniusPdfTermsSection`.
+- [x] **S07-T11** — `GeniusPdfApprovalTrail`.
+- [x] **S07-T12** — `GeniusPdfStamp`.
+- [x] **S07-T13** — `GeniusPdfMetricCards`.
+- [x] **S07-T14** — `GeniusPdfLabel`.
 
 ## D — Optional sections
 
-- [ ] **S07-T15** — كل component يقبل null data حيث منطقي.
-- [ ] **S07-T16** — null section collapses بالكامل.
-- [ ] **S07-T17** — لا padding/margin متبقٍ بعد hidden section.
-- [ ] **S07-T18** — empty lists لها policy واضحة: hide أو empty state.
+- [x] **S07-T15** — كل component يقبل null data حيث منطقي.
+- [x] **S07-T16** — null section collapses بالكامل.
+- [x] **S07-T17** — لا padding/margin متبقٍ بعد hidden section.
+- [x] **S07-T18** — empty lists لها policy واضحة: hide أو empty state.
 
 ## E — Directionality
 
-- [ ] **S07-T19** — كل component يستخدم start/end.
-- [ ] **S07-T20** — كل value run يملك direction مناسب.
-- [ ] **S07-T21** — EN/AR/bilingual examples.
-- [ ] **S07-T22** — mixed address/phone/ID tests.
+- [x] **S07-T19** — كل component يستخدم start/end.
+- [x] **S07-T20** — كل value run يملك direction مناسب.
+- [x] **S07-T21** — EN/AR/bilingual examples.
+- [x] **S07-T22** — mixed address/phone/ID tests.
 
 ## F — Docs
 
-- [ ] **S07-T23** — Flutter-style API docs.
-- [ ] **S07-T24** — usage examples.
-- [ ] **S07-T25** — composition examples.
-- [ ] **S07-T26** — do/don't guidance لمنع layout duplication.
+- [x] **S07-T23** — Flutter-style API docs.
+- [x] **S07-T24** — usage examples.
+- [x] **S07-T25** — composition examples.
+- [x] **S07-T26** — do/don't guidance لمنع layout duplication.
 
 ## Manual Verification Example
 
-- [ ] **S07-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S07-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S07-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S07-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S07-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S07-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S07-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S07-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S07-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S07-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] ERP semantic component library.
-- [ ] Null-collapse behavior.
-- [ ] Directionality goldens.
-- [ ] Component documentation.
+- [x] ERP semantic component library.
+- [x] Null-collapse behavior.
+- [x] Directionality goldens.
+- [x] Component documentation.
 
 ## Exit Gate
 
@@ -896,69 +896,69 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Families
 
-- [ ] **S08-T01** — `GeniusErpTransactionDocument`.
-- [ ] **S08-T02** — `GeniusErpStatementDocument`.
-- [ ] **S08-T03** — `GeniusErpVoucherDocument`.
-- [ ] **S08-T04** — `GeniusErpAnalyticalReport`.
-- [ ] **S08-T05** — `GeniusErpOperationalForm`.
-- [ ] **S08-T06** — `GeniusErpRegisterDocument`.
-- [ ] **S08-T07** — `GeniusErpThermalReceipt`.
-- [ ] **S08-T08** — `GeniusErpLabelDocument`.
-- [ ] **S08-T09** — `GeniusErpCertificateDocument`.
+- [x] **S08-T01** — `GeniusErpTransactionDocument`.
+- [x] **S08-T02** — `GeniusErpStatementDocument`.
+- [x] **S08-T03** — `GeniusErpVoucherDocument`.
+- [x] **S08-T04** — `GeniusErpAnalyticalReport`.
+- [x] **S08-T05** — `GeniusErpOperationalForm`.
+- [x] **S08-T06** — `GeniusErpRegisterDocument`.
+- [x] **S08-T07** — `GeniusErpThermalReceipt`.
+- [x] **S08-T08** — `GeniusErpLabelDocument`.
+- [x] **S08-T09** — `GeniusErpCertificateDocument`.
 
 ## B — Slots/sections
 
-- [ ] **S08-T10** — header slot.
-- [ ] **S08-T11** — document identity slot.
-- [ ] **S08-T12** — party slots.
-- [ ] **S08-T13** — reference slots.
-- [ ] **S08-T14** — line-items/body slot.
-- [ ] **S08-T15** — summary slot.
-- [ ] **S08-T16** — notes/terms slot.
-- [ ] **S08-T17** — approval/signature slot.
-- [ ] **S08-T18** — attachments/QR/barcode slot.
-- [ ] **S08-T19** — footer slot.
+- [x] **S08-T10** — header slot.
+- [x] **S08-T11** — document identity slot.
+- [x] **S08-T12** — party slots.
+- [x] **S08-T13** — reference slots.
+- [x] **S08-T14** — line-items/body slot.
+- [x] **S08-T15** — summary slot.
+- [x] **S08-T16** — notes/terms slot.
+- [x] **S08-T17** — approval/signature slot.
+- [x] **S08-T18** — attachments/QR/barcode slot.
+- [x] **S08-T19** — footer slot.
 
 ## C — Policies
 
-- [ ] **S08-T20** — optional section collapse.
-- [ ] **S08-T21** — page break policy per slot.
-- [ ] **S08-T22** — first/last page variants.
-- [ ] **S08-T23** — direction override per slot.
-- [ ] **S08-T24** — theme override per family.
-- [ ] **S08-T25** — print profile hook.
+- [x] **S08-T20** — optional section collapse.
+- [x] **S08-T21** — page break policy per slot.
+- [x] **S08-T22** — first/last page variants.
+- [x] **S08-T23** — direction override per slot.
+- [x] **S08-T24** — theme override per family.
+- [x] **S08-T25** — print profile hook.
 
 ## D — Extension model
 
-- [ ] **S08-T26** — custom section insertion.
-- [ ] **S08-T27** — before/after hooks without exposing renderer internals.
-- [ ] **S08-T28** — component replacement.
-- [ ] **S08-T29** — data adapter layer.
-- [ ] **S08-T30** — عدم ربط family بmodule واحد.
+- [x] **S08-T26** — custom section insertion.
+- [x] **S08-T27** — before/after hooks without exposing renderer internals.
+- [x] **S08-T28** — component replacement.
+- [x] **S08-T29** — data adapter layer.
+- [x] **S08-T30** — عدم ربط family بmodule واحد.
 
 ## E — Tests/examples
 
-- [ ] **S08-T31** — minimal transaction.
-- [ ] **S08-T32** — full transaction.
-- [ ] **S08-T33** — statement.
-- [ ] **S08-T34** — voucher.
-- [ ] **S08-T35** — analytical report.
-- [ ] **S08-T36** — RTL/bilingual family examples.
-- [ ] **S08-T37** — multi-page family examples.
+- [x] **S08-T31** — minimal transaction.
+- [x] **S08-T32** — full transaction.
+- [x] **S08-T33** — statement.
+- [x] **S08-T34** — voucher.
+- [x] **S08-T35** — analytical report.
+- [x] **S08-T36** — RTL/bilingual family examples.
+- [x] **S08-T37** — multi-page family examples.
 
 ## Manual Verification Example
 
-- [ ] **S08-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S08-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S08-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S08-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S08-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S08-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S08-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S08-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S08-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S08-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Generic document family layer.
-- [ ] Extension/slot contract.
-- [ ] Examples for each family.
+- [x] Generic document family layer.
+- [x] Extension/slot contract.
+- [x] Examples for each family.
 
 ## Exit Gate
 
@@ -979,61 +979,61 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Quotation
 
-- [ ] **S09-T01** — تحويله إلى Transaction family.
-- [ ] **S09-T02** — استخدام shared identity/party/items/summary/terms/signatures.
-- [ ] **S09-T03** — إزالة الحسابات المكررة لصالح calculation layer.
-- [ ] **S09-T04** — الحفاظ على QR والnotes والterms.
+- [x] **S09-T01** — تحويله إلى Transaction family.
+- [x] **S09-T02** — استخدام shared identity/party/items/summary/terms/signatures.
+- [x] **S09-T03** — إزالة الحسابات المكررة لصالح calculation layer.
+- [x] **S09-T04** — الحفاظ على QR والnotes والterms.
 
 ## B — Purchase Order
 
-- [ ] **S09-T05** — تحويل vendor/order details إلى shared components.
-- [ ] **S09-T06** — تحويل items/summary إلى shared implementation.
-- [ ] **S09-T07** — الحفاظ على shipping/notes/terms/signatures.
-- [ ] **S09-T08** — عدم كسر constructor/public API إن أمكن.
+- [x] **S09-T05** — تحويل vendor/order details إلى shared components.
+- [x] **S09-T06** — تحويل items/summary إلى shared implementation.
+- [x] **S09-T07** — الحفاظ على shipping/notes/terms/signatures.
+- [x] **S09-T08** — عدم كسر constructor/public API إن أمكن.
 
 ## C — Tax Invoice
 
-- [ ] **S09-T09** — تحويل header/info/items/tax summary إلى shared components.
-- [ ] **S09-T10** — الحفاظ على amount-in-words.
-- [ ] **S09-T11** — الحفاظ على VAT details وQR.
-- [ ] **S09-T12** — التأكد من bilingual/RTL correctness.
+- [x] **S09-T09** — تحويل header/info/items/tax summary إلى shared components.
+- [x] **S09-T10** — الحفاظ على amount-in-words.
+- [x] **S09-T11** — الحفاظ على VAT details وQR.
+- [x] **S09-T12** — التأكد من bilingual/RTL correctness.
 
 ## D — Compatibility
 
-- [ ] **S09-T13** — Adapters للـ legacy models إن لزم.
-- [ ] **S09-T14** — deprecation فقط عند وجود بديل واضح.
-- [ ] **S09-T15** — عدم تغيير output الحسابي.
-- [ ] **S09-T16** — توثيق أي intentional visual difference ناتج عن إصلاح RTL.
+- [x] **S09-T13** — Adapters للـ legacy models إن لزم.
+- [x] **S09-T14** — deprecation فقط عند وجود بديل واضح.
+- [x] **S09-T15** — عدم تغيير output الحسابي.
+- [x] **S09-T16** — توثيق أي intentional visual difference ناتج عن إصلاح RTL.
 
 ## E — Duplication audit
 
-- [ ] **S09-T17** — قياس duplicated code قبل/بعد.
-- [ ] **S09-T18** — إزالة helpers الخاصة بالقالب إذا أصبحت shared.
-- [ ] **S09-T19** — منع local formatting/calculation duplicates.
+- [x] **S09-T17** — قياس duplicated code قبل/بعد.
+- [x] **S09-T18** — إزالة helpers الخاصة بالقالب إذا أصبحت shared.
+- [x] **S09-T19** — منع local formatting/calculation duplicates.
 
 ## F — Goldens
 
-- [ ] **S09-T20** — EN/LTR لكل قالب.
-- [ ] **S09-T21** — AR/RTL لكل قالب.
-- [ ] **S09-T22** — bilingual where supported.
-- [ ] **S09-T23** — 1/50/500 line scenarios.
-- [ ] **S09-T24** — long notes/party names.
-- [ ] **S09-T25** — null optional sections.
+- [x] **S09-T20** — EN/LTR لكل قالب.
+- [x] **S09-T21** — AR/RTL لكل قالب.
+- [x] **S09-T22** — bilingual where supported.
+- [x] **S09-T23** — 1/50/500 line scenarios.
+- [x] **S09-T24** — long notes/party names.
+- [x] **S09-T25** — null optional sections.
 
 ## Manual Verification Example
 
-- [ ] **S09-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S09-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S09-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S09-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S09-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S09-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S09-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S09-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S09-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S09-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] 3 migrated templates.
-- [ ] Compatibility adapters.
-- [ ] Golden comparison report.
-- [ ] Duplication audit.
+- [x] 3 migrated templates.
+- [x] Compatibility adapters.
+- [x] Golden comparison report.
+- [x] Duplication audit.
 
 ## Exit Gate
 
@@ -1056,75 +1056,75 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Financial reports
 
-- [ ] **S10-T01** — Balance Sheet.
-- [ ] **S10-T02** — Budget Report.
-- [ ] **S10-T03** — Cash Flow.
-- [ ] **S10-T04** — Income Statement.
-- [ ] **S10-T05** — Trial Balance.
-- [ ] **S10-T06** — Customer Statement.
+- [x] **S10-T01** — Balance Sheet.
+- [x] **S10-T02** — Budget Report.
+- [x] **S10-T03** — Cash Flow.
+- [x] **S10-T04** — Income Statement.
+- [x] **S10-T05** — Trial Balance.
+- [x] **S10-T06** — Customer Statement.
 
 ## B — HR/current operational
 
-- [ ] **S10-T07** — Attendance Report.
-- [ ] **S10-T08** — Employee Report.
-- [ ] **S10-T09** — Leave Report.
-- [ ] **S10-T10** — Payslip.
+- [x] **S10-T07** — Attendance Report.
+- [x] **S10-T08** — Employee Report.
+- [x] **S10-T09** — Leave Report.
+- [x] **S10-T10** — Payslip.
 
 ## C — Inventory/delivery
 
-- [ ] **S10-T11** — Inventory Report.
-- [ ] **S10-T12** — Delivery Note.
+- [x] **S10-T11** — Inventory Report.
+- [x] **S10-T12** — Delivery Note.
 
 ## D — Voucher consolidation
 
-- [ ] **S10-T13** — Accounting Entry Voucher.
-- [ ] **S10-T14** — Bank Deposit Voucher.
-- [ ] **S10-T15** — Bank Withdrawal Voucher.
-- [ ] **S10-T16** — Bill Payment Voucher.
-- [ ] **S10-T17** — Gift Voucher.
-- [ ] **S10-T18** — Inventory Voucher.
-- [ ] **S10-T19** — Modern Voucher.
-- [ ] **S10-T20** — Payment Voucher.
-- [ ] **S10-T21** — Purchase Return Voucher.
-- [ ] **S10-T22** — Purchase Voucher.
-- [ ] **S10-T23** — Receipt Voucher.
-- [ ] **S10-T24** — Incoming Remittance Voucher.
-- [ ] **S10-T25** — Outgoing Remittance Voucher.
-- [ ] **S10-T26** — Sales Return Voucher.
-- [ ] **S10-T27** — Sales Voucher.
-- [ ] **S10-T28** — Tax Voucher.
-- [ ] **S10-T29** — Transfer Voucher.
+- [x] **S10-T13** — Accounting Entry Voucher.
+- [x] **S10-T14** — Bank Deposit Voucher.
+- [x] **S10-T15** — Bank Withdrawal Voucher.
+- [x] **S10-T16** — Bill Payment Voucher.
+- [x] **S10-T17** — Gift Voucher.
+- [x] **S10-T18** — Inventory Voucher.
+- [x] **S10-T19** — Modern Voucher.
+- [x] **S10-T20** — Payment Voucher.
+- [x] **S10-T21** — Purchase Return Voucher.
+- [x] **S10-T22** — Purchase Voucher.
+- [x] **S10-T23** — Receipt Voucher.
+- [x] **S10-T24** — Incoming Remittance Voucher.
+- [x] **S10-T25** — Outgoing Remittance Voucher.
+- [x] **S10-T26** — Sales Return Voucher.
+- [x] **S10-T27** — Sales Voucher.
+- [x] **S10-T28** — Tax Voucher.
+- [x] **S10-T29** — Transfer Voucher.
 
 ## E — Voucher architecture
 
-- [ ] **S10-T30** — توحيد account entries table.
-- [ ] **S10-T31** — توحيد party/payment details.
-- [ ] **S10-T32** — توحيد amount highlight.
-- [ ] **S10-T33** — توحيد amount-in-words.
-- [ ] **S10-T34** — توحيد signature/notes/footer/page border.
-- [ ] **S10-T35** — الإبقاء على voucher-specific fields كconfiguration/extension.
+- [x] **S10-T30** — توحيد account entries table.
+- [x] **S10-T31** — توحيد party/payment details.
+- [x] **S10-T32** — توحيد amount highlight.
+- [x] **S10-T33** — توحيد amount-in-words.
+- [x] **S10-T34** — توحيد signature/notes/footer/page border.
+- [x] **S10-T35** — الإبقاء على voucher-specific fields كconfiguration/extension.
 
 ## F — Cleanup
 
-- [ ] **S10-T36** — إزالة duplicated private render helpers.
-- [ ] **S10-T37** — تحديث template registry.
-- [ ] **S10-T38** — تحديث examples.
-- [ ] **S10-T39** — تحديث docs.
-- [ ] **S10-T40** — goldens لكل template EN/AR حيث ينطبق.
+- [x] **S10-T36** — إزالة duplicated private render helpers.
+- [x] **S10-T37** — تحديث template registry.
+- [x] **S10-T38** — تحديث examples.
+- [x] **S10-T39** — تحديث docs.
+- [x] **S10-T40** — goldens لكل template EN/AR حيث ينطبق.
 
 ## Manual Verification Example
 
-- [ ] **S10-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S10-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S10-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S10-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S10-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S10-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S10-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S10-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S10-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S10-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] All current templates mapped to families.
-- [ ] Unified voucher implementation.
-- [ ] Updated template registry/examples/docs.
+- [x] All current templates mapped to families.
+- [x] Unified voucher implementation.
+- [x] Updated template registry/examples/docs.
 
 ## Exit Gate
 
@@ -1146,71 +1146,71 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Print profiles
 
-- [ ] **S11-T01** — A4 portrait.
-- [ ] **S11-T02** — A4 landscape.
-- [ ] **S11-T03** — A5.
-- [ ] **S11-T04** — Letter.
-- [ ] **S11-T05** — Legal.
-- [ ] **S11-T06** — 58mm thermal.
-- [ ] **S11-T07** — 80mm thermal.
-- [ ] **S11-T08** — continuous paper.
-- [ ] **S11-T09** — custom label.
-- [ ] **S11-T10** — label sheet.
-- [ ] **S11-T11** — pre-printed form.
+- [x] **S11-T01** — A4 portrait.
+- [x] **S11-T02** — A4 landscape.
+- [x] **S11-T03** — A5.
+- [x] **S11-T04** — Letter.
+- [x] **S11-T05** — Legal.
+- [x] **S11-T06** — 58mm thermal.
+- [x] **S11-T07** — 80mm thermal.
+- [x] **S11-T08** — continuous paper.
+- [x] **S11-T09** — custom label.
+- [x] **S11-T10** — label sheet.
+- [x] **S11-T11** — pre-printed form.
 
 ## B — Profile properties
 
-- [ ] **S11-T12** — page dimensions.
-- [ ] **S11-T13** — margins.
-- [ ] **S11-T14** — safe area.
-- [ ] **S11-T15** — density.
-- [ ] **S11-T16** — default font scale.
-- [ ] **S11-T17** — header/footer policy.
-- [ ] **S11-T18** — cut spacing.
-- [ ] **S11-T19** — label gaps.
-- [ ] **S11-T20** — copies/original-copy metadata.
+- [x] **S11-T12** — page dimensions.
+- [x] **S11-T13** — margins.
+- [x] **S11-T14** — safe area.
+- [x] **S11-T15** — density.
+- [x] **S11-T16** — default font scale.
+- [x] **S11-T17** — header/footer policy.
+- [x] **S11-T18** — cut spacing.
+- [x] **S11-T19** — label gaps.
+- [x] **S11-T20** — copies/original-copy metadata.
 
 ## C — Thermal receipt engine
 
-- [ ] **S11-T21** — compact typography.
-- [ ] **S11-T22** — variable-height content.
-- [ ] **S11-T23** — minimal margins.
-- [ ] **S11-T24** — QR/barcode placement.
-- [ ] **S11-T25** — receipt totals.
-- [ ] **S11-T26** — cash/payment lines.
-- [ ] **S11-T27** — RTL thermal layout.
+- [x] **S11-T21** — compact typography.
+- [x] **S11-T22** — variable-height content.
+- [x] **S11-T23** — minimal margins.
+- [x] **S11-T24** — QR/barcode placement.
+- [x] **S11-T25** — receipt totals.
+- [x] **S11-T26** — cash/payment lines.
+- [x] **S11-T27** — RTL thermal layout.
 
 ## D — Labels
 
-- [ ] **S11-T28** — single label.
-- [ ] **S11-T29** — sheet grid.
-- [ ] **S11-T30** — gap/bleed handling.
-- [ ] **S11-T31** — barcode/QR.
-- [ ] **S11-T32** — SKU/batch/serial/expiry.
-- [ ] **S11-T33** — RTL/English captions.
-- [ ] **S11-T34** — print calibration offsets.
+- [x] **S11-T28** — single label.
+- [x] **S11-T29** — sheet grid.
+- [x] **S11-T30** — gap/bleed handling.
+- [x] **S11-T31** — barcode/QR.
+- [x] **S11-T32** — SKU/batch/serial/expiry.
+- [x] **S11-T33** — RTL/English captions.
+- [x] **S11-T34** — print calibration offsets.
 
 ## E — Pre-printed
 
-- [ ] **S11-T35** — physical-coordinate opt-in.
-- [ ] **S11-T36** — field anchor positions.
-- [ ] **S11-T37** — no logical mirroring when profile explicitly requires physical placement.
-- [ ] **S11-T38** — calibration test page.
+- [x] **S11-T35** — physical-coordinate opt-in.
+- [x] **S11-T36** — field anchor positions.
+- [x] **S11-T37** — no logical mirroring when profile explicitly requires physical placement.
+- [x] **S11-T38** — calibration test page.
 
 ## Manual Verification Example
 
-- [ ] **S11-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S11-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S11-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S11-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S11-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S11-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S11-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S11-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S11-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S11-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] `GeniusPdfPrintProfile`.
-- [ ] Thermal receipt foundation.
-- [ ] Label foundation.
-- [ ] Calibration example.
+- [x] `GeniusPdfPrintProfile`.
+- [x] Thermal receipt foundation.
+- [x] Label foundation.
+- [x] Calibration example.
 
 ## Exit Gate
 
@@ -1232,60 +1232,60 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Transaction documents
 
-- [ ] **S12-T01** — Sales Order.
-- [ ] **S12-T02** — Proforma Invoice.
-- [ ] **S12-T03** — Simplified/POS Invoice.
-- [ ] **S12-T04** — Debit Note.
-- [ ] **S12-T05** — Sales Return Document.
-- [ ] **S12-T06** — Customer Receipt.
+- [x] **S12-T01** — Sales Order.
+- [x] **S12-T02** — Proforma Invoice.
+- [x] **S12-T03** — Simplified/POS Invoice.
+- [x] **S12-T04** — Debit Note.
+- [x] **S12-T05** — Sales Return Document.
+- [x] **S12-T06** — Customer Receipt.
 
 ## B — Fulfillment
 
-- [ ] **S12-T07** — Picking List.
-- [ ] **S12-T08** — Packing List.
-- [ ] **S12-T09** — Backorder document/report.
+- [x] **S12-T07** — Picking List.
+- [x] **S12-T08** — Packing List.
+- [x] **S12-T09** — Backorder document/report.
 
 ## C — Statements/reports
 
-- [ ] **S12-T10** — Customer Aging.
-- [ ] **S12-T11** — Sales Register.
-- [ ] **S12-T12** — Sales by Customer.
-- [ ] **S12-T13** — Sales by Item.
-- [ ] **S12-T14** — Sales by Salesperson.
-- [ ] **S12-T15** — Price List.
-- [ ] **S12-T16** — Commission Report.
+- [x] **S12-T10** — Customer Aging.
+- [x] **S12-T11** — Sales Register.
+- [x] **S12-T12** — Sales by Customer.
+- [x] **S12-T13** — Sales by Item.
+- [x] **S12-T14** — Sales by Salesperson.
+- [x] **S12-T15** — Price List.
+- [x] **S12-T16** — Commission Report.
 
 ## D — Shared behaviors
 
-- [ ] **S12-T17** — discounts/charges/taxes.
-- [ ] **S12-T18** — multi-currency.
-- [ ] **S12-T19** — payment terms.
-- [ ] **S12-T20** — shipping/delivery references.
-- [ ] **S12-T21** — original/copy/reprint metadata.
-- [ ] **S12-T22** — batch/serial fields عند الحاجة.
+- [x] **S12-T17** — discounts/charges/taxes.
+- [x] **S12-T18** — multi-currency.
+- [x] **S12-T19** — payment terms.
+- [x] **S12-T20** — shipping/delivery references.
+- [x] **S12-T21** — original/copy/reprint metadata.
+- [x] **S12-T22** — batch/serial fields عند الحاجة.
 
 ## E — QA
 
-- [ ] **S12-T23** — EN/AR/bilingual.
-- [ ] **S12-T24** — short/long orders.
-- [ ] **S12-T25** — multi-page items.
-- [ ] **S12-T26** — zero/negative return values.
-- [ ] **S12-T27** — tax inclusive/exclusive configuration.
-- [ ] **S12-T28** — null optional sections.
+- [x] **S12-T23** — EN/AR/bilingual.
+- [x] **S12-T24** — short/long orders.
+- [x] **S12-T25** — multi-page items.
+- [x] **S12-T26** — zero/negative return values.
+- [x] **S12-T27** — tax inclusive/exclusive configuration.
+- [x] **S12-T28** — null optional sections.
 
 ## Manual Verification Example
 
-- [ ] **S12-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S12-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S12-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S12-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S12-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S12-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S12-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S12-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S12-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S12-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Sales template pack.
-- [ ] Sales examples.
-- [ ] Sales golden matrix.
+- [x] Sales template pack.
+- [x] Sales examples.
+- [x] Sales golden matrix.
 
 ## Exit Gate
 
@@ -1307,58 +1307,58 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Source-to-order
 
-- [ ] **S13-T01** — Purchase Requisition.
-- [ ] **S13-T02** — Request for Quotation (RFQ).
-- [ ] **S13-T03** — Supplier Quotation.
-- [ ] **S13-T04** — Quotation Comparison.
+- [x] **S13-T01** — Purchase Requisition.
+- [x] **S13-T02** — Request for Quotation (RFQ).
+- [x] **S13-T03** — Supplier Quotation.
+- [x] **S13-T04** — Quotation Comparison.
 
 ## B — Order/receipt/invoice
 
-- [ ] **S13-T05** — Purchase Order.
-- [ ] **S13-T06** — Goods Receipt Note (GRN).
-- [ ] **S13-T07** — Purchase Invoice.
-- [ ] **S13-T08** — Purchase Debit/Credit Note حسب model.
-- [ ] **S13-T09** — Supplier Return.
+- [x] **S13-T05** — Purchase Order.
+- [x] **S13-T06** — Goods Receipt Note (GRN).
+- [x] **S13-T07** — Purchase Invoice.
+- [x] **S13-T08** — Purchase Debit/Credit Note حسب model.
+- [x] **S13-T09** — Supplier Return.
 
 ## C — Supplier statements
 
-- [ ] **S13-T10** — Supplier Statement.
-- [ ] **S13-T11** — Supplier Aging.
-- [ ] **S13-T12** — Purchase Register.
-- [ ] **S13-T13** — Purchase Analysis.
-- [ ] **S13-T14** — Outstanding Purchase Orders.
+- [x] **S13-T10** — Supplier Statement.
+- [x] **S13-T11** — Supplier Aging.
+- [x] **S13-T12** — Purchase Register.
+- [x] **S13-T13** — Purchase Analysis.
+- [x] **S13-T14** — Outstanding Purchase Orders.
 
 ## D — Shared behaviors
 
-- [ ] **S13-T15** — vendor addresses/tax IDs.
-- [ ] **S13-T16** — expected delivery.
-- [ ] **S13-T17** — warehouse/site reference.
-- [ ] **S13-T18** — landed charges hooks.
-- [ ] **S13-T19** — multi-currency/exchange rate.
-- [ ] **S13-T20** — approval trail.
+- [x] **S13-T15** — vendor addresses/tax IDs.
+- [x] **S13-T16** — expected delivery.
+- [x] **S13-T17** — warehouse/site reference.
+- [x] **S13-T18** — landed charges hooks.
+- [x] **S13-T19** — multi-currency/exchange rate.
+- [x] **S13-T20** — approval trail.
 
 ## E — QA
 
-- [ ] **S13-T21** — partial receipt scenarios.
-- [ ] **S13-T22** — long vendor terms.
-- [ ] **S13-T23** — multi-page items.
-- [ ] **S13-T24** — Arabic/English mixed item codes.
-- [ ] **S13-T25** — tax/discount validation.
-- [ ] **S13-T26** — null shipping fields.
+- [x] **S13-T21** — partial receipt scenarios.
+- [x] **S13-T22** — long vendor terms.
+- [x] **S13-T23** — multi-page items.
+- [x] **S13-T24** — Arabic/English mixed item codes.
+- [x] **S13-T25** — tax/discount validation.
+- [x] **S13-T26** — null shipping fields.
 
 ## Manual Verification Example
 
-- [ ] **S13-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S13-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S13-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S13-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S13-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S13-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S13-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S13-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S13-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S13-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Purchasing pack.
-- [ ] Supplier statement/aging.
-- [ ] Comparison document.
+- [x] Purchasing pack.
+- [x] Supplier statement/aging.
+- [x] Comparison document.
 
 ## Exit Gate
 

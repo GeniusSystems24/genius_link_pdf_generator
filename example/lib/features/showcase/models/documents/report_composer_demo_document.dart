@@ -57,17 +57,26 @@ List<int> buildComposerDemoReport({
   final salesSummary = GeniusPdfSummarySection(
     config: config,
     items: [
-      GeniusPdfSummaryItem.subtotal(
+      GeniusPdfSummaryItem.formatted(
         label: 'Subtotal',
-        value: subtotal.toStringAsFixed(2),
+        isBold: true,
+        rawValue: subtotal,
+        formatter: config.formatter,
+        formatSpec: const GeniusPdfFormatSpec.number(decimalPlaces: 2),
       ),
-      GeniusPdfSummaryItem(
+      GeniusPdfSummaryItem.formatted(
         label: 'VAT (15%)',
-        value: vat.toStringAsFixed(2),
+        rawValue: vat,
+        formatter: config.formatter,
+        formatSpec: const GeniusPdfFormatSpec.number(decimalPlaces: 2),
       ),
-      GeniusPdfSummaryItem.total(
+      GeniusPdfSummaryItem.formatted(
         label: 'Grand Total',
-        value: grandTotal.toStringAsFixed(2),
+        isBold: true,
+        isHighlighted: true,
+        rawValue: grandTotal,
+        formatter: config.formatter,
+        formatSpec: const GeniusPdfFormatSpec.number(decimalPlaces: 2),
       ),
     ],
     style: const GeniusPdfSummaryStyle.bordered(),

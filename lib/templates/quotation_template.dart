@@ -1,16 +1,22 @@
+
 import 'dart:typed_data';
-import 'dart:ui';
 
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
-import '../src/domain/financial/financial.dart';
+import '../src/core/directionality.dart';
 import '../src/core/pdf_config.dart';
+import '../src/domain/erp/erp.dart';
+import '../src/domain/financial/financial.dart';
+import '../src/families/erp/erp_families.dart';
 import '../src/models/pdf_result.dart';
+import 'erp_legacy_shared.dart';
 
+import '../src/packs/sales/sales_documents.dart';
 /// Quotation item model.
+///
+/// Kept for source compatibility. S09 adapts this model into [ErpLineItem]
+/// before rendering/calculation.
 class QuotationItem {
   const QuotationItem({
     required this.itemNumber,
@@ -32,8 +38,13 @@ class QuotationItem {
   final double discount;
   final double tax;
 
+  /// Legacy compatibility getter.
   double get subtotal => quantity * unitPrice;
+
+  /// Legacy compatibility getter. New template rendering uses S06.
   double get total => subtotal - discount + tax;
+
+  /// Legacy string getter retained for source compatibility.
   String get lineTotal => total.toStringAsFixed(2);
 }
 
@@ -59,6 +70,9 @@ class QuotationCustomer {
 }
 
 /// Quotation data model.
+///
+/// Aggregate totals delegate to the shared S06 calculation service through the
+/// S09 compatibility adapter instead of duplicating template calculations.
 class QuotationData {
   const QuotationData({
     required this.quotationNumber,
@@ -88,28 +102,154 @@ class QuotationData {
   final String? terms;
   final String? termsAr;
 
-  double get subTotal => items.fold(0, (sum, item) => sum + item.subtotal);
-  double get totalDiscount => items.fold(0, (sum, item) => sum + item.discount);
-  double get totalTax => items.fold(0, (sum, item) => sum + item.tax);
-  double get grandTotal => subTotal - totalDiscount + totalTax;
+  ErpCalculationResult get _calculation =>
+      QuotationErpAdapter.calculateData(this);
+
+  double get subTotal => _calculation.subtotal.toDouble();
+  double get totalDiscount =>
+      _calculation.lineDiscountTotal.toDouble();
+  double get totalTax => _calculation.taxTotal.toDouble();
+  double get grandTotal => _calculation.grandTotal.toDouble();
 }
 
-/// A professional quotation template.
+/// S09 compatibility adapter from legacy quotation models to S06.
 ///
-/// Creates detailed quotations with customer info, itemized list,
-/// taxes, and terms & conditions.
+/// The adapter is public so applications can migrate data incrementally without
+/// changing the existing [QuotationTemplate] constructor immediately.
+class QuotationErpAdapter extends GeniusErpDocumentAdapter<QuotationData> {
+  const QuotationErpAdapter({
+    required this.company,
+  });
+
+  final GeniusPdfCompanyInfo company;
+
+  static ErpCurrency currencyOf(QuotationData source) =>
+      GeniusErpLegacyCompatibility.currency(source.currency);
+
+  static List<ErpLineItem> lineItemsOf(QuotationData source) {
+    final currency = currencyOf(source);
+
+    return source.items.map((item) {
+      final gross = item.quantity * item.unitPrice;
+      final taxableBase = gross - item.discount;
+      final inferredTaxRate = item.tax == 0 || taxableBase == 0
+          ? 0.0
+          : item.tax / taxableBase * 100;
+
+      return ErpLineItem(
+        id: item.itemNumber.toString(),
+        description: item.description,
+        descriptionAr: item.descriptionAr,
+        quantity: ErpQuantity(
+          value: item.quantity,
+          unit: ErpUnit(
+            code: item.unit ?? 'EA',
+            name: item.unit ?? 'Each',
+            precision: 3,
+          ),
+        ),
+        unitPrice: ErpMoney.fromAmount(
+          item.unitPrice,
+          currency: currency,
+        ),
+        discounts: item.discount == 0
+            ? const []
+            : [
+                ErpDiscount.fixed(
+                  amount: ErpMoney.fromAmount(
+                    item.discount,
+                    currency: currency,
+                  ),
+                ),
+              ],
+        taxes: item.tax == 0
+            ? const []
+            : [
+                ErpTaxLine(
+                  code: 'LEGACY-TAX',
+                  name: 'Tax',
+                  nameAr: 'الضريبة',
+                  ratePercent: inferredTaxRate,
+                ),
+              ],
+      );
+    }).toList(growable: false);
+  }
+
+  static ErpCalculationResult calculateData(QuotationData source) {
+    return const ErpCalculationService().calculate(
+      ErpCalculationRequest(
+        currency: GeniusErpLegacyCompatibility.currency(
+          source.currency,
+        ),
+        lineItems: lineItemsOf(source),
+      ),
+    );
+  }
+
+  @override
+  ErpDocumentContext adapt(QuotationData source) {
+    final party = GeniusErpLegacyCompatibility.party(
+      id: source.customer.vatNumber,
+      name: source.customer.name,
+      nameAr: source.customer.nameAr,
+      taxNumber: source.customer.vatNumber,
+      address: source.customer.address,
+      addressAr: source.customer.addressAr,
+      phone: source.customer.phone,
+      email: source.customer.email,
+      addressRole: ErpAddressRole.billing,
+    );
+
+    return ErpDocumentContext(
+      organization:
+          GeniusErpLegacyCompatibility.organization(company),
+      identity: ErpDocumentIdentity(
+        kind: ErpDocumentKind.quotation,
+        number: source.quotationNumber,
+        issueDate: source.quotationDate,
+        status: _documentStatus(source.status),
+      ),
+      recipient: party,
+      billingAddress:
+          party.addressFor(ErpAddressRole.billing),
+      documentCurrency: currencyOf(source),
+      lineItems: lineItemsOf(source),
+      notes: source.notes,
+      terms: source.terms,
+      metadata: {
+        'validUntil': source.validUntil,
+        'statusAr': source.statusAr,
+        'notesAr': source.notesAr,
+        'termsAr': source.termsAr,
+      },
+    );
+  }
+
+  @override
+  ErpCalculationRequest calculationRequest(
+    QuotationData source,
+    ErpDocumentContext document,
+  ) =>
+      ErpCalculationRequest.fromContext(document);
+
+  static ErpDocumentStatus _documentStatus(String status) {
+    return switch (status.trim().toLowerCase()) {
+      'issued' || 'sent' => ErpDocumentStatus.issued,
+      'approved' || 'accepted' => ErpDocumentStatus.approved,
+      'cancelled' || 'canceled' => ErpDocumentStatus.cancelled,
+      'voided' => ErpDocumentStatus.voided,
+      _ => ErpDocumentStatus.draft,
+    };
+  }
+}
+
+/// A professional quotation template migrated to the S08 Transaction family.
 ///
-/// ## Example
-/// ```dart
-/// final quote = QuotationTemplate(
-///   config: pdfConfig,
-///   company: companyInfo,
-///   data: quotationData,
-/// );
-///
-/// final bytes = quote.generate();
-/// ```
-class QuotationTemplate extends GeniusPdfDocumentBuilder {
+/// The public constructor remains source-compatible with the pre-S09 template.
+/// Identity, party, item table, calculation summary, terms, QR and signatures
+/// are now supplied to the shared family plan.
+class QuotationTemplate extends GeniusSalesTransactionDocument {
   QuotationTemplate({
     required GeniusPdfConfig config,
     required this.company,
@@ -128,509 +268,168 @@ class QuotationTemplate extends GeniusPdfDocumentBuilder {
   final QuotationData quotation;
   final PdfFont? boldFont;
 
-  /// Report ID for QR code URL
+  /// Report ID for QR code URL.
   final String? reportId;
 
-  /// User who printed the report
+  /// User who printed the report.
   final String? printedBy;
 
-  /// Whether to show QR code with report link
+  /// Whether to show QR code with report link.
   final bool showQRCode;
 
-  /// Whether to show signature areas
+  /// Whether to show signature areas.
   final bool showSignatures;
 
-  /// Whether to show notes section
+  /// Whether to show notes section.
   final bool showNotes;
 
-  /// Custom notes to display
+  /// Custom notes to display.
   final String? notes;
-  final String?
-      notesAr; // Added logic to use constructor notes if provided or fallback to data notes
+  final String? notesAr;
+
+  QuotationErpAdapter get _adapter =>
+      QuotationErpAdapter(company: company);
+
+  ErpDocumentContext get erpContext =>
+      _adapter.adapt(quotation);
+
+  ErpCalculationResult get erpCalculation =>
+      const ErpCalculationService().calculate(
+        _adapter.calculationRequest(
+          quotation,
+          erpContext,
+        ),
+      );
 
   @override
-  void build() {
-    // Add repeating footer with user info on all pages
-    if (printedBy != null || showQRCode) {
-      addFooter(
-        userName: printedBy,
-        printTime: _formatDate(DateTime.now()),
-        showPageNumber: true,
-      );
-    }
+  GeniusErpFamilyPlan createFamilyPlan() {
+    final context = erpContext;
+    final calculation = const ErpCalculationService().calculate(
+      _adapter.calculationRequest(
+        quotation,
+        context,
+      ),
+    );
 
-    newPage();
+    final effectiveNotes = notes ??
+        (config.isRTL
+            ? (notesAr ?? quotation.notesAr ?? quotation.notes)
+            : (quotation.notes ?? notesAr ?? quotation.notesAr));
 
-    _drawHeader();
-    _drawCustomerInfo();
-    _drawItemsTable();
-    _drawTotals();
-
-    // Draw Footer Section (Notes/Terms + QR Code)
-    _drawFooterSection();
-
-    // Signatures section
-    if (showSignatures) {
-      _drawSignatureSection();
-    }
+    return GeniusErpFamilyPlan(
+      document: context,
+      calculation: calculation,
+      company: company,
+      title: 'Quotation',
+      titleAr: 'عرض سعر',
+      primaryParty: context.recipient,
+      primaryPartyTitle: 'Bill To',
+      primaryPartyTitleAr: 'فاتورة إلى',
+      addresses: [
+        GeniusErpAddressSection(
+          title: 'Billing Address',
+          titleAr: 'عنوان الفوترة',
+          address: context.billingAddress,
+        ),
+      ],
+      detailFields: [
+        GeniusErpDetailField(
+          label: 'Valid Until',
+          labelAr: 'صالح حتى',
+          value: config.formatter.formatDate(
+            quotation.validUntil,
+          ),
+          valueKind: GeniusPdfValueKind.date,
+        ),
+        GeniusErpDetailField(
+          label: 'Status',
+          labelAr: 'الحالة',
+          value: config.isRTL
+              ? quotation.statusAr
+              : quotation.status,
+          valueKind: GeniusPdfValueKind.customIdentifier,
+        ),
+        GeniusErpDetailField(
+          label: 'Currency',
+          labelAr: 'العملة',
+          value: quotation.currency,
+          valueKind: GeniusPdfValueKind.customIdentifier,
+        ),
+      ],
+      notes: showNotes ? effectiveNotes : null,
+      notesAr: showNotes ? (notesAr ?? quotation.notesAr) : null,
+      terms: quotation.terms,
+      termsAr: quotation.termsAr,
+      signatures: showSignatures
+          ? const [
+              GeniusErpSignatureSpec(
+                title: 'Authorized Signature',
+                titleAr: 'التوقيع المعتمد',
+              ),
+              GeniusErpSignatureSpec(
+                title: 'Customer Acceptance',
+                titleAr: 'موافقة العميل',
+              ),
+            ]
+          : const [],
+      code: showQRCode && reportId != null
+          ? GeniusErpCodeSpec(
+              data: 'https://localhost:443/report/$reportId',
+              caption: 'ID: $reportId',
+              captionAr: 'ID: $reportId',
+            )
+          : null,
+      footerText: printedBy == null
+          ? null
+          : 'Printed by $printedBy',
+      footerTextAr: printedBy == null
+          ? null
+          : 'طبع بواسطة $printedBy',
+      slotPolicies: const {
+        GeniusErpFamilySlot.body: GeniusErpSlotPolicy(
+          breakPolicy: GeniusErpSlotBreakPolicy.auto,
+          estimatedHeight: 120,
+        ),
+        GeniusErpFamilySlot.approvalsSignatures:
+            GeniusErpSlotPolicy(
+          breakPolicy: GeniusErpSlotBreakPolicy.keepTogether,
+          estimatedHeight: 90,
+        ),
+      },
+    );
   }
 
-  /// Validates financial totals then generates the PDF.
+  /// Generates a result while validating the shared S06 calculation input.
   ///
-  /// Returns [GeniusPdfFailure] if subtotal, discount, tax, or grand total
-  /// validation fails. Pass `validateFinancials: false` to skip validation.
+  /// The signature is intentionally unchanged for compatibility. The legacy
+  /// [validationContext] remains accepted; calculation ownership now belongs
+  /// to S06.
   Future<GeniusPdfResult> generateResult({
     bool validateFinancials = true,
     GeniusFinancialValidationContext? validationContext,
   }) async {
     if (validateFinancials) {
-      final policy =
-          validationContext?.roundingPolicy ?? GeniusRoundingPolicy.defaults();
-      final validator = GeniusFinancialValidator(policy);
-
-      final lineTotals =
-          quotation.items.map((i) => i.subtotal).toList();
-      final subtotalResult = validator.validateSubtotal(
-        lineTotals: lineTotals,
-        providedSubtotal: quotation.subTotal,
-      );
-
-      final grandTotalResult = validator.validateGrandTotal(
-        subtotal: quotation.subTotal,
-        discounts: quotation.totalDiscount,
-        vatAmount: quotation.totalTax,
-        fees: 0.0,
-        providedGrandTotal: quotation.grandTotal,
-      );
-
-      final combined =
-          validator.combineResults([subtotalResult, grandTotalResult]);
-
-      if (!combined.isValid) return GeniusPdfFailure.fromValidation(combined);
+      try {
+        erpCalculation;
+      } catch (error, stackTrace) {
+        return GeniusPdfFailure.fromException(
+          error,
+          stackTrace,
+        );
+      }
     }
 
     try {
       return GeniusPdfSuccess(
         bytes: Uint8List.fromList(generate()),
-        fileName: 'quotation_${quotation.quotationNumber}.pdf',
+        fileName:
+            'quotation_${quotation.quotationNumber}.pdf',
       );
-    } catch (e, st) {
-      return GeniusPdfFailure.fromException(e, st);
+    } catch (error, stackTrace) {
+      return GeniusPdfFailure.fromException(
+        error,
+        stackTrace,
+      );
     }
-  }
-
-  void _drawHeader() {
-    final header = GeniusPdfReportHeader(
-      config: config,
-      title: 'Quotation',
-      titleAr: 'عرض سعر',
-      subtitle: '#${quotation.quotationNumber}',
-      subtitleAr: '#${quotation.quotationNumber}',
-      company: company,
-      printDate: quotation.quotationDate,
-      style: const GeniusPdfReportHeaderStyle.modern(),
-      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
-    );
-
-    addReportHeader(header, height: 110);
-  }
-
-  void _drawCustomerInfo() {
-    final customer = quotation.customer;
-
-    // Left side: Customer details
-    final customerItems = [
-      GeniusPdfLabeledValue(
-        config: config,
-        label: 'Customer',
-        labelAr: 'العميل',
-        value:
-            config.isRTL ? (customer.nameAr ?? customer.name) : customer.name,
-      ),
-      if (customer.address != null || customer.addressAr != null)
-        GeniusPdfLabeledValue(
-          config: config,
-          label: 'Address',
-          labelAr: 'العنوان',
-          value: config.isRTL
-              ? (customer.addressAr ?? customer.address ?? '-')
-              : (customer.address ?? '-'),
-        ),
-      if (customer.vatNumber != null)
-        GeniusPdfLabeledValue(
-          config: config,
-          label: 'VAT No',
-          labelAr: 'الرقم الضريبي',
-          value: customer.vatNumber!,
-        ),
-      if (customer.phone != null)
-        GeniusPdfLabeledValue(
-          config: config,
-          label: 'Phone',
-          labelAr: 'الهاتف',
-          value: customer.phone!,
-        ),
-    ];
-
-    // Right side: Quotation details
-    final quoteItems = [
-      GeniusPdfLabeledValue(
-        config: config,
-        label: 'Date',
-        labelAr: 'التاريخ',
-        value: _formatDate(quotation.quotationDate),
-      ),
-      GeniusPdfLabeledValue(
-        config: config,
-        label: 'Valid Until',
-        labelAr: 'صالح حتى',
-        value: _formatDate(quotation.validUntil),
-      ),
-      GeniusPdfLabeledValue(
-        config: config,
-        label: 'Status',
-        labelAr: 'الحالة',
-        value: config.isRTL ? quotation.statusAr : quotation.status,
-      ),
-      GeniusPdfLabeledValue(
-        config: config,
-        label: 'Currency',
-        labelAr: 'العملة',
-        value: quotation.currency,
-      ),
-    ];
-
-    addTwoColumns(
-        spacing: 10,
-        leftContent: (page, bounds) {
-          final infoBox = GeniusPdfInfoBox(
-            config: config,
-            title: 'Bill To',
-            titleAr: 'فاتورة إلى',
-            columns: 1,
-            items: customerItems,
-            style: const GeniusPdfInfoBoxStyle.headerContent(),
-          );
-          return infoBox.draw(page: page, bounds: bounds).height;
-        },
-        rightContent: (page, bounds) {
-          final infoBox = GeniusPdfInfoBox(
-            config: config,
-            title: 'Details',
-            titleAr: 'التفاصيل',
-            columns: 1,
-            items: quoteItems,
-            style: const GeniusPdfInfoBoxStyle.headerContent(),
-          );
-          return infoBox.draw(page: page, bounds: bounds).height;
-        });
-
-    addSpace(10);
-  }
-
-  void _drawItemsTable() {
-    final grid = GeniusPdfDataGrid(
-      config: config,
-      columns: [
-        const GeniusPdfGridColumn(
-          id: 'no',
-          title: '#',
-          titleAr: '#',
-          width: 30,
-          alignment: GeniusPdfTextAlign.center,
-        ),
-        const GeniusPdfGridColumn(
-          id: 'description',
-          title: 'Description',
-          titleAr: 'الوصف',
-          flexFactor: 3,
-        ),
-        const GeniusPdfGridColumn(
-          id: 'qty',
-          title: 'Qty',
-          titleAr: 'الكمية',
-          width: 50,
-          alignment: GeniusPdfTextAlign.center,
-        ),
-        const GeniusPdfGridColumn(
-          id: 'price',
-          title: 'Unit Price',
-          titleAr: 'السعر',
-          width: 70,
-          alignment: GeniusPdfTextAlign.center,
-        ),
-        const GeniusPdfGridColumn(
-          id: 'total',
-          title: 'Total',
-          titleAr: 'الإجمالي',
-          width: 80,
-          alignment: GeniusPdfTextAlign.center,
-        ),
-      ],
-      rows: quotation.items
-          .map((item) => GeniusPdfGridRow(cells: {
-                'no': item.itemNumber,
-                'description': config.isRTL
-                    ? (item.descriptionAr ?? item.description)
-                    : item.description,
-                'qty':
-                    '${item.quantity}${item.unit != null ? ' ${item.unit}' : ''}',
-                'price': _formatNumber(item.unitPrice),
-                'total': item.lineTotal,
-              }))
-          .toList(),
-      style: GeniusPdfGridStyle.modern(),
-    );
-
-    addGrid(grid, spacing: 6);
-    addSpace(8);
-  }
-
-  void _drawTotals() {
-    final summary = GeniusPdfSummarySection(
-      config: config,
-      items: [
-        GeniusPdfSummaryItem.subtotal(
-          label: 'Subtotal',
-          labelAr: 'المجموع الفرعي',
-          value: _formatCurrency(quotation.subTotal),
-        ),
-        if (quotation.totalDiscount > 0)
-          GeniusPdfSummaryItem.subtotal(
-            label: 'Discount',
-            labelAr: 'الخصم',
-            value: '-${_formatCurrency(quotation.totalDiscount)}',
-          ),
-        if (quotation.totalTax > 0)
-          GeniusPdfSummaryItem.subtotal(
-            label: 'Tax (VAT)',
-            labelAr: 'الضريبة',
-            value: _formatCurrency(quotation.totalTax),
-          ),
-        GeniusPdfSummaryItem.total(
-          label: 'Grand Total',
-          labelAr: 'الإجمالي النهائي',
-          value: _formatCurrency(quotation.grandTotal),
-        ),
-      ],
-      style: const GeniusPdfSummaryStyle.bordered(),
-      alignment: GeniusPdfSummaryAlignment.right,
-      width: pageWidth * 0.5,
-    );
-
-    addSummary(summary, spacing: 10);
-  }
-
-  void _drawFooterSection() {
-    final effectiveNotes = notes ??
-        quotation.notes ??
-        (config.isRTL
-            ? notesAr ?? quotation.notesAr
-            : notes ?? quotation.notes);
-    final effectiveTerms =
-        config.isRTL ? quotation.termsAr ?? quotation.terms : quotation.terms;
-
-    final hasNotesOrTerms =
-        (effectiveNotes != null && effectiveNotes.isNotEmpty) ||
-            (effectiveTerms != null && effectiveTerms.isNotEmpty);
-
-    if (!showNotes && (!showQRCode || reportId == null) && !hasNotesOrTerms) {
-      return;
-    }
-
-    addSpace(20);
-
-    // If only one section is shown, draw it normally
-    if (showNotes && (!showQRCode || reportId == null)) {
-      _drawNotes(width: pageWidth);
-      return;
-    }
-
-    if (!showNotes && (showQRCode && reportId != null) && !hasNotesOrTerms) {
-      _drawQRCodeSection(width: pageWidth);
-      return;
-    }
-
-    // Draw side-by-side if both are present
-    addTwoColumns(
-      spacing: 10,
-      leftFlex: config.isLTR ? 2 : 1,
-      rightFlex: config.isLTR ? 1 : 2,
-      leftContent: (page, bounds) {
-        if (config.isLTR) {
-          return _drawNotesContent(page, bounds);
-        } else {
-          return _drawQRCodeContent(page, bounds);
-        }
-      },
-      rightContent: (page, bounds) {
-        if (config.isLTR) {
-          return _drawQRCodeContent(page, bounds);
-        } else {
-          return _drawNotesContent(page, bounds);
-        }
-      },
-    );
-
-    addSpace(20);
-  }
-
-  void _drawNotes({required double width}) {
-    _drawNotesContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
-  }
-
-  double _drawNotesContent(PdfPage page, Rect bounds) {
-    final effectiveNotes = notes ??
-        quotation.notes ??
-        (config.isRTL
-            ? notesAr ?? quotation.notesAr
-            : notes ?? quotation.notes);
-    final effectiveTerms =
-        config.isRTL ? quotation.termsAr ?? quotation.terms : quotation.terms;
-
-    var text = '';
-
-    if (effectiveNotes != null && effectiveNotes.isNotEmpty) {
-      text += config.isRTL
-          ? 'ملاحظات:\n$effectiveNotes\n\n'
-          : 'Notes:\n$effectiveNotes\n\n';
-    }
-
-    if (effectiveTerms != null && effectiveTerms.isNotEmpty) {
-      text += config.isRTL
-          ? 'الشروط والأحكام:\n$effectiveTerms'
-          : 'Terms & Conditions:\n$effectiveTerms';
-    }
-
-    if (text.isEmpty) return 0;
-
-    final font = config.baseFont;
-    final element = PdfTextElement(
-      text: text,
-      font: font,
-      format: config.isLTR
-          ? null
-          : PdfStringFormat(
-              textDirection: PdfTextDirection.rightToLeft,
-              alignment: PdfTextAlignment.right),
-    );
-
-    final result = element.draw(
-      page: page,
-      bounds: bounds,
-    );
-
-    return result?.bounds.height ?? 0;
-  }
-
-  void _drawQRCodeSection({required double width}) {
-    _drawQRCodeContent(currentPage, Rect.fromLTWH(0, currentY, width, 0));
-  }
-
-  double _drawQRCodeContent(PdfPage page, Rect bounds) {
-    if (reportId == null) return 0;
-
-    final qrUrl = 'https://localhost:443/report/$reportId';
-    final caption = 'ID: $reportId';
-
-    final captionFont = config.baseFont;
-    final captionLayout = PdfTextElement(
-      text: caption,
-      font: captionFont,
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.center,
-        textDirection: config.pdfTextDirection
-      ),
-    ).draw(
-        page: page,
-        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, 0));
-
-    final captionHeight = captionLayout?.bounds.height ?? 0;
-    const qrSize = 80.0;
-    final x = bounds.left + (bounds.width - qrSize) / 2;
-    final y = bounds.top + captionHeight + 5;
-
-    final urlQR = GeniusPdfQRCodeGenerator.url(
-      url: qrUrl,
-      config: config,
-      caption: null,
-    );
-
-    urlQR.draw(
-      page: page,
-      bounds: Rect.fromLTWH(x, y, qrSize, qrSize),
-    );
-
-    return captionHeight + 5 + qrSize;
-  }
-
-  void _drawSignatureSection() {
-    if (currentY > pageHeight - 120) {
-      newPage();
-    }
-
-    addSpace(20);
-    addSectionDivider(
-        title: config.isRTL ? 'الموافقة' : 'Acceptance', spacing: 15);
-
-    final signatureY = currentY;
-
-    // Company Signature
-    final companySig = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Authorized Signature',
-      titleAr: 'التوقيع المعتمد',
-      lineWidth: 110,
-    );
-
-    companySig.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? pageWidth - 120 : 0,
-        signatureY,
-        120,
-        60,
-      ),
-    );
-
-    // Customer Signature
-    final customerSig = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Customer Acceptance',
-      titleAr: 'موافقة العميل',
-      lineWidth: 110,
-    );
-
-    customerSig.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? 0 : pageWidth - 120,
-        signatureY,
-        120,
-        60,
-      ),
-    );
-
-    addSpace(80);
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
-  String _formatCurrency(double amount) {
-    final formatted = amount.toStringAsFixed(2).replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
-    return '$formatted ${quotation.currency}';
-  }
-
-  String _formatNumber(double number) {
-    final formatted = number.toStringAsFixed(2).replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
-    return formatted;
   }
 }

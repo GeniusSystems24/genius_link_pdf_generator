@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import '../../core/directionality.dart';
+import '../../core/pdf_formatter.dart';
 
 import 'pdf_styles.dart';
 

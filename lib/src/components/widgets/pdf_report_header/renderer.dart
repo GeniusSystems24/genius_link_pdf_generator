@@ -258,7 +258,7 @@ class GeniusPdfReportHeader {
     GeniusPdfConfig config,
   ) {
     if (style != null) return style;
-    return GeniusPdfReportHeaderStyle.fromTheme(config.printTheme);
+    return GeniusPdfReportHeaderStyle.fromTheme(config.theme.printTheme);
   }
 
   /// Gets the display title based on locale.

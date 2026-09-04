@@ -118,7 +118,7 @@ void main() {
     final client = File(
       '${packageRoot.path}/lib/src/public/genius_pdf_client.dart',
     ).readAsStringSync();
-    expect(client, isNot(contains("../services/pdf_service.dart")));
+    expect(client, isNot(contains('../services/pdf_service.dart')));
     expect(client, isNot(contains('package:share_plus/')));
   });
 

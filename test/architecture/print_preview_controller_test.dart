@@ -2,9 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
-import 'package:genius_link_pdf_generator/src/printing/application/print_preview_gateway.dart';
-import 'package:genius_link_pdf_generator/src/printing/application/print_preview_result.dart';
-import 'package:genius_link_pdf_generator/src/printing/presentation/print_preview_controller.dart';
 
 void main() {
   test('print preview controller delegates through its gateway', () async {

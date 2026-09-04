@@ -10,7 +10,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart' as m;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../../src/builders/pdf_document_builder.dart';
 import '../../../src/components/components.dart';
 import '../../../src/domain/financial/financial.dart';
 import '../../../src/core/pdf_config.dart';
@@ -21,11 +20,18 @@ import '../models/voucher_enums.dart';
 import '../models/voucher_models.dart';
 import '../models/voucher_style.dart';
 
+import '../../../src/families/erp/erp_families.dart';
 /// Abstract base class for all voucher templates.
 ///
 /// Subclasses must override [buildVoucherContent] to render the
 /// voucher-specific body between the header and signatures.
-abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
+/// S10 voucher-family consolidation:
+///
+/// Account entries, party/payment details, amount highlight,
+/// amount-in-words, notes, signatures, footer and page border
+/// remain centralized in this single family base. Concrete
+/// vouchers should keep only voucher-specific extensions.
+abstract class GeniusPdfVoucherTemplate extends GeniusErpVoucherDocument {
   GeniusPdfVoucherTemplate({
     required GeniusPdfConfig config,
     required this.company,

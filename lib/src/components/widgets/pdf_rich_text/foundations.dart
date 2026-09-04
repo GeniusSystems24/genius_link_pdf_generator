@@ -17,10 +17,10 @@ GeniusPdfTextStyle _resolveRichTextDefaultStyle(
   GeniusPdfConfig config,
 ) {
   if (style != null) return style;
-  final typography = config.printTheme.typography;
+  final typography = config.theme.printTheme.typography;
   return GeniusPdfTextStyle(
     fontSize: typography.bodySize,
-    color: config.printTheme.colorScheme.onSurface,
+    color: config.theme.printTheme.colorScheme.onSurface,
     alignment: GeniusPdfTextAlign.start,
   );
 }

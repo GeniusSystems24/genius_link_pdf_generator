@@ -25,7 +25,7 @@ GeniusPdfSummarySection createS00Summary(GeniusPdfConfig config) {
         value: S00FixtureData.grandTotal,
       ),
     ],
-    style: GeniusPdfSummaryStyle.invoice(),
+    style: const GeniusPdfSummaryStyle.invoice(),
   );
 }
 

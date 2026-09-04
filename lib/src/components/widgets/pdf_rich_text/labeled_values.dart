@@ -15,6 +15,42 @@ class GeniusPdfLabeledValue {
     this.valueDirection = GeniusPdfDirection.auto,
   });
 
+  /// Creates a labeled value from a raw value through the shared formatter.
+  factory GeniusPdfLabeledValue.formatted({
+    required GeniusPdfConfig config,
+    required String label,
+    required Object? rawValue,
+    required GeniusPdfFormatSpec formatSpec,
+    String? labelAr,
+    GeniusPdfTextStyle? labelStyle,
+    GeniusPdfTextStyle? valueStyle,
+    Color? valueColor,
+    String separator = ': ',
+    GeniusPdfDirectionality? directionality,
+    GeniusPdfDirection direction = GeniusPdfDirection.auto,
+    GeniusPdfDirection valueDirection = GeniusPdfDirection.auto,
+  }) {
+    final context = GeniusPdfComponentDirectionality.context(
+      config: config,
+      inherited: directionality,
+      componentDirection: direction,
+    );
+    final isRtl = context.resolve().direction == GeniusPdfResolvedDirection.rtl;
+    return GeniusPdfLabeledValue(
+      config: config,
+      label: label,
+      labelAr: labelAr,
+      value: config.formatter.format(rawValue, formatSpec, isRtl: isRtl),
+      labelStyle: labelStyle,
+      valueStyle: valueStyle,
+      valueColor: valueColor,
+      separator: separator,
+      directionality: directionality,
+      direction: direction,
+      valueDirection: valueDirection,
+    );
+  }
+
   /// Creates a labeled value where the value is styled as positive (green).
   factory GeniusPdfLabeledValue.positive({
     required String label,

@@ -2,10 +2,10 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart' hide PdfTextStyle;
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/core/pdf_config.dart';
 
+import '../src/families/erp/erp_families.dart';
 /// Budget line item with actual vs budgeted comparison.
 class BudgetItem {
   const BudgetItem({
@@ -110,7 +110,7 @@ class BudgetReportData {
 ///
 /// final bytes = budgetReport.generate();
 /// ```
-class BudgetReportTemplate extends GeniusPdfDocumentBuilder {
+class BudgetReportTemplate extends GeniusErpAnalyticalReport {
   BudgetReportTemplate({
     required GeniusPdfConfig config,
     required this.company,

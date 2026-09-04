@@ -208,12 +208,23 @@ class GeniusPdfGridRow {
   dynamic getValue(String columnId) => cells[columnId];
 
   /// Gets the formatted value for a column.
-  String getFormattedValue(GeniusPdfGridColumn column) {
+  ///
+  /// Legacy [GeniusPdfGridColumn.valueFormatter] has highest precedence.
+  /// When a shared [formatter] and [GeniusPdfGridColumn.formatSpec] are
+  /// supplied, S05 uses them as the default formatting source.
+  String getFormattedValue(
+    GeniusPdfGridColumn column, {
+    GeniusPdfFormatter? formatter,
+    bool isRtl = false,
+  }) {
     final value = cells[column.id];
-    if (value == null) return '';
     if (column.valueFormatter != null) {
       return column.valueFormatter!(value);
     }
+    if (column.formatSpec != null && formatter != null) {
+      return formatter.format(value, column.formatSpec!, isRtl: isRtl);
+    }
+    if (value == null) return '';
     return value.toString();
   }
 

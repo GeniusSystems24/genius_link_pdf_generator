@@ -3,6 +3,100 @@ import 'package:genius_pdf_example/app/routing/dashboard_destination_registry.da
 
 void main() {
 
+  test('S10 and S11 destinations are registered', () {
+    expect(
+      DashboardDestinationRegistry.primaryDestinations.any(
+        (item) => item.id == 's10_template_family_consolidation',
+      ),
+      isTrue,
+    );
+    expect(
+      DashboardDestinationRegistry.primaryDestinations.any(
+        (item) => item.id == 's11_print_profiles',
+      ),
+      isTrue,
+    );
+  });
+
+
+
+  test('S08 and S09 ERP destinations are registered', () {
+    expect(
+      DashboardDestinationRegistry.primaryDestinations.any(
+        (item) => item.id == 's08_erp_document_families',
+      ),
+      isTrue,
+    );
+    expect(
+      DashboardDestinationRegistry.primaryDestinations.any(
+        (item) => item.id == 's09_migrated_transaction_templates',
+      ),
+      isTrue,
+    );
+  });
+
+
+
+  test('S07 ERP Semantic Components destination is registered', () {
+    expect(
+      DashboardDestinationRegistry.primaryDestinations.any(
+        (item) => item.id == 's07_erp_semantic_components',
+      ),
+      isTrue,
+    );
+    expect(
+      DashboardDestinationRegistry.titleFor(
+        's07_erp_semantic_components',
+      ),
+      'S07 ERP Semantic Components',
+    );
+  });
+
+
+
+  test('S06 ERP Domain destination is registered', () {
+    expect(
+      DashboardDestinationRegistry.primaryDestinations.any(
+        (item) => item.id == 's06_erp_domain_calculation',
+      ),
+      isTrue,
+    );
+    expect(
+      DashboardDestinationRegistry.titleFor(
+        's06_erp_domain_calculation',
+      ),
+      'S06 ERP Domain & Calculations',
+    );
+  });
+
+
+  test('S05 Formatting & Theme destination is registered', () {
+    expect(
+      DashboardDestinationRegistry.primaryDestinations
+          .any((item) => item.id == 's05_formatting_theme'),
+      isTrue,
+    );
+    expect(
+      DashboardDestinationRegistry.titleFor('s05_formatting_theme'),
+      'S05 Formatting & Theme',
+    );
+  });
+
+
+  test('S04 DataGrid vNext destination is registered', () {
+    expect(
+      DashboardDestinationRegistry.primaryDestinations
+          .any((item) => item.id == 's04_data_grid_vnext'),
+      isTrue,
+    );
+    expect(
+      DashboardDestinationRegistry.titleFor('s04_data_grid_vnext'),
+      'S04 DataGrid vNext',
+    );
+  });
+
+
+
   test('S03 flow layout destination is registered', () {
     expect(
       DashboardDestinationRegistry.primaryDestinations

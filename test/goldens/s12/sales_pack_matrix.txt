@@ -1,0 +1,19 @@
+# S12 semantic QA matrix
+SalesOrder|en=ltr|ar=rtl|bilingual=supported|lines=1,50,500
+ProformaInvoice|en=ltr|ar=rtl|bilingual=supported|lines=1,50,500
+PosInvoice|en=ltr|ar=rtl|bilingual=supported|profiles=A4,thermal-via-S11
+DebitNote|en=ltr|ar=rtl|tax=exclusive,inclusive
+SalesReturn|en=ltr|ar=rtl|negative-values=enabled
+CustomerReceipt|en=ltr|ar=rtl|payment-state=S06
+PickingList|en=ltr|ar=rtl|batch-serial=supported
+PackingList|en=ltr|ar=rtl|batch-serial=supported
+Backorder|en=ltr|ar=rtl|partial-fulfillment
+CustomerAging|calculation=testable
+SalesRegister|calculation=testable
+SalesByCustomer|calculation=testable
+SalesByItem|calculation=testable
+SalesBySalesperson|calculation=testable
+PriceList|en=ltr|ar=rtl
+CommissionReport|calculation=testable
+shared|discounts+charges+taxes|multi-currency|payment-terms|shipping-refs
+shared|original-copy-reprint|batch-serial|null-optionals|long-content

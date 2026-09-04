@@ -1,0 +1,17 @@
+# S13 semantic QA matrix
+PurchaseRequisition|en=ltr|ar=rtl|lines=1,50,500
+RequestForQuotation|en=ltr|ar=rtl|long-vendor-terms
+SupplierQuotation|en=ltr|ar=rtl|mixed-item-codes
+QuotationComparison|shared-family-grid|no-custom-page-flow
+PurchaseOrder|legacy+pack-base|expected-delivery|warehouse-site
+GoodsReceiptNote|partial-receipt
+PurchaseInvoice|landed-charge-hook|tax-discount-validation
+PurchaseAdjustment|debit+credit|negative-credit-path
+SupplierReturn|negative-values
+SupplierStatement|calculation=testable
+SupplierAging|calculation=testable
+PurchaseRegister|calculation=testable
+PurchaseAnalysis|calculation=testable
+OutstandingPurchaseOrders|partial-receipt
+shared|vendor-address+tax-id|multi-currency+exchange-rate|approval-trail
+shared|null-shipping|long-terms|multi-page-items|arabic-english-codes

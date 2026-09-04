@@ -38,6 +38,46 @@ class GeniusPdfSummaryItem {
     this.customHeight,
   });
 
+  /// Creates an item from a raw value through the shared S05 formatter.
+  factory GeniusPdfSummaryItem.formatted({
+    required String label,
+    required Object? rawValue,
+    required GeniusPdfFormatter formatter,
+    required GeniusPdfFormatSpec formatSpec,
+    String? labelAr,
+    GeniusPdfTextStyle? style,
+    Color? labelColor,
+    Color? valueColor,
+    double? labelFontSize,
+    double? valueFontSize,
+    bool isBold = false,
+    bool isHighlighted = false,
+    String? valuePrefix,
+    String? valueSuffix,
+    int indent = 0,
+    bool showSeparator = true,
+    double? customHeight,
+    bool isRtl = false,
+  }) {
+    return GeniusPdfSummaryItem(
+      label: label,
+      labelAr: labelAr,
+      value: formatter.format(rawValue, formatSpec, isRtl: isRtl),
+      style: style,
+      labelColor: labelColor,
+      valueColor: valueColor,
+      labelFontSize: labelFontSize,
+      valueFontSize: valueFontSize,
+      isBold: isBold,
+      isHighlighted: isHighlighted,
+      valuePrefix: valuePrefix,
+      valueSuffix: valueSuffix,
+      indent: indent,
+      showSeparator: showSeparator,
+      customHeight: customHeight,
+    );
+  }
+
   /// Creates a total item (highlighted and bold).
   const GeniusPdfSummaryItem.total({
     required this.label,
@@ -252,4 +292,3 @@ enum GeniusPdfSummaryAlignment {
   center,
   right,
 }
-

@@ -6,10 +6,17 @@
 library;
 
 export 'src/core/pdf_config.dart';
+export 'src/core/pdf_formatter.dart';
+export 'src/core/pdf_theme.dart';
+export 'src/core/pdf_print_theme.dart';
+export 'src/components/models/pdf_styles.dart';
 export 'src/core/directionality.dart';
 export 'src/core/pdf_assets.dart';
 export 'src/core/pdf_logger.dart';
 export 'src/domain/financial/financial.dart';
+export 'src/domain/erp/erp.dart';
+export 'src/components/erp/erp_components.dart';
+export 'src/families/erp/erp_families.dart';
 export 'src/models/pdf_image.dart';
 export 'src/models/pdf_result.dart';
 export 'src/domain/models/pdf_delivery.dart';
@@ -22,3 +29,6 @@ export 'src/public/genius_pdf_client.dart';
 export 'src/presentation/views/pdf_preview.dart';
 export 'src/presentation/controllers/genius_pdf_controller.dart';
 export 'src/public/genius_pdf_preview_controller.dart';
+export 'src/families/erp/existing_template_family_registry.dart';
+export 'src/printing/profiles/print_profiles.dart';
+export 'src/packs/erp_packs.dart';

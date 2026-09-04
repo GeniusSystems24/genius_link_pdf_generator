@@ -6,6 +6,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 
+import 'package:genius_pdf_example/shared/presentation/widgets/create_save_open_pdf_button.dart';
 enum _S02Scenario {
   matrix,
   summary,
@@ -169,6 +170,10 @@ class _S02ComponentsRtlVerificationPageState
                         icon: const Icon(Icons.refresh_rounded),
                         label: const Text('Regenerate PDF'),
                       ),
+                      CreateSaveOpenPdfButton(
+                        onCreate: _generate,
+                        fileName: 's02_components_rtl.pdf',
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -252,31 +257,45 @@ class _S02Document extends GeniusPdfDocumentBuilder {
         config: config,
         directionality: directionality,
         hideEmptyValues: !showOptional,
-        items: const [
-          GeniusPdfSummaryItem(
+        items: [
+          GeniusPdfSummaryItem.formatted(
             label: 'Subtotal',
             labelAr: 'المجموع الفرعي',
-            value: '13,650.00 SAR',
+            rawValue: 13650.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
           ),
-          GeniusPdfSummaryItem(
+          GeniusPdfSummaryItem.formatted(
             label: 'Discount',
             labelAr: 'الخصم',
-            value: '-1,250.00 SAR',
+            rawValue: -1250.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
           ),
-          GeniusPdfSummaryItem(
+          GeniusPdfSummaryItem.formatted(
             label: 'VAT',
             labelAr: 'ضريبة القيمة المضافة',
-            value: '15.00%',
+            rawValue: 15.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.percentage(decimalPlaces: 2),
+            isRtl: config.isRTL,
           ),
-          GeniusPdfSummaryItem(
+          const GeniusPdfSummaryItem(
             label: 'Optional charge',
             labelAr: 'رسم اختياري',
             value: '',
           ),
-          GeniusPdfSummaryItem.total(
+          GeniusPdfSummaryItem.formatted(
             label: 'Grand Total',
             labelAr: 'الإجمالي النهائي',
-            value: '15,697.50 SAR',
+            rawValue: 15697.5,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isBold: true,
+            isHighlighted: true,
+            isRtl: config.isRTL,
           ),
         ],
       ),
@@ -399,12 +418,14 @@ class _S02Document extends GeniusPdfDocumentBuilder {
           title: 'Qty',
           titleAr: 'الكمية',
           isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.quantity(decimalPlaces: 2),
         ),
         GeniusPdfGridColumn(
           id: 'amount',
           title: 'Amount',
           titleAr: 'المبلغ',
           isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
         ),
       ],
       rows: const [

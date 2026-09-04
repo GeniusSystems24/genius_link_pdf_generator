@@ -1,15 +1,18 @@
+
 import 'dart:typed_data';
-import 'dart:ui';
 
-import 'package:syncfusion_flutter_pdf/pdf.dart'
-    hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
-import '../src/domain/financial/financial.dart';
+import '../src/core/directionality.dart';
 import '../src/core/pdf_config.dart';
+import '../src/domain/erp/erp.dart';
+import '../src/domain/financial/financial.dart';
+import '../src/families/erp/erp_families.dart';
 import '../src/models/pdf_result.dart';
+import 'erp_legacy_shared.dart';
 
+import '../src/packs/purchasing/purchasing_documents.dart';
 /// Purchase order line item.
 class PurchaseOrderItem {
   const PurchaseOrderItem({
@@ -34,6 +37,7 @@ class PurchaseOrderItem {
   final double discount;
   final DateTime? deliveryDate;
 
+  /// Legacy compatibility getter.
   double get lineTotal => (quantity * unitPrice) - discount;
 }
 
@@ -117,29 +121,192 @@ class PurchaseOrderData {
   final String currency;
   final String status;
 
-  double get subtotal => items.fold(0, (sum, item) => sum + item.lineTotal);
-  double get totalTax =>
-      taxes.fold(0.0, (sum, tax) => sum + (subtotal * tax.rate / 100));
-  double get grandTotal => subtotal + totalTax;
+  ErpCalculationResult get _calculation =>
+      PurchaseOrderErpAdapter.calculateData(this);
+
+  double get subtotal =>
+      (_calculation.subtotal - _calculation.lineDiscountTotal)
+          .toDouble();
+  double get totalTax => _calculation.taxTotal.toDouble();
+  double get grandTotal => _calculation.grandTotal.toDouble();
 }
 
-/// A professional purchase order template.
+/// S09 adapter from PurchaseOrder legacy models into the S06 domain.
+class PurchaseOrderErpAdapter
+    extends GeniusErpDocumentAdapter<PurchaseOrderData> {
+  const PurchaseOrderErpAdapter({
+    required this.company,
+    required this.vendor,
+  });
+
+  final GeniusPdfCompanyInfo company;
+  final PurchaseOrderVendor vendor;
+
+  static ErpCurrency currencyOf(PurchaseOrderData source) =>
+      GeniusErpLegacyCompatibility.currency(source.currency);
+
+  static List<ErpLineItem> lineItemsOf(PurchaseOrderData source) {
+    final currency = currencyOf(source);
+
+    return source.items
+        .map(
+          (item) => ErpLineItem(
+            id: item.itemNumber.toString(),
+            description: item.description,
+            descriptionAr: item.descriptionAr,
+            sku: item.productCode,
+            quantity: ErpQuantity(
+              value: item.quantity,
+              unit: ErpUnit(
+                code: item.unit ?? 'EA',
+                name: item.unit ?? 'Each',
+                precision: 3,
+              ),
+            ),
+            unitPrice: ErpMoney.fromAmount(
+              item.unitPrice,
+              currency: currency,
+            ),
+            discounts: item.discount == 0
+                ? const []
+                : [
+                    ErpDiscount.fixed(
+                      amount: ErpMoney.fromAmount(
+                        item.discount,
+                        currency: currency,
+                      ),
+                    ),
+                  ],
+            metadata: {
+              if (item.deliveryDate != null)
+                'deliveryDate': item.deliveryDate,
+            },
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  static List<ErpTaxLine> taxesOf(PurchaseOrderData source) =>
+      source.taxes
+          .map(
+            (tax) => ErpTaxLine(
+              code: tax.name,
+              name: tax.name,
+              nameAr: tax.nameAr,
+              ratePercent: tax.rate,
+            ),
+          )
+          .toList(growable: false);
+
+  static ErpCalculationResult calculateData(
+    PurchaseOrderData source,
+  ) {
+    return const ErpCalculationService().calculate(
+      ErpCalculationRequest(
+        currency:
+            GeniusErpLegacyCompatibility.currency(source.currency),
+        lineItems: lineItemsOf(source),
+        documentTaxes: taxesOf(source),
+      ),
+    );
+  }
+
+  @override
+  ErpDocumentContext adapt(PurchaseOrderData source) {
+    final vendorParty = GeniusErpLegacyCompatibility.party(
+      id: vendor.vendorCode,
+      name: vendor.name,
+      nameAr: vendor.nameAr,
+      registrationNumber: vendor.vendorCode,
+      taxNumber: vendor.vatNumber,
+      address: vendor.address,
+      addressAr: vendor.addressAr,
+      phone: vendor.phone,
+      email: vendor.email,
+      contactName: vendor.contactPerson,
+      addressRole: ErpAddressRole.billing,
+    );
+
+    final shipping = source.shippingInfo;
+    final shippingAddress = shipping == null
+        ? null
+        : GeniusErpLegacyCompatibility.address(
+            line1: shipping.address,
+            line1Ar: shipping.addressAr,
+            attentionTo: shipping.contactPerson,
+            role: ErpAddressRole.shipping,
+          );
+
+    return ErpDocumentContext(
+      organization:
+          GeniusErpLegacyCompatibility.organization(company),
+      identity: ErpDocumentIdentity(
+        kind: ErpDocumentKind.purchaseOrder,
+        number: source.poNumber,
+        issueDate: source.poDate,
+        status: _documentStatus(source.status),
+      ),
+      recipient: vendorParty,
+      billingAddress:
+          vendorParty.addressFor(ErpAddressRole.billing),
+      shippingAddress: shippingAddress,
+      documentCurrency: currencyOf(source),
+      references: source.quotationRef == null
+          ? const []
+          : [
+              ErpDocumentReference(
+                type: 'Quotation',
+                number: source.quotationRef!,
+              ),
+            ],
+      lineItems: lineItemsOf(source),
+      notes: source.notes,
+      terms: source.termsAndConditions,
+      metadata: {
+        if (source.expectedDeliveryDate != null)
+          'expectedDeliveryDate': source.expectedDeliveryDate,
+        if (source.paymentTerms != null)
+          'paymentTerms': source.paymentTerms,
+        if (source.paymentTermsAr != null)
+          'paymentTermsAr': source.paymentTermsAr,
+        if (source.notesAr != null) 'notesAr': source.notesAr,
+        if (source.termsAndConditionsAr != null)
+          'termsAr': source.termsAndConditionsAr,
+        if (shipping?.phone != null)
+          'shippingPhone': shipping!.phone,
+        if (shipping?.instructions != null)
+          'shippingInstructions': shipping!.instructions,
+        if (shipping?.instructionsAr != null)
+          'shippingInstructionsAr': shipping!.instructionsAr,
+      },
+    );
+  }
+
+  @override
+  ErpCalculationRequest calculationRequest(
+    PurchaseOrderData source,
+    ErpDocumentContext document,
+  ) =>
+      ErpCalculationRequest.fromContext(
+        document,
+        documentTaxes: taxesOf(source),
+      );
+
+  static ErpDocumentStatus _documentStatus(String status) {
+    return switch (status.trim().toLowerCase()) {
+      'approved' => ErpDocumentStatus.approved,
+      'sent' || 'received' => ErpDocumentStatus.issued,
+      'cancelled' || 'canceled' => ErpDocumentStatus.cancelled,
+      _ => ErpDocumentStatus.draft,
+    };
+  }
+}
+
+/// Purchase order template migrated to the S08 Transaction family.
 ///
-/// Creates purchase orders with itemized items, vendor info,
-/// shipping details, and terms.
-///
-/// ## Example
-/// ```dart
-/// final po = PurchaseOrderTemplate(
-///   config: pdfConfig,
-///   company: companyInfo,
-///   vendor: vendorInfo,
-///   purchaseOrder: poData,
-/// );
-///
-/// final bytes = po.generate();
-/// ```
-class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
+/// The constructor/public fields remain source-compatible with the legacy
+/// template.
+class PurchaseOrderTemplate extends GeniusPurchasingTransactionDocument {
   PurchaseOrderTemplate({
     required GeniusPdfConfig config,
     required this.company,
@@ -157,82 +324,157 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
   final bool showShippingInfo;
   final bool showTerms;
 
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
+  PurchaseOrderErpAdapter get _adapter =>
+      PurchaseOrderErpAdapter(
+        company: company,
+        vendor: vendor,
+      );
 
-  @override
-  void build() {
-    newPage();
+  ErpDocumentContext get erpContext =>
+      _adapter.adapt(purchaseOrder);
 
-    _drawHeader();
-    _drawInfoSection();
-    _drawItemsTable();
-    _drawSummary();
-
-    if (showShippingInfo && purchaseOrder.shippingInfo != null) {
-      _drawShippingInfo();
-    }
-
-    if (purchaseOrder.notes != null || purchaseOrder.notesAr != null) {
-      _drawNotes();
-    }
-
-    if (showTerms &&
-        (purchaseOrder.termsAndConditions != null ||
-            purchaseOrder.termsAndConditionsAr != null)) {
-      _drawTermsAndConditions();
-    }
-
-    _drawSignatureSection();
+  ErpCalculationResult get erpCalculation {
+    final context = erpContext;
+    return const ErpCalculationService().calculate(
+      _adapter.calculationRequest(
+        purchaseOrder,
+        context,
+      ),
+    );
   }
 
-  /// Validates financial totals then generates the PDF.
-  ///
-  /// Returns [GeniusPdfFailure] if subtotal, VAT, or grand total validation
-  /// fails. Pass `validateFinancials: false` to skip validation.
+  @override
+  GeniusErpFamilyPlan createFamilyPlan() {
+    final context = erpContext;
+    final calculation = const ErpCalculationService().calculate(
+      _adapter.calculationRequest(
+        purchaseOrder,
+        context,
+      ),
+    );
+
+    final shipping = purchaseOrder.shippingInfo;
+    final shippingInstructions = shipping == null
+        ? null
+        : config.isRTL
+            ? (shipping.instructionsAr ?? shipping.instructions)
+            : (shipping.instructions ?? shipping.instructionsAr);
+    final shippingNotes = shipping == null
+        ? null
+        : [
+            if (shipping.contactPerson != null)
+              '${config.isRTL ? 'جهة الاتصال' : 'Contact'}: '
+                  '${shipping.contactPerson}',
+            if (shipping.phone != null)
+              '${config.isRTL ? 'الهاتف' : 'Phone'}: ${shipping.phone}',
+            if (shippingInstructions != null &&
+                shippingInstructions.isNotEmpty)
+              '${config.isRTL ? 'تعليمات' : 'Instructions'}: '
+                  '$shippingInstructions',
+          ].join('\n');
+
+    return GeniusErpFamilyPlan(
+      document: context,
+      calculation: calculation,
+      company: company,
+      title: 'Purchase Order',
+      titleAr: 'أمر شراء',
+      primaryParty: context.recipient,
+      primaryPartyTitle: 'Vendor',
+      primaryPartyTitleAr: 'المورد',
+      addresses: [
+        GeniusErpAddressSection(
+          title: 'Vendor Address',
+          titleAr: 'عنوان المورد',
+          address: context.billingAddress,
+        ),
+        if (showShippingInfo)
+          GeniusErpAddressSection(
+            title: 'Shipping Address',
+            titleAr: 'عنوان الشحن',
+            address: context.shippingAddress,
+          ),
+      ],
+      detailFields: [
+        if (purchaseOrder.expectedDeliveryDate != null)
+          GeniusErpDetailField(
+            label: 'Expected Delivery',
+            labelAr: 'التسليم المتوقع',
+            value: config.formatter.formatDate(
+              purchaseOrder.expectedDeliveryDate,
+            ),
+            valueKind: GeniusPdfValueKind.date,
+          ),
+        if (purchaseOrder.paymentTerms != null)
+          GeniusErpDetailField(
+            label: 'Payment Terms',
+            labelAr: 'شروط الدفع',
+            value: config.isRTL
+                ? (purchaseOrder.paymentTermsAr ??
+                    purchaseOrder.paymentTerms!)
+                : purchaseOrder.paymentTerms!,
+          ),
+        GeniusErpDetailField(
+          label: 'Status',
+          labelAr: 'الحالة',
+          value: purchaseOrder.status,
+          valueKind: GeniusPdfValueKind.customIdentifier,
+        ),
+      ],
+      notes: [
+        if (purchaseOrder.notes != null)
+          purchaseOrder.notes!,
+        if (showShippingInfo &&
+            shippingNotes != null &&
+            shippingNotes.isNotEmpty)
+          shippingNotes,
+      ].join('\n\n'),
+      notesAr: purchaseOrder.notesAr,
+      terms:
+          showTerms ? purchaseOrder.termsAndConditions : null,
+      termsAr: showTerms
+          ? purchaseOrder.termsAndConditionsAr
+          : null,
+      signatures: const [
+        GeniusErpSignatureSpec(
+          title: 'Prepared By',
+          titleAr: 'أعده',
+        ),
+        GeniusErpSignatureSpec(
+          title: 'Approved By',
+          titleAr: 'اعتمده',
+        ),
+        GeniusErpSignatureSpec(
+          title: 'Received By Vendor',
+          titleAr: 'استلمه المورد',
+        ),
+      ],
+      slotPolicies: const {
+        GeniusErpFamilySlot.body: GeniusErpSlotPolicy(
+          estimatedHeight: 140,
+        ),
+        GeniusErpFamilySlot.approvalsSignatures:
+            GeniusErpSlotPolicy(
+          breakPolicy: GeniusErpSlotBreakPolicy.keepTogether,
+          estimatedHeight: 90,
+        ),
+      },
+    );
+  }
+
   Future<GeniusPdfResult> generateResult({
     bool validateFinancials = true,
     GeniusFinancialValidationContext? validationContext,
   }) async {
     if (validateFinancials) {
-      final policy =
-          validationContext?.roundingPolicy ?? GeniusRoundingPolicy.defaults();
-      final validator = GeniusFinancialValidator(policy);
-
-      final lineTotals =
-          purchaseOrder.items.map((i) => i.lineTotal).toList();
-      final subtotalResult = validator.validateSubtotal(
-        lineTotals: lineTotals,
-        providedSubtotal: purchaseOrder.subtotal,
-      );
-
-      final vatResults = purchaseOrder.taxes
-          .map((tax) => validator.validateVat(
-                vatBase: purchaseOrder.subtotal,
-                vatRate: tax.rate,
-                providedVatAmount: purchaseOrder.subtotal * tax.rate / 100,
-              ))
-          .toList();
-
-      final grandTotalResult = validator.validateGrandTotal(
-        subtotal: purchaseOrder.subtotal,
-        discounts: 0.0,
-        vatAmount: purchaseOrder.totalTax,
-        fees: 0.0,
-        providedGrandTotal: purchaseOrder.grandTotal,
-      );
-
-      final combined = validator.combineResults([
-        subtotalResult,
-        ...vatResults,
-        grandTotalResult,
-      ]);
-
-      if (!combined.isValid) return GeniusPdfFailure.fromValidation(combined);
+      try {
+        erpCalculation;
+      } catch (error, stackTrace) {
+        return GeniusPdfFailure.fromException(
+          error,
+          stackTrace,
+        );
+      }
     }
 
     try {
@@ -240,433 +482,11 @@ class PurchaseOrderTemplate extends GeniusPdfDocumentBuilder {
         bytes: Uint8List.fromList(generate()),
         fileName: 'po_${purchaseOrder.poNumber}.pdf',
       );
-    } catch (e, st) {
-      return GeniusPdfFailure.fromException(e, st);
+    } catch (error, stackTrace) {
+      return GeniusPdfFailure.fromException(
+        error,
+        stackTrace,
+      );
     }
-  }
-
-  void _drawHeader() {
-    // Status badge
-    _drawStatusBadge();
-
-    final header = GeniusPdfReportHeader(
-      config: config,
-      title: 'Purchase Order',
-      titleAr: 'أمر شراء',
-      company: company,
-      printDate: DateTime.now(),
-      style: const GeniusPdfReportHeaderStyle(
-        titleStyle: GeniusPdfTextStyle.title(fontSize: 20),
-        showBorder: false,
-      ),
-      layout: GeniusPdfReportHeaderLayout.standard,
-    );
-
-    header.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, 0, pageWidth, 100),
-    );
-
-    addSpace(105);
-  }
-
-  void _drawStatusBadge() {
-    final statusColors = {
-      'Draft': PdfColor(150, 150, 150),
-      'Pending': PdfColor(255, 165, 0),
-      'Approved': PdfColor(0, 150, 0),
-      'Sent': PdfColor(0, 100, 200),
-      'Received': PdfColor(0, 180, 0),
-      'Cancelled': PdfColor(200, 0, 0),
-    };
-
-    final color = statusColors[purchaseOrder.status] ?? PdfColor(100, 100, 100);
-
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(color),
-      bounds: Rect.fromLTWH(pageWidth - 80, 5, 75, 20),
-    );
-
-    currentPage.graphics.drawString(
-      purchaseOrder.status,
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 9,
-              style: PdfFontStyle.bold),
-      brush: PdfBrushes.white,
-      bounds: Rect.fromLTWH(pageWidth - 80, 5, 75, 20),
-      format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle,
-          textDirection: config.pdfTextDirection),
-    );
-  }
-
-  void _drawInfoSection() {
-    final vendorBox = GeniusPdfInfoBox(
-      config: config,
-      title: 'Vendor',
-      titleAr: 'المورد',
-      items: [
-        GeniusPdfLabeledValue(
-          config: config,
-          label: 'Name',
-          labelAr: 'الاسم',
-          value: config.isRTL ? (vendor.nameAr ?? vendor.name) : vendor.name,
-        ),
-        if (vendor.vendorCode != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Vendor Code',
-            labelAr: 'كود المورد',
-            value: vendor.vendorCode!,
-          ),
-        if (vendor.address != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Address',
-            labelAr: 'العنوان',
-            value: config.isRTL
-                ? (vendor.addressAr ?? vendor.address!)
-                : vendor.address!,
-          ),
-        if (vendor.vatNumber != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'VAT No',
-            labelAr: 'الرقم الضريبي',
-            value: vendor.vatNumber!,
-          ),
-        if (vendor.phone != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Phone',
-            labelAr: 'الهاتف',
-            value: vendor.phone!,
-          ),
-        if (vendor.contactPerson != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Contact',
-            labelAr: 'جهة الاتصال',
-            value: vendor.contactPerson!,
-          ),
-      ],
-      style: const GeniusPdfInfoBoxStyle.headerContent(),
-    );
-
-    final poBox = GeniusPdfInfoBox(
-      config: config,
-      title: 'Order Details',
-      titleAr: 'تفاصيل الطلب',
-      items: [
-        GeniusPdfLabeledValue(
-          config: config,
-          label: 'PO Number',
-          labelAr: 'رقم الطلب',
-          value: purchaseOrder.poNumber,
-        ),
-        GeniusPdfLabeledValue(
-          config: config,
-          label: 'Date',
-          labelAr: 'التاريخ',
-          value: _formatDate(purchaseOrder.poDate),
-        ),
-        if (purchaseOrder.expectedDeliveryDate != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Expected Delivery',
-            labelAr: 'التسليم المتوقع',
-            value: _formatDate(purchaseOrder.expectedDeliveryDate!),
-          ),
-        if (purchaseOrder.quotationRef != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Quotation Ref',
-            labelAr: 'مرجع العرض',
-            value: purchaseOrder.quotationRef!,
-          ),
-        if (purchaseOrder.paymentTerms != null)
-          GeniusPdfLabeledValue(
-            config: config,
-            label: 'Payment Terms',
-            labelAr: 'شروط الدفع',
-            value: config.isRTL
-                ? (purchaseOrder.paymentTermsAr ?? purchaseOrder.paymentTerms!)
-                : purchaseOrder.paymentTerms!,
-          ),
-      ],
-      style: const GeniusPdfInfoBoxStyle.headerContent(),
-    );
-
-    final dualBox = GeniusPdfDualInfoBox(
-      leftBox: config.isRTL ? poBox : vendorBox,
-      rightBox: config.isRTL ? vendorBox : poBox,
-      spacing: 20,
-    );
-
-    final result = dualBox.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 150),
-    );
-
-    addSpace(result.height + 20);
-  }
-
-  void _drawItemsTable() {
-    final grid = GeniusPdfDataGrid(
-      config: config,
-      columns: [
-        const GeniusPdfGridColumn(
-          id: 'no',
-          title: '#',
-          titleAr: '#',
-          width: 30,
-          alignment: GeniusPdfTextAlign.center,
-        ),
-        if (purchaseOrder.items.any((i) => i.productCode != null))
-          const GeniusPdfGridColumn(
-            id: 'code',
-            title: 'Code',
-            titleAr: 'الكود',
-            width: 60,
-          ),
-        const GeniusPdfGridColumn(
-          id: 'description',
-          title: 'Description',
-          titleAr: 'الوصف',
-          flexFactor: 3,
-        ),
-        const GeniusPdfGridColumn(
-          id: 'qty',
-          title: 'Qty',
-          titleAr: 'الكمية',
-          width: 50,
-          alignment: GeniusPdfTextAlign.center,
-        ),
-        GeniusPdfGridColumn.currency(
-          id: 'price',
-          title: 'Unit Price',
-          titleAr: 'سعر الوحدة',
-          width: 85,
-          currencySymbol: '',
-        ),
-        GeniusPdfGridColumn.currency(
-          id: 'total',
-          title: 'Total',
-          titleAr: 'الإجمالي',
-          width: 95,
-          currencySymbol: '',
-        ),
-      ],
-      rows: purchaseOrder.items.map((item) {
-        final cells = <String, dynamic>{
-          'no': item.itemNumber,
-          'description': config.isRTL
-              ? (item.descriptionAr ?? item.description)
-              : item.description,
-          'qty': '${item.quantity}${item.unit != null ? ' ${item.unit}' : ''}',
-          'price': item.unitPrice,
-          'total': item.lineTotal,
-        };
-        if (purchaseOrder.items.any((i) => i.productCode != null)) {
-          cells['code'] = item.productCode ?? '';
-        }
-        return GeniusPdfGridRow(cells: cells);
-      }).toList(),
-      style: GeniusPdfGridStyle.modern(),
-    );
-
-    final result = grid.drawAt(
-      page: currentPage,
-      x: 0,
-      y: currentY,
-      width: pageWidth,
-    );
-
-    if (result != null) {
-      addSpace(result.bounds.height + 15);
-    }
-  }
-
-  void _drawSummary() {
-    final items = <GeniusPdfSummaryItem>[
-      GeniusPdfSummaryItem.subtotal(
-        label: 'Subtotal',
-        labelAr: 'المجموع الفرعي',
-        value: _formatCurrency(purchaseOrder.subtotal),
-      ),
-    ];
-
-    for (final tax in purchaseOrder.taxes) {
-      items.add(GeniusPdfSummaryItem(
-        label: '${tax.name} (${tax.rate}%)',
-        labelAr: '${tax.nameAr ?? tax.name} (${tax.rate}%)',
-        value: _formatCurrency(purchaseOrder.subtotal * tax.rate / 100),
-      ));
-    }
-
-    items.add(GeniusPdfSummaryItem.total(
-      label: 'Grand Total',
-      labelAr: 'الإجمالي الكلي',
-      value: _formatCurrency(purchaseOrder.grandTotal),
-    ));
-
-    final summary = GeniusPdfSummarySection(
-      config: config,
-      items: items,
-      style: const GeniusPdfSummaryStyle.bordered(),
-      alignment: GeniusPdfSummaryAlignment.right,
-      width: pageWidth * 0.4,
-    );
-
-    final result = summary.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 150),
-    );
-
-    addSpace(result.height + 15);
-  }
-
-  void _drawShippingInfo() {
-    final shipping = purchaseOrder.shippingInfo!;
-    final title = config.isRTL ? 'معلومات الشحن' : 'Shipping Information';
-
-    currentPage.graphics.drawString(
-      title,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(22);
-
-    final shippingText = StringBuffer();
-    shippingText.writeln(config.isRTL
-        ? (shipping.addressAr ?? shipping.address)
-        : shipping.address);
-    if (shipping.contactPerson != null) {
-      shippingText.writeln(
-          '${config.isRTL ? 'جهة الاتصال' : 'Contact'}: ${shipping.contactPerson}');
-    }
-    if (shipping.phone != null) {
-      shippingText
-          .writeln('${config.isRTL ? 'الهاتف' : 'Phone'}: ${shipping.phone}');
-    }
-    if (shipping.instructions != null) {
-      final instructions = config.isRTL
-          ? (shipping.instructionsAr ?? shipping.instructions!)
-          : shipping.instructions!;
-      shippingText.writeln(
-          '${config.isRTL ? 'تعليمات' : 'Instructions'}: $instructions');
-    }
-
-    currentPage.graphics.drawString(
-      shippingText.toString(),
-      baseFont,
-      bounds: Rect.fromLTWH(10, currentY, pageWidth - 10, 60),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(65);
-  }
-
-  void _drawNotes() {
-    final notesLabel = config.isRTL ? 'ملاحظات:' : 'Notes:';
-    final notesText = config.isRTL
-        ? (purchaseOrder.notesAr ?? purchaseOrder.notes!)
-        : purchaseOrder.notes!;
-
-    currentPage.graphics.drawString(
-      '$notesLabel\n$notesText',
-      baseFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 50),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(55);
-  }
-
-  void _drawTermsAndConditions() {
-    final termsLabel =
-        config.isRTL ? 'الشروط والأحكام:' : 'Terms & Conditions:';
-    final termsText = config.isRTL
-        ? (purchaseOrder.termsAndConditionsAr ??
-            purchaseOrder.termsAndConditions!)
-        : purchaseOrder.termsAndConditions!;
-
-    currentPage.graphics.drawString(
-      '$termsLabel\n$termsText',
-      baseFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 60),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(65);
-  }
-
-  void _drawSignatureSection() {
-    final bottomY = pageHeight - 80;
-
-    // Prepared by
-    final preparedBy = GeniusPdfSignatureArea(config: config,
-      title: 'Prepared By',
-      titleAr: 'أعده',
-    );
-
-    preparedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(0, bottomY, 150, 60),
-    );
-
-    // Approved by
-    final approvedBy = GeniusPdfSignatureArea(config: config,
-      title: 'Approved By',
-      titleAr: 'اعتمده',
-    );
-
-    approvedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH((pageWidth - 150) / 2, bottomY, 150, 60),
-    );
-
-    // Received by vendor
-    final receivedBy = GeniusPdfSignatureArea(config: config,
-      title: 'Received By Vendor',
-      titleAr: 'استلمه المورد',
-    );
-
-    receivedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(pageWidth - 150, bottomY, 150, 60),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
-  String _formatCurrency(double amount) {
-    final formatted = amount.toStringAsFixed(2).replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
-    return '$formatted ${purchaseOrder.currency}';
   }
 }

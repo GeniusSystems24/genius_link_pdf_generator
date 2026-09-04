@@ -5,7 +5,6 @@ import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import 'support/s00_artifact_helper.dart';
 import 'support/s00_fixture_data.dart';

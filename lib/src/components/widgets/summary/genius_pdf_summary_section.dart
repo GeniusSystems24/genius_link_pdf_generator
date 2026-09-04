@@ -136,7 +136,7 @@ class GeniusPdfSummarySection {
     GeniusPdfConfig config,
   ) {
     if (style != null) return style;
-    return GeniusPdfSummaryStyle.fromTheme(config.printTheme);
+    return GeniusPdfSummaryStyle.fromTheme(config.theme.printTheme);
   }
 
   bool _shouldRenderItem(GeniusPdfSummaryItem item) {

@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/core/pdf_config.dart';
 
+import '../src/families/erp/erp_families.dart';
 /// Delivery note line item.
 class DeliveryItem {
   const DeliveryItem({
@@ -112,7 +112,7 @@ class DeliveryNoteData {
 ///
 /// final bytes = delivery.generate();
 /// ```
-class DeliveryNoteTemplate extends GeniusPdfDocumentBuilder {
+class DeliveryNoteTemplate extends GeniusErpOperationalForm {
   DeliveryNoteTemplate({
     required GeniusPdfConfig config,
     required this.company,

@@ -2,6 +2,7 @@
 ///
 /// This deliberately excludes the concrete voucher barrel to avoid importing
 /// the package public entrypoint from files that are exported by that entrypoint.
+library;
 export 'package:syncfusion_flutter_pdf/pdf.dart';
 
 export '../../src/builders/pdf_document_builder.dart';

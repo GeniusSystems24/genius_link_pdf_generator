@@ -907,7 +907,7 @@ class GeniusPdfInfoBox {
     GeniusPdfConfig config,
   ) {
     if (style != null) return style;
-    return GeniusPdfInfoBoxStyle.fromTheme(config.printTheme);
+    return GeniusPdfInfoBoxStyle.fromTheme(config.theme.printTheme);
   }
 
   /// Draws border lines around a rectangle based on [GeniusPdfBorderStyle].

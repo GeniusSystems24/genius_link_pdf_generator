@@ -1,0 +1,13 @@
+# S11 print-profile semantic matrix
+a4-portrait|595x842|logical
+a4-landscape|595x842|landscape|logical
+a5|420x595|logical
+letter|612x792|logical
+legal|612x1008|logical
+thermal-58mm|58mm|variable-height|rtl-aware|structured=ltr
+thermal-80mm|80mm|variable-height|rtl-aware|structured=ltr
+continuous|custom-width|variable-height
+custom-label|single|gap=0|calibrated
+label-sheet|grid|gap=explicit|bleed=explicit|calibrated
+pre-printed|physical-coordinate|no-logical-mirroring
+calibration|10mm-grid|offset+scale

@@ -2,10 +2,10 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart' hide PdfTextStyle;
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/core/pdf_config.dart';
 
+import '../src/families/erp/erp_families.dart';
 /// Cash flow activity type.
 enum CashFlowActivityType {
   operating,
@@ -118,7 +118,7 @@ class CashFlowData {
 ///
 /// final bytes = cashFlow.generate();
 /// ```
-class CashFlowTemplate extends GeniusPdfDocumentBuilder {
+class CashFlowTemplate extends GeniusErpAnalyticalReport {
   CashFlowTemplate({
     required GeniusPdfConfig config,
     required this.company,

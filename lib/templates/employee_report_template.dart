@@ -2,10 +2,11 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/core/pdf_config.dart';
 
+import 'erp_shared_template_layout.dart';
+import '../src/families/erp/erp_families.dart';
 /// Employee status enum.
 enum EmployeeStatus {
   active,
@@ -162,7 +163,7 @@ class EmployeeReportData {
 ///
 /// final bytes = report.generate();
 /// ```
-class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
+class EmployeeReportTemplate extends GeniusErpRegisterDocument {
   EmployeeReportTemplate({
     required GeniusPdfConfig config,
     required this.company,
@@ -230,7 +231,20 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
 
     // Signatures section
     if (showSignatures) {
-      _drawSignatures();
+      drawErpSignatureRow(
+        signatures: const [
+          GeniusErpTemplateSignatureSpec(
+            title: 'Prepared By',
+            titleAr: 'أعده',
+          ),
+          GeniusErpTemplateSignatureSpec(
+            title: 'HR Manager',
+            titleAr: 'مدير الموارد البشرية',
+          ),
+        ],
+        itemWidth: 120,
+        lineWidth: 110,
+      );
     }
   }
 
@@ -674,57 +688,6 @@ class EmployeeReportTemplate extends GeniusPdfDocumentBuilder {
     return captionHeight + 5 + qrSize;
   }
 
-  void _drawSignatures() {
-    // Ensure enough space for signatures
-    if (currentY > pageHeight - 100) {
-      newPage();
-    }
-
-    addSpace(20);
-    addHorizontalLine(spacing: 10);
-
-    final signatureY = currentY;
-
-    // Prepared By
-    final preparedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'Prepared By',
-      titleAr: 'أعده',
-      lineWidth: 110,
-      showDate: false,
-    );
-
-    preparedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? pageWidth - 120 : 0,
-        signatureY,
-        120,
-        60,
-      ),
-    );
-
-    // HR Manager
-    final approvedBy = GeniusPdfSignatureArea(
-      config: config,
-      title: 'HR Manager',
-      titleAr: 'مدير الموارد البشرية',
-      lineWidth: 110,
-      showDate: false,
-    );
-
-    approvedBy.draw(
-      page: currentPage,
-      bounds: Rect.fromLTWH(
-        config.isRTL ? 0 : pageWidth - 120,
-        signatureY,
-        120,
-        60,
-      ),
-    );
-
-    addSpace(70);
-  }
 
   String _getStatusFilterText(EmployeeStatus? status) {
     if (status == null) return 'All';

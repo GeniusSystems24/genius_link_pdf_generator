@@ -1,0 +1,8 @@
+layout=ltr
+party=Acme Trading
+documentNumber=INV-2026-000123|dir=ltr
+money=15,697.50 SAR|dir=ltr
+taxId=310123456700003|dir=ltr
+phone=+966 50 123 4567|dir=ltr
+email=finance@example.com|dir=ltr
+proseDir=ltr

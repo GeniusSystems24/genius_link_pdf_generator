@@ -12,6 +12,14 @@ import 'package:genius_pdf_example/features/dashboard/presentation/pages/s00_bas
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/s01_directionality_verification_page.dart';
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/s02_components_rtl_verification_page.dart';
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/s03_flow_layout_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s04_data_grid_vnext_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s05_formatting_theme_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s06_erp_domain_calculation_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s07_erp_semantic_components_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s09_migrated_transaction_templates_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s10_template_family_consolidation_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s11_print_profiles_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s08_erp_document_families_verification_page.dart';
 import 'package:genius_pdf_example/features/export/presentation/pages/export_demo_screen.dart';
 import 'package:genius_pdf_example/features/job_manager/presentation/pages/job_manager_demo_screen.dart';
 import 'package:genius_pdf_example/features/modern_vouchers/presentation/pages/modern_vouchers_demo_screen.dart';
@@ -22,6 +30,9 @@ import 'package:genius_pdf_example/features/showcase/presentation/pages/examples
 import 'package:genius_pdf_example/features/template_engine/presentation/pages/template_engine_demo_screen.dart';
 import 'package:genius_pdf_example/features/templates/presentation/pages/templates_demo_screen.dart';
 
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s12_sales_erp_pack_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s13_purchasing_erp_pack_verification_page.dart';
+
 final class DashboardDestinationRegistry {
   const DashboardDestinationRegistry._();
 
@@ -31,6 +42,28 @@ final class DashboardDestinationRegistry {
     DashboardDestination(id: 's01_directionality', title: 'S01 Directionality'),
     DashboardDestination(id: 's02_components_rtl', title: 'S02 Components RTL'),
     DashboardDestination(id: 's03_flow_layout', title: 'S03 Flow Layout'),
+    DashboardDestination(
+        id: 's04_data_grid_vnext', title: 'S04 DataGrid vNext'),
+    DashboardDestination(
+        id: 's05_formatting_theme', title: 'S05 Formatting & Theme'),
+    DashboardDestination(
+        id: 's06_erp_domain_calculation',
+        title: 'S06 ERP Domain & Calculations'),
+    DashboardDestination(
+        id: 's07_erp_semantic_components',
+        title: 'S07 ERP Semantic Components'),
+    DashboardDestination(
+        id: 's08_erp_document_families', title: 'S08 ERP Document Families'),
+    DashboardDestination(
+        id: 's09_migrated_transaction_templates',
+        title: 'S09 Migrated Transaction Templates'),
+    DashboardDestination(
+        id: 's10_template_family_consolidation',
+        title: 'S10 Template Family Consolidation'),
+    DashboardDestination(id: 's11_print_profiles', title: 'S11 Print Profiles'),
+    DashboardDestination(id: 's12_sales_erp_pack', title: 'S12 Sales ERP Pack'),
+    DashboardDestination(
+        id: 's13_purchasing_erp_pack', title: 'S13 Purchasing ERP Pack'),
     DashboardDestination(id: 'components', title: 'Components'),
     DashboardDestination(id: 'templates', title: 'Templates'),
     DashboardDestination(id: 'new_templates', title: 'Business Templates'),
@@ -52,13 +85,36 @@ final class DashboardDestinationRegistry {
         'dashboard' => 'Dashboard',
         's02_components_rtl' => 'S02 Components RTL',
         's03_flow_layout' => 'S03 Flow Layout',
+        's04_data_grid_vnext' => 'S04 DataGrid vNext',
+        's05_formatting_theme' => 'S05 Formatting & Theme',
+        's06_erp_domain_calculation' => 'S06 ERP Domain & Calculations',
+        's07_erp_semantic_components' => 'S07 ERP Semantic Components',
+        's08_erp_document_families' => 'S08 ERP Document Families',
+        's09_migrated_transaction_templates' =>
+          'S09 Migrated Transaction Templates',
+        's10_template_family_consolidation' =>
+          'S10 Template Family Consolidation',
+        's11_print_profiles' => 'S11 Print Profiles',
+        's12_sales_erp_pack' => 'S12 Sales ERP Pack',
+        's13_purchasing_erp_pack' => 'S13 Purchasing ERP Pack',
         's00_baseline' => 'S00 Baseline',
         's01_directionality' => 'S01 Directionality',
-        'components' || 'data_grid' || 'rich_text' || 'info_box' ||
-        'headers' || 'summary' || 'grid_qrcode' || 'grid_infobox' ||
-        'grid_watermark' || 'grid_richtext' => 'Components',
+        'components' ||
+        'data_grid' ||
+        'rich_text' ||
+        'info_box' ||
+        'headers' ||
+        'summary' ||
+        'grid_qrcode' ||
+        'grid_infobox' ||
+        'grid_watermark' ||
+        'grid_richtext' =>
+          'Components',
         'templates' || 'templates_demo' || 'invoices' => 'Templates',
-        'new_templates' || 'financial' || 'sales' || 'hr' =>
+        'new_templates' ||
+        'financial' ||
+        'sales' ||
+        'hr' =>
           'Business Templates',
         'template_engine' => 'Template Engine',
         'barcodes' => 'Barcodes & QR',
@@ -81,11 +137,28 @@ final class DashboardDestinationRegistry {
   }) =>
       switch (id) {
         'dashboard' => DashboardHome(onNavigate: onNavigate),
-        's02_components_rtl' => const S02ComponentsRtlVerificationPage(),
-        's03_flow_layout' => const S03FlowLayoutVerificationPage(),
         's00_baseline' => const S00BaselineRegressionVerificationPage(),
         's01_directionality' => const S01DirectionalityVerificationPage(),
-        'components' || 'data_grid' =>
+        's02_components_rtl' => const S02ComponentsRtlVerificationPage(),
+        's03_flow_layout' => const S03FlowLayoutVerificationPage(),
+        's04_data_grid_vnext' => const S04DataGridVNextVerificationPage(),
+        's05_formatting_theme' => const S05FormattingThemeVerificationPage(),
+        's06_erp_domain_calculation' =>
+          const S06ErpDomainCalculationVerificationPage(),
+        's07_erp_semantic_components' =>
+          const S07ErpSemanticComponentsVerificationPage(),
+        's08_erp_document_families' =>
+          const S08ErpDocumentFamiliesVerificationPage(),
+        's09_migrated_transaction_templates' =>
+          const S09MigratedTransactionTemplatesVerificationPage(),
+        's10_template_family_consolidation' =>
+          const S10TemplateFamilyConsolidationVerificationPage(),
+        's11_print_profiles' => const S11PrintProfilesVerificationPage(),
+        's12_sales_erp_pack' => const S12SalesErpPackVerificationPage(),
+        's13_purchasing_erp_pack' =>
+          const S13PurchasingErpPackVerificationPage(),
+        'components' ||
+        'data_grid' =>
           const ComponentsDemoScreen(initialTab: 0),
         'rich_text' => const ComponentsDemoScreen(initialTab: 1),
         'info_box' => const ComponentsDemoScreen(initialTab: 2),
@@ -95,9 +168,12 @@ final class DashboardDestinationRegistry {
         'grid_infobox' => const ComponentsDemoScreen(initialTab: 6),
         'grid_watermark' => const ComponentsDemoScreen(initialTab: 7),
         'grid_richtext' => const ComponentsDemoScreen(initialTab: 8),
-        'templates' || 'templates_demo' || 'invoices' =>
+        'templates' ||
+        'templates_demo' ||
+        'invoices' =>
           const TemplatesDemoScreen(initialTab: 0),
-        'new_templates' || 'financial' =>
+        'new_templates' ||
+        'financial' =>
           const NewTemplatesDemoScreen(initialTab: 0),
         'sales' => const NewTemplatesDemoScreen(initialTab: 1),
         'hr' => const NewTemplatesDemoScreen(initialTab: 2),
@@ -108,8 +184,7 @@ final class DashboardDestinationRegistry {
         'printing' => const PrintingDemoScreen(),
         'sharing' => const SharingDemoScreen(),
         'ai_features' => const AiFeaturesDemoScreen(),
-        'advanced' || 'v2_architecture' =>
-          const V2ArchitectureDemoScreen(),
+        'advanced' || 'v2_architecture' => const V2ArchitectureDemoScreen(),
         'examples' => const ExamplesShowcaseScreen(),
         'job_manager' => const JobManagerDemoScreen(),
         'custom_report' => const CustomReportScreen(),

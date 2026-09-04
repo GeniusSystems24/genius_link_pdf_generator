@@ -1,0 +1,13 @@
+template=quotation
+family=GeniusErpTransactionDocument
+locale=en|layout=ltr|lines=1|structuredValueDirection=ltr
+locale=en|layout=ltr|lines=50|structuredValueDirection=ltr
+locale=en|layout=ltr|lines=500|structuredValueDirection=ltr
+locale=ar|layout=rtl|lines=1|structuredValueDirection=ltr
+locale=ar|layout=rtl|lines=50|structuredValueDirection=ltr
+locale=ar|layout=rtl|lines=500|structuredValueDirection=ltr
+locale=bilingual|layout=rtl|lines=1|structuredValueDirection=ltr
+locale=bilingual|layout=rtl|lines=50|structuredValueDirection=ltr
+locale=bilingual|layout=rtl|lines=500|structuredValueDirection=ltr
+nullOptional=collapse
+longContent=wrap

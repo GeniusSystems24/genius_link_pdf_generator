@@ -24,7 +24,7 @@ class GeniusPdfCancellationToken {
   }
 
   void throwIfCancelled() {
-    if (_isCancelled) throw GeniusPdfCancelledException();
+    if (_isCancelled) throw const GeniusPdfCancelledException();
   }
 }
 

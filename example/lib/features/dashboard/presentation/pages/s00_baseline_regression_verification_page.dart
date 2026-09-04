@@ -7,6 +7,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/features/components/models/documents/components_demo_documents.dart';
 
+import 'package:genius_pdf_example/shared/presentation/widgets/create_save_open_pdf_button.dart';
 enum _S00Scenario {
   mixedBaseline,
   summary,
@@ -192,6 +193,10 @@ class _S00BaselineRegressionVerificationPageState
                         onPressed: _refresh,
                         icon: const Icon(Icons.refresh_rounded),
                         label: const Text('Regenerate'),
+                      ),
+                      CreateSaveOpenPdfButton(
+                        onCreate: _buildPdf,
+                        fileName: 's00_baseline_regression.pdf',
                       ),
                     ],
                   ),

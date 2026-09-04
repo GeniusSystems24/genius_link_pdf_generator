@@ -4,12 +4,12 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
-import '../src/builders/pdf_document_builder.dart';
 import '../src/components/components.dart';
 import '../src/domain/financial/financial.dart';
 import '../src/core/pdf_config.dart';
 import '../src/models/pdf_result.dart';
 
+import '../src/families/erp/erp_families.dart';
 /// Note type enum for credit/debit notes.
 enum NoteType {
   credit,
@@ -129,7 +129,7 @@ class CreditDebitNoteData {
 ///
 /// final bytes = creditNote.generate();
 /// ```
-class CreditNoteTemplate extends GeniusPdfDocumentBuilder {
+class CreditNoteTemplate extends GeniusErpTransactionDocument {
   CreditNoteTemplate({
     required GeniusPdfConfig config,
     required this.company,

@@ -10,7 +10,9 @@ class _GeniusPdfPriorityQueue extends IterableBase<GeniusPdfJob> {
   @override
   Iterator<GeniusPdfJob> get iterator => _items.iterator;
 
+  @override
   int get length => _items.length;
+  @override
   bool get isNotEmpty => _items.isNotEmpty;
 
   GeniusPdfJob removeFirst() => _items.removeFirst();

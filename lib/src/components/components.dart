@@ -14,6 +14,7 @@
 /// - [GeniusPdfDigitalSignature] - Digital signatures
 /// - [GeniusPdfBarcode] - Barcodes (EAN-13, Code128, etc.)
 /// - [GeniusPdfQRCodeGenerator] - Dynamic QR codes (URL, ZATCA, WiFi, vCard)
+/// - S07 ERP semantic components: identity, party, address, money, tax, terms, approvals, metrics, labels, and null-safe composition.
 library;
 
 // Models
@@ -35,3 +36,6 @@ export 'widgets/pdf_barcode.dart';
 // Security
 export 'widgets/pdf_watermark.dart';
 export 'widgets/pdf_digital_signature.dart';
+
+// ERP semantic components (S07)
+export 'erp/erp_components.dart';

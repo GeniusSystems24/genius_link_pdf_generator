@@ -215,17 +215,17 @@ Future<Uint8List> buildCustomReportPdf(CustomReportData data) async {
         GeniusPdfSummaryItem(
           label: 'Subtotal',
           labelAr: 'المجموع الفرعي',
-          value: 'SAR ${data.subtotal.toStringAsFixed(2)}',
+          value: data.config.formatter.formatMoney(data.subtotal, currencyCode: 'SAR'),
         ),
         GeniusPdfSummaryItem(
           label: 'Tax (15%)',
           labelAr: 'الضريبة (15%)',
-          value: 'SAR ${data.tax.toStringAsFixed(2)}',
+          value: data.config.formatter.formatMoney(data.tax, currencyCode: 'SAR'),
         ),
         GeniusPdfSummaryItem(
           label: 'Discount',
           labelAr: 'الخصم',
-          value: '- SAR ${data.discount.toStringAsFixed(2)}',
+          value: data.config.formatter.formatMoney(-data.discount, currencyCode: 'SAR'),
           valueColor: Colors.red,
         ),
       ],
@@ -316,6 +316,12 @@ List<GeniusPdfGridColumn> _generateColumns(int gridColumns) {
       width: index == 0 ? 80 : (index == 1 ? 120 : 80),
       alignment:
           index >= 2 ? GeniusPdfTextAlign.center : GeniusPdfTextAlign.start,
+      isNumeric: index >= 2 && index <= 4,
+      formatSpec: index == 3 || index == 4
+          ? const GeniusPdfFormatSpec.money(currencyCode: 'SAR')
+          : index == 2
+              ? const GeniusPdfFormatSpec.quantity(decimalPlaces: 2)
+              : null,
     ),
   );
 }
@@ -345,8 +351,8 @@ List<GeniusPdfGridRow> _generateRows(int gridRows) {
         'item': sampleItems[rowIndex % sampleItems.length],
         'description': 'Sample description for row ${rowIndex + 1}',
         'quantity': qty.toString(),
-        'unit_price': 'SAR ${price.toStringAsFixed(2)}',
-        'total': 'SAR ${total.toStringAsFixed(2)}',
+        'unit_price': price,
+        'total': total,
         'notes': rowIndex % 2 == 0 ? 'In stock' : 'On order',
       };
 

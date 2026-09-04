@@ -54,3 +54,8 @@ export 'leave_report_template.dart';
 
 // Service Voucher templates (v3.0.0)
 export 'vouchers/vouchers.dart';
+
+// S09 shared legacy compatibility
+export 'erp_legacy_shared.dart';
+export '../src/packs/sales/sales.dart';
+export '../src/packs/purchasing/purchasing.dart';

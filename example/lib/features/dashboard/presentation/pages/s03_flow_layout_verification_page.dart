@@ -6,6 +6,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 
+import 'package:genius_pdf_example/shared/presentation/widgets/create_save_open_pdf_button.dart';
 enum _S03Scenario {
   onePage,
   fiftyRows,
@@ -187,6 +188,10 @@ class _S03FlowLayoutVerificationPageState
                         },
                         icon: const Icon(Icons.refresh_rounded),
                         label: const Text('Regenerate PDF'),
+                      ),
+                      CreateSaveOpenPdfButton(
+                        onCreate: _generate,
+                        fileName: 's03_flow_layout.pdf',
                       ),
                     ],
                   ),

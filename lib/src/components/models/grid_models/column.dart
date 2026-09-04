@@ -40,6 +40,7 @@ class GeniusPdfGridColumn {
     this.cellStyle,
     this.cellStyleBuilder,
     this.valueFormatter,
+    this.formatSpec,
     this.isNumeric = false,
     this.isVisible = true,
     this.isSortable = false,
@@ -80,18 +81,13 @@ class GeniusPdfGridColumn {
       headerStyle: headerStyle,
       cellStyle: cellStyle,
       isNumeric: isNumeric,
-      valueFormatter: valueFormatter ??
-          (value) {
-            if (value == null) return '';
-            final number =
-                value is num ? value : double.tryParse(value.toString());
-            if (number == null) return value.toString();
-            final formatted = number.toStringAsFixed(decimalPlaces);
-            if (showThousandSeparator) {
-              return _formatWithThousandSeparator(formatted);
-            }
-            return formatted;
-          },
+      valueFormatter: valueFormatter,
+      formatSpec: valueFormatter == null
+          ? GeniusPdfFormatSpec.number(
+              decimalPlaces: decimalPlaces,
+              useGrouping: showThousandSeparator,
+            )
+          : null,
     );
   }
 
@@ -125,18 +121,15 @@ class GeniusPdfGridColumn {
       cellStyle: cellStyle,
       cellStyleBuilder: cellStyleBuilder,
       isNumeric: isNumeric,
-      valueFormatter: (value) {
-        if (value == null) return '';
-        final number = value is num ? value : double.tryParse(value.toString());
-        if (number == null) return value.toString();
-        var formatted = number.toStringAsFixed(decimalPlaces);
-        if (showThousandSeparator) {
-          formatted = _formatWithThousandSeparator(formatted);
-        }
-        return currencyBefore
-            ? '$currencySymbol $formatted'
-            : '$formatted $currencySymbol';
-      },
+      formatSpec: GeniusPdfFormatSpec.money(
+        currencyCode: currencySymbol,
+        decimalPlaces: decimalPlaces,
+        currencyDisplay: GeniusPdfCurrencyDisplay.code,
+        currencyPosition: currencyBefore
+            ? GeniusPdfCurrencyPosition.before
+            : GeniusPdfCurrencyPosition.after,
+        useGrouping: showThousandSeparator,
+      ),
     );
   }
 
@@ -160,12 +153,9 @@ class GeniusPdfGridColumn {
       headerStyle: headerStyle,
       cellStyle: cellStyle,
       isNumeric: true,
-      valueFormatter: (value) {
-        if (value == null) return '';
-        final number = value is num ? value : double.tryParse(value.toString());
-        if (number == null) return value.toString();
-        return '${number.toStringAsFixed(decimalPlaces)}%';
-      },
+      formatSpec: GeniusPdfFormatSpec.percentage(
+        decimalPlaces: decimalPlaces,
+      ),
     );
   }
 
@@ -188,19 +178,9 @@ class GeniusPdfGridColumn {
       alignment: alignment,
       headerStyle: headerStyle,
       cellStyle: cellStyle,
-      valueFormatter: (value) {
-        if (value == null) return '';
-        if (value is DateTime) {
-          return _formatDate(value, dateFormat);
-        }
-        if (value is String) {
-          final parsed = DateTime.tryParse(value);
-          if (parsed != null) {
-            return _formatDate(parsed, dateFormat);
-          }
-        }
-        return value.toString();
-      },
+      formatSpec: GeniusPdfFormatSpec.date(
+        pattern: dateFormat,
+      ),
     );
   }
 
@@ -281,7 +261,12 @@ class GeniusPdfGridColumn {
   final GeniusPdfCellStyle? Function(dynamic value)? cellStyleBuilder;
 
   /// Function to format cell values.
+  ///
+  /// Legacy/custom callbacks have precedence over [formatSpec].
   final String Function(dynamic value)? valueFormatter;
+
+  /// Shared S05 format specification.
+  final GeniusPdfFormatSpec? formatSpec;
 
   /// Whether this column contains numeric data.
   final bool isNumeric;
@@ -351,6 +336,7 @@ class GeniusPdfGridColumn {
     GeniusPdfCellStyle? cellStyle,
     GeniusPdfCellStyle? Function(dynamic value)? cellStyleBuilder,
     String Function(dynamic value)? valueFormatter,
+    GeniusPdfFormatSpec? formatSpec,
     bool? isNumeric,
     bool? isVisible,
     bool? isSortable,
@@ -382,6 +368,7 @@ class GeniusPdfGridColumn {
       cellStyle: cellStyle ?? this.cellStyle,
       cellStyleBuilder: cellStyleBuilder ?? this.cellStyleBuilder,
       valueFormatter: valueFormatter ?? this.valueFormatter,
+      formatSpec: formatSpec ?? this.formatSpec,
       isNumeric: isNumeric ?? this.isNumeric,
       isVisible: isVisible ?? this.isVisible,
       isSortable: isSortable ?? this.isSortable,
@@ -397,37 +384,5 @@ class GeniusPdfGridColumn {
     );
   }
 
-  /// Helper to format numbers with thousand separators.
-  static String _formatWithThousandSeparator(String number) {
-    final parts = number.split('.');
-    final intPart = parts[0];
-    final decPart = parts.length > 1 ? '.${parts[1]}' : '';
-    final buffer = StringBuffer();
-    int count = 0;
-    for (int i = intPart.length - 1; i >= 0; i--) {
-      if (count > 0 && count % 3 == 0 && intPart[i] != '-') {
-        buffer.write(',');
-      }
-      buffer.write(intPart[i]);
-      count++;
-    }
-    return buffer.toString().split('').reversed.join() + decPart;
-  }
 
-  /// Helper to format dates.
-  static String _formatDate(DateTime date, String format) {
-    var result = format;
-    result = result.replaceAll('yyyy', date.year.toString());
-    result =
-        result.replaceAll('yy', (date.year % 100).toString().padLeft(2, '0'));
-    result = result.replaceAll('MM', date.month.toString().padLeft(2, '0'));
-    result = result.replaceAll('M', date.month.toString());
-    result = result.replaceAll('dd', date.day.toString().padLeft(2, '0'));
-    result = result.replaceAll('d', date.day.toString());
-    result = result.replaceAll('HH', date.hour.toString().padLeft(2, '0'));
-    result = result.replaceAll('H', date.hour.toString());
-    result = result.replaceAll('mm', date.minute.toString().padLeft(2, '0'));
-    result = result.replaceAll('ss', date.second.toString().padLeft(2, '0'));
-    return result;
-  }
 }

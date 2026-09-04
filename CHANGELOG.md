@@ -23,6 +23,261 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.0] - 2026-09-03
 
+### S12 — Sales ERP Pack
+
+#### Added
+
+- Added Sales Order, Proforma Invoice, Simplified/POS Invoice, Sales Debit Note,
+  Sales Return and Customer Receipt transaction documents.
+- Added Picking List, Packing List and Backorder outputs.
+- Added Customer Aging, Sales Register, Sales by Customer/Item/Salesperson,
+  Price List and Commission Report.
+- Added shared pack transaction calculation for discounts, charges, taxes,
+  tax-inclusive/exclusive mode, multi-currency, payment state and negative
+  returns through S06.
+- Added Sales analytics, EN/AR/bilingual semantic QA matrix, 1/50/500-line
+  verification, tests, docs and Dashboard preview.
+
+#### Changed
+
+- `QuotationTemplate` and `TaxInvoiceTemplate` now inherit the Sales transaction
+  pack base while preserving their public APIs.
+
+### S13 — Purchasing ERP Pack
+
+#### Added
+
+- Added Purchase Requisition, RFQ, Supplier Quotation, Quotation Comparison,
+  Purchase Order, GRN, Purchase Invoice, Purchase Debit/Credit Note and
+  Supplier Return.
+- Added Supplier Statement/Aging, Purchase Register, Purchase Analysis and
+  Outstanding Purchase Orders.
+- Added explicit partial-receipt models and quotation-comparison analytics.
+- Added `GeniusPurchasingLandedChargesHook`; landed charges become S06 charges
+  before calculation rather than renderer arithmetic.
+- Added vendor/delivery/site/exchange-rate/approval-trail integration, QA
+  matrix, tests, docs and Dashboard preview.
+
+#### Changed
+
+- Existing `PurchaseOrderTemplate` now inherits the Purchasing transaction pack
+  base while preserving its existing constructor and S09 family-plan adapter.
+
+
+### S10 — Consolidate Existing Templates & Voucher Family
+
+#### Changed
+
+- Mapped Balance Sheet, Budget, Cash Flow and Income Statement to the shared
+  Analytical Report family.
+- Mapped Trial Balance, Attendance, Employee, Leave and Inventory reports to
+  the shared Register family.
+- Mapped Customer Statement to the Statement family.
+- Mapped Payslip and Delivery Note to the Operational Form family.
+- Mapped Credit/Debit Note to the Transaction family.
+- Migrated `GeniusPdfVoucherTemplate` to `GeniusErpVoucherDocument`, making
+  Accounting Entry, banking, remittance, trade, return, tax, gift, inventory,
+  payment and receipt vouchers members of one shared voucher family.
+- Preserved public template/voucher class names and constructors.
+- Removed duplicated private signature-row renderers from Attendance, Employee,
+  Leave, Payslip, Inventory and Trial Balance in favor of one logical
+  `drawErpSignatureRow()` helper.
+- Added `GeniusErpExistingTemplateFamilyRegistry` and a non-breaking
+  `TemplateRegistry` ERP-family extension.
+- Added EN/AR family mapping goldens, source-contract tests, docs and Manual
+  Verification examples.
+
+### S11 — Print Profiles, Thermal & Labels Foundation
+
+#### Added
+
+- Added `GeniusPdfPrintProfile` with A4 portrait/landscape, A5, Letter, Legal,
+  58mm/80mm thermal, continuous, custom-label, label-sheet and pre-printed
+  factories.
+- Added immutable margins/safe-area, density, font scale, header/footer policy,
+  cut spacing, label gaps, bleed, copy/original metadata and calibration.
+- Added `GeniusPdfThermalReceiptEngine` with variable height, compact
+  typography, totals, payment lines, QR/barcode and RTL structured-value
+  handling.
+- Added `GeniusPdfLabelPrintDocument` for single labels and calibrated sheets
+  with SKU, batch, serial, expiry, QR and Code128.
+- Added explicit physical-coordinate `GeniusPdfPreprintedFormDocument`.
+- Added `GeniusPdfCalibrationTestDocument` for printer/stock alignment.
+- Added S11 tests, docs and real-PDF Manual Verification scenarios.
+
+
+### S08 — Generic ERP Document Families
+
+#### Added
+
+- Added nine reusable ERP document families: Transaction, Statement, Voucher,
+  Analytical Report, Operational Form, Register, Thermal Receipt, Label and
+  Certificate.
+- Added standard header/identity/party/reference/body/summary/notes/
+  approval/code/footer slots.
+- Added per-slot page-break/direction policies, optional-section collapse,
+  first/last-page variants, family theme override and print-profile hook.
+- Added component replacement, custom-section insertion and lifecycle hooks
+  that do not expose renderer internals.
+- Added module-neutral `GeniusErpDocumentAdapter<T>`.
+- Added S08 tests, documentation and Manual Verification examples.
+
+### S09 — Quotation, Purchase Order & Tax Invoice Migration
+
+#### Changed
+
+- Migrated `QuotationTemplate`, `PurchaseOrderTemplate` and
+  `TaxInvoiceTemplate` to the common `GeniusErpTransactionDocument` family.
+- Preserved their public constructor/model names while routing domain data
+  through compatibility adapters.
+- Moved aggregate totals/taxes/discount calculations to the S06 calculation
+  service.
+- Replaced template-local identity/party/items/summary/terms/signature
+  rendering with shared S07/S08 structure.
+- Preserved Quotation QR/notes/terms, Purchase Order shipping/notes/terms, and
+  Tax Invoice amount-in-words/VAT/QR behavior.
+- Added RTL/bilingual and 1/50/500-line verification coverage.
+- Added duplication audit, migration notes and golden-comparison documentation.
+
+#### Compatibility
+
+- Added `QuotationErpAdapter`, `PurchaseOrderErpAdapter` and
+  `TaxInvoiceErpAdapter`.
+- Kept existing `generateResult()` signatures.
+- Documented intentional visual differences caused by replacing physical
+  left/right layout with direction-safe logical start/end composition.
+
+
+### S07 — ERP Semantic Components
+
+#### Added
+
+- Added `GeniusPdfDocumentIdentity`, `GeniusPdfPartyBlock`,
+  `GeniusPdfAddressBlock` and `GeniusPdfReferenceBlock`.
+- Added `GeniusPdfMoney`, `GeniusPdfAmountInWords`, `GeniusPdfTaxSummary`,
+  `GeniusPdfAdjustmentSummary` and `GeniusPdfBalanceDueBlock`.
+- Added `GeniusPdfTermsSection`, `GeniusPdfApprovalTrail`, `GeniusPdfStamp`,
+  `GeniusPdfMetricCards` and `GeniusPdfLabel`.
+- Added `GeniusPdfErpComponentGroup` for gap-free optional-section composition.
+- Added `GeniusPdfEmptySectionPolicy` for explicit hide/empty-state behavior.
+- Added logical start/end padding/alignment and inherited component
+  directionality across the new semantic layer.
+- Added independent structured-value direction handling for money, document
+  numbers, tax IDs, phone, email, dates and times.
+- Added EN/LTR, AR/RTL and bilingual semantic direction goldens plus component,
+  render-smoke, null-collapse and architecture/source-contract tests.
+- Added **S07 ERP Semantic Components** Manual Verification page and Dashboard
+  navigation.
+- Added S07 API/composition documentation.
+
+#### Architecture
+
+- S07 components consume S06 domain/calculation values and do not duplicate ERP
+  business calculations.
+- Null/optional sections collapse without residual spacing.
+- New semantic public APIs use logical start/end rather than physical
+  left/right configuration.
+- Identity/party/address/tax/terms layout can be reused by later document
+  families instead of being rebuilt per template.
+
+
+### S06 — ERP Shared Domain & Calculation Layer
+
+#### Added
+
+- Added `ErpDocumentContext`, organization/branch, generic document identity,
+  reference, print metadata and status models.
+- Added reusable party/address/tax/contact models and address roles.
+- Added immutable `ErpMoney`, `ErpCurrency`, `ErpExchangeRate` and explicit
+  `ErpRoundingStrategy`.
+- Added quantity/unit/line/tax/discount/charge/batch/serial models.
+- Added approval/signature/attachment metadata.
+- Added typed `ErpCalculationService` with subtotal, line/document discounts,
+  charges, taxable amount, grouped multi-tax totals, grand total, rounding
+  adjustment, optional paid/due and multi-currency base totals.
+- Added explicit discount-before/after-tax calculation policy.
+- Added `ErpDomainValidator`, deterministic validation issues and
+  `ErpDomainValidationException`.
+- Added boundary-only `ErpDomainSerialization`.
+- Added comprehensive model/calculation/rounding/validation/serialization/
+  architecture tests and deterministic calculation snapshot.
+- Added **S06 ERP Domain & Calculations** Manual Verification page.
+
+#### Architecture
+
+- ERP calculations are independent from UI, templates and PDF rendering.
+- Quotation, Purchase Order and Invoice can share the same ERP domain layer.
+- Optional metadata remains null/empty instead of generating dummy values.
+
+
+### S05 — Formatting Engine & Design Tokens
+
+#### Added
+
+- Added stable `GeniusPdfFormatter` and `GeniusPdfDefaultFormatter`.
+- Added `GeniusPdfFormatSettings`, `GeniusPdfFormatSpec`, digit, currency,
+  accounting, locale, precision, and null-placeholder policies.
+- Added money, number, quantity, percentage, date, time, date-time,
+  identifier, exchange-rate, and unit formatting.
+- Added `GeniusPdfTheme` as a backward-compatible facade over the established
+  `GeniusPdfPrintTheme`.
+- Added semantic colors, logical spacing, logical leading/trailing borders,
+  table/document/summary tokens, and logical typography alignment defaults.
+- Added multi-currency golden and formatter/theme/integration tests.
+- Added S05 Formatting & Theme manual verification page and Dashboard route.
+
+#### Changed
+
+- `GeniusPdfConfig` now owns shared `formatter` and `theme` defaults.
+- DataGrid and DataGrid vNext delegate default value formatting to the shared
+  formatter; custom callbacks remain higher precedence.
+- Summary and labeled-value/InfoBox content provide shared-formatter factories.
+- Core component theme defaults resolve through `config.theme.printTheme`.
+- Normal S02 formatting examples use raw values/shared formatter. Historical
+  S00 regression literals remain intentionally unchanged.
+
+#### Compatibility
+
+- Existing string-based Summary/InfoBox/Grid APIs remain valid.
+- Existing DataGrid `valueFormatter` callbacks remain valid.
+- Existing `GeniusPdfPrintTheme` remains valid and is wrapped automatically.
+
+
+### S04 — DataGrid vNext for ERP Reports
+
+#### Added
+
+- Added `GeniusPdfDataGridVNext` while preserving the existing
+  `GeniusPdfDataGrid`.
+- Added fixed/flex/auto-fit width policies, min/max constraints,
+  wrap/ellipsis/clip overflow and stable numeric alignment.
+- Added repeated headers, keep-row-together/controlled split policy,
+  active group-header repetition, group subtotals and final grand totals.
+- Added dynamic nested grouping and `GeniusPdfGridSummaryExpression`.
+- Added row span, column span, conditional row/cell styles, row/cell builders
+  and bilingual empty-state rendering.
+- Added DataGrid-local ERP formatter hooks for money, percentage, quantity,
+  date/time, identifiers, debit/credit semantics, accounting negatives and
+  per-row currency resolution.
+- Added explicit `followDirection`, `preserveDefinitionOrder`, per-column
+  direction and logical header/cell padding.
+- Added lazy row sources, large-data mode, width/style caches and preparation
+  benchmark diagnostics.
+- Added 1k/10k benchmark harness and baseline documentation.
+- Added S04 automated/source-contract tests and **S04 DataGrid vNext** manual
+  verification page with Dashboard navigation.
+- Added `docs/sprints/s04/DATAGRID_VNEXT_CONTRACT.md`,
+  `docs/sprints/s04/S04_IMPLEMENTATION_STATUS.md` and
+  `docs/sprints/s04/BENCHMARK_BASELINE.md`.
+
+#### Compatibility
+
+- Existing `GeniusPdfDataGrid` consumers remain valid.
+- S04 composes the established renderer instead of copying its low-level
+  drawing implementation.
+- S05 remains responsible for the shared formatter/theme contracts.
+
+
 ### S03 — Flow Layout, Blocks, Bands & Pagination Engine
 
 #### Added

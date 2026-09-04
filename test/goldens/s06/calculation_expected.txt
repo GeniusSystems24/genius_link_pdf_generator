@@ -1,0 +1,9 @@
+subtotal=200.00 SAR
+lineDiscount=20.00 SAR
+charges=10.00 SAR
+taxable=190.00 SAR
+tax=28.50 SAR
+rounding=0.00 SAR
+grand=218.50 SAR
+paid=null
+due=null
