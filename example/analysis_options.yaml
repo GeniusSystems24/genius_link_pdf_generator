@@ -1,4 +1,6 @@
 analyzer:
+  exclude:
+    - "lib_before_showcase_*/**"
   errors:
     unused_element_parameter: ignore
 include: package:flutter_lints/flutter.yaml

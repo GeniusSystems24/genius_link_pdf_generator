@@ -5,10 +5,15 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.32.0"
 
 dependencies:
+  super_navigation_sidebar: ^3.3.0
+  super_core: ^3.6.0
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
   genius_link_pdf_generator:
     path: ../
