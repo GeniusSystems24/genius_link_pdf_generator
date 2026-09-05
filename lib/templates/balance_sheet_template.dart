@@ -161,7 +161,7 @@ class BalanceSheetTemplate extends GeniusErpAnalyticalReport {
         titleStyle: GeniusPdfTextStyle.title(fontSize: 18),
         showBorder: false,
       ),
-      layout: GeniusPdfReportHeaderLayout.standard,
+      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
     );
 
     header.draw(
@@ -205,6 +205,7 @@ class BalanceSheetTemplate extends GeniusErpAnalyticalReport {
         'amount': section.total,
       },
       isGroupHeader: true,
+      
     ));
     final grid = GeniusPdfDataGrid(
       config: config,
@@ -230,7 +231,7 @@ class BalanceSheetTemplate extends GeniusErpAnalyticalReport {
         ),
       ],
       rows: rows,
-      style: GeniusPdfGridStyle.modern(),
+      style: GeniusPdfGridStyle.classic(),
     );
 
     final result = grid.drawAt(

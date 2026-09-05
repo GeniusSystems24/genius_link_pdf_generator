@@ -101,6 +101,11 @@ class GeniusPdfPreviewWidget extends StatelessWidget {
 
   final Uint8List pdfData;
   final double? width;
+
+  /// Requested preview height.
+  ///
+  /// If null, the widget uses the available bounded height. Inside a
+  /// vertically unbounded parent it derives a finite responsive height.
   final double? height;
   final bool canChangeOrientation;
   final bool canChangePageFormat;
@@ -111,34 +116,68 @@ class GeniusPdfPreviewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (pdfData.isEmpty) {
       final error = StateError('PDF data is empty.');
-      return errorBuilder?.call(context, error) ?? _buildErrorState(context, error);
+      return errorBuilder?.call(context, error) ??
+          _buildErrorState(context, error);
     }
-    return SizedBox(
-      width: width,
-      height: height,
-      child: PdfPreview(
-        build: (_) => pdfData,
-        canChangeOrientation: canChangeOrientation,
-        canChangePageFormat: canChangePageFormat,
-        canDebug: false,
-        maxPageWidth: width ?? 700,
-        padding: const EdgeInsets.all(8),
-        actions: const [],
-        loadingWidget: loadingWidget ?? _buildDefaultLoading(context),
-        onError: errorBuilder ?? _buildErrorState,
-        useActions: false,
-        shouldRepaint: false,
-        pdfPreviewPageDecoration: const BoxDecoration(
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 8,
-              offset: Offset(0, 4),
+
+    // PdfPreview contains flex children and therefore must never receive an
+    // unbounded vertical constraint. This commonly happens when the preview is
+    // embedded in SingleChildScrollView or another shrink-wrapping parent.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final resolvedHeight =
+            height ?? _resolvePreviewHeight(context, constraints);
+
+        return SizedBox(
+          width: width,
+          height: resolvedHeight,
+          child: PdfPreview(
+            build: (_) => pdfData,
+            canChangeOrientation: canChangeOrientation,
+            canChangePageFormat: canChangePageFormat,
+            canDebug: false,
+            maxPageWidth: width ?? 700,
+            padding: const EdgeInsets.all(8),
+            actions: const [],
+            loadingWidget: loadingWidget ?? _buildDefaultLoading(context),
+            onError: errorBuilder ?? _buildErrorState,
+            useActions: false,
+            shouldRepaint: false,
+            pdfPreviewPageDecoration: const BoxDecoration(
+              color: Colors.white,
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
+  }
+
+  double _resolvePreviewHeight(
+    BuildContext context,
+    BoxConstraints constraints,
+  ) {
+    if (constraints.hasBoundedHeight && constraints.maxHeight.isFinite) {
+      return constraints.maxHeight;
+    }
+
+    final viewportHeight = MediaQuery.sizeOf(context).height;
+    var fallbackHeight = (viewportHeight * 0.72).clamp(480.0, 900.0).toDouble();
+
+    // Respect a finite minimum imposed by the caller while still guaranteeing
+    // that the height passed to PdfPreview is finite.
+    if (constraints.minHeight.isFinite &&
+        constraints.minHeight > fallbackHeight) {
+      fallbackHeight = constraints.minHeight;
+    }
+
+    return fallbackHeight;
   }
 
   Widget _buildDefaultLoading(BuildContext context) => Center(
