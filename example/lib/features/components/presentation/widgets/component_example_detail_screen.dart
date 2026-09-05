@@ -8,6 +8,7 @@ import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/features/components/models/documents/components_demo_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Shared presentation for one focused PDF component example.
 ///
 /// No document is generated when this widget is created. The example waits for
@@ -337,15 +338,15 @@ class _ComponentExampleHeader extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               SegmentedButton<bool>(
-                segments: const [
+                segments:  [
                   ButtonSegment<bool>(
                     value: false,
-                    label: Text('LTR'),
+                    label: Text(pdfLocalization.ltr),
                     icon: Icon(Icons.format_textdirection_l_to_r_rounded),
                   ),
                   ButtonSegment<bool>(
                     value: true,
-                    label: Text('RTL'),
+                    label: Text(pdfLocalization.rtl),
                     icon: Icon(Icons.format_textdirection_r_to_l_rounded),
                   ),
                 ],
@@ -429,7 +430,7 @@ class _PdfPreviewPanel extends StatelessWidget {
         children: [
           _PanelHeader(
             icon: Icons.picture_as_pdf_outlined,
-            title: 'PDF Preview',
+            title: pdfLocalization.pdfPreview,
             trailing: pdfData == null
                 ? _StatusPill(
                     label: executing ? 'Generating' : 'Not generated',
@@ -437,8 +438,8 @@ class _PdfPreviewPanel extends StatelessWidget {
                         ? Icons.sync_rounded
                         : Icons.hourglass_empty_rounded,
                   )
-                : const _StatusPill(
-                    label: 'Generated',
+                :  _StatusPill(
+                    label: pdfLocalization.generated,
                     icon: Icons.check_circle_outline_rounded,
                   ),
           ),
@@ -475,7 +476,7 @@ class _DartUsagePanel extends StatelessWidget {
         border: Border.all(color: colors.outlineVariant),
       ),
       child: CodeViewer(
-        title: 'Dart usage code',
+        title: pdfLocalization.dartUsageCode,
         code: code,
         height: double.infinity,
       ),

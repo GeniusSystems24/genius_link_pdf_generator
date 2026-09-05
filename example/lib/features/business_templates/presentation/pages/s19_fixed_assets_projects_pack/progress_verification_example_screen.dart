@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s19_fixed_assets_projects_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S19 verification example for Progress Report.
 class S19ProgressVerificationExampleScreen extends StatelessWidget {
   const S19ProgressVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S19ProgressVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S19 Fixed Assets & Projects Pack',
-      title: 'Progress Report',
-      description: 'Focused S19 verification for Progress Report. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.progressReport,
+      description: pdfLocalization.s19ProgressReportVerify,
       apiName: 'buildS19ProgressVerificationPdf',
       icon: Icons.domain_outlined,
       generator: buildS19ProgressVerificationPdf,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/showcase/presentation/widgets/showcase_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Complete Demo Showcase example.
 ///
 /// No PDF is generated until **Run example** is pressed. The `Dart usage code`
@@ -19,12 +20,12 @@ List<int> buildCompleteVoucherDemoReport({
 
   @override
   Widget build(BuildContext context) {
-    return const ShowcaseExampleDetailScreen(
+    return  ShowcaseExampleDetailScreen(
       showcaseId: 'showcase_complete_demo',
       category: 'Showcase',
-      title: 'Complete Demo',
+      title: pdfLocalization.completeDemo,
       apiName: 'buildCompleteVoucherDemoReport',
-      description: 'Generate the comprehensive voucher showcase covering the complete voucher template set.',
+      description: pdfLocalization.comprehensiveVoucherShowcaseCoveringDesc,
       icon: Icons.library_books_outlined,
       usageCode: dartUsageCode,
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/benchmark/models/documents/s24_performance_regression_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused S24 verification screen for Golden Coverage Manifest.
 class S24GoldenCoverageManifestVerificationExampleScreen extends StatefulWidget {
   const S24GoldenCoverageManifestVerificationExampleScreen({super.key});
@@ -47,8 +48,8 @@ class _S24GoldenCoverageManifestVerificationExampleScreenState extends State<S24
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'Sprint S24 — Performance & Regression',
-      title: 'Golden Coverage Manifest',
-      description: 'Inspect the public golden-regression manifest and render its case count and supported regression directions in a focused PDF.',
+      title: pdfLocalization.goldenCoverageManifest,
+      description: pdfLocalization.publicGoldenRegressionManifestRenderDesc,
       apiName: 'buildS24GoldenCoverageManifestVerificationPdf',
       icon: Icons.verified_outlined,
       generator: (config) => buildS24GoldenCoverageManifestVerificationPdf(
@@ -60,10 +61,10 @@ class _S24GoldenCoverageManifestVerificationExampleScreenState extends State<S24
       configurationVersion: _rows,
       controls: <Widget>[
         SegmentedButton<int>(
-          segments: const <ButtonSegment<int>>[
-            ButtonSegment<int>(value: 1, label: Text('1 row')),
-            ButtonSegment<int>(value: 50, label: Text('50 rows')),
-            ButtonSegment<int>(value: 500, label: Text('500 rows')),
+          segments: <ButtonSegment<int>>[
+            ButtonSegment<int>(value: 1, label: Text(pdfLocalization.oneRow)),
+            ButtonSegment<int>(value: 50, label: Text(pdfLocalization.fiftyRows)),
+            ButtonSegment<int>(value: 500, label: Text(pdfLocalization.fiveHundredRows)),
           ],
           selected: <int>{_rows},
           onSelectionChanged: (selection) {

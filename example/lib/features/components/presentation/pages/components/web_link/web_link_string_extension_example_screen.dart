@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **String Web-Link Extension**.
 ///
@@ -12,6 +13,7 @@ class WebLinkStringExtensionExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **String Web-Link Extension** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -60,12 +62,12 @@ class WebLinkStringExtensionDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'web_link_string_extension',
       category: 'Components / Core PDF Components / Web Links',
-      title: 'String Web-Link Extension',
+      title: pdfLocalization.stringWebLinkExtension,
       apiName: 'GeniusPdfTextSpan.webLink',
-      description: 'Convert ordinary strings to clickable link spans with toWebLinkSpan().',
+      description: pdfLocalization.ordinaryStringsClickableLinkSpansWebDesc,
       icon: Icons.extension_outlined,
       usageCode: dartUsageCode,
     );

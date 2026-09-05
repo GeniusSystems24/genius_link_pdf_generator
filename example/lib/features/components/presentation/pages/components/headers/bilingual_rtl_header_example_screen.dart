@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Bilingual RTL Header**.
 ///
@@ -12,6 +13,7 @@ class BilingualRtlHeaderExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'package:flutter/material.dart' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Bilingual RTL Header** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -125,12 +127,12 @@ class BilingualRtlHeaderDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'headers_bilingual_rtl',
       category: 'Components / Core PDF Components / Headers',
-      title: 'Bilingual RTL Header',
+      title: pdfLocalization.bilingualRtlHeader,
       apiName: 'GeniusPdfReportHeader',
-      description: 'Bilingual split header with full company details and Saudi-themed colors under RTL configuration.',
+      description: pdfLocalization.bilingualSplitHeaderFullCompanyDesc,
       icon: Icons.format_textdirection_r_to_l_outlined,
       usageCode: dartUsageCode,
     );

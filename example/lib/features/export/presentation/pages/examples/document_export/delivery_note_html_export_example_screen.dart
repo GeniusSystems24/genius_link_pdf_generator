@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Delivery Note business template to HTML.
 class DeliveryNoteHtmlExportExampleScreen extends StatelessWidget {
   const DeliveryNoteHtmlExportExampleScreen({super.key});
@@ -61,8 +62,8 @@ Future<TemplateHtmlExportResult> exportDeliveryNoteTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'Sales Templates',
-      title: 'Delivery Note',
-      description: 'Generate the Delivery Note template and export its PDF content to an HTML document using GeniusPdfExportService. Preview the exact HTML source, save it, and open the exported file.',
+      title: pdfLocalization.deliveryNote,
+      description: pdfLocalization.deliveryNoteHtmlExportDesc,
       icon: Icons.local_shipping_outlined,
       exportTemplate: exportDeliveryNoteTemplateAsHtml,
       usageCode: dartUsageCode,

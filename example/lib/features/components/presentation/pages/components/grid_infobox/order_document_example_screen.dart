@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **Order Document**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -269,12 +270,12 @@ class GridInfoboxOrderDocumentDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'grid_infobox_order_document',
       category: 'Components / Component Compositions / Grid + Info Box',
-      title: 'Order Document',
+      title: pdfLocalization.orderDocument,
       apiName: 'GeniusPdfDataGrid + GeniusPdfInfoBox',
-      description: 'Combine customer/order info boxes with a grouped invoice-style data grid and calculated totals.',
+      description: pdfLocalization.customerOrderInfoBoxesGroupedInvoiceDesc,
       icon: Icons.receipt_long_outlined,
       usageCode: dartUsageCode,
     );

@@ -6,6 +6,7 @@ import 'package:genius_pdf_example/shared/presentation/widgets/example_panels.da
 import 'package:genius_pdf_example/shared/presentation/widgets/example_section.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/responsive_split_layout.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 enum FeatureExampleTone { neutral, info, success, warning, danger }
 
 /// Common presentation for one focused example destination.
@@ -55,7 +56,7 @@ class FeatureExamplePage extends StatelessWidget {
       children: <Widget>[
         if (settings != null)
           ExampleSettingsPanel(
-            title: 'Configuration',
+            title: pdfLocalization.configuration,
             child: settings!,
           ),
         ResponsiveSplitLayout(
@@ -69,14 +70,14 @@ class FeatureExamplePage extends StatelessWidget {
             child: content,
           ),
           secondary: CodePreviewPanel(
-            title: 'Dart usage code',
+            title: pdfLocalization.dartUsageCode,
             code: code,
             height: codeHeight,
           ),
         ),
         if (statusMessage != null && statusMessage!.trim().isNotEmpty)
           ResultStatusPanel(
-            title: 'Execution status',
+            title: pdfLocalization.executionStatus,
             message: statusMessage!,
             tone: switch (statusTone) {
               FeatureExampleTone.neutral => ExampleResultTone.neutral,

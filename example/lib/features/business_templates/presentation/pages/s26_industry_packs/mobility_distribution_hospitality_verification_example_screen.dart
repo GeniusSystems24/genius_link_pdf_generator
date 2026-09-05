@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s26_industry_packs_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S26 verification example for Automotive / Distribution / Hospitality.
 class S26MobilityDistributionHospitalityVerificationExampleScreen extends StatelessWidget {
   const S26MobilityDistributionHospitalityVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S26MobilityDistributionHospitalityVerificationExampleScreen extends Statel
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S26 Industry / Plugin Packs',
-      title: 'Automotive / Distribution / Hospitality',
-      description: 'Focused S26 verification for Automotive / Distribution / Hospitality. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.automotiveDistributionHospitality,
+      description: pdfLocalization.s26AutomotiveDistributionVerify,
       apiName: 'buildS26MobilityDistributionHospitalityVerificationPdf',
       icon: Icons.extension_outlined,
       generator: buildS26MobilityDistributionHospitalityVerificationPdf,

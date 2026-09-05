@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Purchase Order business template to HTML.
 class PurchaseOrderHtmlExportExampleScreen extends StatelessWidget {
   const PurchaseOrderHtmlExportExampleScreen({super.key});
@@ -61,8 +62,8 @@ Future<TemplateHtmlExportResult> exportPurchaseOrderTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'Sales Templates',
-      title: 'Purchase Order',
-      description: 'Generate the Purchase Order template and export its PDF content to an HTML document using GeniusPdfExportService. Preview the exact HTML source, save it, and open the exported file.',
+      title: pdfLocalization.purchaseOrder,
+      description: pdfLocalization.purchaseOrderHtmlExportDesc,
       icon: Icons.shopping_cart_checkout_outlined,
       exportTemplate: exportPurchaseOrderTemplateAsHtml,
       usageCode: dartUsageCode,

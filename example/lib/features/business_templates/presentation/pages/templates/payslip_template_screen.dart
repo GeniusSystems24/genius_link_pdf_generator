@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/hr_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Payslip business template.
 class PayslipTemplateScreen extends StatelessWidget {
   const PayslipTemplateScreen({super.key});
@@ -75,11 +76,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'HR Documents',
-      title: 'Payslip',
+      title: pdfLocalization.payslip,
       titleAr: 'قسيمة الراتب',
-      description: 'Employee payslip with earnings, allowances, deductions, and net pay.',
+      description: pdfLocalization.employeePayslipEarningsAllowancesDesc,
       icon: Icons.payments_outlined,
       buildTemplate: buildPayslipDemo,
       usageCode: dartUsageCode,

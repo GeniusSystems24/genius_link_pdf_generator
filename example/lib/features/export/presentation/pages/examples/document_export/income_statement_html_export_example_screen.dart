@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Income Statement business template to HTML.
 class IncomeStatementHtmlExportExampleScreen extends StatelessWidget {
   const IncomeStatementHtmlExportExampleScreen({super.key});
@@ -61,8 +62,8 @@ Future<TemplateHtmlExportResult> exportIncomeStatementTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Income Statement',
-      description: 'Generate the Income Statement template and export its PDF content to an HTML document using GeniusPdfExportService. Preview the exact HTML source, save it, and open the exported file.',
+      title: pdfLocalization.incomeStatement,
+      description: pdfLocalization.incomeStatementHtmlExportDesc,
       icon: Icons.trending_up_outlined,
       exportTemplate: exportIncomeStatementTemplateAsHtml,
       usageCode: dartUsageCode,

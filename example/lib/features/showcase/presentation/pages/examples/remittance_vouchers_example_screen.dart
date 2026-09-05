@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/showcase/presentation/widgets/showcase_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Remittance Vouchers Showcase example.
 ///
 /// No PDF is generated until **Run example** is pressed. The `Dart usage code`
@@ -18,12 +19,12 @@ List<int> buildRemittanceVoucherDemoReport({
 
   @override
   Widget build(BuildContext context) {
-    return const ShowcaseExampleDetailScreen(
+    return  ShowcaseExampleDetailScreen(
       showcaseId: 'showcase_remittance_vouchers',
       category: 'Showcase',
-      title: 'Remittance Vouchers',
+      title: pdfLocalization.remittanceVouchers,
       apiName: 'buildRemittanceVoucherDemoReport',
-      description: 'Domestic and international incoming and outgoing remittance vouchers.',
+      description: pdfLocalization.domesticInternationalIncomingDesc,
       icon: Icons.send_outlined,
       usageCode: dartUsageCode,
     );

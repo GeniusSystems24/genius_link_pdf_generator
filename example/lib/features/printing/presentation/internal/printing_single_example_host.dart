@@ -8,6 +8,7 @@ import 'package:genius_pdf_example/app/theme/app_theme.dart';
 
 import 'package:super_core/super_core.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 enum PrintingDemoSection { printers, settings, print, profiles }
 
 /// Demo screen for Advanced Printing (v2.2.0 & v2.2.1).
@@ -105,15 +106,15 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
       children: [
         _buildHeaderCard(
           isDark: isDark,
-          title: 'Printer Discovery',
-          description: 'Find and view available printers on your system.',
+          title: pdfLocalization.printerDiscovery,
+          description: pdfLocalization.findAndViewAvailablePrintersOnYourSystem,
           icon: Icons.print_rounded,
           gradient: AppColors.primaryGradient,
         ),
         const SizedBox(height: 16),
         _buildActionButton(
           isDark: isDark,
-          label: 'Discover Printers',
+          label: pdfLocalization.discoverPrinters,
           icon: Icons.search_rounded,
           gradient: AppColors.primaryGradient,
           onPressed: _discoverPrinters,
@@ -121,14 +122,14 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
         const SizedBox(height: 8),
         _buildActionButton(
           isDark: isDark,
-          label: 'Check Printing Info',
+          label: pdfLocalization.checkPrintingInfo,
           icon: Icons.info_outline_rounded,
           gradient: AppColors.infoGradient,
           onPressed: _checkPrintingInfo,
         ),
         const SizedBox(height: 16),
         if (_controller.printers.isNotEmpty) ...[
-          _buildSectionTitle(isDark, 'Available Printers'),
+          _buildSectionTitle(isDark, pdfLocalization.availablePrinters),
           const SizedBox(height: 8),
           ..._controller.printers.map((printer) => _buildPrinterCard(isDark, printer)),
         ],
@@ -144,8 +145,8 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
       children: [
         _buildHeaderCard(
           isDark: isDark,
-          title: 'Print Settings',
-          description: 'Configure paper size, quality, copies, and more.',
+          title: pdfLocalization.printSettings,
+          description: pdfLocalization.configurePaperSizeQualityCopiesAndMore,
           icon: Icons.tune_rounded,
           gradient: AppColors.infoGradient,
         ),
@@ -154,7 +155,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
         // Paper Size
         _buildSettingCard(
           isDark: isDark,
-          title: 'Paper Size',
+          title: pdfLocalization.paperSize,
           icon: Icons.description_rounded,
           child: DropdownButton<GeniusPaperSize>(
             value: _controller.currentSettings.paperSize,
@@ -186,7 +187,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
         // Orientation
         _buildSettingCard(
           isDark: isDark,
-          title: 'Orientation',
+          title: pdfLocalization.orientation,
           icon: Icons.crop_rotate_rounded,
           child: DropdownButton<GeniusPrintOrientation>(
             value: _controller.currentSettings.orientation,
@@ -219,7 +220,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
         // Color Mode
         _buildSettingCard(
           isDark: isDark,
-          title: 'Color Mode',
+          title: pdfLocalization.colorMode,
           icon: Icons.palette_rounded,
           child: DropdownButton<GeniusPrintColorMode>(
             value: _controller.currentSettings.colorMode,
@@ -252,7 +253,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
         // Quality
         _buildSettingCard(
           isDark: isDark,
-          title: 'Quality',
+          title: pdfLocalization.quality,
           icon: Icons.high_quality_rounded,
           child: DropdownButton<GeniusPrintQuality>(
             value: _controller.currentSettings.quality,
@@ -303,23 +304,23 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
         ),
 
         const SizedBox(height: 16),
-        _buildSectionTitle(isDark, 'Presets'),
+        _buildSectionTitle(isDark, pdfLocalization.presets),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
-            _buildPresetChip(isDark, 'Default', () {
+            _buildPresetChip(isDark, pdfLocalization.defaultText, () {
               setState(() => _controller.currentSettings = GeniusPrintSettings.defaults());
             }),
-            _buildPresetChip(isDark, 'Eco', () {
+            _buildPresetChip(isDark, pdfLocalization.eco, () {
               setState(() => _controller.currentSettings = GeniusPrintSettings.eco());
             }),
-            _buildPresetChip(isDark, 'High Quality', () {
+            _buildPresetChip(isDark, pdfLocalization.highQuality, () {
               setState(
                   () => _controller.currentSettings = GeniusPrintSettings.highQuality());
             }),
-            _buildPresetChip(isDark, 'Draft', () {
+            _buildPresetChip(isDark, pdfLocalization.draft, () {
               setState(() => _controller.currentSettings = GeniusPrintSettings.draft());
             }),
           ],
@@ -334,8 +335,8 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
       children: [
         _buildHeaderCard(
           isDark: isDark,
-          title: 'Print Document',
-          description: 'Print the sample PDF with your configured settings.',
+          title: pdfLocalization.printDocument,
+          description: pdfLocalization.printSamplePdfYourConfiguredSettingsDesc,
           icon: Icons.picture_as_pdf_rounded,
           gradient: AppColors.successGradient,
         ),
@@ -355,7 +356,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Current Settings',
+                pdfLocalization.currentSettings,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: isDark ? AppColors.darkText : AppColors.lightText,
@@ -363,14 +364,14 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
               ),
               const SizedBox(height: 12),
               _buildSettingRow(
-                  isDark, 'Paper', _controller.currentSettings.paperSize.displayName),
+                  isDark, pdfLocalization.paper, _controller.currentSettings.paperSize.displayName),
               _buildSettingRow(
-                  isDark, 'Orientation', _controller.currentSettings.orientation.name),
+                  isDark, pdfLocalization.orientation, _controller.currentSettings.orientation.name),
               _buildSettingRow(
-                  isDark, 'Color', _controller.currentSettings.colorMode.name),
+                  isDark, pdfLocalization.color, _controller.currentSettings.colorMode.name),
               _buildSettingRow(
-                  isDark, 'Quality', _controller.currentSettings.quality.name),
-              _buildSettingRow(isDark, 'Copies', '${_controller.currentSettings.copies}'),
+                  isDark, pdfLocalization.quality, _controller.currentSettings.quality.name),
+              _buildSettingRow(isDark, pdfLocalization.copies, '${_controller.currentSettings.copies}'),
             ],
           ),
         ),
@@ -378,7 +379,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
 
         _buildActionButton(
           isDark: isDark,
-          label: 'Print Preview',
+          label: pdfLocalization.printPreview,
           icon: Icons.preview_rounded,
           gradient: AppColors.infoGradient,
           onPressed: _controller.samplePdfBytes != null ? _showPrintPreview : null,
@@ -386,7 +387,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
         const SizedBox(height: 8),
         _buildActionButton(
           isDark: isDark,
-          label: 'Print with Dialog',
+          label: pdfLocalization.printWithDialog,
           icon: Icons.print_rounded,
           gradient: AppColors.successGradient,
           onPressed: _controller.samplePdfBytes != null ? _printWithDialog : null,
@@ -394,7 +395,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
         const SizedBox(height: 8),
         _buildActionButton(
           isDark: isDark,
-          label: _controller.hasSample ? 'Regenerate Sample PDF' : 'Generate Sample PDF',
+          label: _controller.hasSample ? pdfLocalization.regenerateSamplePdf : pdfLocalization.generateSamplePdf,
           icon: Icons.refresh_rounded,
           gradient: AppColors.warningGradient,
           onPressed: _generateSamplePdf,
@@ -411,19 +412,19 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
       children: [
         _buildHeaderCard(
           isDark: isDark,
-          title: 'Print Profiles',
-          description: 'Save and manage your favorite print settings.',
+          title: pdfLocalization.printProfiles,
+          description: pdfLocalization.saveAndManageYourFavoritePrintSettings,
           icon: Icons.bookmark_rounded,
           gradient: AppColors.purpleGradient,
         ),
         const SizedBox(height: 16),
-        _buildSectionTitle(isDark, 'System Presets'),
+        _buildSectionTitle(isDark, pdfLocalization.systemPresets),
         const SizedBox(height: 8),
         ..._controller.profiles
             .where((p) => p.isSystemPreset)
             .map((profile) => _buildProfileCard(isDark, profile)),
         const SizedBox(height: 16),
-        _buildSectionTitle(isDark, 'Your Profiles'),
+        _buildSectionTitle(isDark, pdfLocalization.yourProfiles),
         const SizedBox(height: 8),
         if (_controller.profiles.where((p) => !p.isSystemPreset).isEmpty)
           Container(
@@ -437,7 +438,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
             ),
             child: Center(
               child: Text(
-                'No custom profiles yet',
+                pdfLocalization.noCustomProfilesYet,
                 style: TextStyle(
                   color: isDark
                       ? AppColors.darkTextSecondary
@@ -453,7 +454,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
         const SizedBox(height: 16),
         _buildActionButton(
           isDark: isDark,
-          label: 'Save Current Settings',
+          label: pdfLocalization.saveCurrentSettings,
           icon: Icons.save_rounded,
           gradient: AppColors.primaryGradient,
           onPressed: _saveCurrentSettings,
@@ -593,8 +594,8 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
                 color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Text(
-                'Default',
+              child:  Text(
+                pdfLocalization.defaultText,
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -675,8 +676,8 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
                       color: AppColors.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text(
-                      'Default',
+                    child:  Text(
+                      pdfLocalization.defaultText,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -726,18 +727,18 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
           backgroundColor: Theme.of(context).brightness == Brightness.dark
               ? AppColors.darkSurface
               : AppColors.lightSurface,
-          title: const Text('Save Profile'),
+          title:  Text(pdfLocalization.saveProfile),
           content: TextField(
-            decoration: const InputDecoration(
+            decoration:  InputDecoration(
               labelText: 'Profile Name',
-              hintText: 'e.g., My Office Settings',
+              hintText: pdfLocalization.eGMyOfficeSettings,
             ),
             onChanged: (value) => name = value,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child:  Text(pdfLocalization.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -746,7 +747,7 @@ class _PrintingSingleExampleHostState extends State<PrintingSingleExampleHost> {
                   Navigator.pop(context);
                 }
               },
-              child: const Text('Save'),
+              child:  Text(pdfLocalization.save),
             ),
           ],
         );

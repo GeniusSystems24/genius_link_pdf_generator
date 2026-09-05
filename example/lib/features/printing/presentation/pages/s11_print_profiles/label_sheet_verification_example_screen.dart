@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/printing/models/documents/s11_print_profiles_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S11 verification example for Label sheet.
 class S11LabelSheetVerificationExampleScreen extends StatelessWidget {
   const S11LabelSheetVerificationExampleScreen({super.key});
@@ -21,8 +22,8 @@ class S11LabelSheetVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S11 Print Profiles',
-      title: 'Label sheet',
-      description: 'Focused S11 verification for Label sheet. Generate this example independently, inspect the PDF output, and compare LTR and RTL without switching to another scenario.',
+      title: pdfLocalization.labelSheet2,
+      description: pdfLocalization.s11LabelSheetVerify,
       apiName: 'buildS11LabelSheetVerificationPdf',
       icon: Icons.settings_applications_outlined,
       generator: buildS11LabelSheetVerificationPdf,

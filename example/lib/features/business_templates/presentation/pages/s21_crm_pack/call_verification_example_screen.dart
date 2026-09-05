@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s21_crm_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S21 verification example for Call Report.
 class S21CallVerificationExampleScreen extends StatelessWidget {
   const S21CallVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S21CallVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S21 CRM Pack',
-      title: 'Call Report',
-      description: 'Focused S21 verification for Call Report. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.callReport,
+      description: pdfLocalization.s21CallReportVerify,
       apiName: 'buildS21CallVerificationPdf',
       icon: Icons.people_alt_outlined,
       generator: buildS21CallVerificationPdf,

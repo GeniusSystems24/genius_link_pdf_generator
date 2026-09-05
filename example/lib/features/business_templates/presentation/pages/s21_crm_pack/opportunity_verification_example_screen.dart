@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s21_crm_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S21 verification example for Opportunity Report.
 class S21OpportunityVerificationExampleScreen extends StatelessWidget {
   const S21OpportunityVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S21OpportunityVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S21 CRM Pack',
-      title: 'Opportunity Report',
-      description: 'Focused S21 verification for Opportunity Report. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.opportunityReport,
+      description: pdfLocalization.s21OpportunityReportVerify,
       apiName: 'buildS21OpportunityVerificationPdf',
       icon: Icons.people_alt_outlined,
       generator: buildS21OpportunityVerificationPdf,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Font Sizing & Scripts**.
 ///
@@ -12,6 +13,7 @@ class WebLinkFontSizingExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Font Sizing & Scripts** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -87,12 +89,12 @@ class WebLinkFontSizingDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'web_link_font_sizing',
       category: 'Components / Core PDF Components / Web Links',
-      title: 'Font Sizing & Scripts',
+      title: pdfLocalization.fontSizingAndScripts,
       apiName: 'GeniusPdfTextSpan.webLink',
-      description: 'Demonstrate mixed rich-text font sizes together with superscript and subscript rendering.',
+      description: pdfLocalization.mixedRichTextFontSizesTogetherDesc,
       icon: Icons.format_size_outlined,
       usageCode: dartUsageCode,
     );

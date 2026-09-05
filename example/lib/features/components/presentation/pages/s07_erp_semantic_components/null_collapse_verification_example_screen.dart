@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/components/models/documents/s07_erp_semantic_components_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S07 example for Null Collapse / No Gap.
 class S07NullCollapseVerificationExampleScreen extends StatelessWidget {
   const S07NullCollapseVerificationExampleScreen({super.key});
@@ -11,8 +12,8 @@ class S07NullCollapseVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S07 ERP Semantic Components',
-      title: 'Null Collapse / No Gap',
-      description: 'Focused S07 verification for Null Collapse / No Gap. Generate the document explicitly, inspect the PDF result, and compare LTR and RTL output without switching to another scenario.',
+      title: pdfLocalization.nullCollapseNoGap,
+      description: pdfLocalization.s07NullCollapseNoGapVerify,
       apiName: 'buildS07NullCollapseVerificationPdf',
       icon: Icons.view_module_outlined,
       generator: buildS07NullCollapseVerificationPdf,

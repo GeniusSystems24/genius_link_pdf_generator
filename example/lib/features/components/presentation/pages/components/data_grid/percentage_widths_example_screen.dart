@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Percentage Column Widths DataGrid example.
 ///
 /// The document is generated only after the user presses **Run example**. The
@@ -166,12 +167,12 @@ class DataGridPercentageWidthsDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'data_grid_percentage_widths',
       category: 'Components / Data Grid',
-      title: 'Percentage Column Widths',
+      title: pdfLocalization.percentageColumnWidths,
       apiName: 'GeniusPdfDataGrid',
-      description: 'Configure DataGrid columns with widthPercent and numeric/currency sizing while combining sum, min, and max automatic totals.',
+      description: pdfLocalization.dataGridColumnsWidthPercentNumericDesc,
       icon: Icons.table_chart_outlined,
       usageCode: dartUsageCode,
     );

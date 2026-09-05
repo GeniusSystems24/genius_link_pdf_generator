@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/template_engine/models/documents/s25_template_designer_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S25 verification example for Conditions / Expressions.
 class S25ExpressionsVerificationExampleScreen extends StatefulWidget {
   const S25ExpressionsVerificationExampleScreen({super.key});
@@ -36,8 +37,8 @@ class _S25ExpressionsVerificationExampleScreenState extends State<S25Expressions
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S25 Template Designer',
-      title: 'Conditions / Expressions',
-      description: 'Focused S25 verification for Conditions / Expressions. Generate this example independently, inspect the PDF output, and compare LTR and RTL without switching to another scenario.',
+      title: pdfLocalization.conditionsExpressions,
+      description: pdfLocalization.s25ConditionsExpressionsVerify,
       apiName: 'buildS25ExpressionsVerificationPdf',
       icon: Icons.design_services_outlined,
       generator: (config) => buildS25ExpressionsVerificationPdf(
@@ -57,18 +58,18 @@ class _S25ExpressionsVerificationExampleScreenState extends State<S25Expressions
               labelText: 'Page profile',
               border: OutlineInputBorder(),
             ),
-            items: const [
+            items:  [
               DropdownMenuItem(
                 value: 'a4-portrait',
-                child: Text('A4 Portrait'),
+                child: Text(pdfLocalization.a4Portrait),
               ),
               DropdownMenuItem(
                 value: 'thermal80',
-                child: Text('Thermal 80'),
+                child: Text(pdfLocalization.thermal80),
               ),
               DropdownMenuItem(
                 value: 'labelSheet',
-                child: Text('Label Sheet'),
+                child: Text(pdfLocalization.labelSheet),
               ),
             ],
             onChanged: (value) {
@@ -78,10 +79,10 @@ class _S25ExpressionsVerificationExampleScreenState extends State<S25Expressions
           ),
         ),
         SegmentedButton<int>(
-          segments: const [
-            ButtonSegment(value: 10, label: Text('10 rows')),
-            ButtonSegment(value: 100, label: Text('100 rows')),
-            ButtonSegment(value: 500, label: Text('500 rows')),
+          segments:  [
+            ButtonSegment(value: 10, label: Text(pdfLocalization.tenRows)),
+            ButtonSegment(value: 100, label: Text(pdfLocalization.oneHundredRows)),
+            ButtonSegment(value: 500, label: Text(pdfLocalization.fiveHundredRows)),
           ],
           selected: <int>{_rows},
           onSelectionChanged: (selection) {

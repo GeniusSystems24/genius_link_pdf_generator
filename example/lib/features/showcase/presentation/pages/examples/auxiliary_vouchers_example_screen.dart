@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/showcase/presentation/widgets/showcase_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Auxiliary Vouchers Showcase example.
 ///
 /// No PDF is generated until **Run example** is pressed. The `Dart usage code`
@@ -18,12 +19,12 @@ List<int> buildAuxiliaryVoucherDemoReport({
 
   @override
   Widget build(BuildContext context) {
-    return const ShowcaseExampleDetailScreen(
+    return  ShowcaseExampleDetailScreen(
       showcaseId: 'showcase_auxiliary_vouchers',
       category: 'Showcase',
-      title: 'Auxiliary Vouchers',
+      title: pdfLocalization.auxiliaryVouchers,
       apiName: 'buildAuxiliaryVoucherDemoReport',
-      description: 'Gift, grant, and supporting inventory-operation voucher examples.',
+      description: pdfLocalization.giftGrantSupportingInventoryDesc,
       icon: Icons.card_giftcard_outlined,
       usageCode: dartUsageCode,
     );

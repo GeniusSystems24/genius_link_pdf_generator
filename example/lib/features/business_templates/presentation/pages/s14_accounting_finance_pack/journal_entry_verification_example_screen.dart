@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s14_accounting_finance_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S14 verification example for Journal Entry.
 class S14JournalEntryVerificationExampleScreen extends StatelessWidget {
   const S14JournalEntryVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S14JournalEntryVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S14 Accounting & Finance Pack',
-      title: 'Journal Entry',
-      description: 'Focused S14 verification for Journal Entry. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.journalEntry,
+      description: pdfLocalization.s14JournalEntryVerify,
       apiName: 'buildS14JournalEntryVerificationPdf',
       icon: Icons.account_balance_outlined,
       generator: buildS14JournalEntryVerificationPdf,

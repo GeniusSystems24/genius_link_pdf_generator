@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **Customer & Company Boxes**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -93,12 +94,12 @@ class CustomerCompanyInfoBoxesDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'info_box_customer_company',
       category: 'Components / Core PDF Components / Info Box',
-      title: 'Customer & Company Boxes',
+      title: pdfLocalization.customerAndCompanyBoxes,
       apiName: 'GeniusPdfInfoBox',
-      description: 'Display structured customer and company details side by side using card-style info boxes.',
+      description: pdfLocalization.structuredCustomerCompanyDetailsSideDesc,
       icon: Icons.badge_outlined,
       usageCode: dartUsageCode,
     );

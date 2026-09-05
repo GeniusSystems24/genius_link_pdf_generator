@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/benchmark/models/documents/s24_performance_regression_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused S24 verification screen for Resource / Measurement Cache.
 class S24MeasurementCacheVerificationExampleScreen extends StatefulWidget {
   const S24MeasurementCacheVerificationExampleScreen({super.key});
@@ -58,8 +59,8 @@ class _S24MeasurementCacheVerificationExampleScreenState extends State<S24Measur
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'Sprint S24 — Performance & Regression',
-      title: 'Resource / Measurement Cache',
-      description: 'Verify repeated measurement requests reuse one cached calculation while the generated PDF records the requested row count.',
+      title: pdfLocalization.resourceMeasurementCache,
+      description: pdfLocalization.verifyRepeatedMeasurementRequestsDesc,
       apiName: 'buildS24MeasurementCacheVerificationPdf',
       icon: Icons.cached_outlined,
       generator: (config) => buildS24MeasurementCacheVerificationPdf(
@@ -71,10 +72,10 @@ class _S24MeasurementCacheVerificationExampleScreenState extends State<S24Measur
       configurationVersion: _rows,
       controls: <Widget>[
         SegmentedButton<int>(
-          segments: const <ButtonSegment<int>>[
-            ButtonSegment<int>(value: 1, label: Text('1 row')),
-            ButtonSegment<int>(value: 50, label: Text('50 rows')),
-            ButtonSegment<int>(value: 500, label: Text('500 rows')),
+          segments: <ButtonSegment<int>>[
+            ButtonSegment<int>(value: 1, label: Text(pdfLocalization.oneRow)),
+            ButtonSegment<int>(value: 50, label: Text(pdfLocalization.fiftyRows)),
+            ButtonSegment<int>(value: 500, label: Text(pdfLocalization.fiveHundredRows)),
           ],
           selected: <int>{_rows},
           onSelectionChanged: (selection) {

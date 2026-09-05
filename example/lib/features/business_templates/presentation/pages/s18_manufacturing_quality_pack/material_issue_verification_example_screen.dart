@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s18_manufacturing_quality_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S18 verification example for Material Issue.
 class S18MaterialIssueVerificationExampleScreen extends StatelessWidget {
   const S18MaterialIssueVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S18MaterialIssueVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S18 Manufacturing & Quality Pack',
-      title: 'Material Issue',
-      description: 'Focused S18 verification for Material Issue. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.materialIssue,
+      description: pdfLocalization.s18MaterialIssueVerify,
       apiName: 'buildS18MaterialIssueVerificationPdf',
       icon: Icons.precision_manufacturing_outlined,
       generator: buildS18MaterialIssueVerificationPdf,

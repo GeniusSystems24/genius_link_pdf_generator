@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **Security Access Report**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -164,12 +165,12 @@ class GridWatermarkSecurityAccessDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'grid_watermark_security_access',
       category: 'Components / Component Compositions / Grid + Watermark',
-      title: 'Security Access Report',
+      title: pdfLocalization.securityAccessReport,
       apiName: 'GeniusPdfDataGrid + GeniusPdfWatermark',
-      description: 'Create a security access-log grid with event counting, watermark guidance, and report verification QR code.',
+      description: pdfLocalization.securityAccessLogGridEventCountingDesc,
       icon: Icons.security_outlined,
       usageCode: dartUsageCode,
     );

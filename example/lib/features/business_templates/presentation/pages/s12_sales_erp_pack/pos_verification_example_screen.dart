@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s12_sales_erp_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S12 verification example for Simplified / POS Invoice.
 class S12PosVerificationExampleScreen extends StatelessWidget {
   const S12PosVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S12PosVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S12 Sales ERP Pack',
-      title: 'Simplified / POS Invoice',
-      description: 'Focused S12 verification for Simplified / POS Invoice. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.simplifiedPosInvoice,
+      description: pdfLocalization.s12SimplifiedPosInvoiceVerify,
       apiName: 'buildS12PosVerificationPdf',
       icon: Icons.point_of_sale_outlined,
       generator: buildS12PosVerificationPdf,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Quotation business template to PNG or JPEG images.
 class QuotationImageExportExampleScreen extends StatelessWidget {
   const QuotationImageExportExampleScreen({super.key});
@@ -69,8 +70,8 @@ Future<TemplateImageExportResult> exportQuotationTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'Sales Templates',
-      title: 'Quotation',
-      description: 'Generate the Quotation template, rasterize every PDF page, save it as PNG or JPEG, and preview the exported image bytes.',
+      title: pdfLocalization.quotation,
+      description: pdfLocalization.quotationImageExportDesc,
       icon: Icons.request_quote_outlined,
       exportTemplate: exportQuotationTemplateAsImages,
       usageCode: dartUsageCode,

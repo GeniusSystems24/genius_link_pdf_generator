@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Letterhead Header**.
 ///
@@ -12,6 +13,7 @@ class LetterheadHeaderExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'package:flutter/material.dart' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Letterhead Header** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -122,12 +124,12 @@ class LetterheadHeaderDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'headers_letterhead',
       category: 'Components / Core PDF Components / Headers',
-      title: 'Letterhead Header',
+      title: pdfLocalization.letterheadHeader,
       apiName: 'GeniusPdfReportHeader',
-      description: 'Classic letterhead layout with formal reference metadata for official correspondence.',
+      description: pdfLocalization.classicLetterheadLayoutFormalDesc,
       icon: Icons.description_outlined,
       usageCode: dartUsageCode,
     );

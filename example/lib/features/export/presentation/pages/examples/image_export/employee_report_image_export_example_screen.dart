@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Employee Report business template to PNG or JPEG images.
 class EmployeeReportImageExportExampleScreen extends StatelessWidget {
   const EmployeeReportImageExportExampleScreen({super.key});
@@ -69,8 +70,8 @@ Future<TemplateImageExportResult> exportEmployeeReportTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'HR Templates',
-      title: 'Employee Report',
-      description: 'Generate the Employee Report template, rasterize every PDF page, save it as PNG or JPEG, and preview the exported image bytes.',
+      title: pdfLocalization.employeeReport,
+      description: pdfLocalization.employeeReportImageExportDesc,
       icon: Icons.badge_outlined,
       exportTemplate: exportEmployeeReportTemplateAsImages,
       usageCode: dartUsageCode,

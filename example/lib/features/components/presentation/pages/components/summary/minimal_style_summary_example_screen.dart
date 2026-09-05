@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Minimal Style**.
 ///
@@ -12,6 +13,7 @@ class MinimalStyleSummaryExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Minimal Style** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -74,12 +76,12 @@ class MinimalStyleSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'summary_style_minimal',
       category: 'Components / Core PDF Components / Summary',
-      title: 'Minimal Style',
+      title: pdfLocalization.minimalStyle,
       apiName: 'GeniusPdfSummarySection',
-      description: 'Render the same summary data with GeniusPdfSummaryStyle.minimal().',
+      description: pdfLocalization.summaryDataGeniusPdfSummaryStyleDesc3,
       icon: Icons.horizontal_rule_outlined,
       usageCode: dartUsageCode,
     );

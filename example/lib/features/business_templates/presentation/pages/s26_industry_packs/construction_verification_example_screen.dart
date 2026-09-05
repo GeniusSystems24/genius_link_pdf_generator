@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s26_industry_packs_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S26 verification example for Construction / Real Estate.
 class S26ConstructionVerificationExampleScreen extends StatelessWidget {
   const S26ConstructionVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S26ConstructionVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S26 Industry / Plugin Packs',
-      title: 'Construction / Real Estate',
-      description: 'Focused S26 verification for Construction / Real Estate. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.constructionRealEstate,
+      description: pdfLocalization.s26ConstructionRealEstateVerify,
       apiName: 'buildS26ConstructionVerificationPdf',
       icon: Icons.extension_outlined,
       generator: buildS26ConstructionVerificationPdf,

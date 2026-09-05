@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s13_purchasing_erp_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S13 verification example for Supplier Return.
 class S13SupplierReturnVerificationExampleScreen extends StatelessWidget {
   const S13SupplierReturnVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S13SupplierReturnVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S13 Purchasing ERP Pack',
-      title: 'Supplier Return',
-      description: 'Focused S13 verification for Supplier Return. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.supplierReturn,
+      description: pdfLocalization.s13SupplierReturnVerify,
       apiName: 'buildS13SupplierReturnVerificationPdf',
       icon: Icons.shopping_cart_checkout_outlined,
       generator: buildS13SupplierReturnVerificationPdf,

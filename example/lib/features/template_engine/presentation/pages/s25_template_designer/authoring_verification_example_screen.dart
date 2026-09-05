@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/template_engine/models/documents/s25_template_designer_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S25 verification example for Drag / Drop + Sections.
 class S25AuthoringVerificationExampleScreen extends StatefulWidget {
   const S25AuthoringVerificationExampleScreen({super.key});
@@ -36,8 +37,8 @@ class _S25AuthoringVerificationExampleScreenState extends State<S25AuthoringVeri
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S25 Template Designer',
-      title: 'Drag / Drop + Sections',
-      description: 'Focused S25 verification for Drag / Drop + Sections. Generate this example independently, inspect the PDF output, and compare LTR and RTL without switching to another scenario.',
+      title: pdfLocalization.dragDropPlusSections,
+      description: pdfLocalization.s25DragDropSectionsVerify,
       apiName: 'buildS25AuthoringVerificationPdf',
       icon: Icons.design_services_outlined,
       generator: (config) => buildS25AuthoringVerificationPdf(
@@ -57,18 +58,18 @@ class _S25AuthoringVerificationExampleScreenState extends State<S25AuthoringVeri
               labelText: 'Page profile',
               border: OutlineInputBorder(),
             ),
-            items: const [
+            items:  [
               DropdownMenuItem(
                 value: 'a4-portrait',
-                child: Text('A4 Portrait'),
+                child: Text(pdfLocalization.a4Portrait),
               ),
               DropdownMenuItem(
                 value: 'thermal80',
-                child: Text('Thermal 80'),
+                child: Text(pdfLocalization.thermal80),
               ),
               DropdownMenuItem(
                 value: 'labelSheet',
-                child: Text('Label Sheet'),
+                child: Text(pdfLocalization.labelSheet),
               ),
             ],
             onChanged: (value) {
@@ -78,10 +79,10 @@ class _S25AuthoringVerificationExampleScreenState extends State<S25AuthoringVeri
           ),
         ),
         SegmentedButton<int>(
-          segments: const [
-            ButtonSegment(value: 10, label: Text('10 rows')),
-            ButtonSegment(value: 100, label: Text('100 rows')),
-            ButtonSegment(value: 500, label: Text('500 rows')),
+          segments:  [
+            ButtonSegment(value: 10, label: Text(pdfLocalization.tenRows)),
+            ButtonSegment(value: 100, label: Text(pdfLocalization.oneHundredRows)),
+            ButtonSegment(value: 500, label: Text(pdfLocalization.fiveHundredRows)),
           ],
           selected: <int>{_rows},
           onSelectionChanged: (selection) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports `TrialBalanceTemplate` to PNG or JPEG images.
 class TrialBalanceImageExportExampleScreen extends StatelessWidget {
   const TrialBalanceImageExportExampleScreen({super.key});
@@ -72,11 +73,9 @@ Future<TemplateImageExportResult> exportTrialBalanceTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Trial Balance',
+      title: pdfLocalization.trialBalance,
       description:
-          'Build TrialBalanceTemplate from lib/templates/trial_balance_template.dart, '
-          'rasterize every generated PDF page, save it as PNG or JPEG, and '
-          'preview the exact exported image bytes.',
+          pdfLocalization.trialBalanceImageExportDesc,
       icon: Icons.balance_outlined,
       exportTemplate: exportTrialBalanceTemplateAsImages,
       usageCode: dartUsageCode,

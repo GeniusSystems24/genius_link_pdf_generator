@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s20_maintenance_service_logistics_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S20 verification example for Shipping Label.
 class S20ShippingLabelVerificationExampleScreen extends StatelessWidget {
   const S20ShippingLabelVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S20ShippingLabelVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S20 Maintenance, Service & Logistics Pack',
-      title: 'Shipping Label',
-      description: 'Focused S20 verification for Shipping Label. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.shippingLabel,
+      description: pdfLocalization.s20ShippingLabelVerify,
       apiName: 'buildS20ShippingLabelVerificationPdf',
       icon: Icons.local_shipping_outlined,
       generator: buildS20ShippingLabelVerificationPdf,

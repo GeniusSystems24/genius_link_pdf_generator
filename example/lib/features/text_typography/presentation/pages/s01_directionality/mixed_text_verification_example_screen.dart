@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/text_typography/models/documents/s01_directionality_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S01 example for Mixed Arabic / Latin.
 class S01MixedTextVerificationExampleScreen extends StatelessWidget {
   const S01MixedTextVerificationExampleScreen({super.key});
@@ -11,8 +12,8 @@ class S01MixedTextVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S01 Directionality',
-      title: 'Mixed Arabic / Latin',
-      description: 'Focused S01 verification for Mixed Arabic / Latin. Generate the document explicitly, inspect the PDF result, and compare LTR and RTL output without switching to another scenario.',
+      title: pdfLocalization.mixedArabicLatin,
+      description: pdfLocalization.s01MixedArabicLatinVerify,
       apiName: 'buildS01MixedTextVerificationPdf',
       icon: Icons.swap_horiz_outlined,
       generator: buildS01MixedTextVerificationPdf,

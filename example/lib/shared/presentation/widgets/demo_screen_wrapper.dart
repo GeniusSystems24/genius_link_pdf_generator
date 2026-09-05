@@ -6,6 +6,7 @@ import 'package:genius_pdf_example/shared/presentation/widgets/example_page_shel
 import 'package:genius_pdf_example/shared/presentation/widgets/example_panels.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/responsive_split_layout.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Compatibility wrapper for demo screens hosted by the dashboard scaffold.
 class DemoScreenWrapper extends StatelessWidget {
   const DemoScreenWrapper({
@@ -63,7 +64,7 @@ class DemoPage extends StatelessWidget {
           ResponsiveSplitLayout(
             primary: PdfPreviewPanel(child: content),
             secondary: ExampleSectionAdapter(
-              title: 'Code example',
+              title: pdfLocalization.codeExample,
               icon: Icons.code_rounded,
               child: codeExample!,
             ),

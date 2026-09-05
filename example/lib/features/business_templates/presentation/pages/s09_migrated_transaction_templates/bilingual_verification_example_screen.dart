@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s09_migrated_transaction_templates_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S09 verification example for Bilingual / RTL structured values.
 class S09BilingualVerificationExampleScreen extends StatelessWidget {
   const S09BilingualVerificationExampleScreen({super.key});
@@ -22,8 +23,8 @@ class S09BilingualVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S09 Migrated Transaction Templates',
-      title: 'Bilingual / RTL structured values',
-      description: 'Focused S09 verification for Bilingual / RTL structured values. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.bilingualRtlStructuredValues,
+      description: pdfLocalization.s09BilingualRtlStructuredValuesVerify,
       apiName: 'buildS09BilingualVerificationPdf',
       icon: Icons.description_outlined,
       generator: buildS09BilingualVerificationPdf,

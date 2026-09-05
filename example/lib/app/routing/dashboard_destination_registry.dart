@@ -213,6 +213,7 @@ import 'package:genius_pdf_example/features/architecture/presentation/pages/exam
 import 'package:genius_pdf_example/features/architecture/presentation/pages/examples/plugins_example_screen.dart';
 import 'package:genius_pdf_example/features/architecture/presentation/pages/examples/dependency_injection_example_screen.dart';
 import 'package:genius_pdf_example/features/architecture/presentation/pages/examples/events_example_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 final class DashboardDestinationRegistry {
   const DashboardDestinationRegistry._();
 
@@ -2198,9 +2199,9 @@ final class DashboardDestinationRegistry {
 
   static String titleFor(String id) {
     for (final destination in primaryDestinations) {
-      if (destination.id == id) return destination.title;
+      if (destination.id == id) return pdfLocalization.textBySource(destination.title);
     }
-    return 'Genius Link PDF Generator';
+    return pdfLocalization.geniusLinkPdfGenerator;
   }
 
   static Widget build(String id, {required ValueChanged<String> onNavigate}) {

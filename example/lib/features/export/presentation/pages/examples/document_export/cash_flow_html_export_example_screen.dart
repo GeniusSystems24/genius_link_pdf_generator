@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Cash Flow business template to HTML.
 class CashFlowHtmlExportExampleScreen extends StatelessWidget {
   const CashFlowHtmlExportExampleScreen({super.key});
@@ -61,8 +62,8 @@ Future<TemplateHtmlExportResult> exportCashFlowTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Cash Flow',
-      description: 'Generate the Cash Flow template and export its PDF content to an HTML document using GeniusPdfExportService. Preview the exact HTML source, save it, and open the exported file.',
+      title: pdfLocalization.cashFlow,
+      description: pdfLocalization.cashFlowHtmlExportDesc,
       icon: Icons.swap_vert_circle_outlined,
       exportTemplate: exportCashFlowTemplateAsHtml,
       usageCode: dartUsageCode,

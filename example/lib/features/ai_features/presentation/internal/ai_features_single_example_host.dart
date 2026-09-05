@@ -10,6 +10,7 @@ import 'package:genius_pdf_example/shared/presentation/widgets/component_page.da
 import 'package:genius_pdf_example/shared/presentation/widgets/custom_tab_bar.dart';
 
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Demo screen for AI Features (v2.1.0).
 ///
 /// This screen demonstrates the AI-powered features:
@@ -35,19 +36,19 @@ class _AiFeaturesSingleExampleHostState extends State<AiFeaturesSingleExampleHos
   final List<CustomTabItem> _tabs = [
     CustomTabItem(
       id: 'content_analyzer',
-      title: 'Content Analyzer',
+      title: pdfLocalization.contentAnalyzer,
       icon: Icons.analytics_outlined,
       gradient: AppColors.primaryGradient,
     ),
     CustomTabItem(
       id: 'smart_layout',
-      title: 'Smart Layout',
+      title: pdfLocalization.smartLayout,
       icon: Icons.auto_fix_high_outlined,
       gradient: AppColors.purpleGradient,
     ),
     CustomTabItem(
       id: 'text_services',
-      title: 'Text Services',
+      title: pdfLocalization.textServices,
       icon: Icons.text_fields_outlined,
       gradient: AppColors.cyanGradient,
     ),
@@ -84,9 +85,9 @@ class _AiFeaturesSingleExampleHostState extends State<AiFeaturesSingleExampleHos
 
   Widget _buildContentAnalyzerTab(bool isDark) {
     return ComponentPage(
-      title: 'Content Analyzer',
+      title: pdfLocalization.contentAnalyzer,
       description:
-          'Extract text, detect document types, find keywords and structured data from PDF content',
+          pdfLocalization.extractTextDetectDocumentTypesFindDesc,
       icon: Icons.analytics_outlined,
       gradient: AppColors.primaryGradient,
       isDark: isDark,
@@ -113,9 +114,9 @@ final type = analyzer.detectDocumentType(text);
 
   Widget _buildSmartLayoutTab(bool isDark) {
     return ComponentPage(
-      title: 'Smart Layout',
+      title: pdfLocalization.smartLayout,
       description:
-          'Get intelligent layout suggestions for font sizes, margins, spacing, and color schemes',
+          pdfLocalization.getIntelligentLayoutSuggestionsFontDesc,
       icon: Icons.auto_fix_high_outlined,
       gradient: AppColors.purpleGradient,
       isDark: isDark,
@@ -148,9 +149,9 @@ final scheme = layout.suggestColorScheme(
 
   Widget _buildTextServicesTab(bool isDark) {
     return ComponentPage(
-      title: 'Text Services',
+      title: pdfLocalization.textServices,
       description:
-          'Text summarization, language detection, and smart title generation',
+          pdfLocalization.textSummarizationLanguageDetectionDesc,
       icon: Icons.text_fields_outlined,
       gradient: AppColors.cyanGradient,
       isDark: isDark,
@@ -180,7 +181,7 @@ final titles = services.generateTitles(content);
     return Column(
       children: [
         _buildActionButton(
-          label: 'Analyze Sample Invoice',
+          label: pdfLocalization.analyzeSampleInvoice,
           icon: Icons.receipt_long_outlined,
           gradient: AppColors.primaryGradient,
           onPressed: _analyzeInvoiceText,
@@ -188,7 +189,7 @@ final titles = services.generateTitles(content);
         ),
         const SizedBox(height: 12),
         _buildActionButton(
-          label: 'Analyze Sample Report',
+          label: pdfLocalization.analyzeSampleReport,
           icon: Icons.assessment_outlined,
           gradient: AppColors.infoGradient,
           onPressed: _analyzeReportText,
@@ -196,7 +197,7 @@ final titles = services.generateTitles(content);
         ),
         const SizedBox(height: 12),
         _buildActionButton(
-          label: 'Extract Structured Data',
+          label: pdfLocalization.extractStructuredData,
           icon: Icons.data_object_outlined,
           gradient: AppColors.successGradient,
           onPressed: _extractStructuredData,
@@ -210,7 +211,7 @@ final titles = services.generateTitles(content);
     return Column(
       children: [
         _buildActionButton(
-          label: 'Analyze Font Sizes',
+          label: pdfLocalization.analyzeFontSizes,
           icon: Icons.format_size_outlined,
           gradient: AppColors.purpleGradient,
           onPressed: _analyzeFontSizes,
@@ -218,7 +219,7 @@ final titles = services.generateTitles(content);
         ),
         const SizedBox(height: 12),
         _buildActionButton(
-          label: 'Suggest Margins',
+          label: pdfLocalization.suggestMargins,
           icon: Icons.format_indent_increase_outlined,
           gradient: AppColors.cyanGradient,
           onPressed: _suggestMargins,
@@ -226,7 +227,7 @@ final titles = services.generateTitles(content);
         ),
         const SizedBox(height: 12),
         _buildActionButton(
-          label: 'Suggest Color Scheme',
+          label: pdfLocalization.suggestColorScheme,
           icon: Icons.palette_outlined,
           gradient: AppColors.pinkGradient,
           onPressed: _suggestColorScheme,
@@ -234,7 +235,7 @@ final titles = services.generateTitles(content);
         ),
         const SizedBox(height: 12),
         _buildActionButton(
-          label: 'Full Layout Optimization',
+          label: pdfLocalization.fullLayoutOptimization,
           icon: Icons.auto_awesome_outlined,
           gradient: AppColors.orangeGradient,
           onPressed: _optimizeLayout,
@@ -248,7 +249,7 @@ final titles = services.generateTitles(content);
     return Column(
       children: [
         _buildActionButton(
-          label: 'Summarize Long Text',
+          label: pdfLocalization.summarizeLongText,
           icon: Icons.summarize_outlined,
           gradient: AppColors.cyanGradient,
           onPressed: _summarizeText,
@@ -256,7 +257,7 @@ final titles = services.generateTitles(content);
         ),
         const SizedBox(height: 12),
         _buildActionButton(
-          label: 'Detect Language',
+          label: pdfLocalization.detectLanguage,
           icon: Icons.translate_outlined,
           gradient: AppColors.tealGradient,
           onPressed: _detectLanguage,
@@ -264,7 +265,7 @@ final titles = services.generateTitles(content);
         ),
         const SizedBox(height: 12),
         _buildActionButton(
-          label: 'Generate Titles',
+          label: pdfLocalization.generateTitles,
           icon: Icons.title_outlined,
           gradient: AppColors.warningGradient,
           onPressed: _generateTitles,
@@ -272,7 +273,7 @@ final titles = services.generateTitles(content);
         ),
         const SizedBox(height: 12),
         _buildActionButton(
-          label: 'Extract Keywords',
+          label: pdfLocalization.extractKeywords,
           icon: Icons.key_outlined,
           gradient: AppColors.errorGradient,
           onPressed: _extractKeywords,

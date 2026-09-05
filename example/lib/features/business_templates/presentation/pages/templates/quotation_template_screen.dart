@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/sales_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Quotation business template.
 class QuotationTemplateScreen extends StatelessWidget {
   const QuotationTemplateScreen({super.key});
@@ -65,11 +66,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'Sales Documents',
-      title: 'Quotation',
+      title: pdfLocalization.quotation,
       titleAr: 'عرض سعر',
-      description: 'A professional customer quotation with products, pricing, and validity.',
+      description: pdfLocalization.professionalCustomerQuotationDesc,
       icon: Icons.request_quote_outlined,
       buildTemplate: buildQuotationDemo,
       usageCode: dartUsageCode,

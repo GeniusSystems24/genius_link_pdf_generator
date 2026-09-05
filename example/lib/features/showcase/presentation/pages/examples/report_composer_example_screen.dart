@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/showcase/presentation/widgets/showcase_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Report Composer Showcase example.
 ///
 /// No PDF is generated until **Run example** is pressed. The `Dart usage code`
@@ -20,12 +21,12 @@ List<int> buildComposerDemoReport({
 
   @override
   Widget build(BuildContext context) {
-    return const ShowcaseExampleDetailScreen(
+    return  ShowcaseExampleDetailScreen(
       showcaseId: 'showcase_report_composer',
       category: 'Showcase',
-      title: 'Report Composer',
+      title: pdfLocalization.reportComposer,
       apiName: 'buildComposerDemoReport',
-      description: 'Build a complete PDF report through the fluent report-composer API.',
+      description: pdfLocalization.completePdfReportFluentReportDesc,
       icon: Icons.auto_awesome_outlined,
       usageCode: dartUsageCode,
     );

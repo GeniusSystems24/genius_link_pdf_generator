@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for the Grid Style Showcase DataGrid example.
 ///
@@ -12,6 +13,7 @@ class DataGridStyleShowcaseExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Builds the focused core grid-style showcase example.
 class DataGridStyleShowcaseDemoBuilder extends GeniusPdfDocumentBuilder {
   DataGridStyleShowcaseDemoBuilder(super.config);
@@ -174,12 +176,12 @@ class DataGridStyleShowcaseDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'data_grid_style_showcase',
       category: 'Components / Data Grid',
-      title: 'Grid Style Showcase',
+      title: pdfLocalization.gridStyleShowcase,
       apiName: 'GeniusPdfDataGrid',
-      description: 'Compare modern, classic, striped, and dark GeniusPdfGridStyle presets using the same grid data and custom primary colors.',
+      description: pdfLocalization.compareModernClassicStripedDarkDesc,
       icon: Icons.table_chart_outlined,
       usageCode: dartUsageCode,
     );

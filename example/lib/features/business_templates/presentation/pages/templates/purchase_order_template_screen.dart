@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/sales_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Purchase Order business template.
 class PurchaseOrderTemplateScreen extends StatelessWidget {
   const PurchaseOrderTemplateScreen({super.key});
@@ -68,11 +69,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'Sales Documents',
-      title: 'Purchase Order',
+      title: pdfLocalization.purchaseOrder,
       titleAr: 'أمر شراء',
-      description: 'Vendor purchase order with items, delivery date, terms, and tax.',
+      description: pdfLocalization.vendorPurchaseOrderItemsDeliveryDateDesc,
       icon: Icons.shopping_bag_outlined,
       buildTemplate: buildPurchaseOrderDemo,
       usageCode: dartUsageCode,

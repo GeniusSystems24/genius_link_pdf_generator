@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/components/models/documents/components/data_grid_invoice_footer_rows_demo_builder.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/widgets/s00_baseline_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S00 screen for the DataGrid Baseline regression example.
 ///
 /// The `Dart usage code` panel contains the exact builder source executed by
@@ -152,9 +153,9 @@ class DataGridInvoiceFooterRowsDemoBuilder extends GeniusPdfDocumentBuilder {
   @override
   Widget build(BuildContext context) {
     return S00BaselineExampleDetailScreen(
-      title: 'DataGrid Baseline',
+      title: pdfLocalization.dataGridBaseline,
       apiName: 'DataGridInvoiceFooterRowsDemoBuilder',
-      description: 'Verify headers, rows, numeric cells, footer totals, and page flow using the focused invoice/footer-row DataGrid builder.',
+      description: pdfLocalization.verifyHeadersRowsNumericCellsFooterDesc,
       icon: Icons.table_chart_outlined,
       builderFactory: (config) => DataGridInvoiceFooterRowsDemoBuilder(config),
       usageCode: dartUsageCode,

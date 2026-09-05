@@ -8,6 +8,8 @@ import 'package:genius_pdf_example/app/routing/dashboard_destination_registry.da
 import 'package:genius_pdf_example/app/theme/app_theme.dart';
 import 'package:genius_pdf_example/features/dashboard/presentation/controllers/dashboard_controller.dart';
 
+import 'package:genius_pdf_example/app/controllers/locale_controller.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 class DashboardLayout extends StatefulWidget {
   const DashboardLayout({super.key});
 
@@ -113,7 +115,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       appBar: AppBar(
         leading: mode == SuperNavSidebarMode.drawer
             ? IconButton(
-                tooltip: 'Open navigation',
+                tooltip: pdfLocalization.openNavigation,
                 onPressed: _navigation.openDrawer,
                 icon: const Icon(Icons.menu_rounded),
               )
@@ -125,14 +127,14 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             Text(title, style: typography.titleMd),
             if (_dashboard.selectedId != 'dashboard')
               Text(
-                'Genius Link PDF Generator examples',
+                pdfLocalization.geniusLinkPdfGeneratorExamples,
                 style: typography.caption,
               ),
           ],
         ),
         actions: <Widget>[
           IconButton(
-            tooltip: 'Search examples',
+            tooltip: pdfLocalization.searchExamples,
             onPressed: () => showSuperNavigationSearchView<String>(
               context,
               controller: _navigation,
@@ -148,9 +150,22 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             builder: (context, themeMode, child) {
               final dark = themeMode == ThemeMode.dark;
               return IconButton(
-                tooltip: dark ? 'Use light theme' : 'Use dark theme',
+                tooltip: dark ? pdfLocalization.useLightTheme : pdfLocalization.useDarkTheme,
                 onPressed: themeController.toggleTheme,
                 icon: Icon(dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+              );
+            },
+          ),
+          ValueListenableBuilder<Locale>(
+            valueListenable: localeController,
+            builder: (context, locale, child) {
+              final isArabic = locale.languageCode == 'ar';
+              return IconButton(
+                tooltip: isArabic
+                    ? pdfLocalization.switchToEnglish
+                    : pdfLocalization.switchToArabic,
+                onPressed: localeController.toggleLanguage,
+                icon: const Icon(Icons.language_rounded),
               );
             },
           ),

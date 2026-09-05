@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Auto-Calculated Totals DataGrid example.
 ///
 /// The document is generated only after the user presses **Run example**. The
@@ -115,12 +116,12 @@ class DataGridAutoTotalsDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'data_grid_auto_totals',
       category: 'Components / Data Grid',
-      title: 'Auto-Calculated Totals',
+      title: pdfLocalization.autoCalculatedTotals,
       apiName: 'GeniusPdfDataGrid',
-      description: 'Demonstrate GeniusPdfAutoTotal sum, average, and count rows calculated directly from DataGrid row values.',
+      description: pdfLocalization.geniusPdfAutoTotalSumAverageCountDesc,
       icon: Icons.table_chart_outlined,
       usageCode: dartUsageCode,
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s17_hr_payroll_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S17 verification example for Employee Action Form.
 class S17EmployeeActionVerificationExampleScreen extends StatelessWidget {
   const S17EmployeeActionVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S17EmployeeActionVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S17 HR & Payroll Pack',
-      title: 'Employee Action Form',
-      description: 'Focused S17 verification for Employee Action Form. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.employeeActionForm,
+      description: pdfLocalization.s17EmployeeActionFormVerify,
       apiName: 'buildS17EmployeeActionVerificationPdf',
       icon: Icons.groups_outlined,
       generator: buildS17EmployeeActionVerificationPdf,

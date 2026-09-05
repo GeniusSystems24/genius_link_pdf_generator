@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Invoice Header**.
 ///
@@ -12,6 +13,7 @@ class InvoiceHeaderExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'package:flutter/material.dart' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Invoice Header** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -119,12 +121,12 @@ class InvoiceHeaderDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'headers_invoice',
       category: 'Components / Core PDF Components / Headers',
-      title: 'Invoice Header',
+      title: pdfLocalization.invoiceHeader,
       apiName: 'GeniusPdfReportHeader',
-      description: 'Standard invoice report header with company identity, document number, print date, and invoice styling.',
+      description: pdfLocalization.standardInvoiceReportHeaderCompanyDesc,
       icon: Icons.receipt_long_outlined,
       usageCode: dartUsageCode,
     );

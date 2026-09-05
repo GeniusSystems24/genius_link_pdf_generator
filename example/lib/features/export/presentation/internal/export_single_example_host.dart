@@ -10,6 +10,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 import 'package:genius_pdf_example/app/theme/app_theme.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/component_page.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 // import 'package:genius_pdf_example/shared/presentation/widgets/custom_tab_bar.dart';
 
 /// Demo screen for multi-format export features.
@@ -68,9 +69,9 @@ _controller.removeListener(_onControllerChanged);
   }
   Widget _buildImageExportTab(bool isDark) {
     return ComponentPage(
-      title: 'Image Export',
+      title: pdfLocalization.imageExport,
       description:
-          'Export PDF pages as high-quality PNG or compressed JPEG images.',
+          pdfLocalization.exportPdfPagesHighQualityPngDesc,
       icon: Icons.image_rounded,
       gradient: AppColors.infoGradient,
       isDark: isDark,
@@ -93,7 +94,7 @@ await service.export(doc, config);
                 child: _ExportCard(
                   isDark: isDark,
                   icon: Icons.image_rounded,
-                  label: 'PNG',
+                  label: pdfLocalization.png,
                   sublabel: 'High quality',
                   gradient: AppColors.infoGradient,
                   onPressed: _controller.isReady && !_controller.isLoading
@@ -106,7 +107,7 @@ await service.export(doc, config);
                 child: _ExportCard(
                   isDark: isDark,
                   icon: Icons.photo_rounded,
-                  label: 'JPEG',
+                  label: pdfLocalization.jpeg,
                   sublabel: 'Compressed',
                   gradient: AppColors.orangeGradient,
                   onPressed: _controller.isReady && !_controller.isLoading
@@ -125,8 +126,8 @@ await service.export(doc, config);
 
   Widget _buildDocExportTab(bool isDark) {
     return ComponentPage(
-      title: 'Document Export',
-      description: 'Export to HTML, plain text, or PDF/A archival format.',
+      title: pdfLocalization.documentExport,
+      description: pdfLocalization.exportHtmlPlainTextPdfArchivalFormatDesc,
       icon: Icons.description_rounded,
       gradient: AppColors.purpleGradient,
       isDark: isDark,
@@ -154,7 +155,7 @@ final pdfaConfig = GeniusExportConfiguration.pdfA(
                 child: _ExportCard(
                   isDark: isDark,
                   icon: Icons.html_rounded,
-                  label: 'HTML',
+                  label: pdfLocalization.html,
                   sublabel: 'Web format',
                   gradient: AppColors.purpleGradient,
                   onPressed: _controller.isReady && !_controller.isLoading
@@ -167,7 +168,7 @@ final pdfaConfig = GeniusExportConfiguration.pdfA(
                 child: _ExportCard(
                   isDark: isDark,
                   icon: Icons.text_snippet_rounded,
-                  label: 'Text',
+                  label: pdfLocalization.text,
                   sublabel: 'Plain text',
                   gradient: AppColors.tealGradient,
                   onPressed: _controller.isReady && !_controller.isLoading
@@ -181,7 +182,7 @@ final pdfaConfig = GeniusExportConfiguration.pdfA(
           _ExportCard(
             isDark: isDark,
             icon: Icons.archive_rounded,
-            label: 'PDF/A (Archival)',
+            label: pdfLocalization.pdfAArchival,
             sublabel: 'Long-term preservation',
             gradient: AppColors.successGradient,
             onPressed: _controller.isReady && !_controller.isLoading
@@ -197,8 +198,8 @@ final pdfaConfig = GeniusExportConfiguration.pdfA(
 
   Widget _buildBatchExportTab(bool isDark) {
     return ComponentPage(
-      title: 'Batch Export',
-      description: 'Export to multiple formats simultaneously in background.',
+      title: pdfLocalization.batchExport,
+      description: pdfLocalization.exportMultipleFormatsSimultaneouslyDesc,
       icon: Icons.dynamic_feed_rounded,
       gradient: AppColors.primaryGradient,
       isDark: isDark,
@@ -222,7 +223,7 @@ final results = await exporter.exportToMultipleFormats(
           _ExportCard(
             isDark: isDark,
             icon: Icons.dynamic_feed_rounded,
-            label: 'Export to All Formats',
+            label: pdfLocalization.exportToAllFormats,
             sublabel: 'PNG, HTML, Text',
             gradient: AppColors.primaryGradient,
             onPressed:
@@ -262,15 +263,15 @@ final results = await exporter.exportToMultipleFormats(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           FeatureStatusPanel(
-            message: 'Export completed successfully.',
+            message: pdfLocalization.exportCompletedSuccessfully,
             tone: FeatureExampleTone.success,
           ),
           const SizedBox(height: 10),
-          _buildInfoRow(isDark, 'Format', result.format.displayName),
-          _buildInfoRow(isDark, 'Pages', '${result.pageCount}'),
-          _buildInfoRow(isDark, 'Size', result.fileSizeFormatted),
+          _buildInfoRow(isDark, pdfLocalization.format, result.format.displayName),
+          _buildInfoRow(isDark, pdfLocalization.pages, '${result.pageCount}'),
+          _buildInfoRow(isDark, pdfLocalization.size, result.fileSizeFormatted),
           if (_controller.lastFilePath != null)
-            _buildInfoRow(isDark, 'Path', _controller.lastFilePath!),
+            _buildInfoRow(isDark, pdfLocalization.path, _controller.lastFilePath!),
           if (_controller.lastFilePath != null) ...<Widget>[
             const SizedBox(height: 10),
             Align(
@@ -278,7 +279,7 @@ final results = await exporter.exportToMultipleFormats(
               child: OutlinedButton.icon(
                 onPressed: _openLastFile,
                 icon: const Icon(Icons.open_in_new_rounded),
-                label: const Text('Open exported file'),
+                label:  Text(pdfLocalization.openExportedFile),
               ),
             ),
           ],

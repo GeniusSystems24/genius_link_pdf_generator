@@ -24,6 +24,7 @@ import 'package:genius_pdf_example/features/template_engine/models/documents/tem
 
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Demo screen for Template Engine features (v1.5.0).
 class TemplateEngineSingleExampleHost extends StatefulWidget {
   const TemplateEngineSingleExampleHost({super.key, this.initialTab = 0});
@@ -54,8 +55,8 @@ class _TemplateEngineSingleExampleHostState
 
   Widget _buildBuilderTab() {
     return FeatureExamplePage(
-      title: 'Template Builder',
-      description: 'Create reusable PDF templates programmatically.',
+      title: pdfLocalization.templateBuilder,
+      description: pdfLocalization.reusablePdfTemplatesProgrammaticallyDesc,
       icon: Icons.build_rounded,
       code: '''final template = TemplateBuilder()
   .name('invoice')
@@ -65,13 +66,13 @@ final bytes = await template.render(data);''',
       contentTitle: 'Builder actions',
       content: FeatureActionGrid(
         children: <Widget>[
-          _buildActionButton(label: 'Generate Invoice Template', labelAr: 'إنشاء قالب فاتورة', icon: Icons.receipt_rounded, onPressed: _generateInvoiceTemplate),
-          _buildActionButton(label: 'Generate Report Template', labelAr: 'إنشاء قالب تقرير', icon: Icons.article_rounded, onPressed: _generateReportTemplate),
-          _buildActionButton(label: 'Generate Purchase Order', labelAr: 'إنشاء أمر شراء', icon: Icons.shopping_cart_rounded, onPressed: _generatePurchaseOrderTemplate),
-          _buildActionButton(label: 'Generate Receipt Template', labelAr: 'إنشاء قالب إيصال', icon: Icons.receipt_long_rounded, onPressed: _generateReceiptTemplate),
-          _buildActionButton(label: 'Generate Quotation', labelAr: 'إنشاء عرض سعر', icon: Icons.request_quote_rounded, onPressed: _generateQuotationTemplate),
-          _buildActionButton(label: 'Generate Contract', labelAr: 'إنشاء عقد خدمة', icon: Icons.assignment_rounded, onPressed: _generateContractTemplate),
-          _buildActionButton(label: 'Generate Timesheet', labelAr: 'إنشاء سجل دوام', icon: Icons.schedule_rounded, onPressed: _generateTimesheetTemplate),
+          _buildActionButton(label: pdfLocalization.generateInvoiceTemplate, labelAr: 'إنشاء قالب فاتورة', icon: Icons.receipt_rounded, onPressed: _generateInvoiceTemplate),
+          _buildActionButton(label: pdfLocalization.generateReportTemplate, labelAr: 'إنشاء قالب تقرير', icon: Icons.article_rounded, onPressed: _generateReportTemplate),
+          _buildActionButton(label: pdfLocalization.generatePurchaseOrder, labelAr: 'إنشاء أمر شراء', icon: Icons.shopping_cart_rounded, onPressed: _generatePurchaseOrderTemplate),
+          _buildActionButton(label: pdfLocalization.generateReceiptTemplate, labelAr: 'إنشاء قالب إيصال', icon: Icons.receipt_long_rounded, onPressed: _generateReceiptTemplate),
+          _buildActionButton(label: pdfLocalization.generateQuotation, labelAr: 'إنشاء عرض سعر', icon: Icons.request_quote_rounded, onPressed: _generateQuotationTemplate),
+          _buildActionButton(label: pdfLocalization.generateContract, labelAr: 'إنشاء عقد خدمة', icon: Icons.assignment_rounded, onPressed: _generateContractTemplate),
+          _buildActionButton(label: pdfLocalization.generateTimesheet, labelAr: 'إنشاء سجل دوام', icon: Icons.schedule_rounded, onPressed: _generateTimesheetTemplate),
         ],
       ),
       statusMessage: _status.isEmpty ? 'Choose an action to execute the template builder.' : _status,
@@ -80,8 +81,8 @@ final bytes = await template.render(data);''',
   }
   Widget _buildJsonTab() {
     return FeatureExamplePage(
-      title: 'JSON Templates',
-      description: 'Import, render, and export portable template definitions.',
+      title: pdfLocalization.jsonTemplates,
+      description: pdfLocalization.importRenderExportPortableTemplateDesc,
       icon: Icons.code_rounded,
       code: '''final definition = TemplateDefinition.fromJson(json);
 final bytes = await registry.renderDefinition(definition, data);
@@ -89,9 +90,9 @@ final exported = definition.toJson();''',
       contentTitle: 'JSON template actions',
       content: FeatureActionGrid(
         children: <Widget>[
-          _buildActionButton(label: 'Render JSON Letter', labelAr: 'عرض خطاب JSON', icon: Icons.mail_outline_rounded, onPressed: _generateFromJson),
-          _buildActionButton(label: 'Render JSON Memo', labelAr: 'عرض مذكرة JSON', icon: Icons.note_alt_rounded, onPressed: _generateFromJsonMemo),
-          _buildActionButton(label: 'Export Template to JSON', labelAr: 'تصدير القالب إلى JSON', icon: Icons.download_rounded, onPressed: _exportToJson),
+          _buildActionButton(label: pdfLocalization.renderJsonLetter, labelAr: 'عرض خطاب JSON', icon: Icons.mail_outline_rounded, onPressed: _generateFromJson),
+          _buildActionButton(label: pdfLocalization.renderJsonMemo, labelAr: 'عرض مذكرة JSON', icon: Icons.note_alt_rounded, onPressed: _generateFromJsonMemo),
+          _buildActionButton(label: pdfLocalization.exportTemplateToJson, labelAr: 'تصدير القالب إلى JSON', icon: Icons.download_rounded, onPressed: _exportToJson),
         ],
       ),
       statusMessage: _status.isEmpty ? 'Choose a JSON template action.' : _status,
@@ -99,8 +100,8 @@ final exported = definition.toJson();''',
   }
   Widget _buildRegistryTab() {
     return FeatureExamplePage(
-      title: 'Template Registry',
-      description: 'Register, discover, and render templates from one registry.',
+      title: pdfLocalization.templateRegistry,
+      description: pdfLocalization.registerDiscoverRenderTemplatesOneDesc,
       icon: Icons.inventory_2_rounded,
       code: '''final registry = GeniusTemplateRegistry.instance;
 registry.register(invoiceTemplate);
@@ -109,11 +110,11 @@ final bytes = await registry.render('invoice', data);''',
       contentTitle: 'Registry actions',
       content: FeatureActionGrid(
         children: <Widget>[
-          _buildActionButton(label: 'Register Built-in Templates', labelAr: 'تسجيل القوالب المدمجة', icon: Icons.library_add_rounded, onPressed: _registerBuiltInTemplates),
-          _buildActionButton(label: 'List All Templates', labelAr: 'عرض جميع القوالب', icon: Icons.list_rounded, onPressed: _listTemplates),
-          _buildActionButton(label: 'Render Built-in Invoice', labelAr: 'عرض الفاتورة المدمجة', icon: Icons.picture_as_pdf_rounded, onPressed: _renderBuiltInInvoice),
-          _buildActionButton(label: 'Render Built-in Report', labelAr: 'عرض التقرير المدمج', icon: Icons.assessment_rounded, onPressed: _renderBuiltInReport),
-          _buildActionButton(label: 'Render Built-in Letter', labelAr: 'عرض الخطاب المدمج', icon: Icons.mail_outline_rounded, onPressed: _renderBuiltInLetter),
+          _buildActionButton(label: pdfLocalization.registerBuiltInTemplates, labelAr: 'تسجيل القوالب المدمجة', icon: Icons.library_add_rounded, onPressed: _registerBuiltInTemplates),
+          _buildActionButton(label: pdfLocalization.listAllTemplates, labelAr: 'عرض جميع القوالب', icon: Icons.list_rounded, onPressed: _listTemplates),
+          _buildActionButton(label: pdfLocalization.renderBuiltInInvoice, labelAr: 'عرض الفاتورة المدمجة', icon: Icons.picture_as_pdf_rounded, onPressed: _renderBuiltInInvoice),
+          _buildActionButton(label: pdfLocalization.renderBuiltInReport, labelAr: 'عرض التقرير المدمج', icon: Icons.assessment_rounded, onPressed: _renderBuiltInReport),
+          _buildActionButton(label: pdfLocalization.renderBuiltInLetter, labelAr: 'عرض الخطاب المدمج', icon: Icons.mail_outline_rounded, onPressed: _renderBuiltInLetter),
         ],
       ),
       statusMessage: _status.isEmpty ? 'Choose a registry action.' : _status,

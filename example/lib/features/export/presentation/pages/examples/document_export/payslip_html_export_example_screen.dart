@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Payslip business template to HTML.
 class PayslipHtmlExportExampleScreen extends StatelessWidget {
   const PayslipHtmlExportExampleScreen({super.key});
@@ -61,8 +62,8 @@ Future<TemplateHtmlExportResult> exportPayslipTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'HR Templates',
-      title: 'Payslip',
-      description: 'Generate the Payslip template and export its PDF content to an HTML document using GeniusPdfExportService. Preview the exact HTML source, save it, and open the exported file.',
+      title: pdfLocalization.payslip,
+      description: pdfLocalization.payslipHtmlExportDesc,
       icon: Icons.payments_outlined,
       exportTemplate: exportPayslipTemplateAsHtml,
       usageCode: dartUsageCode,

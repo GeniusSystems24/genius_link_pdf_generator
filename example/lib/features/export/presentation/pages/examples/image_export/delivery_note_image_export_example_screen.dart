@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Delivery Note business template to PNG or JPEG images.
 class DeliveryNoteImageExportExampleScreen extends StatelessWidget {
   const DeliveryNoteImageExportExampleScreen({super.key});
@@ -69,8 +70,8 @@ Future<TemplateImageExportResult> exportDeliveryNoteTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'Sales Templates',
-      title: 'Delivery Note',
-      description: 'Generate the Delivery Note template, rasterize every PDF page, save it as PNG or JPEG, and preview the exported image bytes.',
+      title: pdfLocalization.deliveryNote,
+      description: pdfLocalization.deliveryNoteImageExportDesc,
       icon: Icons.local_shipping_outlined,
       exportTemplate: exportDeliveryNoteTemplateAsImages,
       usageCode: dartUsageCode,

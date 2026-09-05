@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/text_typography/models/documents/s01_directionality_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S01 example for Media Preserve Policy.
 class S01MediaPolicyVerificationExampleScreen extends StatelessWidget {
   const S01MediaPolicyVerificationExampleScreen({super.key});
@@ -11,8 +12,8 @@ class S01MediaPolicyVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S01 Directionality',
-      title: 'Media Preserve Policy',
-      description: 'Focused S01 verification for Media Preserve Policy. Generate the document explicitly, inspect the PDF result, and compare LTR and RTL output without switching to another scenario.',
+      title: pdfLocalization.mediaPreservePolicy,
+      description: pdfLocalization.s01MediaPreservePolicyVerify,
       apiName: 'buildS01MediaPolicyVerificationPdf',
       icon: Icons.swap_horiz_outlined,
       generator: buildS01MediaPolicyVerificationPdf,

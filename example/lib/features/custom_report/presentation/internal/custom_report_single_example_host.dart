@@ -13,6 +13,7 @@ import 'package:genius_pdf_example/app/theme/app_theme.dart';
 import 'package:super_core/super_core.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/example_page_shell.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 class CustomReportSingleExampleHost extends StatefulWidget {
   const CustomReportSingleExampleHost({super.key});
 
@@ -78,20 +79,20 @@ class _CustomReportSingleExampleHostState extends State<CustomReportSingleExampl
           child: Column(
             children: <Widget>[
               ExamplePageHeader(
-                title: 'Custom Report Builder',
+                title: pdfLocalization.customReportBuilder,
                 description:
-                    'Configure a report composition, choose its PDF components, then generate the document explicitly.',
+                    pdfLocalization.reportCompositionChoosePdfComponentsDesc,
                 leading: const Icon(Icons.design_services_outlined),
                 actions: <Widget>[
                   OutlinedButton.icon(
                     onPressed: _resetForm,
                     icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Reset'),
+                    label:  Text(pdfLocalization.reset),
                   ),
                   OutlinedButton.icon(
                     onPressed: _showUsageCode,
                     icon: const Icon(Icons.code_rounded),
-                    label: const Text('Dart usage code'),
+                    label:  Text(pdfLocalization.dartUsageCode),
                   ),
                   FilledButton.icon(
                     onPressed: _isGenerating ? null : _generatePdf,
@@ -171,7 +172,7 @@ builder.dispose();''';
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: CodeViewer(
-              title: 'Dart usage code',
+              title: pdfLocalization.dartUsageCode,
               code: code,
               height: 620,
             ),
@@ -213,7 +214,7 @@ builder.dispose();''';
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Report Settings',
+                  pdfLocalization.reportSettings,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -233,18 +234,18 @@ builder.dispose();''';
               children: [
                 _buildSettingsSection(
                   isDark: isDark,
-                  title: 'Report Information',
+                  title: pdfLocalization.reportInformation,
                   icon: Icons.article_rounded,
                   gradient: AppColors.primaryGradient,
                   children: [
-                    _buildTextField(isDark, 'Report Title (English)',
+                    _buildTextField(isDark, pdfLocalization.reportTitleEnglish,
                         _reportTitle, (v) => _reportTitle = v),
-                    _buildTextField(isDark, 'Report Title (Arabic)',
+                    _buildTextField(isDark, pdfLocalization.reportTitleArabic,
                         _reportTitleAr, (v) => _reportTitleAr = v,
                         isRtl: true),
-                    _buildTextField(isDark, 'Company Name (English)',
+                    _buildTextField(isDark, pdfLocalization.companyNameEnglish,
                         _companyName, (v) => _companyName = v),
-                    _buildTextField(isDark, 'Company Name (Arabic)',
+                    _buildTextField(isDark, pdfLocalization.companyNameArabic,
                         _companyNameAr, (v) => _companyNameAr = v,
                         isRtl: true),
                   ],
@@ -252,29 +253,29 @@ builder.dispose();''';
                 const SizedBox(height: 20),
                 _buildSettingsSection(
                   isDark: isDark,
-                  title: 'Layout Options',
+                  title: pdfLocalization.layoutOptions,
                   icon: Icons.view_quilt_rounded,
                   gradient: AppColors.cyanGradient,
                   children: [
                     _buildSwitchTile(
                         isDark,
-                        'Right-to-Left (RTL)',
-                        'Use Arabic as primary language',
+                        pdfLocalization.rightToLeftRtl,
+                        pdfLocalization.useArabicAsPrimaryLanguage,
                         _isRtl,
                         (v) => setState(() => _isRtl = v)),
                     _buildSwitchTile(
                         isDark,
-                        'Include Header',
+                        pdfLocalization.includeHeader,
                         null,
                         _includeHeader,
                         (v) => setState(() => _includeHeader = v)),
                     _buildSwitchTile(
                         isDark,
-                        'Include Footer',
+                        pdfLocalization.includeFooter,
                         null,
                         _includeFooter,
                         (v) => setState(() => _includeFooter = v)),
-                    _buildSwitchTile(isDark, 'Include Logo Placeholder', null,
+                    _buildSwitchTile(isDark, pdfLocalization.includeLogoPlaceholder, null,
                         _includeLogo, (v) => setState(() => _includeLogo = v)),
                   ],
                 ),
@@ -282,22 +283,22 @@ builder.dispose();''';
                   const SizedBox(height: 20),
                   _buildSettingsSection(
                     isDark: isDark,
-                    title: 'Info Box Settings',
+                    title: pdfLocalization.infoBoxSettings,
                     icon: Icons.info_rounded,
                     gradient: AppColors.purpleGradient,
                     children: [
-                      _buildTextField(isDark, 'Info Box Title', _infoBoxTitle,
+                      _buildTextField(isDark, pdfLocalization.infoBoxTitle, _infoBoxTitle,
                           (v) => _infoBoxTitle = v),
-                      _buildTextField(isDark, 'Info Box Content',
+                      _buildTextField(isDark, pdfLocalization.infoBoxContent,
                           _infoBoxContent, (v) => _infoBoxContent = v,
                           maxLines: 3),
                       _buildDropdown(
                           isDark,
-                          'Info Box Style',
+                          pdfLocalization.infoBoxStyle,
                           _infoBoxStyleType,
-                          ['Card', 'Highlighted', 'Header Content'],
+                          [pdfLocalization.card, pdfLocalization.highlighted, pdfLocalization.headerContent],
                           (v) =>
-                              setState(() => _infoBoxStyleType = v ?? 'Card')),
+                              setState(() => _infoBoxStyleType = v ?? pdfLocalization.card)),
                     ],
                   ),
                 ],
@@ -305,7 +306,7 @@ builder.dispose();''';
                   const SizedBox(height: 20),
                   _buildSettingsSection(
                     isDark: isDark,
-                    title: 'Data Grid Settings',
+                    title: pdfLocalization.dataGridSettings,
                     icon: Icons.table_chart_rounded,
                     gradient: AppColors.orangeGradient,
                     children: [
@@ -313,12 +314,12 @@ builder.dispose();''';
                         children: [
                           Expanded(
                             child: _buildNumberField(
-                                isDark, 'Rows', _gridRows, (v) => _gridRows = v,
+                                isDark, pdfLocalization.rows, _gridRows, (v) => _gridRows = v,
                                 min: 1, max: 20),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: _buildNumberField(isDark, 'Columns',
+                            child: _buildNumberField(isDark, pdfLocalization.columns,
                                 _gridColumns, (v) => _gridColumns = v,
                                 min: 1, max: 6),
                           ),
@@ -326,7 +327,7 @@ builder.dispose();''';
                       ),
                       _buildSwitchTile(
                           isDark,
-                          'Show Totals Row',
+                          pdfLocalization.showTotalsRow,
                           null,
                           _gridShowTotals,
                           (v) => setState(() => _gridShowTotals = v)),
@@ -337,16 +338,16 @@ builder.dispose();''';
                   const SizedBox(height: 20),
                   _buildSettingsSection(
                     isDark: isDark,
-                    title: 'Summary Settings',
+                    title: pdfLocalization.summarySettings,
                     icon: Icons.calculate_rounded,
                     gradient: AppColors.successGradient,
                     children: [
                       _buildCurrencyField(
-                          isDark, 'Subtotal', _subtotal, (v) => _subtotal = v),
+                          isDark, pdfLocalization.subtotal, _subtotal, (v) => _subtotal = v),
                       _buildCurrencyField(
-                          isDark, 'Tax Amount', _tax, (v) => _tax = v),
+                          isDark, pdfLocalization.taxAmount, _tax, (v) => _tax = v),
                       _buildCurrencyField(
-                          isDark, 'Discount', _discount, (v) => _discount = v),
+                          isDark, pdfLocalization.discount, _discount, (v) => _discount = v),
                     ],
                   ),
                 ],
@@ -391,7 +392,7 @@ builder.dispose();''';
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Showcase Components',
+                  pdfLocalization.showcaseComponents,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -409,11 +410,11 @@ builder.dispose();''';
             child: ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                _buildPanelSectionLabel(isDark, 'Core Blocks'),
+                _buildPanelSectionLabel(isDark, pdfLocalization.coreBlocks),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Report Header',
-                  description: 'Company header component',
+                  title: pdfLocalization.reportHeader,
+                  description: pdfLocalization.companyHeaderComponent,
                   icon: Icons.view_stream_rounded,
                   gradient: AppColors.primaryGradient,
                   value: _includeReportHeader,
@@ -422,8 +423,8 @@ builder.dispose();''';
                 const SizedBox(height: 12),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Rich Text',
-                  description: 'Styled text and badges',
+                  title: pdfLocalization.richText,
+                  description: pdfLocalization.styledTextAndBadges,
                   icon: Icons.text_format_rounded,
                   gradient: AppColors.cyanGradient,
                   value: _includeRichText,
@@ -432,8 +433,8 @@ builder.dispose();''';
                 const SizedBox(height: 12),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Info Box',
-                  description: 'Labeled information blocks',
+                  title: pdfLocalization.infoBox,
+                  description: pdfLocalization.labeledInformationBlocks,
                   icon: Icons.info_outline_rounded,
                   gradient: AppColors.purpleGradient,
                   value: _includeInfoBox,
@@ -442,8 +443,8 @@ builder.dispose();''';
                 const SizedBox(height: 12),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Bullet List',
-                  description: 'Structured highlights list',
+                  title: pdfLocalization.bulletList,
+                  description: pdfLocalization.structuredHighlightsList,
                   icon: Icons.format_list_bulleted_rounded,
                   gradient: AppColors.tealGradient,
                   value: _includeBulletList,
@@ -452,19 +453,19 @@ builder.dispose();''';
                 const SizedBox(height: 12),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Two Columns',
-                  description: 'Side-by-side layout blocks',
+                  title: pdfLocalization.twoColumns,
+                  description: pdfLocalization.sideBySideLayoutBlocks,
                   icon: Icons.view_column_rounded,
                   gradient: AppColors.infoGradient,
                   value: _includeTwoColumns,
                   onChanged: (v) => setState(() => _includeTwoColumns = v),
                 ),
                 const SizedBox(height: 20),
-                _buildPanelSectionLabel(isDark, 'Data & Totals'),
+                _buildPanelSectionLabel(isDark, pdfLocalization.dataAndTotals),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Data Grid',
-                  description: 'Tabular data with totals',
+                  title: pdfLocalization.dataGrid,
+                  description: pdfLocalization.tabularDataWithTotals,
                   icon: Icons.table_rows_rounded,
                   gradient: AppColors.orangeGradient,
                   value: _includeDataGrid,
@@ -473,19 +474,19 @@ builder.dispose();''';
                 const SizedBox(height: 12),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Summary',
-                  description: 'Totals and calculations',
+                  title: pdfLocalization.summary,
+                  description: pdfLocalization.totalsAndCalculations2,
                   icon: Icons.summarize_rounded,
                   gradient: AppColors.successGradient,
                   value: _includeSummary,
                   onChanged: (v) => setState(() => _includeSummary = v),
                 ),
                 const SizedBox(height: 20),
-                _buildPanelSectionLabel(isDark, 'Verification'),
+                _buildPanelSectionLabel(isDark, pdfLocalization.verification),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'QR Code',
-                  description: 'Scan to verify',
+                  title: pdfLocalization.qrCode,
+                  description: pdfLocalization.scanToVerify,
                   icon: Icons.qr_code_2_rounded,
                   gradient: AppColors.primaryGradient,
                   value: _includeQrCode,
@@ -494,19 +495,19 @@ builder.dispose();''';
                 const SizedBox(height: 12),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Barcode',
-                  description: 'Tracking barcode',
+                  title: pdfLocalization.barcode,
+                  description: pdfLocalization.trackingBarcode,
                   icon: Icons.line_axis_rounded,
                   gradient: AppColors.warningGradient,
                   value: _includeBarcode,
                   onChanged: (v) => setState(() => _includeBarcode = v),
                 ),
                 const SizedBox(height: 20),
-                _buildPanelSectionLabel(isDark, 'Branding & Assets'),
+                _buildPanelSectionLabel(isDark, pdfLocalization.brandingAndAssets),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Images',
-                  description: 'Logo and branding',
+                  title: pdfLocalization.images,
+                  description: pdfLocalization.logoAndBranding,
                   icon: Icons.image_rounded,
                   gradient: AppColors.pinkGradient,
                   value: _includeImages,
@@ -515,19 +516,19 @@ builder.dispose();''';
                 const SizedBox(height: 12),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Attachments',
-                  description: 'Image attachments pages',
+                  title: pdfLocalization.attachments,
+                  description: pdfLocalization.imageAttachmentsPages,
                   icon: Icons.attachment_rounded,
                   gradient: AppColors.tealGradient,
                   value: _includeAttachments,
                   onChanged: (v) => setState(() => _includeAttachments = v),
                 ),
                 const SizedBox(height: 20),
-                _buildPanelSectionLabel(isDark, 'Security'),
+                _buildPanelSectionLabel(isDark, pdfLocalization.security),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Watermark',
-                  description: 'Document watermark',
+                  title: pdfLocalization.watermark,
+                  description: pdfLocalization.documentWatermark,
                   icon: Icons.water_drop_rounded,
                   gradient: AppColors.infoGradient,
                   value: _includeWatermark,
@@ -536,8 +537,8 @@ builder.dispose();''';
                 const SizedBox(height: 12),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Digital Signature',
-                  description: 'Signature placeholder',
+                  title: pdfLocalization.digitalSignature,
+                  description: pdfLocalization.signaturePlaceholder,
                   icon: Icons.verified_rounded,
                   gradient: AppColors.successGradient,
                   value: _includeDigitalSignature,
@@ -547,8 +548,8 @@ builder.dispose();''';
                 const SizedBox(height: 12),
                 _buildComponentToggle(
                   isDark: isDark,
-                  title: 'Signature Area',
-                  description: 'Manual signature blocks',
+                  title: pdfLocalization.signatureArea,
+                  description: pdfLocalization.manualSignatureBlocks,
                   icon: Icons.draw_rounded,
                   gradient: AppColors.orangeGradient,
                   value: _includeSignatureArea,
@@ -924,7 +925,7 @@ builder.dispose();''';
               Icon(Icons.preview_rounded, color: colors.onPrimaryContainer),
               const SizedBox(width: 8),
               Text(
-                'Configuration summary',
+                pdfLocalization.configurationSummary,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   color: colors.onPrimaryContainer,
                   fontWeight: FontWeight.w700,
@@ -933,13 +934,13 @@ builder.dispose();''';
             ],
           ),
           const SizedBox(height: 14),
-          _buildPreviewRow('Title', _isRtl ? _reportTitleAr : _reportTitle),
-          _buildPreviewRow('Company', _isRtl ? _companyNameAr : _companyName),
-          _buildPreviewRow('Direction', _isRtl ? 'RTL (Arabic)' : 'LTR (English)'),
-          _buildPreviewRow('Header/Footer', '${_includeHeader ? "On" : "Off"} / ${_includeFooter ? "On" : "Off"}'),
-          _buildPreviewRow('Components', activeComponents.join(', ')),
+          _buildPreviewRow(pdfLocalization.title, _isRtl ? _reportTitleAr : _reportTitle),
+          _buildPreviewRow(pdfLocalization.company, _isRtl ? _companyNameAr : _companyName),
+          _buildPreviewRow(pdfLocalization.direction, _isRtl ? pdfLocalization.rtlArabic : pdfLocalization.ltrEnglish),
+          _buildPreviewRow(pdfLocalization.headerFooter, '${_includeHeader ? "On" : "Off"} / ${_includeFooter ? "On" : "Off"}'),
+          _buildPreviewRow(pdfLocalization.components, activeComponents.join(', ')),
           if (_includeSummary)
-            _buildPreviewRow('Total', 'SAR ${total.toStringAsFixed(2)}'),
+            _buildPreviewRow(pdfLocalization.total, 'SAR ${total.toStringAsFixed(2)}'),
         ],
       ),
     );
@@ -1309,25 +1310,25 @@ class _ShowcaseReportBuilder extends GeniusPdfDocumentBuilder {
         items: [
           GeniusPdfLabeledValue(
             config: config,
-            label: 'Report ID',
+            label: pdfLocalization.reportId,
             labelAr: 'رقم التقرير',
             value: 'GL-2026-001',
           ),
           GeniusPdfLabeledValue(
             config: config,
-            label: 'Prepared By',
+            label: pdfLocalization.preparedBy,
             labelAr: 'أعد بواسطة',
             value: isRTL ? 'فريق التقارير' : 'Reporting Team',
           ),
           GeniusPdfLabeledValue(
             config: config,
-            label: 'Status',
+            label: pdfLocalization.status,
             labelAr: 'الحالة',
             value: isRTL ? 'قابل للمراجعة' : 'Ready for Review',
           ),
           GeniusPdfLabeledValue(
             config: config,
-            label: 'Scope',
+            label: pdfLocalization.scope,
             labelAr: 'النطاق',
             value: isRTL ? 'عمليات متعددة' : 'Multi-department',
           ),
@@ -1356,19 +1357,19 @@ class _ShowcaseReportBuilder extends GeniusPdfDocumentBuilder {
           items: [
             GeniusPdfLabeledValue(
               config: config,
-              label: 'Growth',
+              label: pdfLocalization.growth,
               labelAr: 'النمو',
               value: '+18.4%',
             ),
             GeniusPdfLabeledValue(
               config: config,
-              label: 'Efficiency',
+              label: pdfLocalization.efficiency,
               labelAr: 'الكفاءة',
               value: '92%',
             ),
             GeniusPdfLabeledValue(
               config: config,
-              label: 'Risk',
+              label: pdfLocalization.risk,
               labelAr: 'المخاطر',
               value: isRTL ? 'منخفض' : 'Low',
             ),
@@ -1385,17 +1386,17 @@ class _ShowcaseReportBuilder extends GeniusPdfDocumentBuilder {
           titleAr: 'الملخص السريع',
           items: [
             GeniusPdfSummaryItem.subtotal(
-              label: 'Operating Income',
+              label: pdfLocalization.operatingIncome,
               labelAr: 'الدخل التشغيلي',
               value: 'SAR 1,250,000',
             ),
             GeniusPdfSummaryItem.positive(
-              label: 'Net Margin',
+              label: pdfLocalization.netMargin,
               labelAr: 'الهامش الصافي',
               value: 'SAR 420,000',
             ),
             GeniusPdfSummaryItem.total(
-              label: 'Net Total',
+              label: pdfLocalization.netTotal,
               labelAr: 'الإجمالي الصافي',
               value: 'SAR 1,670,000',
             ),
@@ -1474,7 +1475,7 @@ class _ShowcaseReportBuilder extends GeniusPdfDocumentBuilder {
     if (options.includeQrCode) {
       final qr = GeniusPdfQRCodeGenerator.url(
         url: 'https://genius.systems/demo',
-        caption: 'Scan to verify',
+        caption: pdfLocalization.scanToVerify,
         captionAr: 'امسح للتحقق',
         config: config,
       );
@@ -1510,7 +1511,7 @@ class _ShowcaseReportBuilder extends GeniusPdfDocumentBuilder {
     if (options.includeAttachments && options.logoImage != null) {
       addImageAttachment(
         options.logoImage!.scaledToWidth(240),
-        title: 'Attachment: Brand Logo',
+        title: pdfLocalization.attachmentBrandLogo,
         titleAr: 'مرفق: شعار الشركة',
         spacing: 4,
       );
@@ -1526,22 +1527,22 @@ class _ShowcaseReportBuilder extends GeniusPdfDocumentBuilder {
       config: config,
       items: [
         GeniusPdfSummaryItem.subtotal(
-          label: 'Subtotal',
+          label: pdfLocalization.subtotal,
           labelAr: 'الإجمالي قبل الضريبة',
           value: 'SAR ${_fmtNumber(options.subtotal)}',
         ),
         GeniusPdfSummaryItem(
-          label: 'Tax (15%)',
+          label: pdfLocalization.tax15Percent,
           labelAr: 'الضريبة (15%)',
           value: 'SAR ${_fmtNumber(options.tax)}',
         ),
         GeniusPdfSummaryItem.negative(
-          label: 'Discount',
+          label: pdfLocalization.discount,
           labelAr: 'الخصم',
           value: '- SAR ${_fmtNumber(options.discount)}',
         ),
         GeniusPdfSummaryItem.total(
-          label: 'Total',
+          label: pdfLocalization.total,
           labelAr: 'الإجمالي',
           value: 'SAR ${_fmtNumber(total)}',
         ),

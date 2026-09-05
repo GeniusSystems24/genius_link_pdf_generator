@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:super_core/super_core.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 class ExampleFeatureCard extends StatelessWidget {
   const ExampleFeatureCard({
     super.key,
@@ -55,7 +56,7 @@ class ExampleFeatureCard extends StatelessWidget {
               SizedBox(height: spacing.space4),
               Row(
                 children: <Widget>[
-                  Text('Open', style: context.superTextTheme.labelMd.copyWith(color: Theme.of(context).colorScheme.primary)),
+                  Text(pdfLocalization.open, style: context.superTextTheme.labelMd.copyWith(color: Theme.of(context).colorScheme.primary)),
                   SizedBox(width: spacing.space1),
                   const Icon(Icons.arrow_forward_rounded, size: 18),
                 ],

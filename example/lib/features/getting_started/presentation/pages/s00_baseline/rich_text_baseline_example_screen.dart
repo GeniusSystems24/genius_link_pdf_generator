@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/models/documents/components/rich_text_fluent_formatting_demo_builder.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/widgets/s00_baseline_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated S00 screen for the RichText Baseline regression example.
 ///
@@ -13,6 +14,7 @@ class S00RichTextBaselineExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Fluent Formatting** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -111,9 +113,9 @@ class RichTextFluentFormattingDemoBuilder extends GeniusPdfDocumentBuilder {
   @override
   Widget build(BuildContext context) {
     return S00BaselineExampleDetailScreen(
-      title: 'RichText Baseline',
+      title: pdfLocalization.richTextBaseline,
       apiName: 'RichTextFluentFormattingDemoBuilder',
-      description: 'Verify rich-text wrapping, inline formatting, and layout stability using the focused fluent-formatting builder.',
+      description: pdfLocalization.verifyRichTextWrappingInlineDesc,
       icon: Icons.text_fields_outlined,
       builderFactory: (config) => RichTextFluentFormattingDemoBuilder(config),
       usageCode: dartUsageCode,

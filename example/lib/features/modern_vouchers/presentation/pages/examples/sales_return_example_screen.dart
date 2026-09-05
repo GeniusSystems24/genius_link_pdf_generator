@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/modern_vouchers/models/documents/modern_vouchers_demo_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated PDF-preview example for **Modern Sales Return**.
 ///
 /// The document is generated only after the user presses **Run example**.
@@ -32,8 +33,8 @@ Future<Uint8List> generateModernSalesReturnVoucherPdf(GeniusPdfConfig config) as
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'Modern Vouchers',
-      title: 'Modern Sales Return',
-      description: 'Sales return voucher with refund details.',
+      title: pdfLocalization.modernSalesReturn,
+      description: pdfLocalization.salesReturnVoucherWithRefundDetails,
       apiName: 'generateModernSalesReturnVoucherPdf',
       icon: Icons.assignment_return_outlined,
       generator: generateModernSalesReturnVoucherPdf,

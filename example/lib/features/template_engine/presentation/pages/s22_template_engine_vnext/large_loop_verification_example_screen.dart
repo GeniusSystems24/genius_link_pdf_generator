@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/template_engine/models/documents/s22_template_engine_vnext_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S22 verification example for Bounded Large Loop.
 class S22LargeLoopVerificationExampleScreen extends StatefulWidget {
   const S22LargeLoopVerificationExampleScreen({super.key});
@@ -31,8 +32,8 @@ class _S22LargeLoopVerificationExampleScreenState extends State<S22LargeLoopVeri
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S22 Template Engine vNext',
-      title: 'Bounded Large Loop',
-      description: 'Focused S22 verification for Bounded Large Loop. Generate this example independently, inspect the PDF output, and compare LTR and RTL without switching to another scenario.',
+      title: pdfLocalization.boundedLargeLoop,
+      description: pdfLocalization.s22BoundedLargeLoopVerify,
       apiName: 'buildS22LargeLoopVerificationPdf',
       icon: Icons.account_tree_outlined,
       generator: (config) => buildS22LargeLoopVerificationPdf(
@@ -44,10 +45,10 @@ class _S22LargeLoopVerificationExampleScreenState extends State<S22LargeLoopVeri
       configurationVersion: _rowCount,
       controls: <Widget>[
         SegmentedButton<int>(
-          segments: const [
-            ButtonSegment(value: 1, label: Text('1 row')),
-            ButtonSegment(value: 100, label: Text('100 rows')),
-            ButtonSegment(value: 1000, label: Text('1000 rows')),
+          segments:  [
+            ButtonSegment(value: 1, label: Text(pdfLocalization.oneRow)),
+            ButtonSegment(value: 100, label: Text(pdfLocalization.oneHundredRows)),
+            ButtonSegment(value: 1000, label: Text(pdfLocalization.oneThousandRows)),
           ],
           selected: <int>{_rowCount},
           onSelectionChanged: (selection) {

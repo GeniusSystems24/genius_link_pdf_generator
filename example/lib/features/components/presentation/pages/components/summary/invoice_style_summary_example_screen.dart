@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Invoice Style**.
 ///
@@ -12,6 +13,7 @@ class InvoiceStyleSummaryExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Invoice Style** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -74,12 +76,12 @@ class InvoiceStyleSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'summary_style_invoice',
       category: 'Components / Core PDF Components / Summary',
-      title: 'Invoice Style',
+      title: pdfLocalization.invoiceStyle,
       apiName: 'GeniusPdfSummarySection',
-      description: 'Render the same summary data with GeniusPdfSummaryStyle.invoice().',
+      description: pdfLocalization.summaryDataGeniusPdfSummaryStyleDesc2,
       icon: Icons.receipt_outlined,
       usageCode: dartUsageCode,
     );

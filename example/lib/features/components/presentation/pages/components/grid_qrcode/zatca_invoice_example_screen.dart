@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **ZATCA E-Invoice QR**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -267,12 +268,12 @@ class GridQrcodeZatcaInvoiceDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'grid_qrcode_zatca_invoice',
       category: 'Components / Component Compositions / Grid + QR Code',
-      title: 'ZATCA E-Invoice QR',
+      title: pdfLocalization.zatcaEInvoiceQr,
       apiName: 'GeniusPdfDataGrid + GeniusPdfQRCodeGenerator',
-      description: 'Build an e-invoice with company/customer metadata, item grid totals, and a ZATCA-compatible QR code.',
+      description: pdfLocalization.eInvoiceCompanyCustomerMetadataItemDesc,
       icon: Icons.qr_code_2_outlined,
       usageCode: dartUsageCode,
     );

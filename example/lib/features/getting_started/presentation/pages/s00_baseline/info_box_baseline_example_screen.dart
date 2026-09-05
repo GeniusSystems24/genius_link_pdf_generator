@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/components/models/documents/components/info_box_customer_company_info_boxes_demo_builder.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/widgets/s00_baseline_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S00 screen for the InfoBox Baseline regression example.
 ///
 /// The `Dart usage code` panel contains the exact builder source executed by
@@ -95,9 +96,9 @@ class CustomerCompanyInfoBoxesDemoBuilder extends GeniusPdfDocumentBuilder {
   @override
   Widget build(BuildContext context) {
     return S00BaselineExampleDetailScreen(
-      title: 'InfoBox Baseline',
+      title: pdfLocalization.infoBoxBaseline,
       apiName: 'CustomerCompanyInfoBoxesDemoBuilder',
-      description: 'Verify label/value placement, icon placement, and mixed numeric/Latin values using the focused InfoBox builder.',
+      description: pdfLocalization.verifyLabelValuePlacementIconDesc,
       icon: Icons.info_outline,
       builderFactory: (config) => CustomerCompanyInfoBoxesDemoBuilder(config),
       usageCode: dartUsageCode,

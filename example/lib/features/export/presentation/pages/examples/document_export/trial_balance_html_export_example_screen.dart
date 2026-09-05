@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports `TrialBalanceTemplate` to HTML.
 class TrialBalanceHtmlExportExampleScreen extends StatelessWidget {
   const TrialBalanceHtmlExportExampleScreen({super.key});
@@ -61,11 +62,9 @@ Future<TemplateHtmlExportResult> exportTrialBalanceTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Trial Balance',
+      title: pdfLocalization.trialBalance,
       description:
-          'Build TrialBalanceTemplate from lib/templates/trial_balance_template.dart '
-          'and export its generated PDF document to HTML using '
-          'GeniusPdfExportService. Preview, copy, save, and open the exact HTML output.',
+          pdfLocalization.trialBalanceHtmlExportDesc,
       icon: Icons.balance_outlined,
       exportTemplate: exportTrialBalanceTemplateAsHtml,
       usageCode: dartUsageCode,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/hr_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Leave Report business template.
 class LeaveReportTemplateScreen extends StatelessWidget {
   const LeaveReportTemplateScreen({super.key});
@@ -59,11 +60,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'HR Documents',
-      title: 'Leave Report',
+      title: pdfLocalization.leaveReport,
       titleAr: 'تقرير الإجازات',
-      description: 'Leave balances and requests with periods, types, and approval status.',
+      description: pdfLocalization.leaveBalancesRequestsPeriodsTypesDesc,
       icon: Icons.event_available_outlined,
       buildTemplate: buildLeaveReportDemo,
       usageCode: dartUsageCode,

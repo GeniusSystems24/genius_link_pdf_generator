@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/text_typography/models/documents/s01_directionality_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S01 example for Nested Overrides.
 class S01NestedOverridesVerificationExampleScreen extends StatelessWidget {
   const S01NestedOverridesVerificationExampleScreen({super.key});
@@ -11,8 +12,8 @@ class S01NestedOverridesVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S01 Directionality',
-      title: 'Nested Overrides',
-      description: 'Focused S01 verification for Nested Overrides. Generate the document explicitly, inspect the PDF result, and compare LTR and RTL output without switching to another scenario.',
+      title: pdfLocalization.nestedOverrides,
+      description: pdfLocalization.s01NestedOverridesVerify,
       apiName: 'buildS01NestedOverridesVerificationPdf',
       icon: Icons.swap_horiz_outlined,
       generator: buildS01NestedOverridesVerificationPdf,

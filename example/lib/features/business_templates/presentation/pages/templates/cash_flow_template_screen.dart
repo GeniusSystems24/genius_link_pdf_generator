@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/financial_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Cash Flow Statement business template.
 class CashFlowTemplateScreen extends StatelessWidget {
   const CashFlowTemplateScreen({super.key});
@@ -79,11 +80,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'Financial Reports',
-      title: 'Cash Flow Statement',
+      title: pdfLocalization.cashFlowStatement,
       titleAr: 'قائمة التدفقات النقدية',
-      description: 'Operating, investing, and financing cash-flow activities.',
+      description: pdfLocalization.operatingInvestingFinancingCashFlowDesc,
       icon: Icons.water_drop_outlined,
       buildTemplate: buildCashFlowDemo,
       usageCode: dartUsageCode,

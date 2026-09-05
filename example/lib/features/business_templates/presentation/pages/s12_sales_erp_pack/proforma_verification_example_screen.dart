@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s12_sales_erp_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S12 verification example for Proforma Invoice.
 class S12ProformaVerificationExampleScreen extends StatelessWidget {
   const S12ProformaVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S12ProformaVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S12 Sales ERP Pack',
-      title: 'Proforma Invoice',
-      description: 'Focused S12 verification for Proforma Invoice. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.proformaInvoice,
+      description: pdfLocalization.s12ProformaInvoiceVerify,
       apiName: 'buildS12ProformaVerificationPdf',
       icon: Icons.point_of_sale_outlined,
       generator: buildS12ProformaVerificationPdf,

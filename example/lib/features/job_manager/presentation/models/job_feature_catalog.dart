@@ -11,6 +11,7 @@ import 'package:genius_pdf_example/features/showcase/models/documents/position_t
 import 'package:genius_pdf_example/features/showcase/models/documents/qr_attachments_demo_document.dart';
 import 'package:genius_pdf_example/shared/data/sample_data.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 final class JobFeatureCatalog {
   JobFeatureCatalog({
     required GeniusPdfConfig config,
@@ -34,27 +35,27 @@ final class JobFeatureCatalog {
         features: [
           JobFeature(
             name: 'DataGrid',
-            description: 'Tables with RTL support',
+            description: pdfLocalization.tablesWithRtlSupport,
             builder: _buildDataGridTest,
           ),
           JobFeature(
             name: 'RichText',
-            description: 'Styled text with colors',
+            description: pdfLocalization.styledTextWithColors,
             builder: _buildRichTextTest,
           ),
           JobFeature(
             name: 'InfoBox',
-            description: 'Information boxes',
+            description: pdfLocalization.informationBoxes,
             builder: _buildInfoBoxTest,
           ),
           JobFeature(
             name: 'ReportHeader',
-            description: 'Professional headers',
+            description: pdfLocalization.professionalHeaders,
             builder: _buildReportHeaderTest,
           ),
           JobFeature(
             name: 'SummarySection',
-            description: 'Totals & calculations',
+            description: pdfLocalization.totalsAndCalculations,
             builder: _buildSummarySectionTest,
           ),
         ],
@@ -66,22 +67,22 @@ final class JobFeatureCatalog {
         features: [
           JobFeature(
             name: 'TaxInvoice',
-            description: 'ZATCA invoice template',
+            description: pdfLocalization.zatcaInvoiceTemplate,
             builder: _buildTaxInvoiceTest,
           ),
           JobFeature(
             name: 'TrialBalance',
-            description: 'Trial balance report',
+            description: pdfLocalization.trialBalanceReport,
             builder: _buildTrialBalanceTest,
           ),
           JobFeature(
             name: 'CustomerStatement',
-            description: 'Account statement',
+            description: pdfLocalization.accountStatement2,
             builder: _buildCustomerStatementTest,
           ),
           JobFeature(
             name: 'InventoryReport',
-            description: 'Inventory valuation',
+            description: pdfLocalization.inventoryValuation,
             builder: _buildInventoryReportTest,
           ),
         ],
@@ -93,22 +94,22 @@ final class JobFeatureCatalog {
         features: [
           JobFeature(
             name: 'BalanceSheet',
-            description: 'Balance sheet report',
+            description: pdfLocalization.balanceSheetReport,
             builder: _buildBalanceSheetTest,
           ),
           JobFeature(
             name: 'IncomeStatement',
-            description: 'P&L statement',
+            description: pdfLocalization.pAndLStatement,
             builder: _buildIncomeStatementTest,
           ),
           JobFeature(
             name: 'CashFlow',
-            description: 'Cash flow statement',
+            description: pdfLocalization.cashFlowStatement2,
             builder: _buildCashFlowTest,
           ),
           JobFeature(
             name: 'BudgetReport',
-            description: 'Budget vs actual',
+            description: pdfLocalization.budgetVsActual2,
             builder: _buildBudgetReportTest,
           ),
         ],
@@ -120,22 +121,22 @@ final class JobFeatureCatalog {
         features: [
           JobFeature(
             name: 'Quotation',
-            description: 'Price quotation',
+            description: pdfLocalization.priceQuotation,
             builder: _buildQuotationTest,
           ),
           JobFeature(
             name: 'PurchaseOrder',
-            description: 'Purchase order',
+            description: pdfLocalization.purchaseOrder2,
             builder: _buildPurchaseOrderTest,
           ),
           JobFeature(
             name: 'DeliveryNote',
-            description: 'Delivery note',
+            description: pdfLocalization.deliveryNote2,
             builder: _buildDeliveryNoteTest,
           ),
           JobFeature(
             name: 'Payslip',
-            description: 'Employee payslip',
+            description: pdfLocalization.employeePayslip,
             builder: _buildPayslipTest,
           ),
         ],
@@ -147,17 +148,17 @@ final class JobFeatureCatalog {
         features: [
           JobFeature(
             name: 'Watermark',
-            description: 'Text watermarks',
+            description: pdfLocalization.textWatermarks,
             builder: _buildWatermarkTest,
           ),
           JobFeature(
             name: 'TiledWatermark',
-            description: 'Tiled pattern watermark',
+            description: pdfLocalization.tiledPatternWatermark,
             builder: _buildTiledWatermarkTest,
           ),
           JobFeature(
             name: 'DigitalSignature',
-            description: 'Signature appearance',
+            description: pdfLocalization.signatureAppearance,
             builder: _buildDigitalSignatureTest,
           ),
         ],
@@ -171,17 +172,17 @@ final class JobFeatureCatalog {
         features: [
           // JobFeature(
           //   name: 'Service Vouchers',
-          //   description: 'Accounting & receipts',
+          //   description: pdfLocalization.accountingAndReceipts,
           //   builder: _buildServiceVouchersTest,
           // ),
           // JobFeature(
           //   name: 'Banking Vouchers',
-          //   description: 'Deposit, withdrawal, transfer',
+          //   description: pdfLocalization.depositWithdrawalTransfer,
           //   builder: _buildBankingVouchersTest,
           // ),
           // JobFeature(
           //   name: 'Remittance Vouchers',
-          //   description: 'Domestic & international',
+          //   description: pdfLocalization.domesticAndInternational,
           //   builder: _buildRemittanceVouchersTest,
           // ),
         ],
@@ -193,22 +194,22 @@ final class JobFeatureCatalog {
         features: [
           JobFeature(
             name: 'Advanced Layout',
-            description: 'Columns & headers',
+            description: pdfLocalization.columnsAndHeaders,
             builder: _buildAdvancedLayoutTest,
           ),
           JobFeature(
             name: 'Position Tracking',
-            description: 'Precise layout control',
+            description: pdfLocalization.preciseLayoutControl,
             builder: _buildPositionTrackingTest,
           ),
           // JobFeature(
           //   name: 'Smart Space',
-          //   description: 'Auto page breaks',
+          //   description: pdfLocalization.autoPageBreaks,
           //   builder: _buildSmartSpaceTest,
           // ),
           // JobFeature(
           //   name: 'Report Composer',
-          //   description: 'Fluent API demo',
+          //   description: pdfLocalization.fluentApiDemo,
           //   builder: _buildReportComposerTest,
           // ),
         ],
@@ -224,12 +225,12 @@ final class JobFeatureCatalog {
         features: [
           JobFeature(
             name: 'Multi-Grid',
-            description: 'Multiple grids & summaries',
+            description: pdfLocalization.multipleGridsAndSummaries,
             builder: _buildMultiGridSummaryTest,
           ),
           JobFeature(
             name: 'QR & Attachments',
-            description: 'Barcodes & images',
+            description: pdfLocalization.barcodesAndImages,
             builder: _buildQRAttachmentsTest,
           ),
         ],
@@ -250,11 +251,11 @@ final class JobFeatureCatalog {
           config: _config,
           columns: [
             GeniusPdfGridColumn(
-                id: 'code', title: 'Code', titleAr: 'الرمز', width: 60),
+                id: 'code', title: pdfLocalization.code, titleAr: 'الرمز', width: 60),
             GeniusPdfGridColumn(
-                id: 'name', title: 'Name', titleAr: 'الاسم', flexFactor: 2),
+                id: 'name', title: pdfLocalization.name, titleAr: 'الاسم', flexFactor: 2),
             GeniusPdfGridColumn.currency(
-                id: 'amount', title: 'Amount', titleAr: 'المبلغ'),
+                id: 'amount', title: pdfLocalization.amount, titleAr: 'المبلغ'),
           ],
           rows: [
             GeniusPdfGridRow(cells: {
@@ -359,17 +360,17 @@ final class JobFeatureCatalog {
       buildContent: (builder) {
         final box = GeniusPdfInfoBox(
           config: localConfig,
-          title: 'Customer Details',
+          title: pdfLocalization.customerDetails,
           titleAr: 'تفاصيل العميل',
           items: [
             GeniusPdfLabeledValue(
                 config: localConfig,
-                label: 'Name',
+                label: pdfLocalization.name,
                 labelAr: 'الاسم',
                 value: 'Ahmed Mohammed'),
             GeniusPdfLabeledValue(
                 config: localConfig,
-                label: 'Phone',
+                label: pdfLocalization.phone,
                 labelAr: 'الهاتف',
                 value: '+966 12 345 6789'),
           ],
@@ -391,7 +392,7 @@ final class JobFeatureCatalog {
       buildContent: (builder) {
         final header = GeniusPdfReportHeader(
           config: _config,
-          title: 'Sales Report',
+          title: pdfLocalization.salesReport,
           titleAr: 'تقرير المبيعات',
           subtitle: 'January 2025',
           subtitleAr: 'يناير 2025',
@@ -420,15 +421,15 @@ final class JobFeatureCatalog {
           config: builder.config,
           items: [
             GeniusPdfSummaryItem(
-                label: 'Subtotal',
+                label: pdfLocalization.subtotal,
                 labelAr: 'المجموع الفرعي',
                 value: '10,000.00 SAR'),
             GeniusPdfSummaryItem(
-                label: 'VAT (15%)',
+                label: pdfLocalization.vat15Percent,
                 labelAr: 'ضريبة (15%)',
                 value: '1,500.00 SAR'),
             GeniusPdfSummaryItem.total(
-                label: 'Grand Total',
+                label: pdfLocalization.grandTotal,
                 labelAr: 'الإجمالي',
                 value: '11,500.00 SAR'),
           ],
@@ -487,7 +488,7 @@ final class JobFeatureCatalog {
     final data = BalanceSheetData(
       reportDate: DateTime.now(),
       assets: BalanceSheetSection(
-        title: 'Assets',
+        title: pdfLocalization.assets,
         titleAr: 'الأصول',
         items: [
           const BalanceSheetItem(
@@ -498,7 +499,7 @@ final class JobFeatureCatalog {
         ],
       ),
       liabilities: BalanceSheetSection(
-        title: 'Liabilities',
+        title: pdfLocalization.liabilities,
         titleAr: 'الالتزامات',
         items: [
           const BalanceSheetItem(
@@ -509,7 +510,7 @@ final class JobFeatureCatalog {
         ],
       ),
       equity: BalanceSheetSection(
-        title: 'Equity',
+        title: pdfLocalization.equity,
         titleAr: 'حقوق الملكية',
         items: [
           const BalanceSheetItem(
@@ -533,7 +534,7 @@ final class JobFeatureCatalog {
       periodStart: DateTime(2026, 1, 1),
       periodEnd: DateTime(2026, 1, 31),
       revenue: IncomeStatementSection(
-        title: 'Revenue',
+        title: pdfLocalization.revenue,
         titleAr: 'الإيرادات',
         items: [
           const IncomeStatementItem(
@@ -544,7 +545,7 @@ final class JobFeatureCatalog {
         ],
       ),
       costOfSales: IncomeStatementSection(
-        title: 'Cost of Sales',
+        title: pdfLocalization.costOfSales,
         titleAr: 'تكلفة المبيعات',
         items: [
           const IncomeStatementItem(
@@ -555,7 +556,7 @@ final class JobFeatureCatalog {
         ],
       ),
       operatingExpenses: IncomeStatementSection(
-        title: 'Operating Expenses',
+        title: pdfLocalization.operatingExpenses,
         titleAr: 'المصروفات التشغيلية',
         items: [
           const IncomeStatementItem(
@@ -583,8 +584,8 @@ final class JobFeatureCatalog {
           type: CashFlowActivityType.operating,
           title: '',
           items: [
-            const CashFlowItem(
-                description: 'Cash from customers',
+             CashFlowItem(
+                description: pdfLocalization.cashFromCustomers,
                 descriptionAr: 'النقد من العملاء',
                 amount: 480000),
           ]),
@@ -592,8 +593,8 @@ final class JobFeatureCatalog {
           type: CashFlowActivityType.investing,
           title: '',
           items: [
-            const CashFlowItem(
-                description: 'Equipment purchase',
+             CashFlowItem(
+                description: pdfLocalization.equipmentPurchase,
                 descriptionAr: 'شراء معدات',
                 amount: -50000),
           ]),
@@ -601,8 +602,8 @@ final class JobFeatureCatalog {
           type: CashFlowActivityType.financing,
           title: '',
           items: [
-            const CashFlowItem(
-                description: 'Bank loan',
+             CashFlowItem(
+                description: pdfLocalization.bankLoan,
                 descriptionAr: 'قرض بنكي',
                 amount: 100000),
           ]),
@@ -623,7 +624,7 @@ final class JobFeatureCatalog {
       periodStart: DateTime(2026, 1, 1),
       periodEnd: DateTime(2026, 1, 31),
       sections: [
-        BudgetSection(title: 'Revenue', titleAr: 'الإيرادات', items: [
+        BudgetSection(title: pdfLocalization.revenue, titleAr: 'الإيرادات', items: [
           const BudgetItem(
               category: 'Sales',
               categoryAr: 'المبيعات',
@@ -654,9 +655,9 @@ final class JobFeatureCatalog {
       quotationDate: DateTime.now(),
       validUntil: DateTime.now().add(const Duration(days: 30)),
       items: [
-        const QuotationItem(
+         QuotationItem(
             itemNumber: 1,
-            description: 'Product A',
+            description: pdfLocalization.productA,
             descriptionAr: 'منتج أ',
             quantity: 5,
             unitPrice: 1000),
@@ -685,10 +686,10 @@ final class JobFeatureCatalog {
       poDate: DateTime.now(),
       expectedDeliveryDate: DateTime.now().add(const Duration(days: 14)),
       items: [
-        const PurchaseOrderItem(
+         PurchaseOrderItem(
             itemNumber: 1,
             productCode: 'P001',
-            description: 'Item A',
+            description: pdfLocalization.itemA,
             descriptionAr: 'مادة أ',
             quantity: 10,
             unitPrice: 500),
@@ -717,10 +718,10 @@ final class JobFeatureCatalog {
       deliveryNumber: 'DN-2026-001',
       deliveryDate: DateTime.now(),
       items: [
-        const DeliveryItem(
+         DeliveryItem(
             itemNumber: 1,
             productCode: 'P001',
-            description: 'Widget',
+            description: pdfLocalization.widget,
             descriptionAr: 'منتج',
             orderedQty: 100,
             deliveredQty: 100,
@@ -755,12 +756,12 @@ final class JobFeatureCatalog {
       workingDays: 22,
       paidDays: 22,
       earnings: [
-        const EarningsItem(
-            description: 'Basic', descriptionAr: 'الراتب', amount: 15000)
+         EarningsItem(
+            description: pdfLocalization.basic, descriptionAr: 'الراتب', amount: 15000)
       ],
       deductions: [
-        const DeductionsItem(
-            description: 'GOSI', descriptionAr: 'التأمينات', amount: 1462.50)
+         DeductionsItem(
+            description: pdfLocalization.gosi, descriptionAr: 'التأمينات', amount: 1462.50)
       ],
     );
     return PayslipTemplate(

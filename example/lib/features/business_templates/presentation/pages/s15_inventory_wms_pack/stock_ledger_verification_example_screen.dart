@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s15_inventory_wms_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S15 verification example for Stock Ledger.
 class S15StockLedgerVerificationExampleScreen extends StatelessWidget {
   const S15StockLedgerVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S15StockLedgerVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S15 Inventory & WMS Pack',
-      title: 'Stock Ledger',
-      description: 'Focused S15 verification for Stock Ledger. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.stockLedger,
+      description: pdfLocalization.s15StockLedgerVerify,
       apiName: 'buildS15StockLedgerVerificationPdf',
       icon: Icons.inventory_2_outlined,
       generator: buildS15StockLedgerVerificationPdf,

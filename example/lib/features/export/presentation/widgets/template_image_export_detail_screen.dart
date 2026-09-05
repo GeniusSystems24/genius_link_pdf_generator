@@ -8,6 +8,7 @@ import 'package:genius_pdf_example/features/export/models/documents/template_ima
 import 'package:genius_pdf_example/shared/presentation/controllers/demo_document_controller.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Signature used by focused template-image-export examples.
 typedef TemplateImageExporter = Future<TemplateImageExportResult> Function({
   required bool isRtl,
@@ -157,7 +158,7 @@ class _TemplateImageExportDetailScreenState
       icon: widget.icon,
       contentTitle: 'Image preview',
       contentDescription:
-          'The preview uses the same exported bytes saved by this example.',
+          pdfLocalization.previewExportedBytesSavedExampleDesc,
       settings: _buildSettings(),
       actions: <Widget>[
         FilledButton.icon(
@@ -205,9 +206,9 @@ class _TemplateImageExportDetailScreenState
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
         SegmentedButton<bool>(
-          segments: const <ButtonSegment<bool>>[
-            ButtonSegment<bool>(value: false, label: Text('LTR')),
-            ButtonSegment<bool>(value: true, label: Text('RTL')),
+          segments: <ButtonSegment<bool>>[
+            ButtonSegment<bool>(value: false, label: Text(pdfLocalization.ltr)),
+            ButtonSegment<bool>(value: true, label: Text(pdfLocalization.rtl)),
           ],
           selected: <bool>{_isRtl},
           onSelectionChanged: _running || _opening
@@ -215,15 +216,15 @@ class _TemplateImageExportDetailScreenState
               : (selection) => _setRtl(selection.first),
         ),
         SegmentedButton<GeniusExportFormat>(
-          segments: const <ButtonSegment<GeniusExportFormat>>[
+          segments: <ButtonSegment<GeniusExportFormat>>[
             ButtonSegment<GeniusExportFormat>(
               value: GeniusExportFormat.png,
-              label: Text('PNG'),
+              label: Text(pdfLocalization.png),
               icon: Icon(Icons.image_outlined),
             ),
             ButtonSegment<GeniusExportFormat>(
               value: GeniusExportFormat.jpeg,
-              label: Text('JPEG'),
+              label: Text(pdfLocalization.jpeg),
               icon: Icon(Icons.photo_outlined),
             ),
           ],
@@ -275,7 +276,7 @@ class _ImagePreview extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     if (running) {
-      return const SizedBox(
+      return  SizedBox(
         height: 560,
         child: Center(
           child: Column(
@@ -283,7 +284,7 @@ class _ImagePreview extends StatelessWidget {
             children: <Widget>[
               CircularProgressIndicator(),
               SizedBox(height: 12),
-              Text('Rasterizing template pages…'),
+              Text(pdfLocalization.rasterizingTemplatePages),
             ],
           ),
         ),
@@ -308,7 +309,7 @@ class _ImagePreview extends StatelessWidget {
 
     final value = result;
     if (value == null) {
-      return const SizedBox(
+      return  SizedBox(
         height: 560,
         child: Center(
           child: Column(
@@ -316,9 +317,9 @@ class _ImagePreview extends StatelessWidget {
             children: <Widget>[
               Icon(Icons.image_search_outlined, size: 48),
               SizedBox(height: 12),
-              Text('No exported image yet'),
+              Text(pdfLocalization.noExportedImageYet),
               SizedBox(height: 6),
-              Text('Press Run export to generate and preview the template.'),
+              Text(pdfLocalization.pressRunExportGeneratePreviewDesc),
             ],
           ),
         ),
@@ -335,14 +336,14 @@ class _ImagePreview extends StatelessWidget {
             const Spacer(),
             if (value.pages.length > 1) ...<Widget>[
               IconButton(
-                tooltip: 'Previous page',
+                tooltip: pdfLocalization.previousPage,
                 onPressed: safeIndex > 0
                     ? () => onPageChanged(safeIndex - 1)
                     : null,
                 icon: const Icon(Icons.chevron_left_rounded),
               ),
               IconButton(
-                tooltip: 'Next page',
+                tooltip: pdfLocalization.nextPage,
                 onPressed: safeIndex < value.pages.length - 1
                     ? () => onPageChanged(safeIndex + 1)
                     : null,

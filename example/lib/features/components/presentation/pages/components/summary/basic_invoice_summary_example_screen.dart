@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Basic Invoice Summary**.
 ///
@@ -12,6 +13,7 @@ class BasicInvoiceSummaryExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Basic Invoice Summary** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -79,12 +81,12 @@ class BasicInvoiceSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'summary_basic_invoice',
       category: 'Components / Core PDF Components / Summary',
-      title: 'Basic Invoice Summary',
+      title: pdfLocalization.basicInvoiceSummary,
       apiName: 'GeniusPdfSummarySection',
-      description: 'Build an invoice summary with regular, negative, separator, and grand-total summary items.',
+      description: pdfLocalization.invoiceSummaryRegularNegativeDesc,
       icon: Icons.receipt_long_outlined,
       usageCode: dartUsageCode,
     );

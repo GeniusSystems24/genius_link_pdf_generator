@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Mixed Links & Styles**.
 ///
@@ -12,6 +13,7 @@ class WebLinkMixedStylesExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Mixed Links & Styles** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -87,12 +89,12 @@ class WebLinkMixedStylesDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'web_link_mixed_styles',
       category: 'Components / Core PDF Components / Web Links',
-      title: 'Mixed Links & Styles',
+      title: pdfLocalization.mixedLinksAndStyles,
       apiName: 'GeniusPdfTextSpan.webLink',
-      description: 'Combine bold text, multiple colored links, mailto links, and ordinary formatted text in one rich-text flow.',
+      description: pdfLocalization.boldTextMultipleColoredLinksMailtoDesc,
       icon: Icons.format_color_text_outlined,
       usageCode: dartUsageCode,
     );

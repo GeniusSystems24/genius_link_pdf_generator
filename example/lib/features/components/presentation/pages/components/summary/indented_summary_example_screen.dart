@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Indented Hierarchy**.
 ///
@@ -12,6 +13,7 @@ class IndentedSummaryExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Indented Hierarchy** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -104,12 +106,12 @@ class IndentedSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'summary_indented',
       category: 'Components / Core PDF Components / Summary',
-      title: 'Indented Hierarchy',
+      title: pdfLocalization.indentedHierarchy,
       apiName: 'GeniusPdfSummarySection',
-      description: 'Build hierarchical summary rows using indentation levels, subtotals, separators, and a final total.',
+      description: pdfLocalization.hierarchicalSummaryRowsIndentationDesc,
       icon: Icons.format_indent_increase_outlined,
       usageCode: dartUsageCode,
     );

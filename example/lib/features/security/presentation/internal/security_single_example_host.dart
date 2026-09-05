@@ -7,6 +7,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 enum SecurityExampleKind {
   confidentialWatermark,
   draftWatermark,
@@ -791,7 +792,7 @@ class _SecuritySingleExampleHostState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content:
-                  const Text('Comprehensive demo generated! Password: demo123'),
+                   Text(pdfLocalization.comprehensiveDemoGeneratedPasswordDemo),
               backgroundColor: Theme.of(context).colorScheme.primary,
               behavior: SnackBarBehavior.floating,
               shape:
@@ -936,7 +937,7 @@ class _SecuritySingleExampleHostState
           child: SizedBox(
             height: 680,
             child: data == null
-                ? const Center(
+                ?  Center(
                     child: Padding(
                       padding: EdgeInsets.all(24),
                       child: Column(
@@ -944,11 +945,10 @@ class _SecuritySingleExampleHostState
                         children: [
                           Icon(Icons.picture_as_pdf_outlined, size: 48),
                           SizedBox(height: 12),
-                          Text('No PDF generated yet'),
+                          Text(pdfLocalization.noPdfGeneratedYet),
                           SizedBox(height: 6),
                           Text(
-                            'Press Run example to generate the document and '
-                            'show its PDF preview here.',
+                            pdfLocalization.pressRunExampleGenerateDocumentShowDesc,
                             textAlign: TextAlign.center,
                           ),
                         ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Budget Report business template to PNG or JPEG images.
 class BudgetReportImageExportExampleScreen extends StatelessWidget {
   const BudgetReportImageExportExampleScreen({super.key});
@@ -69,8 +70,8 @@ Future<TemplateImageExportResult> exportBudgetReportTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Budget Report',
-      description: 'Generate the Budget Report template, rasterize every PDF page, save it as PNG or JPEG, and preview the exported image bytes.',
+      title: pdfLocalization.budgetReport,
+      description: pdfLocalization.budgetReportImageExportDesc,
       icon: Icons.pie_chart_outline,
       exportTemplate: exportBudgetReportTemplateAsImages,
       usageCode: dartUsageCode,

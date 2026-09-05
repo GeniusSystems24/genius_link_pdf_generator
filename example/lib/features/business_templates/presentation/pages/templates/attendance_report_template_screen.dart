@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/hr_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Attendance Report business template.
 class AttendanceReportTemplateScreen extends StatelessWidget {
   const AttendanceReportTemplateScreen({super.key});
@@ -55,11 +56,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'HR Documents',
-      title: 'Attendance Report',
+      title: pdfLocalization.attendanceReport,
       titleAr: 'تقرير الحضور',
-      description: 'Attendance summary with working days, statuses, and working hours.',
+      description: pdfLocalization.attendanceSummaryWorkingDaysStatusesDesc,
       icon: Icons.fact_check_outlined,
       buildTemplate: buildAttendanceReportDemo,
       usageCode: dartUsageCode,

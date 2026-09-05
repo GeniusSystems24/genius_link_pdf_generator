@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Saudi Style Header**.
 ///
@@ -12,6 +13,7 @@ class SaudiStyleHeaderExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'package:flutter/material.dart' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Saudi Style Header** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -123,12 +125,12 @@ class SaudiStyleHeaderDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'headers_saudi_style',
       category: 'Components / Core PDF Components / Headers',
-      title: 'Saudi Style Header',
+      title: pdfLocalization.saudiStyleHeader,
       apiName: 'GeniusPdfReportHeader',
-      description: 'Official Saudi-themed bilingual header with Arabic-first title order and green identity styling.',
+      description: pdfLocalization.officialSaudiThemedBilingualHeaderDesc,
       icon: Icons.account_balance_outlined,
       usageCode: dartUsageCode,
     );

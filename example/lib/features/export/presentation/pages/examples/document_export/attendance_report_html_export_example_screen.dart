@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Attendance Report business template to HTML.
 class AttendanceReportHtmlExportExampleScreen extends StatelessWidget {
   const AttendanceReportHtmlExportExampleScreen({super.key});
@@ -61,8 +62,8 @@ Future<TemplateHtmlExportResult> exportAttendanceReportTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'HR Templates',
-      title: 'Attendance Report',
-      description: 'Generate the Attendance Report template and export its PDF content to an HTML document using GeniusPdfExportService. Preview the exact HTML source, save it, and open the exported file.',
+      title: pdfLocalization.attendanceReport,
+      description: pdfLocalization.attendanceReportHtmlExportDesc,
       icon: Icons.schedule_outlined,
       exportTemplate: exportAttendanceReportTemplateAsHtml,
       usageCode: dartUsageCode,

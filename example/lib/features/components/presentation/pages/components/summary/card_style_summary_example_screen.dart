@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Card Style**.
 ///
@@ -12,6 +13,7 @@ class CardStyleSummaryExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Card Style** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -74,12 +76,12 @@ class CardStyleSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'summary_style_card',
       category: 'Components / Core PDF Components / Summary',
-      title: 'Card Style',
+      title: pdfLocalization.cardStyle,
       apiName: 'GeniusPdfSummarySection',
-      description: 'Render the same summary data with GeniusPdfSummaryStyle.card().',
+      description: pdfLocalization.summaryDataGeniusPdfSummaryStyleCardDesc,
       icon: Icons.crop_7_5_outlined,
       usageCode: dartUsageCode,
     );

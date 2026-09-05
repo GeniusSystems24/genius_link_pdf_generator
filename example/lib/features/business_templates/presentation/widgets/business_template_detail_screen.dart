@@ -7,6 +7,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 import 'package:genius_pdf_example/features/business_templates/models/documents/shared_build.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Builds one of the business-template demo documents for the requested
 /// direction.
 typedef BusinessTemplateDemoBuilder = NewTemplatesDemoBuild Function({
@@ -351,15 +352,15 @@ class _TemplateDetailHeader extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               SegmentedButton<bool>(
-                segments: const [
+                segments:  [
                   ButtonSegment<bool>(
                     value: false,
-                    label: Text('LTR'),
+                    label: Text(pdfLocalization.ltr),
                     icon: Icon(Icons.format_textdirection_l_to_r_rounded),
                   ),
                   ButtonSegment<bool>(
                     value: true,
-                    label: Text('RTL'),
+                    label: Text(pdfLocalization.rtl),
                     icon: Icon(Icons.format_textdirection_r_to_l_rounded),
                   ),
                 ],
@@ -443,7 +444,7 @@ class _PreviewPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionSurface(
-      title: 'PDF Preview',
+      title: pdfLocalization.pdfPreview,
       subtitle: 'The document is generated only after you run the example.',
       icon: Icons.picture_as_pdf_outlined,
       child: _buildContent(context),
@@ -452,10 +453,10 @@ class _PreviewPanel extends StatelessWidget {
 
   Widget _buildContent(BuildContext context) {
     if (executing) {
-      return const _PreviewWaitingState(
+      return  _PreviewWaitingState(
         icon: Icons.hourglass_top_rounded,
-        title: 'Generating preview…',
-        message: 'The selected example is being executed.',
+        title: pdfLocalization.generatingPreview,
+        message: pdfLocalization.theSelectedExampleIsBeingExecuted,
         loading: true,
       );
     }
@@ -463,7 +464,7 @@ class _PreviewPanel extends StatelessWidget {
     if (error != null) {
       return _PreviewWaitingState(
         icon: Icons.error_outline_rounded,
-        title: 'Generation failed',
+        title: pdfLocalization.generationFailed,
         message: error.toString(),
         error: true,
       );
@@ -471,10 +472,10 @@ class _PreviewPanel extends StatelessWidget {
 
     final data = pdfData;
     if (data == null) {
-      return const _PreviewWaitingState(
+      return  _PreviewWaitingState(
         icon: Icons.play_circle_outline_rounded,
-        title: 'Ready to run',
-        message: 'Press “Run example” to generate this document and display its PDF preview.',
+        title: pdfLocalization.readyToRun,
+        message: pdfLocalization.pressRunExampleGenerateDocumentDesc,
       );
     }
 
@@ -557,14 +558,14 @@ class _UsageCodePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionSurface(
-      title: 'Dart usage code',
+      title: pdfLocalization.dartUsageCode,
       subtitle: 'Copy or adapt the exact demo-builder code used to create this PDF template.',
       icon: Icons.code_rounded,
       padding: EdgeInsets.zero,
       child: LayoutBuilder(
         builder: (context, constraints) {
           return CodeViewer(
-            title: 'Dart usage code',
+            title: pdfLocalization.dartUsageCode,
             code: code,
             height: constraints.maxHeight,
           );

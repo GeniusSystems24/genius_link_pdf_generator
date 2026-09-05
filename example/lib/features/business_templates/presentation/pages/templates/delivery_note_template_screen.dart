@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/sales_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Delivery Note business template.
 class DeliveryNoteTemplateScreen extends StatelessWidget {
   const DeliveryNoteTemplateScreen({super.key});
@@ -68,11 +69,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'Sales Documents',
-      title: 'Delivery Note',
+      title: pdfLocalization.deliveryNote,
       titleAr: 'إشعار تسليم',
-      description: 'Shipment and delivery confirmation with recipient and quantity details.',
+      description: pdfLocalization.shipmentDeliveryConfirmationDesc,
       icon: Icons.local_shipping_outlined,
       buildTemplate: buildDeliveryNoteDemo,
       usageCode: dartUsageCode,

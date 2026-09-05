@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_syntax_view/flutter_syntax_view.dart';
 import 'package:super_core/super_core.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 class CodeViewer extends StatelessWidget {
   const CodeViewer({
     super.key,
@@ -70,14 +71,14 @@ class CodeViewer extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.copy_rounded, size: 18),
-                  tooltip: 'Copy code',
+                  tooltip: pdfLocalization.copyCode,
                   onPressed: () async {
                     await Clipboard.setData(ClipboardData(text: code));
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                       SnackBar(
                         behavior: SnackBarBehavior.floating,
-                        content: Text('Code copied to clipboard'),
+                        content: Text(pdfLocalization.codeCopiedToClipboard),
                       ),
                     );
                   },

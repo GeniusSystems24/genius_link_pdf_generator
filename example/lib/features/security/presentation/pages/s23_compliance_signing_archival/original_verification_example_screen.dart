@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/security/models/documents/s23_compliance_signing_archival_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S23 verification example for Original.
 class S23OriginalVerificationExampleScreen extends StatelessWidget {
   const S23OriginalVerificationExampleScreen({super.key});
@@ -21,8 +22,8 @@ class S23OriginalVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S23 Compliance, Signing & Archival',
-      title: 'Original',
-      description: 'Focused S23 verification for Original. Generate this example independently, inspect the PDF output, and compare LTR and RTL without switching to another scenario.',
+      title: pdfLocalization.original,
+      description: pdfLocalization.s23OriginalVerify,
       apiName: 'buildS23OriginalVerificationPdf',
       icon: Icons.verified_user_outlined,
       generator: buildS23OriginalVerificationPdf,

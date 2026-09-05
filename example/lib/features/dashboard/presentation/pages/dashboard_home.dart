@@ -6,6 +6,7 @@ import 'package:genius_pdf_example/shared/presentation/widgets/example_page_shel
 import 'package:genius_pdf_example/shared/presentation/widgets/example_section.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_card.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 class DashboardHome extends StatelessWidget {
   const DashboardHome({super.key, required this.onNavigate});
 
@@ -14,44 +15,44 @@ class DashboardHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExamplePageShell(
-      title: 'Genius Link PDF Generator',
+      title: pdfLocalization.geniusLinkPdfGenerator,
       description:
-          'Explore document generation, reusable PDF components, RTL/LTR behavior, templates, delivery workflows, job queues, security, and advanced package modules without losing any existing example coverage.',
+          pdfLocalization.documentGenerationReusablePdfDesc,
       leading: const Icon(Icons.picture_as_pdf_outlined),
       actions: <Widget>[
         FilledButton.icon(
           onPressed: () => onNavigate('examples'),
           icon: const Icon(Icons.play_arrow_rounded),
-          label: const Text('Open showcase'),
+          label:  Text(pdfLocalization.openShowcase),
         ),
         OutlinedButton.icon(
           onPressed: () => onNavigate('s00_baseline'),
           icon: const Icon(Icons.fact_check_outlined),
-          label: const Text('Getting started'),
+          label:  Text(pdfLocalization.gettingStarted),
         ),
       ],
       children: <Widget>[
         _PackageSummary(onNavigate: onNavigate),
         _FeatureGrid(onNavigate: onNavigate),
         ExampleSection(
-          title: 'Coverage is preserved',
+          title: pdfLocalization.coverageIsPreserved,
           description:
-              'The navigation keeps the original S00-S26 verification modules and all existing demos as separate destinations. Similar examples are grouped together rather than merged or removed.',
+              pdfLocalization.navigationKeepsOriginalS00S26Desc,
           leading: const Icon(Icons.verified_outlined),
           child: Wrap(
             spacing: context.superTheme.spacing.space2,
             runSpacing: context.superTheme.spacing.space2,
-            children: const <Widget>[
-              Chip(label: Text('S00-S26 modules')),
-              Chip(label: Text('Components')),
-              Chip(label: Text('Templates')),
-              Chip(label: Text('Reports')),
-              Chip(label: Text('Export')),
-              Chip(label: Text('Printing')),
-              Chip(label: Text('Sharing')),
-              Chip(label: Text('Security')),
-              Chip(label: Text('Job queue')),
-              Chip(label: Text('AI / Advanced')),
+            children:  <Widget>[
+              Chip(label: Text(pdfLocalization.s00S26Modules)),
+              Chip(label: Text(pdfLocalization.components)),
+              Chip(label: Text(pdfLocalization.templates)),
+              Chip(label: Text(pdfLocalization.reports)),
+              Chip(label: Text(pdfLocalization.exportText)),
+              Chip(label: Text(pdfLocalization.printing)),
+              Chip(label: Text(pdfLocalization.sharing)),
+              Chip(label: Text(pdfLocalization.security)),
+              Chip(label: Text(pdfLocalization.jobQueue)),
+              Chip(label: Text(pdfLocalization.aiAdvanced)),
             ],
           ),
         ),
@@ -68,9 +69,9 @@ class _PackageSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExampleSection(
-      title: 'Start with the workflow you need',
+      title: pdfLocalization.startWithTheWorkflowYouNeed,
       description:
-          'The example application is organized by responsibility instead of release sequence. Screen codes remain searchable for developers who know the S00-S26 module names.',
+          pdfLocalization.exampleApplicationIsOrganizedDesc,
       leading: const Icon(Icons.route_outlined),
       child: Wrap(
         spacing: context.superTheme.spacing.space2,
@@ -78,27 +79,27 @@ class _PackageSummary extends StatelessWidget {
         children: <Widget>[
           ActionChip(
             avatar: const Icon(Icons.widgets_outlined, size: 18),
-            label: const Text('Components'),
+            label:  Text(pdfLocalization.components),
             onPressed: () => onNavigate('components'),
           ),
           ActionChip(
             avatar: const Icon(Icons.description_outlined, size: 18),
-            label: const Text('Templates'),
+            label:  Text(pdfLocalization.templates),
             onPressed: () => onNavigate('templates'),
           ),
           ActionChip(
             avatar: const Icon(Icons.work_history_outlined, size: 18),
-            label: const Text('Job queue'),
+            label:  Text(pdfLocalization.jobQueue),
             onPressed: () => onNavigate('job_manager'),
           ),
           ActionChip(
             avatar: const Icon(Icons.print_outlined, size: 18),
-            label: const Text('Printing'),
+            label:  Text(pdfLocalization.printing),
             onPressed: () => onNavigate('printing'),
           ),
           ActionChip(
             avatar: const Icon(Icons.speed_outlined, size: 18),
-            label: const Text('Performance'),
+            label:  Text(pdfLocalization.performance),
             onPressed: () => onNavigate('s24_performance_regression'),
           ),
         ],
@@ -115,52 +116,52 @@ class _FeatureGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <_DashboardFeature>[
-      const _DashboardFeature(
+       _DashboardFeature(
         id: 's03_flow_layout',
-        title: 'Document Builder',
-        description: 'Flow layout, pagination, page setup, and document construction.',
+        title: pdfLocalization.documentBuilder,
+        description: pdfLocalization.flowLayoutPaginationPageSetupDesc,
         icon: Icons.view_stream_outlined,
       ),
-      const _DashboardFeature(
+       _DashboardFeature(
         id: 'components',
-        title: 'Components',
-        description: 'Tables, summaries, headers, rich text, info boxes, QR combinations, and RTL cases.',
+        title: pdfLocalization.components,
+        description: pdfLocalization.tablesSummariesHeadersRichTextInfoDesc,
         icon: Icons.widgets_outlined,
       ),
-      const _DashboardFeature(
+       _DashboardFeature(
         id: 'business_balance_sheet',
-        title: 'Business Templates',
-        description: 'Open a dedicated business-template example; choose other financial, sales, and HR templates from the sidebar.',
+        title: pdfLocalization.businessTemplates,
+        description: pdfLocalization.openDedicatedBusinessTemplateExampleDesc,
         icon: Icons.business_center_outlined,
       ),
-      const _DashboardFeature(
+       _DashboardFeature(
         id: 'template_engine',
-        title: 'Template Engine',
-        description: 'Built-in templates, JSON-backed templates, vNext engine, consolidation, and designer examples.',
+        title: pdfLocalization.templateEngine,
+        description: pdfLocalization.builtTemplatesJsonBackedTemplatesVDesc,
         icon: Icons.account_tree_outlined,
       ),
-      const _DashboardFeature(
+       _DashboardFeature(
         id: 'export',
-        title: 'Delivery',
-        description: 'Export, save/open workflows, sharing, printing profiles, and security/compliance examples.',
+        title: pdfLocalization.delivery,
+        description: pdfLocalization.exportSaveOpenWorkflowsSharingDesc,
         icon: Icons.outbox_outlined,
       ),
-      const _DashboardFeature(
+       _DashboardFeature(
         id: 'job_manager',
-        title: 'Background Generation',
-        description: 'Job manager, queues, batch/background workflows, status, and result handling.',
+        title: pdfLocalization.backgroundGeneration,
+        description: pdfLocalization.jobManagerQueuesBatchBackgroundDesc,
         icon: Icons.work_history_outlined,
       ),
-      const _DashboardFeature(
+       _DashboardFeature(
         id: 'v2_architecture',
-        title: 'Architecture',
-        description: 'Application integration, advanced APIs, ERP domain calculations, and extension points.',
+        title: pdfLocalization.architecture,
+        description: pdfLocalization.applicationIntegrationAdvancedApisDesc,
         icon: Icons.architecture_outlined,
       ),
-      const _DashboardFeature(
+       _DashboardFeature(
         id: 's24_performance_regression',
-        title: 'Benchmark & Performance',
-        description: 'Regression verification and performance-oriented examples.',
+        title: pdfLocalization.benchmarkAndPerformance,
+        description: pdfLocalization.regressionVerificationPerformanceDesc,
         icon: Icons.speed_outlined,
       ),
     ];

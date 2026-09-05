@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/showcase/presentation/widgets/showcase_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Service Vouchers Showcase example.
 ///
 /// No PDF is generated until **Run example** is pressed. The `Dart usage code`
@@ -23,12 +24,12 @@ List<int> buildVoucherDemoReport({required GeniusPdfConfig config}''';
 
   @override
   Widget build(BuildContext context) {
-    return const ShowcaseExampleDetailScreen(
+    return  ShowcaseExampleDetailScreen(
       showcaseId: 'showcase_service_vouchers',
       category: 'Showcase',
-      title: 'Service Vouchers',
+      title: pdfLocalization.serviceVouchers,
       apiName: 'buildVoucherDemoReport',
-      description: 'Accounting entries, receipts, payments, tax vouchers, and check receipts in one batch.',
+      description: pdfLocalization.accountingEntriesReceiptsPaymentsTaxDesc,
       icon: Icons.receipt_long_outlined,
       usageCode: dartUsageCode,
     );

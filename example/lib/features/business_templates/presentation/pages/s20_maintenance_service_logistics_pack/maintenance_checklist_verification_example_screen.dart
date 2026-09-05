@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s20_maintenance_service_logistics_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S20 verification example for Maintenance Checklist.
 class S20MaintenanceChecklistVerificationExampleScreen extends StatelessWidget {
   const S20MaintenanceChecklistVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S20MaintenanceChecklistVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S20 Maintenance, Service & Logistics Pack',
-      title: 'Maintenance Checklist',
-      description: 'Focused S20 verification for Maintenance Checklist. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.maintenanceChecklist,
+      description: pdfLocalization.s20MaintenanceChecklistVerify,
       apiName: 'buildS20MaintenanceChecklistVerificationPdf',
       icon: Icons.local_shipping_outlined,
       generator: buildS20MaintenanceChecklistVerificationPdf,

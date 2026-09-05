@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/financial_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Balance Sheet business template.
 class BalanceSheetTemplateScreen extends StatelessWidget {
   const BalanceSheetTemplateScreen({super.key});
@@ -100,11 +101,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'Financial Reports',
-      title: 'Balance Sheet',
+      title: pdfLocalization.balanceSheet,
       titleAr: 'الميزانية العمومية',
-      description: 'Assets, liabilities, and equity in a complete financial-position statement.',
+      description: pdfLocalization.assetsLiabilitiesEquityCompleteDesc,
       icon: Icons.account_balance_wallet_outlined,
       buildTemplate: buildBalanceSheetDemo,
       usageCode: dartUsageCode,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Corporate Header & Info Groups**.
 ///
@@ -12,6 +13,7 @@ class CorporateGroupsHeaderExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'package:flutter/material.dart' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Corporate Header & Info Groups** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -125,12 +127,12 @@ class CorporateGroupsHeaderDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'headers_corporate_groups',
       category: 'Components / Core PDF Components / Headers',
-      title: 'Corporate Header & Info Groups',
+      title: pdfLocalization.corporateHeaderAndInfoGroups,
       apiName: 'GeniusPdfReportHeader',
-      description: 'Corporate report header using reusable registration and contact information groups.',
+      description: pdfLocalization.corporateReportHeaderReusableDesc,
       icon: Icons.business_outlined,
       usageCode: dartUsageCode,
     );

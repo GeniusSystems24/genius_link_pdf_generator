@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Payslip business template to PNG or JPEG images.
 class PayslipImageExportExampleScreen extends StatelessWidget {
   const PayslipImageExportExampleScreen({super.key});
@@ -69,8 +70,8 @@ Future<TemplateImageExportResult> exportPayslipTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'HR Templates',
-      title: 'Payslip',
-      description: 'Generate the Payslip template, rasterize every PDF page, save it as PNG or JPEG, and preview the exported image bytes.',
+      title: pdfLocalization.payslip,
+      description: pdfLocalization.payslipImageExportDesc,
       icon: Icons.payments_outlined,
       exportTemplate: exportPayslipTemplateAsImages,
       usageCode: dartUsageCode,

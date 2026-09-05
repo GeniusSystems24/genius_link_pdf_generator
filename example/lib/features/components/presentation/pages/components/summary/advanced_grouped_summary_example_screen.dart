@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Advanced Grouped Summary**.
 ///
@@ -12,6 +13,7 @@ class AdvancedGroupedSummaryExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Advanced Grouped Summary** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -243,12 +245,12 @@ class AdvancedGroupedSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'summary_advanced_groups',
       category: 'Components / Core PDF Components / Summary',
-      title: 'Advanced Grouped Summary',
+      title: pdfLocalization.advancedGroupedSummary,
       apiName: 'GeniusPdfSummarySection',
-      description: 'Build a P&L-style multi-group summary with custom colors, indented items, calculated sections, and advanced totals.',
+      description: pdfLocalization.pLStyleMultiGroupSummaryCustomColorsDesc,
       icon: Icons.stacked_bar_chart_outlined,
       usageCode: dartUsageCode,
     );

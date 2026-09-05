@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/financial_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Income Statement business template.
 class IncomeStatementTemplateScreen extends StatelessWidget {
   const IncomeStatementTemplateScreen({super.key});
@@ -84,11 +85,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'Financial Reports',
-      title: 'Income Statement',
+      title: pdfLocalization.incomeStatement,
       titleAr: 'قائمة الدخل',
-      description: 'Revenue, cost of sales, operating expenses, and profitability.',
+      description: pdfLocalization.revenueCostSalesOperatingExpensesDesc,
       icon: Icons.trending_up_outlined,
       buildTemplate: buildIncomeStatementDemo,
       usageCode: dartUsageCode,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/modern_vouchers/models/documents/modern_vouchers_demo_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated PDF-preview example for **Modern Sales Voucher**.
 ///
 /// The document is generated only after the user presses **Run example**.
@@ -32,8 +33,8 @@ Future<Uint8List> generateModernSalesVoucherPdf(GeniusPdfConfig config) async {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'Modern Vouchers',
-      title: 'Modern Sales Voucher',
-      description: 'Clean, official sales invoice design.',
+      title: pdfLocalization.modernSalesVoucher,
+      description: pdfLocalization.cleanOfficialSalesInvoiceDesign,
       apiName: 'generateModernSalesVoucherPdf',
       icon: Icons.shopping_cart_outlined,
       generator: generateModernSalesVoucherPdf,

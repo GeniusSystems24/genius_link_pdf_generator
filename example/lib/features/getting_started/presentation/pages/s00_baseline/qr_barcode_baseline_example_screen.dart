@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/components/models/documents/components/grid_qrcode_zatca_invoice_demo_builder.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/widgets/s00_baseline_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S00 screen for the QR / Barcode Baseline regression example.
 ///
 /// The `Dart usage code` panel contains the exact builder source executed by
@@ -269,9 +270,9 @@ class GridQrcodeZatcaInvoiceDemoBuilder extends GeniusPdfDocumentBuilder {
   @override
   Widget build(BuildContext context) {
     return S00BaselineExampleDetailScreen(
-      title: 'QR / Barcode Baseline',
+      title: pdfLocalization.qrBarcodeBaseline,
       apiName: 'GridQrcodeZatcaInvoiceDemoBuilder',
-      description: 'Verify QR rendering in document directionality scenarios using the focused ZATCA invoice QR builder.',
+      description: pdfLocalization.verifyQrRenderingDocumentDesc,
       icon: Icons.qr_code_2_outlined,
       builderFactory: (config) => GridQrcodeZatcaInvoiceDemoBuilder(config),
       usageCode: dartUsageCode,

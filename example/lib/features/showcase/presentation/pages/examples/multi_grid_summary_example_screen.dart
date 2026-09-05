@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/showcase/presentation/widgets/showcase_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Multi-Grid Summary Showcase example.
 ///
 /// No PDF is generated until **Run example** is pressed. The `Dart usage code`
@@ -282,12 +283,12 @@ class MultiGridSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ShowcaseExampleDetailScreen(
+    return  ShowcaseExampleDetailScreen(
       showcaseId: 'showcase_multi_grid_summary',
       category: 'Showcase',
-      title: 'Multi-Grid Summary',
+      title: pdfLocalization.multiGridSummary,
       apiName: 'MultiGridSummaryDemoBuilder',
-      description: 'Multiple paginated grids with section summaries and a final report summary.',
+      description: pdfLocalization.multiplePaginatedGridsSectionDesc,
       icon: Icons.table_chart_outlined,
       usageCode: dartUsageCode,
     );

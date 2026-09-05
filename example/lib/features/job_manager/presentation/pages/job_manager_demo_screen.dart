@@ -12,6 +12,7 @@ import 'package:genius_pdf_example/shared/presentation/widgets/example_panels.da
 import 'package:genius_pdf_example/shared/presentation/widgets/example_section.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/responsive_split_layout.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Demonstrates queued/background PDF generation and job lifecycle management.
 class JobManagerDemoScreen extends StatefulWidget {
   const JobManagerDemoScreen({super.key, this.controller});
@@ -95,27 +96,27 @@ await controller.openFile(filePath);''';
     final hasFinished = jobs.any((job) => job.isFinished);
 
     return ExamplePageShell(
-      title: 'Background Generation & Job Queue',
+      title: pdfLocalization.backgroundGenerationAndJobQueue,
       description:
-          'Queue multiple PDF builders, observe concurrency and lifecycle state, then retry, cancel, remove, or open completed jobs.',
+          pdfLocalization.queueMultiplePdfBuildersObserveDesc,
       leading: const Icon(Icons.work_history_outlined),
       actions: <Widget>[
         if (hasQueued)
           OutlinedButton.icon(
             onPressed: _cancelAllQueued,
             icon: const Icon(Icons.cancel_outlined),
-            label: const Text('Cancel queued'),
+            label:  Text(pdfLocalization.cancelQueued),
           ),
         if (hasFinished)
           OutlinedButton.icon(
             onPressed: _clearFinished,
             icon: const Icon(Icons.cleaning_services_outlined),
-            label: const Text('Clear finished'),
+            label:  Text(pdfLocalization.clearFinished),
           ),
         FilledButton.icon(
           onPressed: _font == null ? null : _testAllFeatures,
           icon: const Icon(Icons.playlist_add_check_rounded),
-          label: const Text('Queue all'),
+          label:  Text(pdfLocalization.queueAll),
         ),
       ],
       children: <Widget>[
@@ -130,7 +131,7 @@ await controller.openFile(filePath);''';
           primaryFlex: 10,
           secondaryFlex: 13,
           primary: ExampleSection(
-            title: 'Generation catalog',
+            title: pdfLocalization.generationCatalog,
             description: _font == null
                 ? 'Loading the demo font before builders can be queued…'
                 : 'Run one builder or enqueue every implemented builder in a category.',
@@ -143,8 +144,8 @@ await controller.openFile(filePath);''';
             ),
           ),
           secondary: ExampleSection(
-            title: 'Job queue',
-            description: 'Newest jobs appear first. Completed jobs can be opened from disk.',
+            title: pdfLocalization.jobQueue,
+            description: pdfLocalization.newestJobsAppearFirstCompletedJobsDesc,
             leading: const Icon(Icons.queue_outlined),
             child: _JobQueue(
               jobs: jobs,
@@ -156,8 +157,8 @@ await controller.openFile(filePath);''';
             ),
           ),
         ),
-        const CodePreviewPanel(
-          title: 'Dart usage code',
+         CodePreviewPanel(
+          title: pdfLocalization.dartUsageCode,
           code: _usageCode,
           height: 300,
         ),
@@ -250,10 +251,10 @@ class _JobMetrics extends StatelessWidget {
       spacing: gap,
       runSpacing: gap,
       children: <Widget>[
-        _Metric(label: 'Queued', value: queued, icon: Icons.schedule_outlined),
-        _Metric(label: 'Processing', value: processing, icon: Icons.sync_rounded),
-        _Metric(label: 'Completed', value: completed, icon: Icons.check_circle_outline),
-        _Metric(label: 'Failed', value: failed, icon: Icons.error_outline),
+        _Metric(label: pdfLocalization.queued, value: queued, icon: Icons.schedule_outlined),
+        _Metric(label: pdfLocalization.processing, value: processing, icon: Icons.sync_rounded),
+        _Metric(label: pdfLocalization.completed, value: completed, icon: Icons.check_circle_outline),
+        _Metric(label: pdfLocalization.failed, value: failed, icon: Icons.error_outline),
       ],
     );
   }
@@ -368,7 +369,7 @@ class _CategoryCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: enabled && category.features.isNotEmpty ? onRunAll : null,
                   icon: const Icon(Icons.playlist_add_rounded, size: 18),
-                  label: const Text('Queue group'),
+                  label:  Text(pdfLocalization.queueGroup),
                 ),
               ],
             ),
@@ -387,7 +388,7 @@ class _CategoryCard extends StatelessWidget {
               ],
             ),
             if (category.features.isEmpty)
-              Text('No active examples in this category.', style: context.superTextTheme.bodySm.copyWith(color: t.fg3)),
+              Text(pdfLocalization.noActiveExamplesInThisCategory, style: context.superTextTheme.bodySm.copyWith(color: t.fg3)),
           ],
         ),
       ),
@@ -422,9 +423,9 @@ class _JobQueue extends StatelessWidget {
           children: <Widget>[
             Icon(Icons.inbox_outlined, size: 42, color: context.superTheme.fg3),
             SizedBox(height: spacing.space3),
-            Text('No jobs queued', style: context.superTextTheme.titleMd.copyWith(color: context.superTheme.fg1)),
+            Text(pdfLocalization.noJobsQueued, style: context.superTextTheme.titleMd.copyWith(color: context.superTheme.fg1)),
             SizedBox(height: spacing.space1),
-            Text('Choose a generation example from the catalog.', style: context.superTextTheme.bodySm.copyWith(color: context.superTheme.fg3)),
+            Text(pdfLocalization.chooseAGenerationExampleFromTheCatalog, style: context.superTextTheme.bodySm.copyWith(color: context.superTheme.fg3)),
           ],
         ),
       );
@@ -529,14 +530,14 @@ class _JobTile extends StatelessWidget {
 
   Widget get _actions {
     if (job.status == GeniusPdfJobStatus.queued) {
-      return IconButton(onPressed: onCancel, tooltip: 'Cancel', icon: const Icon(Icons.close_rounded));
+      return IconButton(onPressed: onCancel, tooltip: pdfLocalization.cancel, icon: const Icon(Icons.close_rounded));
     }
     if (job.status == GeniusPdfJobStatus.completed && onOpen != null) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          IconButton(onPressed: onOpen, tooltip: 'Open', icon: const Icon(Icons.open_in_new_rounded)),
-          IconButton(onPressed: onRemove, tooltip: 'Remove', icon: const Icon(Icons.delete_outline_rounded)),
+          IconButton(onPressed: onOpen, tooltip: pdfLocalization.open, icon: const Icon(Icons.open_in_new_rounded)),
+          IconButton(onPressed: onRemove, tooltip: pdfLocalization.remove, icon: const Icon(Icons.delete_outline_rounded)),
         ],
       );
     }
@@ -544,13 +545,13 @@ class _JobTile extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          IconButton(onPressed: onRetry, tooltip: 'Retry', icon: const Icon(Icons.refresh_rounded)),
-          IconButton(onPressed: onRemove, tooltip: 'Remove', icon: const Icon(Icons.delete_outline_rounded)),
+          IconButton(onPressed: onRetry, tooltip: pdfLocalization.retry, icon: const Icon(Icons.refresh_rounded)),
+          IconButton(onPressed: onRemove, tooltip: pdfLocalization.remove, icon: const Icon(Icons.delete_outline_rounded)),
         ],
       );
     }
     if (job.isFinished) {
-      return IconButton(onPressed: onRemove, tooltip: 'Remove', icon: const Icon(Icons.delete_outline_rounded));
+      return IconButton(onPressed: onRemove, tooltip: pdfLocalization.remove, icon: const Icon(Icons.delete_outline_rounded));
     }
     return const SizedBox.shrink();
   }

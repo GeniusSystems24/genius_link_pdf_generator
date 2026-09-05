@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:super_core/super_core.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Semantic visual intent used by the template catalog components.
 enum TemplateCatalogTone { primary, info, success, warning, danger, neutral }
 
@@ -75,7 +76,7 @@ class TemplateCatalogPageHeader extends StatelessWidget {
                           Text(title, style: typography.headlineSm),
                           SizedBox(height: spacing.space1),
                           Text(
-                            'genius_link_pdf_generator showcase',
+                            pdfLocalization.geniusLinkPdfGeneratorShowcase,
                             style: typography.labelMd.copyWith(color: theme.fg3),
                           ),
                         ],
@@ -107,9 +108,9 @@ class TemplateCatalogPageHeader extends StatelessWidget {
                       icon: Icons.picture_as_pdf_outlined,
                       label: '$templateCount templates',
                     ),
-                    const _MetricChip(
+                     _MetricChip(
                       icon: Icons.translate_rounded,
-                      label: 'LTR + RTL',
+                      label: pdfLocalization.ltrPlusRtl,
                     ),
                   ],
                 ),
@@ -411,7 +412,7 @@ class TemplateGenerationStatus extends StatelessWidget {
           if (onDismiss != null) ...<Widget>[
             SizedBox(width: spacing.space2),
             IconButton(
-              tooltip: 'Dismiss',
+              tooltip: pdfLocalization.dismiss,
               onPressed: onDismiss,
               icon: const Icon(Icons.close_rounded),
             ),
@@ -446,24 +447,24 @@ class _DirectionControl extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('Document direction', style: context.superTextTheme.titleMd),
+          Text(pdfLocalization.documentDirection, style: context.superTextTheme.titleMd),
           SizedBox(height: spacing.space1),
           Text(
-            'Switch the generated sample between RTL and LTR content.',
+            pdfLocalization.switchGeneratedSampleBetweenRtlLtrDesc,
             style: context.superTextTheme.bodySm.copyWith(color: theme.fg2),
           ),
           SizedBox(height: spacing.space3),
           SegmentedButton<bool>(
-            segments: const <ButtonSegment<bool>>[
+            segments: <ButtonSegment<bool>>[
               ButtonSegment<bool>(
                 value: true,
                 icon: Icon(Icons.format_textdirection_r_to_l_rounded),
-                label: Text('RTL'),
+                label: Text(pdfLocalization.rtl),
               ),
               ButtonSegment<bool>(
                 value: false,
                 icon: Icon(Icons.format_textdirection_l_to_r_rounded),
-                label: Text('LTR'),
+                label: Text(pdfLocalization.ltr),
               ),
             ],
             selected: <bool>{isRtl},

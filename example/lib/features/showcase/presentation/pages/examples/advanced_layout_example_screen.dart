@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/showcase/presentation/widgets/showcase_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Advanced Layout Showcase example.
 ///
 /// No PDF is generated until **Run example** is pressed. The `Dart usage code`
@@ -240,12 +241,12 @@ class AdvancedLayoutDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ShowcaseExampleDetailScreen(
+    return  ShowcaseExampleDetailScreen(
       showcaseId: 'showcase_advanced_layout',
       category: 'Showcase',
-      title: 'Advanced Layout',
+      title: pdfLocalization.advancedLayout,
       apiName: 'AdvancedLayoutDemoBuilder',
-      description: 'Rich text, info boxes, report headers, flexible columns, and page templates.',
+      description: pdfLocalization.richTextInfoBoxesReportHeadersDesc,
       icon: Icons.dashboard_customize_outlined,
       usageCode: dartUsageCode,
     );

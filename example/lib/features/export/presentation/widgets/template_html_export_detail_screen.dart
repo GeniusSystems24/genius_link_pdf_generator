@@ -6,6 +6,7 @@ import 'package:genius_pdf_example/features/export/models/documents/template_htm
 import 'package:genius_pdf_example/shared/presentation/controllers/demo_document_controller.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Signature used by focused template-to-HTML export examples.
 typedef TemplateHtmlExporter = Future<TemplateHtmlExportResult> Function({
   required bool isRtl,
@@ -147,9 +148,9 @@ class _TemplateHtmlExportDetailScreenState
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+       SnackBar(
         behavior: SnackBarBehavior.floating,
-        content: Text('HTML copied to clipboard'),
+        content: Text(pdfLocalization.htmlCopiedToClipboard),
       ),
     );
   }
@@ -173,8 +174,7 @@ class _TemplateHtmlExportDetailScreenState
       icon: widget.icon,
       contentTitle: 'HTML output preview',
       contentDescription:
-          'The source below is decoded directly from the exact HTML bytes '
-          'returned by GeniusPdfExportService.',
+          pdfLocalization.sourceBelowIsDecodedDirectlyExactDesc,
       settings: _buildSettings(),
       actions: <Widget>[
         FilledButton.icon(
@@ -195,7 +195,7 @@ class _TemplateHtmlExportDetailScreenState
         OutlinedButton.icon(
           onPressed: result == null || _running ? null : _copyHtml,
           icon: const Icon(Icons.copy_all_outlined),
-          label: const Text('Copy HTML'),
+          label:  Text(pdfLocalization.copyHtml),
         ),
       ],
       content: _HtmlOutputPreview(
@@ -223,9 +223,9 @@ class _TemplateHtmlExportDetailScreenState
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
         SegmentedButton<bool>(
-          segments: const <ButtonSegment<bool>>[
-            ButtonSegment<bool>(value: false, label: Text('LTR')),
-            ButtonSegment<bool>(value: true, label: Text('RTL')),
+          segments: <ButtonSegment<bool>>[
+            ButtonSegment<bool>(value: false, label: Text(pdfLocalization.ltr)),
+            ButtonSegment<bool>(value: true, label: Text(pdfLocalization.rtl)),
           ],
           selected: <bool>{_isRtl},
           onSelectionChanged: _running || _opening
@@ -236,13 +236,13 @@ class _TemplateHtmlExportDetailScreenState
           selected: _includeStyles,
           onSelected: _running || _opening ? null : _setIncludeStyles,
           avatar: const Icon(Icons.style_outlined, size: 18),
-          label: const Text('Include CSS styles'),
+          label:  Text(pdfLocalization.includeCssStyles),
         ),
         FilterChip(
           selected: _embedImages,
           onSelected: _running || _opening ? null : _setEmbedImages,
           avatar: const Icon(Icons.image_outlined, size: 18),
-          label: const Text('Embed images'),
+          label:  Text(pdfLocalization.embedImages),
         ),
       ],
     );
@@ -266,7 +266,7 @@ class _HtmlOutputPreview extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     if (running) {
-      return const SizedBox(
+      return  SizedBox(
         height: 600,
         child: Center(
           child: Column(
@@ -274,7 +274,7 @@ class _HtmlOutputPreview extends StatelessWidget {
             children: <Widget>[
               CircularProgressIndicator(),
               SizedBox(height: 12),
-              Text('Converting template PDF to HTML…'),
+              Text(pdfLocalization.convertingTemplatePdfToHtml),
             ],
           ),
         ),
@@ -299,7 +299,7 @@ class _HtmlOutputPreview extends StatelessWidget {
 
     final value = result;
     if (value == null) {
-      return const SizedBox(
+      return  SizedBox(
         height: 600,
         child: Center(
           child: Column(
@@ -307,11 +307,10 @@ class _HtmlOutputPreview extends StatelessWidget {
             children: <Widget>[
               Icon(Icons.code_off_outlined, size: 48),
               SizedBox(height: 12),
-              Text('No HTML export yet'),
+              Text(pdfLocalization.noHtmlExportYet),
               SizedBox(height: 6),
               Text(
-                'Press Run export to generate the template and inspect '
-                'the exported HTML.',
+                pdfLocalization.pressRunExportGenerateTemplateDesc,
                 textAlign: TextAlign.center,
               ),
             ],

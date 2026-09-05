@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/components/models/documents/s07_erp_semantic_components_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S07 example for Reusable Composition.
 class S07CompositionVerificationExampleScreen extends StatelessWidget {
   const S07CompositionVerificationExampleScreen({super.key});
@@ -11,8 +12,8 @@ class S07CompositionVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S07 ERP Semantic Components',
-      title: 'Reusable Composition',
-      description: 'Focused S07 verification for Reusable Composition. Generate the document explicitly, inspect the PDF result, and compare LTR and RTL output without switching to another scenario.',
+      title: pdfLocalization.reusableComposition,
+      description: pdfLocalization.s07ReusableCompositionVerify,
       apiName: 'buildS07CompositionVerificationPdf',
       icon: Icons.view_module_outlined,
       generator: buildS07CompositionVerificationPdf,

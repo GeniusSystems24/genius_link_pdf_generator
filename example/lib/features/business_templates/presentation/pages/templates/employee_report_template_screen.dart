@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/hr_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Employee Report business template.
 class EmployeeReportTemplateScreen extends StatelessWidget {
   const EmployeeReportTemplateScreen({super.key});
@@ -61,11 +62,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'HR Documents',
-      title: 'Employee Report',
+      title: pdfLocalization.employeeReport,
       titleAr: 'تقرير الموظفين',
-      description: 'Employee directory/report with department, role, status, and salary data.',
+      description: pdfLocalization.employeeDirectoryReportDepartmentDesc,
       icon: Icons.badge_outlined,
       buildTemplate: buildEmployeeReportDemo,
       usageCode: dartUsageCode,

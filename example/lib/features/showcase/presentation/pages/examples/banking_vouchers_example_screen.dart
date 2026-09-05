@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/showcase/presentation/widgets/showcase_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Banking Vouchers Showcase example.
 ///
 /// No PDF is generated until **Run example** is pressed. The `Dart usage code`
@@ -18,12 +19,12 @@ List<int> buildBankingVoucherDemoReport({
 
   @override
   Widget build(BuildContext context) {
-    return const ShowcaseExampleDetailScreen(
+    return  ShowcaseExampleDetailScreen(
       showcaseId: 'showcase_banking_vouchers',
       category: 'Showcase',
-      title: 'Banking Vouchers',
+      title: pdfLocalization.bankingVouchers,
       apiName: 'buildBankingVoucherDemoReport',
-      description: 'Bank deposits, withdrawals, transfers, and bill-payment voucher examples.',
+      description: pdfLocalization.bankDepositsWithdrawalsTransfersBillDesc,
       icon: Icons.account_balance_outlined,
       usageCode: dartUsageCode,
     );

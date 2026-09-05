@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Cash Flow business template to PNG or JPEG images.
 class CashFlowImageExportExampleScreen extends StatelessWidget {
   const CashFlowImageExportExampleScreen({super.key});
@@ -69,8 +70,8 @@ Future<TemplateImageExportResult> exportCashFlowTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Cash Flow',
-      description: 'Generate the Cash Flow template, rasterize every PDF page, save it as PNG or JPEG, and preview the exported image bytes.',
+      title: pdfLocalization.cashFlow,
+      description: pdfLocalization.cashFlowImageExportDesc,
       icon: Icons.swap_vert_circle_outlined,
       exportTemplate: exportCashFlowTemplateAsImages,
       usageCode: dartUsageCode,

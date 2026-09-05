@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Shared layout used by component-oriented and document-oriented examples.
 ///
 /// [gradient] and [isDark] remain for source compatibility with the legacy
@@ -45,17 +46,17 @@ class ComponentPage extends StatelessWidget {
         spacing: 12,
         runSpacing: 8,
         children: <Widget>[
-          const Text('Text direction'),
+           Text(pdfLocalization.textDirection),
           SegmentedButton<bool>(
-            segments: const <ButtonSegment<bool>>[
+            segments: <ButtonSegment<bool>>[
               ButtonSegment<bool>(
                 value: false,
-                label: Text('LTR'),
+                label: Text(pdfLocalization.ltr),
                 icon: Icon(Icons.format_textdirection_l_to_r_rounded),
               ),
               ButtonSegment<bool>(
                 value: true,
-                label: Text('RTL'),
+                label: Text(pdfLocalization.rtl),
                 icon: Icon(Icons.format_textdirection_r_to_l_rounded),
               ),
             ],
@@ -68,7 +69,7 @@ class ComponentPage extends StatelessWidget {
       ),
       contentTitle: 'Example',
       contentDescription:
-          'Run the available action explicitly to execute this example.',
+          pdfLocalization.availableActionExplicitlyExecuteDesc,
       content: preview,
       code: codeExample,
       statusMessage: isGenerating ? 'Executing example…' : null,

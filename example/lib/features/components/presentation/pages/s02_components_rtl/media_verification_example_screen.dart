@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/components/models/documents/s02_components_rtl_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S02 example for Media Direction Policy.
 class S02MediaVerificationExampleScreen extends StatelessWidget {
   const S02MediaVerificationExampleScreen({super.key});
@@ -11,8 +12,8 @@ class S02MediaVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S02 Components RTL',
-      title: 'Media Direction Policy',
-      description: 'Focused S02 verification for Media Direction Policy. Generate the document explicitly, inspect the PDF result, and compare LTR and RTL output without switching to another scenario.',
+      title: pdfLocalization.mediaDirectionPolicy,
+      description: pdfLocalization.s02MediaDirectionPolicyVerify,
       apiName: 'buildS02MediaVerificationPdf',
       icon: Icons.compare_arrows_outlined,
       generator: buildS02MediaVerificationPdf,

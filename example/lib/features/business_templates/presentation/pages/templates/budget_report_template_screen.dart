@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/financial_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Budget Report business template.
 class BudgetReportTemplateScreen extends StatelessWidget {
   const BudgetReportTemplateScreen({super.key});
@@ -76,11 +77,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'Financial Reports',
-      title: 'Budget Report',
+      title: pdfLocalization.budgetReport,
       titleAr: 'تقرير الميزانية',
-      description: 'Budget-versus-actual comparison with variance analysis.',
+      description: pdfLocalization.budgetVersusActualComparisonVarianceDesc,
       icon: Icons.pie_chart_outline_rounded,
       buildTemplate: buildBudgetReportDemo,
       usageCode: dartUsageCode,

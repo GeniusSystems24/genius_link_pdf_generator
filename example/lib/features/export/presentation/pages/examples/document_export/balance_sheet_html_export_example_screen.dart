@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Balance Sheet business template to HTML.
 class BalanceSheetHtmlExportExampleScreen extends StatelessWidget {
   const BalanceSheetHtmlExportExampleScreen({super.key});
@@ -61,8 +62,8 @@ Future<TemplateHtmlExportResult> exportBalanceSheetTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Balance Sheet',
-      description: 'Generate the Balance Sheet template and export its PDF content to an HTML document using GeniusPdfExportService. Preview the exact HTML source, save it, and open the exported file.',
+      title: pdfLocalization.balanceSheet,
+      description: pdfLocalization.balanceSheetHtmlExportDesc,
       icon: Icons.account_balance_wallet_outlined,
       exportTemplate: exportBalanceSheetTemplateAsHtml,
       usageCode: dartUsageCode,

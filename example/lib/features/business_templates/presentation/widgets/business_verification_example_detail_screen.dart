@@ -7,6 +7,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 typedef BusinessVerificationPdfGenerator = Future<Uint8List> Function(
   GeniusPdfConfig config,
 );
@@ -133,9 +134,9 @@ class _BusinessVerificationExampleDetailScreenState
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               SegmentedButton<bool>(
-                segments: const [
-                  ButtonSegment(value: false, label: Text('LTR')),
-                  ButtonSegment(value: true, label: Text('RTL')),
+                segments:  [
+                  ButtonSegment(value: false, label: Text(pdfLocalization.ltr)),
+                  ButtonSegment(value: true, label: Text(pdfLocalization.rtl)),
                 ],
                 selected: <bool>{_rtl},
                 onSelectionChanged: (_running || _opening)
@@ -177,7 +178,7 @@ class _BusinessVerificationExampleDetailScreenState
                 running: _running,
               );
               final code = CodeViewer(
-                title: 'Dart usage code',
+                title: pdfLocalization.dartUsageCode,
                 code: widget.usageCode,
               );
               if (constraints.maxWidth >= 1100) {
@@ -222,13 +223,13 @@ class _BusinessPdfPreviewPanel extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     Widget child;
     if (running) {
-      child = const Center(
+      child =  Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 12),
-            Text('Generating preview…'),
+            Text(pdfLocalization.generatingPreview),
           ],
         ),
       );
@@ -244,7 +245,7 @@ class _BusinessPdfPreviewPanel extends StatelessWidget {
         ),
       );
     } else if (data == null) {
-      child = const Center(
+      child =  Center(
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Column(
@@ -252,10 +253,10 @@ class _BusinessPdfPreviewPanel extends StatelessWidget {
             children: [
               Icon(Icons.picture_as_pdf_outlined, size: 42),
               SizedBox(height: 12),
-              Text('Ready to run'),
+              Text(pdfLocalization.readyToRun),
               SizedBox(height: 6),
               Text(
-                'Press “Run example” to generate the document and show its PDF preview.',
+                pdfLocalization.pressRunExampleGenerateDocumentShowDesc2,
                 textAlign: TextAlign.center,
               ),
             ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s12_sales_erp_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S12 verification example for Picking List.
 class S12PickingVerificationExampleScreen extends StatelessWidget {
   const S12PickingVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S12PickingVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S12 Sales ERP Pack',
-      title: 'Picking List',
-      description: 'Focused S12 verification for Picking List. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.pickingList,
+      description: pdfLocalization.s12PickingListVerify,
       apiName: 'buildS12PickingVerificationPdf',
       icon: Icons.point_of_sale_outlined,
       generator: buildS12PickingVerificationPdf,

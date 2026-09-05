@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 final class SharingDemoController extends ChangeNotifier {
   SharingDemoController({
     required GeniusPdfConfig config,
@@ -128,7 +129,7 @@ final class SharingDemoController extends ChangeNotifier {
   Future<void> shareViaSystem() => _share(
         status: 'Opening share sheet...',
         target: GeniusShareTarget.system(),
-        successMessage: 'Shared successfully!',
+        successMessage: pdfLocalization.sharedSuccessfully,
       );
 
   Future<void> shareViaEmail() => _share(
@@ -137,19 +138,19 @@ final class SharingDemoController extends ChangeNotifier {
           subject: 'PDF Document',
           body: 'Please find the attached PDF document.',
         ),
-        successMessage: 'Email prepared!',
+        successMessage: pdfLocalization.emailPrepared,
       );
 
   Future<void> shareViaBluetooth() => _share(
         status: 'Preparing Bluetooth share...',
         target: GeniusShareTarget.bluetooth(),
-        successMessage: 'Ready to share!',
+        successMessage: pdfLocalization.readyToShare,
       );
 
   Future<void> saveToLocal() => _share(
         status: 'Saving...',
         target: GeniusShareTarget.local(),
-        successMessage: 'Saved successfully!',
+        successMessage: pdfLocalization.savedSuccessfully,
         includeFilePath: true,
       );
 

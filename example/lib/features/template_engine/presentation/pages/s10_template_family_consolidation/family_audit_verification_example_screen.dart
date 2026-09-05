@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/template_engine/models/documents/s10_template_family_consolidation_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S10 verification example for Template Family Audit.
 class S10FamilyAuditVerificationExampleScreen extends StatelessWidget {
   const S10FamilyAuditVerificationExampleScreen({super.key});
@@ -21,8 +22,8 @@ class S10FamilyAuditVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S10 Template Family Consolidation',
-      title: 'Template Family Audit',
-      description: 'Focused S10 verification for Template Family Audit. Generate this example independently, inspect the PDF output, and compare LTR and RTL without switching to another scenario.',
+      title: pdfLocalization.templateFamilyAudit,
+      description: pdfLocalization.s10TemplateFamilyAuditVerify,
       apiName: 'buildS10FamilyAuditVerificationPdf',
       icon: Icons.hub_outlined,
       generator: buildS10FamilyAuditVerificationPdf,

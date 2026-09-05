@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Full Company Details**.
 ///
@@ -12,6 +13,7 @@ class FullDetailsHeaderExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'package:flutter/material.dart' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Full Company Details** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -178,12 +180,12 @@ class FullDetailsHeaderDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'headers_full_details',
       category: 'Components / Core PDF Components / Headers',
-      title: 'Full Company Details',
+      title: pdfLocalization.fullCompanyDetails,
       apiName: 'GeniusPdfReportHeader',
-      description: 'Full-detail company header with custom registration/contact groups and extended identity metadata.',
+      description: pdfLocalization.fullDetailCompanyHeaderCustomDesc,
       icon: Icons.domain_outlined,
       usageCode: dartUsageCode,
     );

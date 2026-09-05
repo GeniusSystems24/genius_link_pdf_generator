@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/getting_started/models/documents/s00_baseline/s00_mixed_baseline_demo_builder.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/widgets/s00_baseline_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S00 screen for the Mixed ERP Baseline regression example.
 ///
 /// The `Dart usage code` panel contains the exact builder source executed by
@@ -117,9 +118,9 @@ class S00MixedBaselineDemoBuilder extends GeniusPdfDocumentBuilder {
   @override
   Widget build(BuildContext context) {
     return S00BaselineExampleDetailScreen(
-      title: 'Mixed ERP Baseline',
+      title: pdfLocalization.mixedErpBaseline,
       apiName: 'S00MixedBaselineDemoBuilder',
-      description: 'Verify mixed Arabic/Latin ERP labels, document identifiers, amounts, IBAN, phone, email, URL, and empty values against the S00 baseline.',
+      description: pdfLocalization.verifyMixedArabicLatinErpLabelsDesc,
       icon: Icons.fact_check_outlined,
       builderFactory: (config) => S00MixedBaselineDemoBuilder(config),
       usageCode: dartUsageCode,

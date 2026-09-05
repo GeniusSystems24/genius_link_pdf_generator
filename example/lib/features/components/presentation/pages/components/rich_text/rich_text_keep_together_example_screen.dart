@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **Footer-Edge Continuation**.
 ///
@@ -12,6 +13,7 @@ class RichTextKeepTogetherExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Footer-Edge Continuation** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -57,12 +59,12 @@ class RichTextKeepTogetherDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'rich_text_keep_together',
       category: 'Components / Core PDF Components / Rich Text',
-      title: 'Footer-Edge Continuation',
+      title: pdfLocalization.footerEdgeContinuation,
       apiName: 'GeniusPdfRichText',
-      description: 'Verify rich text safely continues on a new page when the current page is close to the footer boundary.',
+      description: pdfLocalization.verifyRichTextSafelyContinuesNewPageDesc,
       icon: Icons.vertical_align_bottom_outlined,
       usageCode: dartUsageCode,
     );

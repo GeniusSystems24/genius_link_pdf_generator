@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s12_sales_erp_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S12 verification example for Sales Register.
 class S12SalesRegisterVerificationExampleScreen extends StatelessWidget {
   const S12SalesRegisterVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S12SalesRegisterVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S12 Sales ERP Pack',
-      title: 'Sales Register',
-      description: 'Focused S12 verification for Sales Register. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.salesRegister,
+      description: pdfLocalization.s12SalesRegisterVerify,
       apiName: 'buildS12SalesRegisterVerificationPdf',
       icon: Icons.point_of_sale_outlined,
       generator: buildS12SalesRegisterVerificationPdf,

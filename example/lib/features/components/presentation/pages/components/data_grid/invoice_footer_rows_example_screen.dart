@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Invoice & Footer Rows DataGrid example.
 ///
 /// The document is generated only after the user presses **Run example**. The
@@ -150,12 +151,12 @@ class DataGridInvoiceFooterRowsDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'data_grid_invoice_footer_rows',
       category: 'Components / Data Grid',
-      title: 'Invoice & Footer Rows',
+      title: pdfLocalization.invoiceAndFooterRows,
       apiName: 'GeniusPdfDataGrid',
-      description: 'Build an invoice-style GeniusPdfDataGrid with mixed column sizing, currency columns, subtotal rows, discount, VAT, and a grand total.',
+      description: pdfLocalization.invoiceStyleGeniusPdfDataGridMixedDesc,
       icon: Icons.table_chart_outlined,
       usageCode: dartUsageCode,
     );

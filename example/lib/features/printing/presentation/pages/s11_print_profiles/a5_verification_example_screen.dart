@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/printing/models/documents/s11_print_profiles_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S11 verification example for A5.
 class S11A5VerificationExampleScreen extends StatelessWidget {
   const S11A5VerificationExampleScreen({super.key});
@@ -21,8 +22,8 @@ class S11A5VerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S11 Print Profiles',
-      title: 'A5',
-      description: 'Focused S11 verification for A5. Generate this example independently, inspect the PDF output, and compare LTR and RTL without switching to another scenario.',
+      title: pdfLocalization.a5,
+      description: pdfLocalization.s115Verify,
       apiName: 'buildS11A5VerificationPdf',
       icon: Icons.settings_applications_outlined,
       generator: buildS11A5VerificationPdf,

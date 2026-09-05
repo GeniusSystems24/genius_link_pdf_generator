@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Income Statement business template to PNG or JPEG images.
 class IncomeStatementImageExportExampleScreen extends StatelessWidget {
   const IncomeStatementImageExportExampleScreen({super.key});
@@ -69,8 +70,8 @@ Future<TemplateImageExportResult> exportIncomeStatementTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Income Statement',
-      description: 'Generate the Income Statement template, rasterize every PDF page, save it as PNG or JPEG, and preview the exported image bytes.',
+      title: pdfLocalization.incomeStatement,
+      description: pdfLocalization.incomeStatementImageExportDesc,
       icon: Icons.trending_up_outlined,
       exportTemplate: exportIncomeStatementTemplateAsImages,
       usageCode: dartUsageCode,

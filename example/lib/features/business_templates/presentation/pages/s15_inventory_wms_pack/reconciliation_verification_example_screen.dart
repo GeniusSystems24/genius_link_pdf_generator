@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s15_inventory_wms_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S15 verification example for Count Reconciliation.
 class S15ReconciliationVerificationExampleScreen extends StatelessWidget {
   const S15ReconciliationVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S15ReconciliationVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S15 Inventory & WMS Pack',
-      title: 'Count Reconciliation',
-      description: 'Focused S15 verification for Count Reconciliation. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.countReconciliation,
+      description: pdfLocalization.s15CountReconciliationVerify,
       apiName: 'buildS15ReconciliationVerificationPdf',
       icon: Icons.inventory_2_outlined,
       generator: buildS15ReconciliationVerificationPdf,

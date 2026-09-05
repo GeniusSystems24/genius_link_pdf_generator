@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/models/documents/components/summary_basic_invoice_summary_demo_builder.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/widgets/s00_baseline_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated S00 screen for the Summary Baseline regression example.
 ///
@@ -13,6 +14,7 @@ class S00SummaryBaselineExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **Basic Invoice Summary** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -81,9 +83,9 @@ class BasicInvoiceSummaryDemoBuilder extends GeniusPdfDocumentBuilder {
   @override
   Widget build(BuildContext context) {
     return S00BaselineExampleDetailScreen(
-      title: 'Summary Baseline',
+      title: pdfLocalization.summaryBaseline,
       apiName: 'BasicInvoiceSummaryDemoBuilder',
-      description: 'Verify subtotal, VAT, grand total, wrapping, highlighting, and summary placement using the focused invoice-summary builder.',
+      description: pdfLocalization.verifySubtotalVatGrandTotalWrappingDesc,
       icon: Icons.calculate_outlined,
       builderFactory: (config) => BasicInvoiceSummaryDemoBuilder(config),
       usageCode: dartUsageCode,

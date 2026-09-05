@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s08_erp_document_families_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S08 verification example for Replacement / custom section.
 class S08CustomSlotsVerificationExampleScreen extends StatelessWidget {
   const S08CustomSlotsVerificationExampleScreen({super.key});
@@ -22,8 +23,8 @@ class S08CustomSlotsVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S08 ERP Document Families',
-      title: 'Replacement / custom section',
-      description: 'Focused S08 verification for Replacement / custom section. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.replacementCustomSection,
+      description: pdfLocalization.s08ReplacementCustomSectionVerify,
       apiName: 'buildS08CustomSlotsVerificationPdf',
       icon: Icons.account_tree_outlined,
       generator: buildS08CustomSlotsVerificationPdf,

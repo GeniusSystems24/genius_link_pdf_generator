@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **Footer-Edge Keep Together**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -56,12 +57,12 @@ class InfoBoxKeepTogetherDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'info_box_keep_together',
       category: 'Components / Core PDF Components / Info Box',
-      title: 'Footer-Edge Keep Together',
+      title: pdfLocalization.footerEdgeKeepTogether,
       apiName: 'GeniusPdfInfoBox',
-      description: 'Verify that a multi-row info box moves safely to a new page when insufficient footer space remains.',
+      description: pdfLocalization.verifyMultiRowInfoBoxMovesSafelyNewDesc,
       icon: Icons.vertical_align_bottom_outlined,
       usageCode: dartUsageCode,
     );

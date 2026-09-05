@@ -7,6 +7,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 
 import 'package:genius_pdf_example/app/theme/app_theme.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Demo screen for Barcode & QR Code generation features.
 class BarcodeDemoScreen extends StatefulWidget {
   final int initialTab;
@@ -86,9 +87,9 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         dividerColor: Colors.transparent,
         padding: const EdgeInsets.all(6),
         tabs: [
-          _buildTab(Icons.view_week_rounded, '1D Barcodes', isDark),
-          _buildTab(Icons.qr_code_2_rounded, 'QR Codes', isDark),
-          _buildTab(Icons.grid_view_rounded, 'All-in-One', isDark),
+          _buildTab(Icons.view_week_rounded, pdfLocalization.oneDBarcodes, isDark),
+          _buildTab(Icons.qr_code_2_rounded, pdfLocalization.qrCodes, isDark),
+          _buildTab(Icons.grid_view_rounded, pdfLocalization.allInOne, isDark),
         ],
       ),
     );
@@ -126,9 +127,9 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
           _buildHeaderCard(
             isDark,
             icon: Icons.view_week_rounded,
-            title: 'GeniusPdfBarcode',
+            title: pdfLocalization.geniusPdfBarcode,
             description:
-                'Generate 1D barcodes for products, shipping, and documents.',
+                pdfLocalization.text1DBarcodesProductsShippingDesc,
             gradient: AppColors.primaryGradient,
           ),
           const SizedBox(height: 16),
@@ -145,7 +146,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
           const SizedBox(height: 16),
           _buildGenerateButton(
             isDark,
-            'Generate All Barcodes PDF',
+            pdfLocalization.generateAllBarcodesPdf,
             AppColors.primaryGradient,
             _generate1DBarcodes,
           ),
@@ -235,29 +236,29 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
           _buildHeaderCard(
             isDark,
             icon: Icons.qr_code_2_rounded,
-            title: 'GeniusPdfQRCodeGenerator',
+            title: pdfLocalization.geniusPdfQrcodeGenerator,
             description:
-                'Dynamic QR codes for URLs, ZATCA invoices, WiFi, and contacts.',
+                pdfLocalization.dynamicQrCodesUrlsZatcaInvoicesWiFiDesc,
             gradient: AppColors.purpleGradient,
           ),
           const SizedBox(height: 16),
           _buildRtlToggle(isDark),
           const SizedBox(height: 16),
-          _buildQRCard(isDark, 'URL QR Code', 'رمز QR لرابط',
-              'Scan to open website', Icons.link_rounded),
+          _buildQRCard(isDark, pdfLocalization.urlQrCode, 'رمز QR لرابط',
+              pdfLocalization.scanToOpenWebsite, Icons.link_rounded),
           const SizedBox(height: 12),
-          _buildQRCard(isDark, 'ZATCA Invoice', 'فاتورة هيئة الزكاة',
-              'Saudi e-invoice QR (TLV)', Icons.receipt_long_rounded),
+          _buildQRCard(isDark, pdfLocalization.zatcaInvoice, 'فاتورة هيئة الزكاة',
+              pdfLocalization.saudiEInvoiceQrTlv, Icons.receipt_long_rounded),
           const SizedBox(height: 12),
-          _buildQRCard(isDark, 'WiFi Config', 'إعدادات واي فاي',
-              'WiFi connection QR', Icons.wifi_rounded),
+          _buildQRCard(isDark, pdfLocalization.wiFiConfig, 'إعدادات واي فاي',
+              pdfLocalization.wiFiConnectionQr, Icons.wifi_rounded),
           const SizedBox(height: 12),
-          _buildQRCard(isDark, 'vCard Contact', 'بطاقة اتصال',
-              'Contact information QR', Icons.contact_page_rounded),
+          _buildQRCard(isDark, pdfLocalization.vCardContact, 'بطاقة اتصال',
+              pdfLocalization.contactInformationQr, Icons.contact_page_rounded),
           const SizedBox(height: 16),
           _buildGenerateButton(
             isDark,
-            'Generate All QR Codes PDF',
+            pdfLocalization.generateAllQrCodesPdf,
             AppColors.purpleGradient,
             _generateQRCodes,
           ),
@@ -333,9 +334,9 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
           _buildHeaderCard(
             isDark,
             icon: Icons.grid_view_rounded,
-            title: 'Complete Demo',
+            title: pdfLocalization.completeDemo,
             description:
-                'Generate a full PDF with all barcode and QR code types on one page.',
+                pdfLocalization.fullPdfBarcodeQrCodeTypesOnePageDesc,
             gradient: AppColors.successGradient,
           ),
           const SizedBox(height: 16),
@@ -345,7 +346,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
           const SizedBox(height: 16),
           _buildGenerateButton(
             isDark,
-            'Generate Complete Demo PDF',
+            pdfLocalization.generateCompleteDemoPdf,
             AppColors.successGradient,
             _generateAllInOne,
           ),
@@ -472,16 +473,16 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
                   ? AppColors.darkTextSecondary
                   : AppColors.lightTextSecondary),
           const SizedBox(width: 8),
-          Text('Language Direction',
+          Text(pdfLocalization.languageDirection,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 color: isDark ? AppColors.darkText : AppColors.lightText,
               )),
           const Spacer(),
           SegmentedButton<bool>(
-            segments: const [
-              ButtonSegment(value: true, label: Text('RTL')),
-              ButtonSegment(value: false, label: Text('LTR')),
+            segments:  [
+              ButtonSegment(value: true, label: Text(pdfLocalization.rtl)),
+              ButtonSegment(value: false, label: Text(pdfLocalization.ltr)),
             ],
             selected: {_isRTL},
             onSelectionChanged: (v) => setState(() => _isRTL = v.first),
@@ -570,7 +571,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       final ean13 = GeniusPdfBarcode.ean13(
         config: geniusPdfConfig,
         data: '5901234123457',
-        caption: 'Product Code',
+        caption: pdfLocalization.productCode,
         captionAr: 'رمز المنتج',
         style: const GeniusPdfBarcodeStyle.retail(),
       );
@@ -584,7 +585,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       final code128 = GeniusPdfBarcode.code128(
         config: geniusPdfConfig,
         data: 'GENIUS-PDF-2025',
-        caption: 'Reference Number',
+        caption: pdfLocalization.referenceNumber,
         captionAr: 'الرقم المرجعي',
         style: const GeniusPdfBarcodeStyle.document(),
       );
@@ -644,7 +645,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       final urlQR = GeniusPdfQRCodeGenerator.url(
         config: geniusPdfConfig,
         url: 'https://github.com/GeniusSystems24',
-        caption: 'Visit Website',
+        caption: pdfLocalization.visitWebsite,
         captionAr: 'زيارة الموقع',
         style: const GeniusPdfQRCodeStyle(),
       );
@@ -754,7 +755,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       final ean13 = GeniusPdfBarcode.ean13(
         config: geniusPdfConfig,
         data: '5901234123457',
-        caption: 'EAN-13',
+        caption: pdfLocalization.ean13,
         style: const GeniusPdfBarcodeStyle.compact(),
       );
       final ean13Rect = ean13.draw(
@@ -766,7 +767,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       final code128 = GeniusPdfBarcode.code128(
         config: geniusPdfConfig,
         data: 'GENIUS-2025',
-        caption: 'Code 128',
+        caption: pdfLocalization.code128,
         style: const GeniusPdfBarcodeStyle.compact(),
       );
       code128.draw(
@@ -797,7 +798,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       final urlQR = GeniusPdfQRCodeGenerator.url(
         config: geniusPdfConfig,
         url: 'https://genius.systems',
-        caption: 'URL',
+        caption: pdfLocalization.url,
         captionAr: 'رابط',
         style: const GeniusPdfQRCodeStyle.compact(),
       );

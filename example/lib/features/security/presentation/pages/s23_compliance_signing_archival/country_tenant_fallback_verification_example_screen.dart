@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/security/models/documents/s23_compliance_signing_archival_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S23 verification example for Country / Tenant Registry.
 class S23CountryTenantFallbackVerificationExampleScreen extends StatelessWidget {
   const S23CountryTenantFallbackVerificationExampleScreen({super.key});
@@ -21,8 +22,8 @@ class S23CountryTenantFallbackVerificationExampleScreen extends StatelessWidget 
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S23 Compliance, Signing & Archival',
-      title: 'Country / Tenant Registry',
-      description: 'Focused S23 verification for Country / Tenant Registry. Generate this example independently, inspect the PDF output, and compare LTR and RTL without switching to another scenario.',
+      title: pdfLocalization.countryTenantRegistry,
+      description: pdfLocalization.s23CountryTenantRegistryVerify,
       apiName: 'buildS23CountryTenantFallbackVerificationPdf',
       icon: Icons.verified_user_outlined,
       generator: buildS23CountryTenantFallbackVerificationPdf,

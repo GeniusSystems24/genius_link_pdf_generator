@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Budget Report business template to HTML.
 class BudgetReportHtmlExportExampleScreen extends StatelessWidget {
   const BudgetReportHtmlExportExampleScreen({super.key});
@@ -61,8 +62,8 @@ Future<TemplateHtmlExportResult> exportBudgetReportTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Budget Report',
-      description: 'Generate the Budget Report template and export its PDF content to an HTML document using GeniusPdfExportService. Preview the exact HTML source, save it, and open the exported file.',
+      title: pdfLocalization.budgetReport,
+      description: pdfLocalization.budgetReportHtmlExportDesc,
       icon: Icons.pie_chart_outline,
       exportTemplate: exportBudgetReportTemplateAsHtml,
       usageCode: dartUsageCode,

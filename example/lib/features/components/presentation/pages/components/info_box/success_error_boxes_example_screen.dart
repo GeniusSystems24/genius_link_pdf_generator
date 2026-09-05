@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **Success & Error States**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -72,12 +73,12 @@ class SuccessErrorBoxesDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'info_box_success_error',
       category: 'Components / Core PDF Components / Info Box',
-      title: 'Success & Error States',
+      title: pdfLocalization.successAndErrorStates,
       apiName: 'GeniusPdfInfoBox',
-      description: 'Compare success and error semantic info-box styles using focused status content.',
+      description: pdfLocalization.compareSuccessErrorSemanticInfoBoxDesc,
       icon: Icons.task_alt_outlined,
       usageCode: dartUsageCode,
     );

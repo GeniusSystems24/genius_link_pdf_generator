@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s16_pos_retail_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S16 verification example for 58mm Receipt.
 class S16Receipt58VerificationExampleScreen extends StatelessWidget {
   const S16Receipt58VerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S16Receipt58VerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S16 POS & Retail Pack',
-      title: '58mm Receipt',
-      description: 'Focused S16 verification for 58mm Receipt. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.fiftyEightMmReceipt,
+      description: pdfLocalization.s1658MmReceiptVerify,
       apiName: 'buildS16Receipt58VerificationPdf',
       icon: Icons.point_of_sale_outlined,
       generator: buildS16Receipt58VerificationPdf,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_html_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_html_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Credit Note business template to HTML.
 class CreditNoteHtmlExportExampleScreen extends StatelessWidget {
   const CreditNoteHtmlExportExampleScreen({super.key});
@@ -61,8 +62,8 @@ Future<TemplateHtmlExportResult> exportCreditNoteTemplateAsHtml({
   Widget build(BuildContext context) {
     return TemplateHtmlExportDetailScreen(
       category: 'Sales Templates',
-      title: 'Credit Note',
-      description: 'Generate the Credit Note template and export its PDF content to an HTML document using GeniusPdfExportService. Preview the exact HTML source, save it, and open the exported file.',
+      title: pdfLocalization.creditNote,
+      description: pdfLocalization.creditNoteHtmlExportDesc,
       icon: Icons.receipt_long_outlined,
       exportTemplate: exportCreditNoteTemplateAsHtml,
       usageCode: dartUsageCode,

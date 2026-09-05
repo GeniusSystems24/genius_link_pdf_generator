@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s19_fixed_assets_projects_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S19 verification example for Depreciation Report.
 class S19DepreciationVerificationExampleScreen extends StatelessWidget {
   const S19DepreciationVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S19DepreciationVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S19 Fixed Assets & Projects Pack',
-      title: 'Depreciation Report',
-      description: 'Focused S19 verification for Depreciation Report. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.depreciationReport,
+      description: pdfLocalization.s19DepreciationReportVerify,
       apiName: 'buildS19DepreciationVerificationPdf',
       icon: Icons.domain_outlined,
       generator: buildS19DepreciationVerificationPdf,

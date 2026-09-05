@@ -7,6 +7,7 @@ import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 typedef S00DocumentBuilderFactory = GeniusPdfDocumentBuilder Function(
   GeniusPdfConfig config,
 );
@@ -194,7 +195,7 @@ class _S00BaselineExampleDetailScreenState
                           Expanded(
                             flex: 10,
                             child: CodeViewer(
-                              title: 'Dart usage code',
+                              title: pdfLocalization.dartUsageCode,
                               code: widget.usageCode,
                               height: double.infinity,
                             ),
@@ -227,7 +228,7 @@ class _S00BaselineExampleDetailScreenState
                         SizedBox(
                           height: constraints.maxWidth >= 720 ? 680 : 580,
                           child: CodeViewer(
-                            title: 'Dart usage code',
+                            title: pdfLocalization.dartUsageCode,
                             code: widget.usageCode,
                           ),
                         ),
@@ -306,7 +307,7 @@ class _Header extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Getting Started / S00 Baseline',
+                      pdfLocalization.gettingStartedS00Baseline,
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: colors.primary,
                         fontWeight: FontWeight.w700,
@@ -341,9 +342,9 @@ class _Header extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               SegmentedButton<bool>(
-                segments: const [
-                  ButtonSegment(value: false, label: Text('LTR')),
-                  ButtonSegment(value: true, label: Text('RTL')),
+                segments:  [
+                  ButtonSegment(value: false, label: Text(pdfLocalization.ltr)),
+                  ButtonSegment(value: true, label: Text(pdfLocalization.rtl)),
                 ],
                 selected: <bool>{isRtl},
                 onSelectionChanged: executing || openingPdf
@@ -377,7 +378,7 @@ class _Header extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.open_in_new_rounded),
-                label: const Text('Open PDF'),
+                label:  Text(pdfLocalization.openPdf),
               ),
             ],
           );
@@ -463,13 +464,13 @@ class _PreviewColumn extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     if (executing) {
-      return const Center(
+      return  Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 14),
-            Text('Generating preview…'),
+            Text(pdfLocalization.generatingPreview),
           ],
         ),
       );
@@ -484,7 +485,7 @@ class _PreviewColumn extends StatelessWidget {
             children: [
               Icon(Icons.error_outline_rounded, color: colors.error, size: 42),
               const SizedBox(height: 12),
-              const Text('PDF generation failed'),
+               Text(pdfLocalization.pdfGenerationFailed),
               const SizedBox(height: 6),
               SelectableText(
                 '$error',
@@ -512,12 +513,12 @@ class _PreviewColumn extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Ready to run',
+                pdfLocalization.readyToRun,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 6),
               Text(
-                'Press “Run example” to generate this baseline document and display its PDF preview.',
+                pdfLocalization.pressRunExampleGenerateBaselineDesc,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: colors.onSurfaceVariant),
               ),

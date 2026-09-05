@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:genius_pdf_example/localizations/generated/l10n.dart';
 import 'package:super_navigation_sidebar/super_navigation_sidebar.dart';
 
+import 'package:genius_pdf_example/app/controllers/locale_controller.dart';
 import 'package:genius_pdf_example/app/theme/app_theme.dart';
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/dashboard_layout.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 class GeniusPdfExampleApp extends StatelessWidget {
   const GeniusPdfExampleApp({super.key});
@@ -13,24 +13,37 @@ class GeniusPdfExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeController,
-      builder: (context, themeMode, child) => MaterialApp(
-        title: 'Genius Link PDF Generator',
-        debugShowCheckedModeBanner: false,
-        themeMode: themeMode,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        localizationsDelegates: [
-          PDFGeneratorLocalization.delegate,
-          SuperNavigationLocalization.delegate,
-
-          //
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: SuperNavigationLocalization.supportedLocales,
-        home: const DashboardLayout(),
-      ),
+      builder: (context, themeMode, _) {
+        return ValueListenableBuilder<Locale>(
+          valueListenable: localeController,
+          builder: (context, locale, _) {
+            return MaterialApp(
+              title: lookupPDFGeneratorLocalization(locale).geniusLinkPdfGenerator,
+              debugShowCheckedModeBanner: false,
+              locale: locale,
+              themeMode: themeMode,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+                ...PDFGeneratorLocalization.localizationsDelegates,
+                SuperNavigationLocalization.delegate,
+              ],
+              supportedLocales: PDFGeneratorLocalization.supportedLocales,
+              builder: (context, child) {
+                return PDFGeneratorLocalizationBinder(
+                  child: child ?? const SizedBox.shrink(),
+                );
+              },
+              // Recreate sidebar metadata so its labels use the new locale.
+              home: DashboardLayout(
+                key: ValueKey<String>(
+                  'dashboard-${locale.languageCode}',
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/components/models/documents/components/grid_watermark_confidential_audit_demo_builder.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/widgets/s00_baseline_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S00 screen for the Watermark Baseline regression example.
 ///
 /// The `Dart usage code` panel contains the exact builder source executed by
@@ -162,9 +163,9 @@ class GridWatermarkConfidentialAuditDemoBuilder extends GeniusPdfDocumentBuilder
   @override
   Widget build(BuildContext context) {
     return S00BaselineExampleDetailScreen(
-      title: 'Watermark Baseline',
+      title: pdfLocalization.watermarkBaseline,
       apiName: 'GridWatermarkConfidentialAuditDemoBuilder',
-      description: 'Verify watermark visibility, orientation, and clipping using the focused confidential-audit watermark builder.',
+      description: pdfLocalization.verifyWatermarkVisibilityOrientationDesc,
       icon: Icons.branding_watermark_outlined,
       builderFactory: (config) => GridWatermarkConfidentialAuditDemoBuilder(config),
       usageCode: dartUsageCode,

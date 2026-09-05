@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **Expense Recommendations**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -203,12 +204,12 @@ class GridRichtextExpenseRecommendationsDemoBuilder extends GeniusPdfDocumentBui
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'grid_richtext_expense_recommendations',
       category: 'Components / Component Compositions / Grid + Rich Text',
-      title: 'Expense Recommendations',
+      title: pdfLocalization.expenseRecommendations,
       apiName: 'GeniusPdfDataGrid + GeniusPdfRichText',
-      description: 'Combine an expense grid with formatted recommendation blocks and a report summary info box.',
+      description: pdfLocalization.expenseGridFormattedRecommendationDesc,
       icon: Icons.insights_outlined,
       usageCode: dartUsageCode,
     );

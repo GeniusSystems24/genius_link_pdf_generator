@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s14_accounting_finance_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S14 verification example for AP Aging.
 class S14ApAgingVerificationExampleScreen extends StatelessWidget {
   const S14ApAgingVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S14ApAgingVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S14 Accounting & Finance Pack',
-      title: 'AP Aging',
-      description: 'Focused S14 verification for AP Aging. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.apAging,
+      description: pdfLocalization.s14ApAgingVerify,
       apiName: 'buildS14ApAgingVerificationPdf',
       icon: Icons.account_balance_outlined,
       generator: buildS14ApAgingVerificationPdf,

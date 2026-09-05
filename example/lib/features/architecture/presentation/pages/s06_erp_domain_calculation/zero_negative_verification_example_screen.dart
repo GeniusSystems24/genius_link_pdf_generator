@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/architecture/models/documents/s06_erp_domain_calculation_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S06 example for Zero / Negative Policy.
 class S06ZeroNegativeVerificationExampleScreen extends StatelessWidget {
   const S06ZeroNegativeVerificationExampleScreen({super.key});
@@ -11,8 +12,8 @@ class S06ZeroNegativeVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S06 ERP Domain & Calculations',
-      title: 'Zero / Negative Policy',
-      description: 'Focused S06 verification for Zero / Negative Policy. Generate the document explicitly, inspect the PDF result, and compare LTR and RTL output without switching to another scenario.',
+      title: pdfLocalization.zeroNegativePolicy,
+      description: pdfLocalization.s06ZeroNegativePolicyVerify,
       apiName: 'buildS06ZeroNegativeVerificationPdf',
       icon: Icons.calculate_outlined,
       generator: buildS06ZeroNegativeVerificationPdf,

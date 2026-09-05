@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s19_fixed_assets_projects_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S19 verification example for Asset Movement.
 class S19AssetMovementVerificationExampleScreen extends StatelessWidget {
   const S19AssetMovementVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S19AssetMovementVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S19 Fixed Assets & Projects Pack',
-      title: 'Asset Movement',
-      description: 'Focused S19 verification for Asset Movement. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.assetMovement,
+      description: pdfLocalization.s19AssetMovementVerify,
       apiName: 'buildS19AssetMovementVerificationPdf',
       icon: Icons.domain_outlined,
       generator: buildS19AssetMovementVerificationPdf,

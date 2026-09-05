@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Balance Sheet business template to PNG or JPEG images.
 class BalanceSheetImageExportExampleScreen extends StatelessWidget {
   const BalanceSheetImageExportExampleScreen({super.key});
@@ -69,8 +70,8 @@ Future<TemplateImageExportResult> exportBalanceSheetTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'Financial Templates',
-      title: 'Balance Sheet',
-      description: 'Generate the Balance Sheet template, rasterize every PDF page, save it as PNG or JPEG, and preview the exported image bytes.',
+      title: pdfLocalization.balanceSheet,
+      description: pdfLocalization.balanceSheetImageExportDesc,
       icon: Icons.account_balance_wallet_outlined,
       exportTemplate: exportBalanceSheetTemplateAsImages,
       usageCode: dartUsageCode,

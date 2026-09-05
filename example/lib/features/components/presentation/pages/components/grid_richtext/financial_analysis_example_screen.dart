@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **Financial Analysis**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -167,12 +168,12 @@ class GridRichtextFinancialAnalysisDemoBuilder extends GeniusPdfDocumentBuilder 
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'grid_richtext_financial_analysis',
       category: 'Components / Component Compositions / Grid + Rich Text',
-      title: 'Financial Analysis',
+      title: pdfLocalization.financialAnalysis,
       apiName: 'GeniusPdfDataGrid + GeniusPdfRichText',
-      description: 'Combine introductory rich text, a revenue analysis data grid, automatic totals, and formatted commentary.',
+      description: pdfLocalization.introductoryRichTextRevenueAnalysisDesc,
       icon: Icons.analytics_outlined,
       usageCode: dartUsageCode,
     );

@@ -16,6 +16,7 @@ import 'package:genius_pdf_example/features/architecture/models/documents/report
 import 'package:genius_pdf_example/features/architecture/models/documents/simple_document.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Every concrete demo formerly hosted by the V2 Architecture aggregate page.
 enum V2ArchitectureExample {
   simpleDocument,
@@ -270,7 +271,7 @@ class _V2ArchitectureSingleExampleHostState
   Widget _buildPdfPreview() {
     final bytes = _pdfBytes;
     if (_isLoading) {
-      return const SizedBox(
+      return  SizedBox(
         height: 700,
         child: Center(
           child: Column(
@@ -278,7 +279,7 @@ class _V2ArchitectureSingleExampleHostState
             children: <Widget>[
               CircularProgressIndicator(),
               SizedBox(height: 12),
-              Text('Generating PDF preview…'),
+              Text(pdfLocalization.generatingPdfPreview),
             ],
           ),
         ),
@@ -286,7 +287,7 @@ class _V2ArchitectureSingleExampleHostState
     }
 
     if (bytes == null) {
-      return const SizedBox(
+      return  SizedBox(
         height: 700,
         child: Center(
           child: Column(
@@ -294,9 +295,9 @@ class _V2ArchitectureSingleExampleHostState
             children: <Widget>[
               Icon(Icons.picture_as_pdf_outlined, size: 48),
               SizedBox(height: 12),
-              Text('No PDF generated yet'),
+              Text(pdfLocalization.noPdfGeneratedYet),
               SizedBox(height: 6),
-              Text('Press the action button to generate and preview the document.'),
+              Text(pdfLocalization.pressActionButtonGeneratePreviewDesc),
             ],
           ),
         ),
@@ -327,7 +328,7 @@ class _V2ArchitectureSingleExampleHostState
         borderRadius: BorderRadius.circular(12),
       ),
       child: _eventLog.isEmpty
-          ? const Center(child: Text('No events emitted yet.'))
+          ?  Center(child: Text(pdfLocalization.noEventsEmittedYet))
           : ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -734,7 +735,7 @@ class _V2ArchitectureSingleExampleHostState
 
     eventBus.emit(GeniusDocumentCreatedEvent(
       documentId: 'doc-${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Demo Document',
+      title: pdfLocalization.demoDocument,
     ));
 
     setState(() {

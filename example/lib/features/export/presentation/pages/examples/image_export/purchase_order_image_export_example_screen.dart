@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/export/models/documents/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/widgets/template_image_export_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Exports the Purchase Order business template to PNG or JPEG images.
 class PurchaseOrderImageExportExampleScreen extends StatelessWidget {
   const PurchaseOrderImageExportExampleScreen({super.key});
@@ -69,8 +70,8 @@ Future<TemplateImageExportResult> exportPurchaseOrderTemplateAsImages({
   Widget build(BuildContext context) {
     return TemplateImageExportDetailScreen(
       category: 'Sales Templates',
-      title: 'Purchase Order',
-      description: 'Generate the Purchase Order template, rasterize every PDF page, save it as PNG or JPEG, and preview the exported image bytes.',
+      title: pdfLocalization.purchaseOrder,
+      description: pdfLocalization.purchaseOrderImageExportDesc,
       icon: Icons.shopping_cart_checkout_outlined,
       exportTemplate: exportPurchaseOrderTemplateAsImages,
       usageCode: dartUsageCode,

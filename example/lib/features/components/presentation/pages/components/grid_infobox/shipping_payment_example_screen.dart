@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **Shipping & Payment**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -239,12 +240,12 @@ class GridInfoboxShippingPaymentDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'grid_infobox_shipping_payment',
       category: 'Components / Component Compositions / Grid + Info Box',
-      title: 'Shipping & Payment',
+      title: pdfLocalization.shippingAndPayment,
       apiName: 'GeniusPdfDataGrid + GeniusPdfInfoBox',
-      description: 'Combine shipping/payment information boxes, delivery tracking rows, and status messages in one focused document.',
+      description: pdfLocalization.shippingPaymentInformationBoxesDesc,
       icon: Icons.local_shipping_outlined,
       usageCode: dartUsageCode,
     );

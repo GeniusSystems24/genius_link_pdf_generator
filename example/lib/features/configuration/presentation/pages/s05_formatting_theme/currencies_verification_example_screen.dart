@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/configuration/models/documents/s05_formatting_theme_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S05 example for Multi-currency.
 class S05CurrenciesVerificationExampleScreen extends StatelessWidget {
   const S05CurrenciesVerificationExampleScreen({super.key});
@@ -11,8 +12,8 @@ class S05CurrenciesVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S05 Formatting & Theme',
-      title: 'Multi-currency',
-      description: 'Focused S05 verification for Multi-currency. Generate the document explicitly, inspect the PDF result, and compare LTR and RTL output without switching to another scenario.',
+      title: pdfLocalization.multiCurrency,
+      description: pdfLocalization.s05MultiCurrencyVerify,
       apiName: 'buildS05CurrenciesVerificationPdf',
       icon: Icons.format_paint_outlined,
       generator: buildS05CurrenciesVerificationPdf,

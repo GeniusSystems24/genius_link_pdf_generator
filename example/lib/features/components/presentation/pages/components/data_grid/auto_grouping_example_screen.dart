@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Auto Grouping DataGrid example.
 ///
 /// The document is generated only after the user presses **Run example**. The
@@ -88,12 +89,12 @@ class DataGridAutoGroupingDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'data_grid_auto_grouping',
       category: 'Components / Data Grid',
-      title: 'Auto Grouping',
+      title: pdfLocalization.autoGrouping,
       apiName: 'GeniusPdfDataGrid',
-      description: 'Use GeniusDataGridUtils.autoGroup to convert ordinary rows into grouped sections with automatically generated summaries.',
+      description: pdfLocalization.geniusDataGridUtilsAutoGroupConvertDesc,
       icon: Icons.table_chart_outlined,
       usageCode: dartUsageCode,
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/getting_started/models/documents/s00_baseline/s00_long_content_demo_builder.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/widgets/s00_baseline_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S00 screen for the Long / Multi-page Baseline regression example.
 ///
 /// The `Dart usage code` panel contains the exact builder source executed by
@@ -35,9 +36,9 @@ class S00LongContentDemoBuilder extends GeniusPdfDocumentBuilder {
   @override
   Widget build(BuildContext context) {
     return S00BaselineExampleDetailScreen(
-      title: 'Long / Multi-page Baseline',
+      title: pdfLocalization.longMultiPageBaseline,
       apiName: 'S00LongContentDemoBuilder',
-      description: 'Verify long-content page flow and transitions across multiple pages in both LTR and RTL modes.',
+      description: pdfLocalization.verifyLongContentPageFlowTransitionsDesc,
       icon: Icons.article_outlined,
       builderFactory: (config) => S00LongContentDemoBuilder(config),
       usageCode: dartUsageCode,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/showcase/presentation/widgets/showcase_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the QR & Attachments Showcase example.
 ///
 /// No PDF is generated until **Run example** is pressed. The `Dart usage code`
@@ -214,12 +215,12 @@ class QRAttachmentsDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ShowcaseExampleDetailScreen(
+    return  ShowcaseExampleDetailScreen(
       showcaseId: 'showcase_qr_attachments',
       category: 'Showcase',
-      title: 'QR & Attachments',
+      title: pdfLocalization.qrAndAttachments,
       apiName: 'QRAttachmentsDemoBuilder',
-      description: 'QR codes, inline image attachments, image pages, and attachment batches.',
+      description: pdfLocalization.qrCodesInlineImageAttachmentsImageDesc,
       icon: Icons.qr_code_2_outlined,
       usageCode: dartUsageCode,
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for the Custom Color Styles DataGrid example.
 ///
@@ -12,6 +13,7 @@ class DataGridCustomStylesExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Builds the focused custom-color grid-style showcase example.
 class DataGridCustomStylesDemoBuilder extends GeniusPdfDocumentBuilder {
   DataGridCustomStylesDemoBuilder(super.config);
@@ -222,12 +224,12 @@ class DataGridCustomStylesDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'data_grid_custom_styles',
       category: 'Components / Data Grid',
-      title: 'Custom Color Styles',
+      title: pdfLocalization.customColorStyles,
       apiName: 'GeniusPdfDataGrid',
-      description: 'Show elegant, pastel, bordered, minimal, Saudi, and invoice grid styles with their default or customized primary colors.',
+      description: pdfLocalization.elegantPastelBorderedMinimalSaudiDesc,
       icon: Icons.table_chart_outlined,
       usageCode: dartUsageCode,
     );

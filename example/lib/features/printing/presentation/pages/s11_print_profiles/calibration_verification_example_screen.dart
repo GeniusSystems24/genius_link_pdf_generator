@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/printing/models/documents/s11_print_profiles_verification_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S11 verification example for Calibration page.
 class S11CalibrationVerificationExampleScreen extends StatelessWidget {
   const S11CalibrationVerificationExampleScreen({super.key});
@@ -21,8 +22,8 @@ class S11CalibrationVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'S11 Print Profiles',
-      title: 'Calibration page',
-      description: 'Focused S11 verification for Calibration page. Generate this example independently, inspect the PDF output, and compare LTR and RTL without switching to another scenario.',
+      title: pdfLocalization.calibrationPage,
+      description: pdfLocalization.s11CalibrationPageVerify,
       apiName: 'buildS11CalibrationVerificationPdf',
       icon: Icons.settings_applications_outlined,
       generator: buildS11CalibrationVerificationPdf,

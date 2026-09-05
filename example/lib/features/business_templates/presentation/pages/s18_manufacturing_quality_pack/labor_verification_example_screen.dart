@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s18_manufacturing_quality_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S18 verification example for Labor Report.
 class S18LaborVerificationExampleScreen extends StatelessWidget {
   const S18LaborVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S18LaborVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S18 Manufacturing & Quality Pack',
-      title: 'Labor Report',
-      description: 'Focused S18 verification for Labor Report. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.laborReport,
+      description: pdfLocalization.s18LaborReportVerify,
       apiName: 'buildS18LaborVerificationPdf',
       icon: Icons.precision_manufacturing_outlined,
       generator: buildS18LaborVerificationPdf,

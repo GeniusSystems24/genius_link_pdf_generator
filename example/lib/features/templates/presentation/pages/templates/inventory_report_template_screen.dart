@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/templates/models/documents/template_example_build.dart';
 import 'package:genius_pdf_example/features/templates/models/documents/templates_demo_documents.dart';
 import 'package:genius_pdf_example/features/templates/presentation/widgets/template_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 TemplateExampleBuild _buildInventoryReportTemplate({required bool isRtl}) {
   return TemplateExampleBuild(
@@ -26,6 +27,7 @@ import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart'
     show geniusPdfConfig;
 import 'package:genius_pdf_example/shared/data/sample_data.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 GeniusPdfConfig createTemplatesDemoConfig({required bool isRtl}) {
   return geniusPdfConfig.copyWith(
     textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
@@ -52,11 +54,11 @@ template.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const TemplateExampleDetailScreen(
+    return  TemplateExampleDetailScreen(
       category: 'Report Templates',
-      title: 'Inventory Report',
+      title: pdfLocalization.inventoryReport,
       titleAr: 'تقرير المخزون',
-      description: 'Inventory valuation report with category grouping, quantities, costs, totals, signatures, and QR support.',
+      description: pdfLocalization.inventoryValuationReportCategoryDesc,
       icon: Icons.inventory_2_outlined,
       buildTemplate: _buildInventoryReportTemplate,
       usageCode: dartUsageCode,

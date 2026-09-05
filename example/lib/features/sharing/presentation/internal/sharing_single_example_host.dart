@@ -12,6 +12,7 @@ import 'package:genius_pdf_example/app/theme/app_theme.dart';
 
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Demo screen for Sharing features (v2.3.x).
 class SharingSingleExampleHost extends StatefulWidget {
   const SharingSingleExampleHost({
@@ -74,8 +75,8 @@ _controller.removeListener(_onControllerChanged);
   }
   Widget _buildQuickShareTab(bool isDark) {
     return FeatureExamplePage(
-      title: 'Quick Share',
-      description: 'Share PDFs through the unified sharing service.',
+      title: pdfLocalization.quickShare,
+      description: pdfLocalization.sharePdfsThroughTheUnifiedSharingService,
       icon: Icons.flash_on_rounded,
       code: '''final service = GeniusPdfSharingService();
 await service.share(pdfBytes, fileName: 'document.pdf');''',
@@ -87,28 +88,28 @@ await service.share(pdfBytes, fileName: 'document.pdf');''',
             children: <Widget>[
               _buildShareButton(
                 isDark: isDark,
-                label: 'System Share Sheet',
+                label: pdfLocalization.systemShareSheet,
                 icon: Icons.share_rounded,
                 gradient: AppColors.primaryGradient,
                 onPressed: () => _shareViaSystem(),
               ),
               _buildShareButton(
                 isDark: isDark,
-                label: 'Share via Email',
+                label: pdfLocalization.shareViaEmail,
                 icon: Icons.email_rounded,
                 gradient: AppColors.infoGradient,
                 onPressed: () => _shareViaEmail(),
               ),
               _buildShareButton(
                 isDark: isDark,
-                label: 'Share via Bluetooth',
+                label: pdfLocalization.shareViaBluetooth,
                 icon: Icons.bluetooth_rounded,
                 gradient: AppColors.purpleGradient,
                 onPressed: () => _shareViaBluetooth(),
               ),
               _buildShareButton(
                 isDark: isDark,
-                label: 'Save to Local Storage',
+                label: pdfLocalization.saveToLocalStorage,
                 icon: Icons.save_rounded,
                 gradient: AppColors.successGradient,
                 onPressed: () => _saveToLocal(),
@@ -117,7 +118,7 @@ await service.share(pdfBytes, fileName: 'document.pdf');''',
           ),
           if (_controller.contacts.isNotEmpty) ...<Widget>[
             const SizedBox(height: 18),
-            _buildSectionTitle(isDark, 'Quick Share Contacts'),
+            _buildSectionTitle(isDark, pdfLocalization.quickShareContacts),
             const SizedBox(height: 8),
             ..._controller.contacts.map(
               (contact) => _buildContactCard(isDark, contact),
@@ -136,8 +137,8 @@ await service.share(pdfBytes, fileName: 'document.pdf');''',
 
   Widget _buildEmailTab(bool isDark) {
     return FeatureExamplePage(
-      title: 'Email Sharing',
-      description: 'Compose PDF email shares and reuse message templates.',
+      title: pdfLocalization.emailSharing,
+      description: pdfLocalization.pdfEmailSharesReuseMessageTemplatesDesc,
       icon: Icons.email_rounded,
       code: '''await sharing.shareByEmail(
   pdfBytes,
@@ -152,21 +153,21 @@ await service.share(pdfBytes, fileName: 'document.pdf');''',
             children: <Widget>[
               _buildShareButton(
                 isDark: isDark,
-                label: 'Compose Email',
+                label: pdfLocalization.composeEmail,
                 icon: Icons.edit_rounded,
                 gradient: AppColors.primaryGradient,
                 onPressed: () => _composeEmail(),
               ),
               _buildShareButton(
                 isDark: isDark,
-                label: 'Open Gmail',
+                label: pdfLocalization.openGmail,
                 icon: Icons.mail_rounded,
                 gradient: AppColors.errorGradient,
                 onPressed: () => _openGmail(),
               ),
               _buildShareButton(
                 isDark: isDark,
-                label: 'Open Outlook',
+                label: pdfLocalization.openOutlook,
                 icon: Icons.mail_outline_rounded,
                 gradient: AppColors.infoGradient,
                 onPressed: () => _openOutlook(),
@@ -174,7 +175,7 @@ await service.share(pdfBytes, fileName: 'document.pdf');''',
             ],
           ),
           const SizedBox(height: 18),
-          _buildSectionTitle(isDark, 'Email Templates'),
+          _buildSectionTitle(isDark, pdfLocalization.emailTemplates),
           const SizedBox(height: 8),
           ..._controller.templates.map(
             (template) => _buildTemplateCard(isDark, template),
@@ -189,8 +190,8 @@ await service.share(pdfBytes, fileName: 'document.pdf');''',
 
   Widget _buildBluetoothTab(bool isDark) {
     return FeatureExamplePage(
-      title: 'Bluetooth Sharing',
-      description: 'Discover nearby devices and share PDF documents directly.',
+      title: pdfLocalization.bluetoothSharing,
+      description: pdfLocalization.discoverNearbyDevicesSharePdfDesc,
       icon: Icons.bluetooth_rounded,
       code: '''final devices = await sharing.discoverBluetoothDevices();
 await sharing.shareToBluetoothDevice(pdfBytes, device);''',
@@ -202,14 +203,14 @@ await sharing.shareToBluetoothDevice(pdfBytes, device);''',
             children: <Widget>[
               _buildShareButton(
                 isDark: isDark,
-                label: 'Nearby Share / AirDrop',
+                label: pdfLocalization.nearbyShareAirDrop,
                 icon: Icons.near_me_rounded,
                 gradient: AppColors.cyanGradient,
                 onPressed: () => _shareViaNearby(),
               ),
               _buildShareButton(
                 isDark: isDark,
-                label: 'Discover Devices',
+                label: pdfLocalization.discoverDevices,
                 icon: Icons.bluetooth_searching_rounded,
                 gradient: AppColors.purpleGradient,
                 onPressed: () => _discoverDevices(),
@@ -218,7 +219,7 @@ await sharing.shareToBluetoothDevice(pdfBytes, device);''',
           ),
           if (_controller.savedDevices.isNotEmpty) ...<Widget>[
             const SizedBox(height: 18),
-            _buildSectionTitle(isDark, 'Saved Devices'),
+            _buildSectionTitle(isDark, pdfLocalization.savedDevices),
             const SizedBox(height: 8),
             ..._controller.savedDevices.map(
               (device) => _buildDeviceCard(isDark, device),
@@ -234,9 +235,9 @@ await sharing.shareToBluetoothDevice(pdfBytes, device);''',
 
   Widget _buildAppsTab(bool isDark) {
     return FeatureExamplePage(
-      title: 'App Sharing',
+      title: pdfLocalization.appSharing,
       description:
-          'Send PDF documents to messaging, cloud, and external applications.',
+          pdfLocalization.sendPdfDocumentsMessagingCloudDesc,
       icon: Icons.apps_rounded,
       code: '''await sharing.shareToApp(
   pdfBytes,
@@ -246,7 +247,7 @@ await sharing.shareToBluetoothDevice(pdfBytes, device);''',
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _buildSectionTitle(isDark, 'Messaging Apps'),
+          _buildSectionTitle(isDark, pdfLocalization.messagingApps),
           const SizedBox(height: 8),
           Wrap(
             spacing: 10,
@@ -254,21 +255,21 @@ await sharing.shareToBluetoothDevice(pdfBytes, device);''',
             children: <Widget>[
               _buildAppCard(
                 isDark,
-                'WhatsApp',
+                pdfLocalization.whatsApp,
                 Icons.message_rounded,
                 AppColors.successGradient,
                 () => _shareToApp(GeniusSharableApp.whatsApp()),
               ),
               _buildAppCard(
                 isDark,
-                'Telegram',
+                pdfLocalization.telegram,
                 Icons.send_rounded,
                 AppColors.infoGradient,
                 () => _shareToApp(GeniusSharableApp.telegram()),
               ),
               _buildAppCard(
                 isDark,
-                'Signal',
+                pdfLocalization.signal,
                 Icons.shield_rounded,
                 AppColors.purpleGradient,
                 () => _shareToApp(GeniusSharableApp.signal()),
@@ -276,7 +277,7 @@ await sharing.shareToBluetoothDevice(pdfBytes, device);''',
             ],
           ),
           const SizedBox(height: 18),
-          _buildSectionTitle(isDark, 'Cloud Storage'),
+          _buildSectionTitle(isDark, pdfLocalization.cloudStorage),
           const SizedBox(height: 8),
           Wrap(
             spacing: 10,
@@ -284,21 +285,21 @@ await sharing.shareToBluetoothDevice(pdfBytes, device);''',
             children: <Widget>[
               _buildAppCard(
                 isDark,
-                'Google Drive',
+                pdfLocalization.googleDrive,
                 Icons.cloud_rounded,
                 AppColors.warningGradient,
                 () => _shareToApp(GeniusSharableApp.googleDrive()),
               ),
               _buildAppCard(
                 isDark,
-                'Dropbox',
+                pdfLocalization.dropbox,
                 Icons.folder_rounded,
                 AppColors.infoGradient,
                 () => _shareToApp(GeniusSharableApp.dropbox()),
               ),
               _buildAppCard(
                 isDark,
-                'OneDrive',
+                pdfLocalization.oneDrive,
                 Icons.cloud_queue_rounded,
                 AppColors.primaryGradient,
                 () => _shareToApp(GeniusSharableApp.oneDrive()),
@@ -310,14 +311,14 @@ await sharing.shareToBluetoothDevice(pdfBytes, device);''',
             children: <Widget>[
               _buildShareButton(
                 isDark: isDark,
-                label: 'Save to Downloads',
+                label: pdfLocalization.saveToDownloads,
                 icon: Icons.download_rounded,
                 gradient: AppColors.successGradient,
                 onPressed: () => _saveToDownloads(),
               ),
               _buildShareButton(
                 isDark: isDark,
-                label: 'Open in External App',
+                label: pdfLocalization.openInExternalApp,
                 icon: Icons.open_in_new_rounded,
                 gradient: AppColors.infoGradient,
                 onPressed: () => _openInExternalApp(),
@@ -334,8 +335,8 @@ await sharing.shareToBluetoothDevice(pdfBytes, device);''',
 
   Widget _buildHistoryTab(bool isDark) {
     return FeatureExamplePage(
-      title: 'Share History',
-      description: 'Inspect recent PDF sharing activity and outcomes.',
+      title: pdfLocalization.shareHistory,
+      description: pdfLocalization.recentPdfSharingActivityOutcomesDesc,
       icon: Icons.history_rounded,
       code: '''final history = sharing.history;
 for (final item in history) {
@@ -346,11 +347,11 @@ for (final item in history) {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           if (_controller.history.isEmpty)
-            const FeatureReadyState(
+             FeatureReadyState(
               icon: Icons.history_rounded,
-              title: 'No sharing history yet',
+              title: pdfLocalization.noSharingHistoryYet,
               description:
-                  'Run a sharing action and completed entries will appear here.',
+                  pdfLocalization.sharingActionCompletedEntriesWillDesc,
             )
           else ...<Widget>[
             Row(
@@ -359,7 +360,7 @@ for (final item in history) {
                 TextButton.icon(
                   onPressed: _clearHistory,
                   icon: const Icon(Icons.delete_outline_rounded),
-                  label: const Text('Clear history'),
+                  label:  Text(pdfLocalization.clearHistory),
                 ),
               ],
             ),

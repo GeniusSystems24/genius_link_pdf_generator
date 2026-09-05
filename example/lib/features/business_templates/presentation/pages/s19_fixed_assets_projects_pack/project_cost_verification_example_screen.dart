@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/s19_fixed_assets_projects_pack_verification_documents.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated S19 verification example for Project Cost.
 class S19ProjectCostVerificationExampleScreen extends StatelessWidget {
   const S19ProjectCostVerificationExampleScreen({super.key});
@@ -20,8 +21,8 @@ class S19ProjectCostVerificationExampleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BusinessVerificationExampleDetailScreen(
       sprint: 'S19 Fixed Assets & Projects Pack',
-      title: 'Project Cost',
-      description: 'Focused S19 verification for Project Cost. Generate this scenario independently, inspect the PDF output, and compare LTR and RTL without switching to another example.',
+      title: pdfLocalization.projectCost,
+      description: pdfLocalization.s19ProjectCostVerify,
       apiName: 'buildS19ProjectCostVerificationPdf',
       icon: Icons.domain_outlined,
       generator: buildS19ProjectCostVerificationPdf,

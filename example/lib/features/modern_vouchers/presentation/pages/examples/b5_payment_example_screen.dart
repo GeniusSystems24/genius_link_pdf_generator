@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/modern_vouchers/models/documents/modern_vouchers_demo_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated PDF-preview example for **B5 Payment Voucher**.
 ///
 /// The document is generated only after the user presses **Run example**.
@@ -32,8 +33,8 @@ Future<Uint8List> generateB5PaymentVoucherPdf(GeniusPdfConfig config) async {
   Widget build(BuildContext context) {
     return VerificationExampleDetailScreen(
       sprint: 'Modern Vouchers',
-      title: 'B5 Payment Voucher',
-      description: 'Special B5-sized payment voucher.',
+      title: pdfLocalization.b5PaymentVoucher,
+      description: pdfLocalization.specialB5SizedPaymentVoucher,
       apiName: 'generateB5PaymentVoucherPdf',
       icon: Icons.payments_outlined,
       generator: generateB5PaymentVoucherPdf,

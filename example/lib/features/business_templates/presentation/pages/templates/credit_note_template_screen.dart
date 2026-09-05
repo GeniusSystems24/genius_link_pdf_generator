@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/sales_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/widgets/business_template_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated example screen for the Credit Note business template.
 class CreditNoteTemplateScreen extends StatelessWidget {
   const CreditNoteTemplateScreen({super.key});
@@ -61,11 +62,11 @@ build.builder.dispose();
 
   @override
   Widget build(BuildContext context) {
-    return const BusinessTemplateDetailScreen(
+    return  BusinessTemplateDetailScreen(
       category: 'Sales Documents',
-      title: 'Credit Note',
+      title: pdfLocalization.creditNote,
       titleAr: 'إشعار دائن',
-      description: 'Credit adjustment document for returned goods or invoice corrections.',
+      description: pdfLocalization.creditAdjustmentDocumentReturnedDesc,
       icon: Icons.money_off,
       buildTemplate: buildCreditNoteDemo,
       usageCode: dartUsageCode,

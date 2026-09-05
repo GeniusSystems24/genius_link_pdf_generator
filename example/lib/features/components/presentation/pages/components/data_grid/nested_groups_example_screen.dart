@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for the Nested Groups DataGrid example.
 ///
 /// The document is generated only after the user presses **Run example**. The
@@ -141,12 +142,12 @@ class DataGridNestedGroupsDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'data_grid_nested_groups',
       category: 'Components / Data Grid',
-      title: 'Nested Groups',
+      title: pdfLocalization.nestedGroups,
       apiName: 'GeniusPdfDataGrid',
-      description: 'Create grouped DataGrid content with nested subgroups, subgroup summaries, group summaries, and a document-level grand total.',
+      description: pdfLocalization.groupedDataGridContentNestedDesc,
       icon: Icons.table_chart_outlined,
       usageCode: dartUsageCode,
     );

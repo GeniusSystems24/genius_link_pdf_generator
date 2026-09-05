@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Dedicated screen for **Info & Warning States**.
 ///
 /// The PDF is generated only after **Run example** is pressed. The code panel
@@ -75,12 +76,12 @@ class InfoWarningBoxesDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'info_box_info_warning',
       category: 'Components / Core PDF Components / Info Box',
-      title: 'Info & Warning States',
+      title: pdfLocalization.infoAndWarningStates,
       apiName: 'GeniusPdfInfoBox',
-      description: 'Compare informational and warning semantic info-box styles in a dual-box layout.',
+      description: pdfLocalization.compareInformationalWarningSemanticDesc,
       icon: Icons.warning_amber_outlined,
       usageCode: dartUsageCode,
     );

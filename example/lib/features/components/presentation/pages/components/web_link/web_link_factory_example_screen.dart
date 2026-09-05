@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:genius_pdf_example/features/components/presentation/widgets/component_example_detail_screen.dart';
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
 /// Dedicated screen for **TextSpan Web Link Factory**.
 ///
@@ -12,6 +13,7 @@ class WebLinkFactoryExampleScreen extends StatelessWidget {
   static const String dartUsageCode = r'''import 'dart:ui' show Color;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 /// Focused document builder for the **TextSpan Web Link Factory** example.
 ///
 /// This file contains only one logical example. It is also embedded verbatim
@@ -64,12 +66,12 @@ class WebLinkFactoryDemoBuilder extends GeniusPdfDocumentBuilder {
 
   @override
   Widget build(BuildContext context) {
-    return const ComponentExampleDetailScreen(
+    return  ComponentExampleDetailScreen(
       componentId: 'web_link_factory',
       category: 'Components / Core PDF Components / Web Links',
-      title: 'TextSpan Web Link Factory',
+      title: pdfLocalization.textSpanWebLinkFactory,
       apiName: 'GeniusPdfTextSpan.webLink',
-      description: 'Create a clickable hyperlink directly with GeniusPdfTextSpan.webLink().',
+      description: pdfLocalization.clickableHyperlinkDirectlyGeniusPdfDesc,
       icon: Icons.open_in_new_outlined,
       usageCode: dartUsageCode,
     );
