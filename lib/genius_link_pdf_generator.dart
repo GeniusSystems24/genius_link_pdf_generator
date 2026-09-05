@@ -150,3 +150,8 @@ export 'src/printing/printing.dart';
 // Sharing (v2.3.0)
 export 'src/sharing/sharing.dart';
 export 'src/packs/erp_packs.dart';
+export 'src/template_engine_vnext/template_engine_vnext.dart';
+export 'src/compliance/compliance.dart';
+export 'src/quality/quality.dart';
+export 'src/template_designer/template_designer.dart';
+export 'src/industry_packs/industry_pack_api.dart';

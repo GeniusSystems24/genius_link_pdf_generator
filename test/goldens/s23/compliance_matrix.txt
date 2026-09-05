@@ -1,0 +1,11 @@
+# S23 Compliance / Signing / Audit / Archival semantic QA matrix
+Compliance|profile|country-tenant-plugin|required-fields|qr-hooks
+Copies|original|copy|reprint|reason-policy
+Approval|business-approval-not-signature
+Signing|metadata|certificate-provider-contract|timestamp-contract
+Integrity|hash-metadata|fingerprint-provider|uuid
+Archive|xmp|attachments|capability-flags|source-audit|generation-version
+Security|higher-level-policy|existing-service|protected-unprotected
+Profiles|version|effective-date|source-references|no-hardcoded-law
+Registry|generic|country|tenant|effective-selection
+Manual|ltr|rtl|null|long|preview-generate

@@ -1,0 +1,22 @@
+# S15 Inventory & WMS semantic QA matrix
+StockReceipt|ltr+rtl|batch+serial+expiry
+StockIssue|ltr+rtl|fractional-quantity
+StockTransfer|source+destination
+WarehouseTransfer|warehouse+location
+StockAdjustment|positive+negative-adjustment
+StockCount|system+counted
+CycleCount|system+counted
+CountReconciliation|variance-only
+ItemCard|movement-history
+StockLedger|running-balance
+StockValuation|quantity*unit-cost-pre-render
+StockAvailability|on-hand-reserved-available
+ReorderReport|reorder-point
+MinMaxReport|min+max
+SlowDeadStock|age-days
+BatchReport|traceability
+SerialReport|traceability
+ExpiryReport|traceability
+MovementTraceability|lot+batch+serial+expiry
+Labels|item+shelf+batch+serial+location|S11-engine
+QA|multi-unit|fractional|large-count|long-name|arabic-name+latin-sku

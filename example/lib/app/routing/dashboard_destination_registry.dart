@@ -33,6 +33,19 @@ import 'package:genius_pdf_example/features/templates/presentation/pages/templat
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/s12_sales_erp_pack_verification_page.dart';
 import 'package:genius_pdf_example/features/dashboard/presentation/pages/s13_purchasing_erp_pack_verification_page.dart';
 
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s14_accounting_finance_pack_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s15_inventory_wms_pack_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s16_pos_retail_pack_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s17_hr_payroll_pack_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s18_manufacturing_quality_pack_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s19_fixed_assets_projects_pack_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s20_maintenance_service_logistics_pack_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s21_crm_pack_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s22_template_engine_vnext_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s23_compliance_signing_archival_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s24_performance_regression_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s25_template_designer_verification_page.dart';
+import 'package:genius_pdf_example/features/dashboard/presentation/pages/s26_industry_packs_verification_page.dart';
 final class DashboardDestinationRegistry {
   const DashboardDestinationRegistry._();
 
@@ -64,6 +77,19 @@ final class DashboardDestinationRegistry {
     DashboardDestination(id: 's12_sales_erp_pack', title: 'S12 Sales ERP Pack'),
     DashboardDestination(
         id: 's13_purchasing_erp_pack', title: 'S13 Purchasing ERP Pack'),
+    DashboardDestination(id: 's14_accounting_finance_pack', title: 'S14 Accounting & Finance Pack'),
+    DashboardDestination(id: 's15_inventory_wms_pack', title: 'S15 Inventory & WMS Pack'),
+    DashboardDestination(id: 's16_pos_retail_pack', title: 'S16 POS & Retail Pack'),
+    DashboardDestination(id: 's17_hr_payroll_pack', title: 'S17 HR & Payroll Pack'),
+    DashboardDestination(id: 's18_manufacturing_quality_pack', title: 'S18 Manufacturing & Quality Pack'),
+    DashboardDestination(id: 's19_fixed_assets_projects_pack', title: 'S19 Fixed Assets & Projects Pack'),
+    DashboardDestination(id: 's20_maintenance_service_logistics_pack', title: 'S20 Maintenance, Service & Logistics Pack'),
+    DashboardDestination(id: 's21_crm_pack', title: 'S21 CRM Pack'),
+    DashboardDestination(id: 's22_template_engine_vnext', title: 'S22 Template Engine vNext'),
+    DashboardDestination(id: 's23_compliance_signing_archival', title: 'S23 Compliance, Signing & Archival'),
+    DashboardDestination(id: 's24_performance_regression', title: 'S24 Performance & Regression'),
+    DashboardDestination(id: 's25_template_designer', title: 'S25 Template Designer'),
+    DashboardDestination(id: 's26_industry_packs', title: 'S26 Industry / Plugin Packs'),
     DashboardDestination(id: 'components', title: 'Components'),
     DashboardDestination(id: 'templates', title: 'Templates'),
     DashboardDestination(id: 'new_templates', title: 'Business Templates'),
@@ -128,6 +154,19 @@ final class DashboardDestinationRegistry {
         'job_manager' => 'Job Manager',
         'custom_report' => 'Custom Report',
         'modern_vouchers' => 'Modern Vouchers',
+        's14_accounting_finance_pack' => 'S14 Accounting & Finance Pack',
+        's15_inventory_wms_pack' => 'S15 Inventory & WMS Pack',
+        's16_pos_retail_pack' => 'S16 POS & Retail Pack',
+        's17_hr_payroll_pack' => 'S17 HR & Payroll Pack',
+        's18_manufacturing_quality_pack' => 'S18 Manufacturing & Quality Pack',
+        's19_fixed_assets_projects_pack' => 'S19 Fixed Assets & Projects Pack',
+        's20_maintenance_service_logistics_pack' => 'S20 Maintenance, Service & Logistics Pack',
+        's21_crm_pack' => 'S21 CRM Pack',
+        's22_template_engine_vnext' => 'S22 Template Engine vNext',
+        's23_compliance_signing_archival' => 'S23 Compliance, Signing & Archival',
+        's24_performance_regression' => 'S24 Performance & Regression',
+        's25_template_designer' => 'S25 Template Designer',
+        's26_industry_packs' => 'S26 Industry / Plugin Packs',
         _ => 'Genius PDF',
       };
 
@@ -189,6 +228,19 @@ final class DashboardDestinationRegistry {
         'job_manager' => const JobManagerDemoScreen(),
         'custom_report' => const CustomReportScreen(),
         'modern_vouchers' => const ModernVouchersDemoScreen(),
+        's14_accounting_finance_pack' => const S14AccountingFinancePackVerificationPage(),
+        's15_inventory_wms_pack' => const S15InventoryWmsPackVerificationPage(),
+        's16_pos_retail_pack' => const S16PosRetailPackVerificationPage(),
+        's17_hr_payroll_pack' => const S17HrPayrollPackVerificationPage(),
+        's18_manufacturing_quality_pack' => const S18ManufacturingQualityPackVerificationPage(),
+        's19_fixed_assets_projects_pack' => const S19FixedAssetsProjectsPackVerificationPage(),
+        's20_maintenance_service_logistics_pack' => const S20MaintenanceServiceLogisticsPackVerificationPage(),
+        's21_crm_pack' => const S21CrmPackVerificationPage(),
+        's22_template_engine_vnext' => const S22TemplateEngineVNextVerificationPage(),
+        's23_compliance_signing_archival' => const S23ComplianceSigningArchivalVerificationPage(),
+        's24_performance_regression' => const S24PerformanceRegressionVerificationPage(),
+        's25_template_designer' => const S25TemplateDesignerVerificationPage(),
+        's26_industry_packs' => const S26IndustryPacksVerificationPage(),
         _ => DashboardHome(onNavigate: onNavigate),
       };
 }

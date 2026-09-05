@@ -1,0 +1,26 @@
+# S14 Accounting & Finance semantic QA matrix
+GeneralLedger|ltr+rtl|debit-credit|opening+movement+closing|carry-policy
+JournalEntry|balanced-reconciliation|decimal-precision
+JournalRegister|ltr+rtl|10k-preparation
+AccountStatement|ltr+rtl|long-hierarchy
+ARAging|calculation-testable
+APAging|calculation-testable
+CustomerBalances|calculation-testable
+SupplierBalances|calculation-testable
+CashBook|semantic-debit-credit
+BankBook|semantic-debit-credit
+BankReconciliation|book-vs-statement|variance
+PettyCash|register-family
+PaymentRegister|register-family
+ReceiptRegister|register-family
+VATSummary|taxable+exempt+zero-rated
+TaxRegister|rate+base+tax
+TaxBreakdown|configurable-category
+RoundingReconciliation|expected-vs-actual
+CostCenterStatement|grouped
+CostCenterTrialBalance|grouped
+ProjectFinancialReport|grouped
+BudgetVsActual|variance
+MultiPeriodComparison|dynamic-period-columns
+AccountingPresentation|negative-parentheses|zero-dash|rtl-ledger-policy
+Currency|SAR+USD+KWD+JPY|no-silent-cross-currency-sum

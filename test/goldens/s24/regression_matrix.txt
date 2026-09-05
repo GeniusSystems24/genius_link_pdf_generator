@@ -1,0 +1,6 @@
+# S24 regression matrix
+Performance|family-baselines|font-resource-cache|media-cache|measurement-cache
+Performance|large-grid-profile|background-benchmark|batch-benchmark
+Golden|component|family|erp-pack|EN-LTR|AR-RTL|bilingual|thermal|labels
+Semantic|text-extraction|document-number|party|totals|tax|page-number|currency
+Semantic|required-compliance-metadata

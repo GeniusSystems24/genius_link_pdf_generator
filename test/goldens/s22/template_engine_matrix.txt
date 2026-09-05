@@ -1,0 +1,12 @@
+# S22 Template Engine vNext semantic QA matrix
+Schema|explicit-version|migration-v1-v2|readable-errors
+Elements|component|section|pageBreak|barcode|qrCode|signature|summary
+Elements|metric|chart|attachment|stamp|label|group|subTemplate
+Expression|nested-path|arithmetic|boolean|null-coalesce
+Expression|sum|avg|min|max|groupSum|format|i18n
+Security|unknown-function-rejected|no-eval|token-depth-limits
+Composition|subtemplate|inheritance|named-component|style-inheritance
+Registry|id|version|pack|variant|locale|country|organization|branch
+Registry|effective-range|fallback|draft-published|history|checksum|rollback
+Direction|schema|element|component|bilingual-nested|value-direction
+Tests|invalid-expression|migration|unknown-element|large-loop|renderer-free-schema

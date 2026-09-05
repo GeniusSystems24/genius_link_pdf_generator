@@ -1,0 +1,23 @@
+# S17 HR & Payroll semantic QA matrix
+EmployeeProfile|ltr+rtl|arabic-name|latin-id|privacy
+EmployeeList|role-visibility|masked-national-id
+EmploymentContract|optional-end-date|long-terms
+EmployeeActionForm|previous+new+reason
+Attendance|worked+late|null-check-in/out
+Timesheet|project+task|total-hours
+Overtime|hours+multiplier
+LeaveBalance|entitled-used-pending-available
+LeaveRequest|status+approver
+Payslip|base+allowances+deductions+net|long-lines
+PayrollSheet|multi-employee|reconciliation
+PayrollSummary|base+earnings-deductions=net
+AllowancesReport|long-list
+DeductionsReport|long-list
+LoanAdvance|original-repaid-outstanding
+SalaryCertificate|single-page-contract|confidential
+EmploymentCertificate|single-page-contract
+ExperienceCertificate|single-page-contract
+EndOfService|policy-driven|partial-year-config
+FinalSettlement|earnings-deductions=net
+Privacy|visibility|masking|watermark|role-hooks
+BiDi|arabic-employee-name|employee-id|IBAN|bank-data

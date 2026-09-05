@@ -23,6 +23,216 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.0] - 2026-09-03
 
+### S24 — Performance, Visual & Semantic Regression
+
+#### Added
+
+- Added document-family benchmark catalog and runner.
+- Added bounded resource/media byte caches and measurement cache.
+- Added portable large-grid profiling metrics plus background/batch benchmark support.
+- Added component/family/core-pack golden manifests for EN/LTR, AR/RTL,
+  bilingual, thermal and label scenarios.
+- Added extracted-text semantic regression for document number, party, totals,
+  tax, page number, currency and configured compliance metadata.
+- Added tests, QA matrix, docs and Dashboard manual verification.
+
+### S25 — Visual Template Designer Model & Authoring Layer
+
+#### Added
+
+- Added designer document state over Template Engine vNext.
+- Added drag/drop component metadata, properties panel schema, style schema and
+  binding metadata.
+- Added sample-data preview, EN/AR/bilingual direction modes, page-profile
+  selection, multi-page sample support and validation messages.
+- Added authoring operations for sections, conditions, expressions,
+  subtemplates, named components and styles.
+- Added tests, QA matrix, docs and Dashboard manual verification.
+
+### S26 — Industry / Plugin Template Packs
+
+#### Added
+
+- Added package/plugin boundary, pack manifest, domain-extension declaration,
+  compliance-hook declaration and core-version compatibility rules.
+- Added Retail extensions over POS without duplicating POS core.
+- Added Restaurant KOT/table/kitchen/delivery variants.
+- Added Construction/Real Estate progress, BOQ, property/unit and billing
+  variants.
+- Added Healthcare/Education generic shells with plugin-owned regulated models.
+- Added Automotive/Distribution/Hospitality variants that reuse
+  service/logistics/transaction families.
+- Added tests, QA matrix, docs and Dashboard manual verification.
+
+
+### S21 — CRM Pack
+
+#### Added
+
+- Added Customer Profile, Lead, Opportunity, Pipeline, Activity, Visit, Call,
+  Customer History, Proposal and Contract Summary documents.
+- Added printable metric cards, stage/status, timeline/history, contact/party
+  and attachment/reference primitives.
+- Added weighted pipeline totals, long-history/multi-page proposal QA and
+  draft/confidential watermark variants.
+- Added S21 tests, docs and Dashboard verification page.
+
+### S22 — Template Engine vNext, Schema Versioning & Registry
+
+#### Added
+
+- Added explicit versioned template schema and v1→v2 migration/legacy-map
+  adapter with readable validation errors.
+- Added Component, Section, PageBreak, Barcode, QRCode, Signature, Summary,
+  Metric, Chart, Attachment, Stamp, Label, Group and SubTemplate schema
+  elements.
+- Added restricted expression parser with nested access, arithmetic,
+  boolean/null-safe conditions, aggregates, group aggregates, formatting and
+  localization.
+- Added inheritance, subtemplates, named components, style inheritance and
+  document-family binding.
+- Added TemplateId/Version/Pack/scoped registry, effective dates, fallback,
+  draft/published state, history/checksum/rollback.
+- Added direction/value-direction inheritance and security/source tests.
+- Added S22 docs and Dashboard verification page.
+
+### S23 — Compliance, Signing, Audit & Archival Profiles
+
+#### Added
+
+- Added `GeniusPdfComplianceProfile`, country/tenant plugin contract,
+  required-field validation and structured QR hooks.
+- Added original/copy/reprint policies.
+- Added separate business approval and cryptographic signing metadata plus
+  certificate-signing/timestamp/hash/fingerprint provider contracts.
+- Added XMP, embedded-attachment, archive capability, source audit and
+  generation metadata abstractions.
+- Added higher-level enterprise security policy that delegates to the existing
+  `GeniusPdfSecurityService`.
+- Added jurisdiction-profile registry with version/effective-date/source
+  references and no hard-coded country law in base templates.
+- Added S23 tests, docs and Dashboard verification page.
+
+
+### S19 — Fixed Assets & Projects Pack
+
+#### Added
+
+- Added Asset Card, Register, Label, Transfer, Assignment, Return, Disposal,
+  Depreciation, Maintenance, Count and Movement outputs.
+- Added Asset label profiles through the S11 label/profile engine.
+- Added straight-line and declining-balance depreciation preparation with
+  residual-floor and cost/accumulated/NBV reconciliation.
+- Added Project Summary, Budget, Cost, Profitability, Timesheet, Expense,
+  Milestone, Progress, Completion Certificate, Billing, Resource Utilization
+  and Purchasing reports.
+- Added multi-period project financial reconciliation.
+- Added BiDi/label/depreciation/project-financial/long-content QA and a
+  Dashboard manual verification page.
+
+### S20 — Maintenance, Service & Logistics Pack
+
+#### Added
+
+- Added Service Order, Maintenance Work Order, Preventive Schedule,
+  Maintenance Checklist, Technician Report, Service Completion, Spare Parts,
+  Warranty, Inspection and Calibration/Service History outputs.
+- Added Shipment, Packing List, Dispatch Note, Waybill, Manifest, Trip Sheet/
+  Report, Shipping/Pallet labels, Container List, Freight Summary and Proof of
+  Delivery.
+- Added reusable route/reference, vehicle/driver/technician identity,
+  checklist, signature/proof, geo/time and attachment/photo models.
+- Reused S18 checklist/measurement semantics and S11 label/thermal profiles.
+- Added QA for multi-stop manifests, long shipment items, Arabic addresses with
+  Latin tracking numbers, label/thermal profiles and POD signatures.
+- Added S20 documentation and Dashboard manual verification page.
+
+
+### S17 — HR & Payroll Pack
+
+#### Added
+
+- Added Employee Profile/List, Employment Contract/Form and Employee Action
+  Form outputs.
+- Added Attendance, Timesheet, Overtime, Leave Balance and Leave Request.
+- Added Payslip, Payroll Sheet/Summary, Allowances/Deductions and Employee
+  Loan/Advance reports.
+- Added Salary, Employment and Experience certificates.
+- Added policy-driven End-of-Service calculation/report and Final Settlement.
+- Added field visibility, sensitive-ID masking, confidential/custom watermark
+  support and role-specific printable variant hooks.
+- Added Arabic employee/mixed ID+bank QA, long payroll-line tests, payroll
+  reconciliation and certificate single-page content constraints.
+- Added S17 documentation, semantic QA matrix and Dashboard verification page.
+
+### S18 — Manufacturing & Quality Pack
+
+#### Added
+
+- Added BOM, Production Order, Work Order, Job Card, Material Requirement,
+  Material Issue/Return, Production Receipt and Routing/Traveler.
+- Added Machine Operation, Labor, Scrap, WIP and Production Variance reports.
+- Added Quality/Incoming/In-process/Final Inspection, NCR, CAPA, COA, Quality
+  Checklist, Audit Form and Calibration Record.
+- Added nested operation/material table primitives using grouped DataGrid rows.
+- Added checklist primitives, pass/fail/status cells,
+  measurement/specification/value/tolerance rows, batch/serial traceability
+  and approval/sign-off.
+- Added QA for multi-level BOM, long routing, mixed units, RTL technical terms
+  with Latin codes and multi-page checklists.
+- Added S18 documentation, semantic QA matrix and Dashboard verification page.
+
+
+### S14 — Accounting & Finance Pack
+
+#### Added
+
+- Added General Ledger, Journal Entry/Register and Account Statement.
+- Added AR/AP Aging, customer/supplier balances, Cash/Bank books, Bank
+  Reconciliation, Petty Cash, Payment and Receipt registers.
+- Added VAT/Tax Summary, Tax Register, taxable/exempt/zero-rated breakdown and
+  rounding reconciliation.
+- Added Cost Center Statement/Trial Balance, Project Financial, Budget vs
+  Actual and Multi-period Comparison reports.
+- Added debit/credit semantic modeling, accounting-negative formatting,
+  opening/movement/closing balances, hierarchy and optional carry-forward
+  policy.
+- Added reconciliation/precision/multi-currency/hierarchy tests and 10k-row
+  preparation benchmark.
+- Added S14 docs, semantic QA matrix and Dashboard verification page.
+
+### S15 — Inventory & WMS Pack
+
+#### Added
+
+- Added Stock Receipt, Issue, Transfer, Warehouse Transfer and Adjustment.
+- Added Stock Count, Cycle Count and variance reconciliation.
+- Added Item Card, Stock Ledger, Valuation, Availability, Reorder, Min/Max and
+  Slow/Dead Stock reports.
+- Added batch, serial and expiry traceability.
+- Added multi-unit/base-unit and fractional quantity support.
+- Added Item, Shelf, Batch, Serial and Location labels on the S11 label engine.
+- Added S15 tests, semantic QA matrix, docs and Dashboard verification page.
+
+### S16 — POS & Retail Pack
+
+#### Added
+
+- Added 58mm/80mm POS receipts, Refund, Exchange and Gift Receipt.
+- Added optional Kitchen Order Ticket, Shift Open/Close, X/Z, Cash Drawer and
+  Payment Method Summary reports.
+- Added Barcode, Price and Promotion labels using the S11 label engine.
+- Added tax summary, discount/promotion, cash/change, multiple-payment,
+  QR/barcode, copy/reprint and Arabic-note receipt behavior.
+- Added S16 tests, semantic QA matrix, docs and Dashboard verification page.
+
+#### Changed
+
+- Extended `GeniusPdfThermalReceiptData` with optional localized receipt titles
+  and `showAmounts` (default `true`) so Gift/KOT outputs reuse the same thermal
+  renderer without breaking existing callers.
+
+
 ### S12 — Sales ERP Pack
 
 #### Added

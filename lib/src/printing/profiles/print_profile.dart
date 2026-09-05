@@ -38,6 +38,7 @@ enum GeniusPdfHeaderFooterPolicy {
 enum GeniusPdfCopyKind {
   original,
   copy,
+  reprint,
 }
 
 /// Copy metadata that can be surfaced by templates/engines.
@@ -50,6 +51,8 @@ class GeniusPdfCopyMetadata {
     this.originalLabelAr = 'الأصل',
     this.copyLabel = 'Copy',
     this.copyLabelAr = 'نسخة',
+    this.reprintLabel = 'Reprint',
+    this.reprintLabelAr = 'إعادة طباعة',
   })  : assert(copyNumber > 0),
         assert(totalCopies > 0),
         assert(copyNumber <= totalCopies);
@@ -61,12 +64,21 @@ class GeniusPdfCopyMetadata {
   final String originalLabelAr;
   final String copyLabel;
   final String copyLabelAr;
+  final String reprintLabel;
+  final String reprintLabelAr;
 
   String label({required bool isRtl}) {
-    final base = kind == GeniusPdfCopyKind.original
-        ? (isRtl ? originalLabelAr : originalLabel)
-        : (isRtl ? copyLabelAr : copyLabel);
-    return totalCopies == 1 ? base : '$base $copyNumber/$totalCopies';
+    final base = switch (kind) {
+      GeniusPdfCopyKind.original =>
+        isRtl ? originalLabelAr : originalLabel,
+      GeniusPdfCopyKind.copy =>
+        isRtl ? copyLabelAr : copyLabel,
+      GeniusPdfCopyKind.reprint =>
+        isRtl ? reprintLabelAr : reprintLabel,
+    };
+    return totalCopies == 1
+        ? base
+        : '$base $copyNumber/$totalCopies';
   }
 }
 

@@ -51,6 +51,9 @@ class GeniusPdfThermalReceiptData {
     required this.date,
     required this.items,
     this.merchantNameAr,
+    this.title,
+    this.titleAr,
+    this.showAmounts = true,
     this.currency = 'SAR',
     this.discount = 0,
     this.tax = 0,
@@ -64,6 +67,16 @@ class GeniusPdfThermalReceiptData {
 
   final String merchantName;
   final String? merchantNameAr;
+
+  /// Optional localized receipt heading.
+  final String? title;
+  final String? titleAr;
+
+  /// Whether monetary quantity/price/summary/payment sections are rendered.
+  ///
+  /// Defaults to true for backward compatibility. S16 Gift/KOT sets false.
+  final bool showAmounts;
+
   final String receiptNumber;
   final DateTime date;
   final List<GeniusPdfThermalLineItem> items;
@@ -102,15 +115,24 @@ GeniusPdfConfig _thermalReceiptConfig(
 
   // Variable-height receipt. The estimate deliberately includes generous
   // wrapping allowance so the generated page does not clip at the cut edge.
+  int _estimatedThermalItemLines(
+    GeniusPdfThermalLineItem item,
+  ) {
+    final longest = item.description.length >
+            (item.descriptionAr?.length ?? 0)
+        ? item.description
+        : (item.descriptionAr ?? item.description);
+    final explicitLines = '\n'.allMatches(longest).length + 1;
+    final wrappedLines = (longest.length / 34).ceil();
+    return explicitLines > wrappedLines
+        ? explicitLines
+        : wrappedLines;
+  }
+
   final itemHeight = data.items.fold<double>(
     0,
-    (sum, item) => sum +
-        30 +
-        ((item.description.length +
-                    (item.descriptionAr?.length ?? 0)) >
-                60
-            ? 18
-            : 0),
+    (sum, item) =>
+        sum + 18 + _estimatedThermalItemLines(item) * 16,
   );
   final paymentHeight = data.payments.length * 18.0;
   final codesHeight =
@@ -162,8 +184,11 @@ class GeniusPdfThermalReceiptEngine extends GeniusErpThermalReceipt {
           : data.merchantName,
       font: config.headerFont,
     );
+    final receiptTitle = config.isRTL
+        ? (data.titleAr ?? data.title ?? 'إيصال')
+        : (data.title ?? data.titleAr ?? 'Receipt');
     _drawCentered(
-      config.isRTL ? 'إيصال' : 'Receipt',
+      receiptTitle,
       font: config.boldFont,
     );
 
@@ -200,47 +225,51 @@ class GeniusPdfThermalReceiptEngine extends GeniusErpThermalReceipt {
         );
       }
 
-      final qty = config.formatter.formatQuantity(
-        item.quantity,
-        decimalPlaces: 3,
-      );
-      _drawLtrLine(
-        '$qty × ${item.unitPrice.toStringAsFixed(2)} '
-        '= ${item.total.toStringAsFixed(2)} ${data.currency}',
-        font: config.smallFont,
-      );
+      if (data.showAmounts) {
+        final qty = config.formatter.formatQuantity(
+          item.quantity,
+          decimalPlaces: 3,
+        );
+        _drawLtrLine(
+          '$qty × ${item.unitPrice.toStringAsFixed(2)} '
+          '= ${item.total.toStringAsFixed(2)} ${data.currency}',
+          font: config.smallFont,
+        );
+      }
       addSpace(3);
     }
 
-    _divider();
+    if (data.showAmounts) {
+      _divider();
 
-    _drawMoneyLine(
-      label: 'Subtotal',
-      labelAr: 'المجموع الفرعي',
-      amount: data.subtotal,
-    );
-    if (data.discount != 0) {
       _drawMoneyLine(
-        label: 'Discount',
-        labelAr: 'الخصم',
-        amount: -data.discount,
+        label: 'Subtotal',
+        labelAr: 'المجموع الفرعي',
+        amount: data.subtotal,
+      );
+      if (data.discount != 0) {
+        _drawMoneyLine(
+          label: 'Discount',
+          labelAr: 'الخصم',
+          amount: -data.discount,
+        );
+      }
+      if (data.tax != 0) {
+        _drawMoneyLine(
+          label: 'Tax',
+          labelAr: 'الضريبة',
+          amount: data.tax,
+        );
+      }
+      _drawMoneyLine(
+        label: 'Total',
+        labelAr: 'الإجمالي',
+        amount: data.grandTotal,
+        bold: true,
       );
     }
-    if (data.tax != 0) {
-      _drawMoneyLine(
-        label: 'Tax',
-        labelAr: 'الضريبة',
-        amount: data.tax,
-      );
-    }
-    _drawMoneyLine(
-      label: 'Total',
-      labelAr: 'الإجمالي',
-      amount: data.grandTotal,
-      bold: true,
-    );
 
-    if (data.payments.isNotEmpty) {
+    if (data.showAmounts && data.payments.isNotEmpty) {
       _divider();
       _drawWrapped(
         config.isRTL ? 'الدفع' : 'Payment',

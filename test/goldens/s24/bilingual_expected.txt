@@ -1,0 +1,1 @@
+document=INV-LATIN-001|party=Demo Customer/عميل تجريبي|currency=SAR|page=1/1

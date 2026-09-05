@@ -1,0 +1,26 @@
+# S19 Fixed Assets & Projects semantic QA matrix
+AssetCard|normal|null-optionals|ltr|rtl|mixed
+AssetRegister|long-data|multi-page|asset-tag-ltr
+AssetLabel|durable-single|compact-sheet|tag+serial-bidi
+AssetTransfer|from-to-location
+AssetAssignment|custodian
+AssetReturn|store-return
+AssetDisposal|proceeds+reason
+Depreciation|straight-line|declining|reconciliation|residual-floor
+AssetMaintenance|cost+next-due
+AssetCount|found+missing
+AssetMovement|all-kinds
+ProjectSummary|arabic-name|latin-project-code
+ProjectBudget|period+total
+ProjectCost|period+total
+ProjectProfitability|revenue-cost-profit-margin
+ProjectTimesheet|hours+calculated-cost
+ProjectExpense|approved+optional
+Milestones|long-notes|multi-page
+Progress|summary+risks+next-steps
+CompletionCertificate|certificate-family
+ProjectBilling|multi-period
+ResourceUtilization|zero-available+percentage
+ProjectPurchasing|supplier+reference
+QA|serial-tag-bidi|label-profiles|depreciation-reconciliation
+QA|multi-period-financials|long-milestones|arabic-english-codes

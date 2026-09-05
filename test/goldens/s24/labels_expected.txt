@@ -1,0 +1,1 @@
+profile=labelSheet|sku=SKU-LATIN-001|barcode=123456789012

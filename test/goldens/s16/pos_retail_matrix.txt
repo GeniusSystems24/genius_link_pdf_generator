@@ -1,0 +1,17 @@
+# S16 POS & Retail semantic QA matrix
+Receipt58|58mm|ltr+rtl|no-cut-off
+Receipt80|80mm|ltr+rtl|no-cut-off
+RefundReceipt|negative-values
+ExchangeReceipt|mixed-return-sale-semantics
+GiftReceipt|showAmounts=false
+KitchenOrderTicket|thermal-shared-engine|showAmounts=false
+ShiftOpen|register-family
+ShiftClose|register-family
+XReport|analytical-family
+ZReport|analytical-family
+CashDrawer|opening+expected+actual+variance
+PaymentMethodSummary|cash+card+bank+wallet+voucher
+RetailLabels|barcode+price+promotion|S11-label-engine
+ReceiptBehaviors|tax-summary|discounts+promotions|cash+change|multi-payment
+ReceiptBehaviors|qr+barcode|copy+reprint|compact-arabic
+QA|thermal-width-stress|very-long-name|arabic-note|high-item-count|rtl+ltr

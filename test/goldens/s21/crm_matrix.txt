@@ -1,0 +1,14 @@
+# S21 CRM semantic QA matrix
+CustomerProfile|arabic-name|latin-email-phone|contacts
+LeadReport|status|source|estimated-value
+Opportunity|stage|probability|weighted-value
+Pipeline|stage-count|amount|weighted-total
+Activity|500-history|sorted|long-notes
+Visit|filtered-activity
+Call|filtered-activity
+CustomerHistory|timeline
+Proposal|250-lines|multi-page|totals
+ContractSummary|references|attachments|confidential
+Presentation|metric|stage-text|timeline|contact-block|attachment
+BiDi|arabic-notes|latin-email-phone
+Watermark|none|draft|confidential

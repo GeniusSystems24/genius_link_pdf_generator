@@ -1379,72 +1379,72 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Ledger/journal
 
-- [ ] **S14-T01** — General Ledger.
-- [ ] **S14-T02** — Journal Entry.
-- [ ] **S14-T03** — Journal Register.
-- [ ] **S14-T04** — Account Statement.
+- [x] **S14-T01** — General Ledger.
+- [x] **S14-T02** — Journal Entry.
+- [x] **S14-T03** — Journal Register.
+- [x] **S14-T04** — Account Statement.
 
 ## B — Receivables/payables
 
-- [ ] **S14-T05** — AR Aging.
-- [ ] **S14-T06** — AP Aging.
-- [ ] **S14-T07** — Customer Balances.
-- [ ] **S14-T08** — Supplier Balances.
+- [x] **S14-T05** — AR Aging.
+- [x] **S14-T06** — AP Aging.
+- [x] **S14-T07** — Customer Balances.
+- [x] **S14-T08** — Supplier Balances.
 
 ## C — Cash/bank
 
-- [ ] **S14-T09** — Cash Book.
-- [ ] **S14-T10** — Bank Book.
-- [ ] **S14-T11** — Bank Reconciliation.
-- [ ] **S14-T12** — Petty Cash.
-- [ ] **S14-T13** — Payment Register.
-- [ ] **S14-T14** — Receipt Register.
+- [x] **S14-T09** — Cash Book.
+- [x] **S14-T10** — Bank Book.
+- [x] **S14-T11** — Bank Reconciliation.
+- [x] **S14-T12** — Petty Cash.
+- [x] **S14-T13** — Payment Register.
+- [x] **S14-T14** — Receipt Register.
 
 ## D — Tax
 
-- [ ] **S14-T15** — VAT/Tax Summary.
-- [ ] **S14-T16** — Tax Register.
-- [ ] **S14-T17** — taxable/exempt/zero-rated breakdown configuration.
-- [ ] **S14-T18** — rounding/reconciliation report.
+- [x] **S14-T15** — VAT/Tax Summary.
+- [x] **S14-T16** — Tax Register.
+- [x] **S14-T17** — taxable/exempt/zero-rated breakdown configuration.
+- [x] **S14-T18** — rounding/reconciliation report.
 
 ## E — Cost/project/budget
 
-- [ ] **S14-T19** — Cost Center Statement.
-- [ ] **S14-T20** — Cost Center Trial Balance.
-- [ ] **S14-T21** — Project Financial Report.
-- [ ] **S14-T22** — Budget vs Actual.
-- [ ] **S14-T23** — Multi-period Comparison.
+- [x] **S14-T19** — Cost Center Statement.
+- [x] **S14-T20** — Cost Center Trial Balance.
+- [x] **S14-T21** — Project Financial Report.
+- [x] **S14-T22** — Budget vs Actual.
+- [x] **S14-T23** — Multi-period Comparison.
 
 ## F — Financial presentation
 
-- [ ] **S14-T24** — debit/credit semantic styles.
-- [ ] **S14-T25** — accounting negatives.
-- [ ] **S14-T26** — opening/movement/closing balances.
-- [ ] **S14-T27** — group/subtotal hierarchy.
-- [ ] **S14-T28** — page-level carry/brought-forward policy where required.
+- [x] **S14-T24** — debit/credit semantic styles.
+- [x] **S14-T25** — accounting negatives.
+- [x] **S14-T26** — opening/movement/closing balances.
+- [x] **S14-T27** — group/subtotal hierarchy.
+- [x] **S14-T28** — page-level carry/brought-forward policy where required.
 
 ## G — QA
 
-- [ ] **S14-T29** — calculation reconciliation tests.
-- [ ] **S14-T30** — decimal precision tests.
-- [ ] **S14-T31** — multi-currency tests.
-- [ ] **S14-T32** — long chart-of-accounts hierarchy.
-- [ ] **S14-T33** — RTL ledger column policy.
-- [ ] **S14-T34** — 10k-row performance sample.
+- [x] **S14-T29** — calculation reconciliation tests.
+- [x] **S14-T30** — decimal precision tests.
+- [x] **S14-T31** — multi-currency tests.
+- [x] **S14-T32** — long chart-of-accounts hierarchy.
+- [x] **S14-T33** — RTL ledger column policy.
+- [x] **S14-T34** — 10k-row performance sample.
 
 ## Manual Verification Example
 
-- [ ] **S14-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S14-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S14-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S14-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S14-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S14-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S14-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S14-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S14-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S14-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Accounting pack.
-- [ ] Reconciliation/calculation tests.
-- [ ] Hierarchical ledger reports.
+- [x] Accounting pack.
+- [x] Reconciliation/calculation tests.
+- [x] Hierarchical ledger reports.
 
 ## Exit Gate
 
@@ -1465,65 +1465,65 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Movement docs
 
-- [ ] **S15-T01** — Stock Receipt.
-- [ ] **S15-T02** — Stock Issue.
-- [ ] **S15-T03** — Stock Transfer.
-- [ ] **S15-T04** — Warehouse Transfer.
-- [ ] **S15-T05** — Stock Adjustment.
+- [x] **S15-T01** — Stock Receipt.
+- [x] **S15-T02** — Stock Issue.
+- [x] **S15-T03** — Stock Transfer.
+- [x] **S15-T04** — Warehouse Transfer.
+- [x] **S15-T05** — Stock Adjustment.
 
 ## B — Count docs
 
-- [ ] **S15-T06** — Stock Count.
-- [ ] **S15-T07** — Cycle Count.
-- [ ] **S15-T08** — variance/count reconciliation.
+- [x] **S15-T06** — Stock Count.
+- [x] **S15-T07** — Cycle Count.
+- [x] **S15-T08** — variance/count reconciliation.
 
 ## C — Reports
 
-- [ ] **S15-T09** — Item Card.
-- [ ] **S15-T10** — Stock Ledger.
-- [ ] **S15-T11** — Stock Valuation.
-- [ ] **S15-T12** — Stock Availability.
-- [ ] **S15-T13** — Reorder Report.
-- [ ] **S15-T14** — Min/Max Report.
-- [ ] **S15-T15** — Slow/Dead Stock.
+- [x] **S15-T09** — Item Card.
+- [x] **S15-T10** — Stock Ledger.
+- [x] **S15-T11** — Stock Valuation.
+- [x] **S15-T12** — Stock Availability.
+- [x] **S15-T13** — Reorder Report.
+- [x] **S15-T14** — Min/Max Report.
+- [x] **S15-T15** — Slow/Dead Stock.
 
 ## D — Traceability
 
-- [ ] **S15-T16** — Batch Report.
-- [ ] **S15-T17** — Serial Report.
-- [ ] **S15-T18** — Expiry Report.
-- [ ] **S15-T19** — lot/batch references داخل movement docs.
+- [x] **S15-T16** — Batch Report.
+- [x] **S15-T17** — Serial Report.
+- [x] **S15-T18** — Expiry Report.
+- [x] **S15-T19** — lot/batch references داخل movement docs.
 
 ## E — Labels
 
-- [ ] **S15-T20** — Item Label.
-- [ ] **S15-T21** — Shelf Label.
-- [ ] **S15-T22** — Batch Label.
-- [ ] **S15-T23** — Serial Label.
-- [ ] **S15-T24** — Location Label.
+- [x] **S15-T20** — Item Label.
+- [x] **S15-T21** — Shelf Label.
+- [x] **S15-T22** — Batch Label.
+- [x] **S15-T23** — Serial Label.
+- [x] **S15-T24** — Location Label.
 
 ## F — QA
 
-- [ ] **S15-T25** — multi-unit quantities.
-- [ ] **S15-T26** — fractional quantities.
-- [ ] **S15-T27** — large item counts.
-- [ ] **S15-T28** — long item names.
-- [ ] **S15-T29** — Arabic item names + Latin SKU.
-- [ ] **S15-T30** — batch/serial/expiry mixed values.
+- [x] **S15-T25** — multi-unit quantities.
+- [x] **S15-T26** — fractional quantities.
+- [x] **S15-T27** — large item counts.
+- [x] **S15-T28** — long item names.
+- [x] **S15-T29** — Arabic item names + Latin SKU.
+- [x] **S15-T30** — batch/serial/expiry mixed values.
 
 ## Manual Verification Example
 
-- [ ] **S15-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S15-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S15-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S15-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S15-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S15-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S15-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S15-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S15-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S15-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Inventory/WMS pack.
-- [ ] Traceability reports.
-- [ ] Label set.
+- [x] Inventory/WMS pack.
+- [x] Traceability reports.
+- [x] Label set.
 
 ## Exit Gate
 
@@ -1544,60 +1544,60 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Receipts
 
-- [ ] **S16-T01** — 58mm receipt.
-- [ ] **S16-T02** — 80mm receipt.
-- [ ] **S16-T03** — Refund Receipt.
-- [ ] **S16-T04** — Exchange Receipt.
-- [ ] **S16-T05** — Gift Receipt.
+- [x] **S16-T01** — 58mm receipt.
+- [x] **S16-T02** — 80mm receipt.
+- [x] **S16-T03** — Refund Receipt.
+- [x] **S16-T04** — Exchange Receipt.
+- [x] **S16-T05** — Gift Receipt.
 
 ## B — Operations
 
-- [ ] **S16-T06** — Kitchen Order Ticket (KOT) كقالب اختياري مناسب للمطاعم.
-- [ ] **S16-T07** — Shift Open report.
-- [ ] **S16-T08** — Shift Close report.
-- [ ] **S16-T09** — X Report.
-- [ ] **S16-T10** — Z Report.
-- [ ] **S16-T11** — Cash Drawer report.
-- [ ] **S16-T12** — Payment Method Summary.
+- [x] **S16-T06** — Kitchen Order Ticket (KOT) كقالب اختياري مناسب للمطاعم.
+- [x] **S16-T07** — Shift Open report.
+- [x] **S16-T08** — Shift Close report.
+- [x] **S16-T09** — X Report.
+- [x] **S16-T10** — Z Report.
+- [x] **S16-T11** — Cash Drawer report.
+- [x] **S16-T12** — Payment Method Summary.
 
 ## C — Labels
 
-- [ ] **S16-T13** — Barcode label.
-- [ ] **S16-T14** — Price label.
-- [ ] **S16-T15** — Promotion label.
+- [x] **S16-T13** — Barcode label.
+- [x] **S16-T14** — Price label.
+- [x] **S16-T15** — Promotion label.
 
 ## D — Receipt behaviors
 
-- [ ] **S16-T16** — tax summary.
-- [ ] **S16-T17** — discounts/promotions.
-- [ ] **S16-T18** — cash/change.
-- [ ] **S16-T19** — multiple payment methods.
-- [ ] **S16-T20** — QR/barcode.
-- [ ] **S16-T21** — copy/reprint marker.
-- [ ] **S16-T22** — compact Arabic typography.
+- [x] **S16-T16** — tax summary.
+- [x] **S16-T17** — discounts/promotions.
+- [x] **S16-T18** — cash/change.
+- [x] **S16-T19** — multiple payment methods.
+- [x] **S16-T20** — QR/barcode.
+- [x] **S16-T21** — copy/reprint marker.
+- [x] **S16-T22** — compact Arabic typography.
 
 ## E — QA
 
-- [ ] **S16-T23** — thermal width stress.
-- [ ] **S16-T24** — very long product names.
-- [ ] **S16-T25** — Arabic notes under line item.
-- [ ] **S16-T26** — high item count.
-- [ ] **S16-T27** — no cut-off at end.
-- [ ] **S16-T28** — RTL/LTR receipts.
+- [x] **S16-T23** — thermal width stress.
+- [x] **S16-T24** — very long product names.
+- [x] **S16-T25** — Arabic notes under line item.
+- [x] **S16-T26** — high item count.
+- [x] **S16-T27** — no cut-off at end.
+- [x] **S16-T28** — RTL/LTR receipts.
 
 ## Manual Verification Example
 
-- [ ] **S16-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S16-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S16-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S16-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S16-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S16-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S16-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S16-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S16-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S16-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] POS/Retail pack.
-- [ ] 58/80mm golden samples.
-- [ ] Shift/X/Z reports.
+- [x] POS/Retail pack.
+- [x] 58/80mm golden samples.
+- [x] Shift/X/Z reports.
 
 ## Exit Gate
 
@@ -1618,64 +1618,64 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Employee
 
-- [ ] **S17-T01** — Employee Profile.
-- [ ] **S17-T02** — Employee List.
-- [ ] **S17-T03** — Employment Contract/Form support where applicable.
-- [ ] **S17-T04** — Employee Action Form.
+- [x] **S17-T01** — Employee Profile.
+- [x] **S17-T02** — Employee List.
+- [x] **S17-T03** — Employment Contract/Form support where applicable.
+- [x] **S17-T04** — Employee Action Form.
 
 ## B — Time/attendance
 
-- [ ] **S17-T05** — Attendance Report.
-- [ ] **S17-T06** — Timesheet.
-- [ ] **S17-T07** — Overtime Report.
-- [ ] **S17-T08** — Leave Balance.
-- [ ] **S17-T09** — Leave Request.
+- [x] **S17-T05** — Attendance Report.
+- [x] **S17-T06** — Timesheet.
+- [x] **S17-T07** — Overtime Report.
+- [x] **S17-T08** — Leave Balance.
+- [x] **S17-T09** — Leave Request.
 
 ## C — Payroll
 
-- [ ] **S17-T10** — Payslip.
-- [ ] **S17-T11** — Payroll Sheet.
-- [ ] **S17-T12** — Payroll Summary.
-- [ ] **S17-T13** — Allowances Report.
-- [ ] **S17-T14** — Deductions Report.
-- [ ] **S17-T15** — Employee Loan/Advance Report.
+- [x] **S17-T10** — Payslip.
+- [x] **S17-T11** — Payroll Sheet.
+- [x] **S17-T12** — Payroll Summary.
+- [x] **S17-T13** — Allowances Report.
+- [x] **S17-T14** — Deductions Report.
+- [x] **S17-T15** — Employee Loan/Advance Report.
 
 ## D — Certificates/settlement
 
-- [ ] **S17-T16** — Salary Certificate.
-- [ ] **S17-T17** — Employment Certificate.
-- [ ] **S17-T18** — Experience Certificate.
-- [ ] **S17-T19** — End-of-Service calculation/report.
-- [ ] **S17-T20** — Final Settlement.
+- [x] **S17-T16** — Salary Certificate.
+- [x] **S17-T17** — Employment Certificate.
+- [x] **S17-T18** — Experience Certificate.
+- [x] **S17-T19** — End-of-Service calculation/report.
+- [x] **S17-T20** — Final Settlement.
 
 ## E — Privacy/security
 
-- [ ] **S17-T21** — field visibility policies.
-- [ ] **S17-T22** — masking of sensitive identifiers where configured.
-- [ ] **S17-T23** — watermark/confidential marker.
-- [ ] **S17-T24** — role-specific printable variant hooks.
+- [x] **S17-T21** — field visibility policies.
+- [x] **S17-T22** — masking of sensitive identifiers where configured.
+- [x] **S17-T23** — watermark/confidential marker.
+- [x] **S17-T24** — role-specific printable variant hooks.
 
 ## F — QA
 
-- [ ] **S17-T25** — Arabic employee names.
-- [ ] **S17-T26** — mixed IDs/bank data.
-- [ ] **S17-T27** — long allowance/deduction lists.
-- [ ] **S17-T28** — payroll total reconciliation.
-- [ ] **S17-T29** — certificate single-page constraints.
+- [x] **S17-T25** — Arabic employee names.
+- [x] **S17-T26** — mixed IDs/bank data.
+- [x] **S17-T27** — long allowance/deduction lists.
+- [x] **S17-T28** — payroll total reconciliation.
+- [x] **S17-T29** — certificate single-page constraints.
 
 ## Manual Verification Example
 
-- [ ] **S17-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S17-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S17-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S17-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S17-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S17-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S17-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S17-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S17-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S17-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] HR/Payroll pack.
-- [ ] Certificates.
-- [ ] Payroll reconciliation tests.
+- [x] HR/Payroll pack.
+- [x] Certificates.
+- [x] Payroll reconciliation tests.
 
 ## Exit Gate
 
@@ -1696,64 +1696,64 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Manufacturing
 
-- [ ] **S18-T01** — Bill of Materials (BOM).
-- [ ] **S18-T02** — Production Order.
-- [ ] **S18-T03** — Work Order.
-- [ ] **S18-T04** — Job Card.
-- [ ] **S18-T05** — Material Requirement.
-- [ ] **S18-T06** — Material Issue.
-- [ ] **S18-T07** — Material Return.
-- [ ] **S18-T08** — Production Receipt.
-- [ ] **S18-T09** — Routing/Traveler.
-- [ ] **S18-T10** — Machine Operation Report.
-- [ ] **S18-T11** — Labor Report.
-- [ ] **S18-T12** — Scrap Report.
-- [ ] **S18-T13** — Work in Progress.
-- [ ] **S18-T14** — Production Variance.
+- [x] **S18-T01** — Bill of Materials (BOM).
+- [x] **S18-T02** — Production Order.
+- [x] **S18-T03** — Work Order.
+- [x] **S18-T04** — Job Card.
+- [x] **S18-T05** — Material Requirement.
+- [x] **S18-T06** — Material Issue.
+- [x] **S18-T07** — Material Return.
+- [x] **S18-T08** — Production Receipt.
+- [x] **S18-T09** — Routing/Traveler.
+- [x] **S18-T10** — Machine Operation Report.
+- [x] **S18-T11** — Labor Report.
+- [x] **S18-T12** — Scrap Report.
+- [x] **S18-T13** — Work in Progress.
+- [x] **S18-T14** — Production Variance.
 
 ## B — Quality
 
-- [ ] **S18-T15** — Quality Inspection.
-- [ ] **S18-T16** — Incoming Inspection.
-- [ ] **S18-T17** — In-process Inspection.
-- [ ] **S18-T18** — Final Inspection.
-- [ ] **S18-T19** — Non-Conformance Report (NCR).
-- [ ] **S18-T20** — Corrective/Preventive Action (CAPA).
-- [ ] **S18-T21** — Certificate of Analysis (COA).
-- [ ] **S18-T22** — Quality Checklist.
-- [ ] **S18-T23** — Audit Form.
-- [ ] **S18-T24** — Calibration Record.
+- [x] **S18-T15** — Quality Inspection.
+- [x] **S18-T16** — Incoming Inspection.
+- [x] **S18-T17** — In-process Inspection.
+- [x] **S18-T18** — Final Inspection.
+- [x] **S18-T19** — Non-Conformance Report (NCR).
+- [x] **S18-T20** — Corrective/Preventive Action (CAPA).
+- [x] **S18-T21** — Certificate of Analysis (COA).
+- [x] **S18-T22** — Quality Checklist.
+- [x] **S18-T23** — Audit Form.
+- [x] **S18-T24** — Calibration Record.
 
 ## C — Shared mechanics
 
-- [ ] **S18-T25** — nested operation/material tables.
-- [ ] **S18-T26** — checklist primitives.
-- [ ] **S18-T27** — pass/fail/status cells.
-- [ ] **S18-T28** — measurement/specification/value/tolerance rows.
-- [ ] **S18-T29** — batch/serial traceability.
-- [ ] **S18-T30** — approval/sign-off.
+- [x] **S18-T25** — nested operation/material tables.
+- [x] **S18-T26** — checklist primitives.
+- [x] **S18-T27** — pass/fail/status cells.
+- [x] **S18-T28** — measurement/specification/value/tolerance rows.
+- [x] **S18-T29** — batch/serial traceability.
+- [x] **S18-T30** — approval/sign-off.
 
 ## D — QA
 
-- [ ] **S18-T31** — multi-level BOM.
-- [ ] **S18-T32** — long routing.
-- [ ] **S18-T33** — mixed units.
-- [ ] **S18-T34** — RTL technical terms + Latin codes.
-- [ ] **S18-T35** — multi-page checklists.
+- [x] **S18-T31** — multi-level BOM.
+- [x] **S18-T32** — long routing.
+- [x] **S18-T33** — mixed units.
+- [x] **S18-T34** — RTL technical terms + Latin codes.
+- [x] **S18-T35** — multi-page checklists.
 
 ## Manual Verification Example
 
-- [ ] **S18-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S18-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S18-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S18-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S18-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S18-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S18-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S18-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S18-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S18-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Manufacturing pack.
-- [ ] Quality pack.
-- [ ] Checklist/measurement primitives.
+- [x] Manufacturing pack.
+- [x] Quality pack.
+- [x] Checklist/measurement primitives.
 
 ## Exit Gate
 
@@ -1774,55 +1774,55 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Fixed assets
 
-- [ ] **S19-T01** — Asset Card.
-- [ ] **S19-T02** — Asset Register.
-- [ ] **S19-T03** — Asset Label.
-- [ ] **S19-T04** — Asset Transfer.
-- [ ] **S19-T05** — Asset Assignment.
-- [ ] **S19-T06** — Asset Return.
-- [ ] **S19-T07** — Asset Disposal.
-- [ ] **S19-T08** — Depreciation Report.
-- [ ] **S19-T09** — Asset Maintenance Report.
-- [ ] **S19-T10** — Asset Count.
-- [ ] **S19-T11** — Asset Movement Report.
+- [x] **S19-T01** — Asset Card.
+- [x] **S19-T02** — Asset Register.
+- [x] **S19-T03** — Asset Label.
+- [x] **S19-T04** — Asset Transfer.
+- [x] **S19-T05** — Asset Assignment.
+- [x] **S19-T06** — Asset Return.
+- [x] **S19-T07** — Asset Disposal.
+- [x] **S19-T08** — Depreciation Report.
+- [x] **S19-T09** — Asset Maintenance Report.
+- [x] **S19-T10** — Asset Count.
+- [x] **S19-T11** — Asset Movement Report.
 
 ## B — Projects
 
-- [ ] **S19-T12** — Project Summary.
-- [ ] **S19-T13** — Project Budget.
-- [ ] **S19-T14** — Project Cost.
-- [ ] **S19-T15** — Project Profitability.
-- [ ] **S19-T16** — Project Timesheet.
-- [ ] **S19-T17** — Project Expense Report.
-- [ ] **S19-T18** — Milestone Report.
-- [ ] **S19-T19** — Progress Report.
-- [ ] **S19-T20** — Completion Certificate.
-- [ ] **S19-T21** — Project Billing.
-- [ ] **S19-T22** — Resource Utilization.
-- [ ] **S19-T23** — Project Purchasing Report.
+- [x] **S19-T12** — Project Summary.
+- [x] **S19-T13** — Project Budget.
+- [x] **S19-T14** — Project Cost.
+- [x] **S19-T15** — Project Profitability.
+- [x] **S19-T16** — Project Timesheet.
+- [x] **S19-T17** — Project Expense Report.
+- [x] **S19-T18** — Milestone Report.
+- [x] **S19-T19** — Progress Report.
+- [x] **S19-T20** — Completion Certificate.
+- [x] **S19-T21** — Project Billing.
+- [x] **S19-T22** — Resource Utilization.
+- [x] **S19-T23** — Project Purchasing Report.
 
 ## C — QA
 
-- [ ] **S19-T24** — asset serial/tag BiDi.
-- [ ] **S19-T25** — label profiles.
-- [ ] **S19-T26** — depreciation reconciliation.
-- [ ] **S19-T27** — multi-period project financials.
-- [ ] **S19-T28** — long milestone notes.
-- [ ] **S19-T29** — Arabic/English project codes.
+- [x] **S19-T24** — asset serial/tag BiDi.
+- [x] **S19-T25** — label profiles.
+- [x] **S19-T26** — depreciation reconciliation.
+- [x] **S19-T27** — multi-period project financials.
+- [x] **S19-T28** — long milestone notes.
+- [x] **S19-T29** — Arabic/English project codes.
 
 ## Manual Verification Example
 
-- [ ] **S19-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S19-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S19-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S19-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S19-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S19-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S19-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S19-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S19-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S19-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Fixed Assets pack.
-- [ ] Projects pack.
-- [ ] Asset labels/certificates.
+- [x] Fixed Assets pack.
+- [x] Projects pack.
+- [x] Asset labels/certificates.
 
 ## Exit Gate
 
@@ -1843,62 +1843,62 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Maintenance/service
 
-- [ ] **S20-T01** — Service Order.
-- [ ] **S20-T02** — Maintenance Work Order.
-- [ ] **S20-T03** — Preventive Maintenance Schedule.
-- [ ] **S20-T04** — Maintenance Checklist.
-- [ ] **S20-T05** — Technician Report.
-- [ ] **S20-T06** — Service Completion Report.
-- [ ] **S20-T07** — Spare Parts Usage.
-- [ ] **S20-T08** — Warranty Report.
-- [ ] **S20-T09** — Inspection Report.
-- [ ] **S20-T10** — Calibration/Service History.
+- [x] **S20-T01** — Service Order.
+- [x] **S20-T02** — Maintenance Work Order.
+- [x] **S20-T03** — Preventive Maintenance Schedule.
+- [x] **S20-T04** — Maintenance Checklist.
+- [x] **S20-T05** — Technician Report.
+- [x] **S20-T06** — Service Completion Report.
+- [x] **S20-T07** — Spare Parts Usage.
+- [x] **S20-T08** — Warranty Report.
+- [x] **S20-T09** — Inspection Report.
+- [x] **S20-T10** — Calibration/Service History.
 
 ## B — Logistics
 
-- [ ] **S20-T11** — Shipment Document.
-- [ ] **S20-T12** — Packing List variant.
-- [ ] **S20-T13** — Dispatch Note.
-- [ ] **S20-T14** — Waybill.
-- [ ] **S20-T15** — Manifest.
-- [ ] **S20-T16** — Trip Sheet.
-- [ ] **S20-T17** — Trip Report.
-- [ ] **S20-T18** — Shipping Label.
-- [ ] **S20-T19** — Pallet Label.
-- [ ] **S20-T20** — Container List.
-- [ ] **S20-T21** — Freight Summary.
-- [ ] **S20-T22** — Proof of Delivery.
+- [x] **S20-T11** — Shipment Document.
+- [x] **S20-T12** — Packing List variant.
+- [x] **S20-T13** — Dispatch Note.
+- [x] **S20-T14** — Waybill.
+- [x] **S20-T15** — Manifest.
+- [x] **S20-T16** — Trip Sheet.
+- [x] **S20-T17** — Trip Report.
+- [x] **S20-T18** — Shipping Label.
+- [x] **S20-T19** — Pallet Label.
+- [x] **S20-T20** — Container List.
+- [x] **S20-T21** — Freight Summary.
+- [x] **S20-T22** — Proof of Delivery.
 
 ## C — Shared mechanics
 
-- [ ] **S20-T23** — route/reference blocks.
-- [ ] **S20-T24** — vehicle/driver/technician identity blocks.
-- [ ] **S20-T25** — checklists.
-- [ ] **S20-T26** — signature/proof blocks.
-- [ ] **S20-T27** — geo/time metadata fields.
-- [ ] **S20-T28** — attachments/photos reference slots.
+- [x] **S20-T23** — route/reference blocks.
+- [x] **S20-T24** — vehicle/driver/technician identity blocks.
+- [x] **S20-T25** — checklists.
+- [x] **S20-T26** — signature/proof blocks.
+- [x] **S20-T27** — geo/time metadata fields.
+- [x] **S20-T28** — attachments/photos reference slots.
 
 ## D — QA
 
-- [ ] **S20-T29** — multi-stop manifests.
-- [ ] **S20-T30** — long shipment items.
-- [ ] **S20-T31** — Arabic addresses + Latin tracking numbers.
-- [ ] **S20-T32** — label/thermal profiles.
-- [ ] **S20-T33** — proof-of-delivery signatures.
+- [x] **S20-T29** — multi-stop manifests.
+- [x] **S20-T30** — long shipment items.
+- [x] **S20-T31** — Arabic addresses + Latin tracking numbers.
+- [x] **S20-T32** — label/thermal profiles.
+- [x] **S20-T33** — proof-of-delivery signatures.
 
 ## Manual Verification Example
 
-- [ ] **S20-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S20-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S20-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S20-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S20-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S20-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S20-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S20-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S20-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S20-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Maintenance/Service pack.
-- [ ] Logistics pack.
-- [ ] Shipping/pallet labels.
+- [x] Maintenance/Service pack.
+- [x] Logistics pack.
+- [x] Shipping/pallet labels.
 
 ## Exit Gate
 
@@ -1919,46 +1919,46 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — CRM
 
-- [ ] **S21-T01** — Customer Profile.
-- [ ] **S21-T02** — Lead Report.
-- [ ] **S21-T03** — Opportunity Report.
-- [ ] **S21-T04** — Pipeline Report.
-- [ ] **S21-T05** — Activity Report.
-- [ ] **S21-T06** — Visit Report.
-- [ ] **S21-T07** — Call Report.
-- [ ] **S21-T08** — Customer History.
-- [ ] **S21-T09** — Proposal.
-- [ ] **S21-T10** — Contract summary/document shell.
+- [x] **S21-T01** — Customer Profile.
+- [x] **S21-T02** — Lead Report.
+- [x] **S21-T03** — Opportunity Report.
+- [x] **S21-T04** — Pipeline Report.
+- [x] **S21-T05** — Activity Report.
+- [x] **S21-T06** — Visit Report.
+- [x] **S21-T07** — Call Report.
+- [x] **S21-T08** — Customer History.
+- [x] **S21-T09** — Proposal.
+- [x] **S21-T10** — Contract summary/document shell.
 
 ## B — Presentation
 
-- [ ] **S21-T11** — metric cards.
-- [ ] **S21-T12** — stage/status visualization without depending on charts only.
-- [ ] **S21-T13** — timeline/history list.
-- [ ] **S21-T14** — contact/party blocks.
-- [ ] **S21-T15** — attachments/reference list.
+- [x] **S21-T11** — metric cards.
+- [x] **S21-T12** — stage/status visualization without depending on charts only.
+- [x] **S21-T13** — timeline/history list.
+- [x] **S21-T14** — contact/party blocks.
+- [x] **S21-T15** — attachments/reference list.
 
 ## C — QA
 
-- [ ] **S21-T16** — long activity histories.
-- [ ] **S21-T17** — Arabic notes + Latin emails/phones.
-- [ ] **S21-T18** — pipeline totals.
-- [ ] **S21-T19** — multi-page proposals.
-- [ ] **S21-T20** — confidential watermark variants.
+- [x] **S21-T16** — long activity histories.
+- [x] **S21-T17** — Arabic notes + Latin emails/phones.
+- [x] **S21-T18** — pipeline totals.
+- [x] **S21-T19** — multi-page proposals.
+- [x] **S21-T20** — confidential watermark variants.
 
 ## Manual Verification Example
 
-- [ ] **S21-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S21-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S21-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S21-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S21-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S21-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S21-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S21-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S21-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S21-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] CRM pack.
-- [ ] Customer-history/timeline components where reusable.
-- [ ] Proposal/contract shells.
+- [x] CRM pack.
+- [x] Customer-history/timeline components where reusable.
+- [x] Proposal/contract shells.
 
 ## Exit Gate
 
@@ -1979,92 +1979,92 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Schema
 
-- [ ] **S22-T01** — إضافة explicit schemaVersion.
-- [ ] **S22-T02** — تعريف migration strategy بين schema versions.
-- [ ] **S22-T03** — validation errors قابلة للفهم.
-- [ ] **S22-T04** — backward compatibility للـ current definitions.
+- [x] **S22-T01** — إضافة explicit schemaVersion.
+- [x] **S22-T02** — تعريف migration strategy بين schema versions.
+- [x] **S22-T03** — validation errors قابلة للفهم.
+- [x] **S22-T04** — backward compatibility للـ current definitions.
 
 ## B — New elements
 
-- [ ] **S22-T05** — Component.
-- [ ] **S22-T06** — Section.
-- [ ] **S22-T07** — PageBreak.
-- [ ] **S22-T08** — Barcode.
-- [ ] **S22-T09** — QRCode.
-- [ ] **S22-T10** — Signature.
-- [ ] **S22-T11** — Summary.
-- [ ] **S22-T12** — Metric.
-- [ ] **S22-T13** — Chart.
-- [ ] **S22-T14** — Attachment.
-- [ ] **S22-T15** — Stamp.
-- [ ] **S22-T16** — Label.
-- [ ] **S22-T17** — Group.
-- [ ] **S22-T18** — SubTemplate.
+- [x] **S22-T05** — Component.
+- [x] **S22-T06** — Section.
+- [x] **S22-T07** — PageBreak.
+- [x] **S22-T08** — Barcode.
+- [x] **S22-T09** — QRCode.
+- [x] **S22-T10** — Signature.
+- [x] **S22-T11** — Summary.
+- [x] **S22-T12** — Metric.
+- [x] **S22-T13** — Chart.
+- [x] **S22-T14** — Attachment.
+- [x] **S22-T15** — Stamp.
+- [x] **S22-T16** — Label.
+- [x] **S22-T17** — Group.
+- [x] **S22-T18** — SubTemplate.
 
 ## C — Expression engine
 
-- [ ] **S22-T19** — safe nested property access.
-- [ ] **S22-T20** — arithmetic.
-- [ ] **S22-T21** — boolean/null-safe conditions.
-- [ ] **S22-T22** — aggregates.
-- [ ] **S22-T23** — group aggregates.
-- [ ] **S22-T24** — formatters.
-- [ ] **S22-T25** — localization keys.
-- [ ] **S22-T26** — no arbitrary code execution.
+- [x] **S22-T19** — safe nested property access.
+- [x] **S22-T20** — arithmetic.
+- [x] **S22-T21** — boolean/null-safe conditions.
+- [x] **S22-T22** — aggregates.
+- [x] **S22-T23** — group aggregates.
+- [x] **S22-T24** — formatters.
+- [x] **S22-T25** — localization keys.
+- [x] **S22-T26** — no arbitrary code execution.
 
 ## D — Composition
 
-- [ ] **S22-T27** — subtemplates.
-- [ ] **S22-T28** — inheritance/composition.
-- [ ] **S22-T29** — named reusable components.
-- [ ] **S22-T30** — style inheritance.
-- [ ] **S22-T31** — document-family binding.
+- [x] **S22-T27** — subtemplates.
+- [x] **S22-T28** — inheritance/composition.
+- [x] **S22-T29** — named reusable components.
+- [x] **S22-T30** — style inheritance.
+- [x] **S22-T31** — document-family binding.
 
 ## E — Registry/versioning
 
-- [ ] **S22-T32** — TemplateId.
-- [ ] **S22-T33** — TemplateVersion.
-- [ ] **S22-T34** — TemplatePack.
-- [ ] **S22-T35** — Variant.
-- [ ] **S22-T36** — Locale.
-- [ ] **S22-T37** — Country.
-- [ ] **S22-T38** — Organization.
-- [ ] **S22-T39** — Branch.
-- [ ] **S22-T40** — EffectiveFrom/EffectiveTo.
-- [ ] **S22-T41** — fallback hierarchy.
-- [ ] **S22-T42** — draft/published state.
-- [ ] **S22-T43** — history/checksum/rollback.
+- [x] **S22-T32** — TemplateId.
+- [x] **S22-T33** — TemplateVersion.
+- [x] **S22-T34** — TemplatePack.
+- [x] **S22-T35** — Variant.
+- [x] **S22-T36** — Locale.
+- [x] **S22-T37** — Country.
+- [x] **S22-T38** — Organization.
+- [x] **S22-T39** — Branch.
+- [x] **S22-T40** — EffectiveFrom/EffectiveTo.
+- [x] **S22-T41** — fallback hierarchy.
+- [x] **S22-T42** — draft/published state.
+- [x] **S22-T43** — history/checksum/rollback.
 
 ## F — Directionality
 
-- [ ] **S22-T44** — direction property في schema.
-- [ ] **S22-T45** — element override.
-- [ ] **S22-T46** — component inheritance.
-- [ ] **S22-T47** — bilingual nested sections.
-- [ ] **S22-T48** — value-direction formatting.
+- [x] **S22-T44** — direction property في schema.
+- [x] **S22-T45** — element override.
+- [x] **S22-T46** — component inheritance.
+- [x] **S22-T47** — bilingual nested sections.
+- [x] **S22-T48** — value-direction formatting.
 
 ## G — Tests/security
 
-- [ ] **S22-T49** — invalid expression tests.
-- [ ] **S22-T50** — schema migration tests.
-- [ ] **S22-T51** — unknown element tests.
-- [ ] **S22-T52** — large-loop tests.
-- [ ] **S22-T53** — no renderer-specific objects in serialized schema.
+- [x] **S22-T49** — invalid expression tests.
+- [x] **S22-T50** — schema migration tests.
+- [x] **S22-T51** — unknown element tests.
+- [x] **S22-T52** — large-loop tests.
+- [x] **S22-T53** — no renderer-specific objects in serialized schema.
 
 ## Manual Verification Example
 
-- [ ] **S22-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S22-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S22-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S22-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S22-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S22-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S22-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S22-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S22-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S22-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Template Engine vNext.
-- [ ] Versioned schema.
-- [ ] Safe expression engine.
-- [ ] Template registry/versioning.
+- [x] Template Engine vNext.
+- [x] Versioned schema.
+- [x] Safe expression engine.
+- [x] Template registry/versioning.
 
 ## Exit Gate
 
@@ -2086,55 +2086,55 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Compliance abstraction
 
-- [ ] **S23-T01** — `GeniusPdfComplianceProfile`.
-- [ ] **S23-T02** — country/tenant plugin contract.
-- [ ] **S23-T03** — required-field validation hooks.
-- [ ] **S23-T04** — structured QR payload hooks.
-- [ ] **S23-T05** — original/copy/reprint policies.
+- [x] **S23-T01** — `GeniusPdfComplianceProfile`.
+- [x] **S23-T02** — country/tenant plugin contract.
+- [x] **S23-T03** — required-field validation hooks.
+- [x] **S23-T04** — structured QR payload hooks.
+- [x] **S23-T05** — original/copy/reprint policies.
 
 ## B — Security/signing
 
-- [ ] **S23-T06** — business approval منفصل عن cryptographic signature.
-- [ ] **S23-T07** — signing metadata model.
-- [ ] **S23-T08** — certificate signature integration contract.
-- [ ] **S23-T09** — timestamp integration contract.
-- [ ] **S23-T10** — document hash metadata.
-- [ ] **S23-T11** — UUID/document fingerprint.
+- [x] **S23-T06** — business approval منفصل عن cryptographic signature.
+- [x] **S23-T07** — signing metadata model.
+- [x] **S23-T08** — certificate signature integration contract.
+- [x] **S23-T09** — timestamp integration contract.
+- [x] **S23-T10** — document hash metadata.
+- [x] **S23-T11** — UUID/document fingerprint.
 
 ## C — Archival/document metadata
 
-- [ ] **S23-T12** — XMP metadata abstraction.
-- [ ] **S23-T13** — embedded attachments hook.
-- [ ] **S23-T14** — archive profile capability flags.
-- [ ] **S23-T15** — source transaction/audit metadata.
-- [ ] **S23-T16** — document generation timestamp/version.
+- [x] **S23-T12** — XMP metadata abstraction.
+- [x] **S23-T13** — embedded attachments hook.
+- [x] **S23-T14** — archive profile capability flags.
+- [x] **S23-T15** — source transaction/audit metadata.
+- [x] **S23-T16** — document generation timestamp/version.
 
 ## D — Existing security integration
 
-- [ ] **S23-T17** — توحيد encryption/password/permissions مع higher-level policy.
-- [ ] **S23-T18** — عدم كسر current security service.
-- [ ] **S23-T19** — اختبارات protected/unprotected flows.
+- [x] **S23-T17** — توحيد encryption/password/permissions مع higher-level policy.
+- [x] **S23-T18** — عدم كسر current security service.
+- [x] **S23-T19** — اختبارات protected/unprotected flows.
 
 ## E — Compliance packs
 
-- [ ] **S23-T20** — بناء framework فقط للـ jurisdiction-specific requirements.
-- [ ] **S23-T21** — عدم hardcode قوانين دولة داخل base templates.
-- [ ] **S23-T22** — كل country profile له version/effective date.
-- [ ] **S23-T23** — توثيق أن المتطلبات القانونية يجب تحديثها حسب المصدر الرسمي وقت التنفيذ.
+- [x] **S23-T20** — بناء framework فقط للـ jurisdiction-specific requirements.
+- [x] **S23-T21** — عدم hardcode قوانين دولة داخل base templates.
+- [x] **S23-T22** — كل country profile له version/effective date.
+- [x] **S23-T23** — توثيق أن المتطلبات القانونية يجب تحديثها حسب المصدر الرسمي وقت التنفيذ.
 
 ## Manual Verification Example
 
-- [ ] **S23-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S23-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S23-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S23-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S23-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S23-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S23-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S23-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S23-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S23-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Compliance plugin architecture.
-- [ ] Signing/audit metadata layer.
-- [ ] Archival capability abstraction.
+- [x] Compliance plugin architecture.
+- [x] Signing/audit metadata layer.
+- [x] Archival capability abstraction.
 
 ## Exit Gate
 
@@ -2155,35 +2155,35 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Performance
 
-- [ ] **S24-T01** — baseline لكل document family.
-- [ ] **S24-T02** — cache fonts/resources حيث آمن.
-- [ ] **S24-T03** — cache images/barcodes/QR where appropriate.
-- [ ] **S24-T04** — avoid repeated measurement.
-- [ ] **S24-T05** — large-grid memory profiling.
-- [ ] **S24-T06** — background generation benchmark.
-- [ ] **S24-T07** — batch generation benchmark.
+- [x] **S24-T01** — baseline لكل document family.
+- [x] **S24-T02** — cache fonts/resources حيث آمن.
+- [x] **S24-T03** — cache images/barcodes/QR where appropriate.
+- [x] **S24-T04** — avoid repeated measurement.
+- [x] **S24-T05** — large-grid memory profiling.
+- [x] **S24-T06** — background generation benchmark.
+- [x] **S24-T07** — batch generation benchmark.
 
 ## B — Visual regression
 
-- [ ] **S24-T08** — goldens لكل component أساسي.
-- [ ] **S24-T09** — goldens لكل family.
-- [ ] **S24-T10** — goldens لكل core ERP pack.
-- [ ] **S24-T11** — EN/LTR.
-- [ ] **S24-T12** — AR/RTL.
-- [ ] **S24-T13** — bilingual.
-- [ ] **S24-T14** — thermal.
-- [ ] **S24-T15** — labels.
+- [x] **S24-T08** — goldens لكل component أساسي.
+- [x] **S24-T09** — goldens لكل family.
+- [x] **S24-T10** — goldens لكل core ERP pack.
+- [x] **S24-T11** — EN/LTR.
+- [x] **S24-T12** — AR/RTL.
+- [x] **S24-T13** — bilingual.
+- [x] **S24-T14** — thermal.
+- [x] **S24-T15** — labels.
 
 ## C — Semantic regression
 
-- [ ] **S24-T16** — text extraction checks.
-- [ ] **S24-T17** — document number.
-- [ ] **S24-T18** — party.
-- [ ] **S24-T19** — totals.
-- [ ] **S24-T20** — tax.
-- [ ] **S24-T21** — page number.
-- [ ] **S24-T22** — currency.
-- [ ] **S24-T23** — required compliance metadata where configured.
+- [x] **S24-T16** — text extraction checks.
+- [x] **S24-T17** — document number.
+- [x] **S24-T18** — party.
+- [x] **S24-T19** — totals.
+- [x] **S24-T20** — tax.
+- [x] **S24-T21** — page number.
+- [x] **S24-T22** — currency.
+- [x] **S24-T23** — required compliance metadata where configured.
 
 ## D — Stress matrix
 
@@ -2220,18 +2220,18 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## Manual Verification Example
 
-- [ ] **S24-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S24-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S24-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S24-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S24-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S24-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S24-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S24-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S24-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S24-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Release regression matrix.
-- [ ] Performance report.
-- [ ] Quality gate checklist.
-- [ ] Updated architecture/docs.
+- [x] Release regression matrix.
+- [x] Performance report.
+- [x] Quality gate checklist.
+- [x] Updated architecture/docs.
 
 ## Exit Gate
 
@@ -2253,30 +2253,30 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Designer model
 
-- [ ] **S25-T01** — تعريف designer document state فوق Template Engine vNext.
-- [ ] **S25-T02** — drag/drop component metadata.
-- [ ] **S25-T03** — properties panel schema.
-- [ ] **S25-T04** — style editor schema.
-- [ ] **S25-T05** — data binding editor.
+- [x] **S25-T01** — تعريف designer document state فوق Template Engine vNext.
+- [x] **S25-T02** — drag/drop component metadata.
+- [x] **S25-T03** — properties panel schema.
+- [x] **S25-T04** — style editor schema.
+- [x] **S25-T05** — data binding editor.
 
 ## B — Preview
 
-- [ ] **S25-T06** — sample data preview.
-- [ ] **S25-T07** — EN/AR direction switch.
-- [ ] **S25-T08** — bilingual preview.
-- [ ] **S25-T09** — page profile switch.
-- [ ] **S25-T10** — multi-page preview.
-- [ ] **S25-T11** — validation messages.
+- [x] **S25-T06** — sample data preview.
+- [x] **S25-T07** — EN/AR direction switch.
+- [x] **S25-T08** — bilingual preview.
+- [x] **S25-T09** — page profile switch.
+- [x] **S25-T10** — multi-page preview.
+- [x] **S25-T11** — validation messages.
 
 ## C — Authoring
 
-- [ ] **S25-T12** — tables.
-- [ ] **S25-T13** — sections.
-- [ ] **S25-T14** — conditions.
-- [ ] **S25-T15** — expressions.
-- [ ] **S25-T16** — subtemplates.
-- [ ] **S25-T17** — components.
-- [ ] **S25-T18** — styles.
+- [x] **S25-T12** — tables.
+- [x] **S25-T13** — sections.
+- [x] **S25-T14** — conditions.
+- [x] **S25-T15** — expressions.
+- [x] **S25-T16** — subtemplates.
+- [x] **S25-T17** — components.
+- [x] **S25-T18** — styles.
 - [ ] **S25-T19** — headers/footers.
 - [ ] **S25-T20** — labels/thermal.
 
@@ -2299,17 +2299,17 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## Manual Verification Example
 
-- [ ] **S25-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S25-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S25-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S25-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S25-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S25-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S25-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S25-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S25-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S25-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Designer-ready schema/UI contract.
-- [ ] Preview/validation workflow.
-- [ ] Publish/version lifecycle.
+- [x] Designer-ready schema/UI contract.
+- [x] Preview/validation workflow.
+- [x] Publish/version lifecycle.
 
 ## Exit Gate
 
@@ -2330,42 +2330,42 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## A — Pack contract
 
-- [ ] **S26-T01** — تعريف package/plugin boundaries.
-- [ ] **S26-T02** — template pack manifest.
-- [ ] **S26-T03** — required domain extensions.
-- [ ] **S26-T04** — optional compliance hooks.
-- [ ] **S26-T05** — version compatibility rules.
+- [x] **S26-T01** — تعريف package/plugin boundaries.
+- [x] **S26-T02** — template pack manifest.
+- [x] **S26-T03** — required domain extensions.
+- [x] **S26-T04** — optional compliance hooks.
+- [x] **S26-T05** — version compatibility rules.
 
 ## B — Retail
 
-- [ ] **S26-T06** — retail-specific labels/promotions/receipts فوق POS pack.
-- [ ] **S26-T07** — لا تكرار core POS.
+- [x] **S26-T06** — retail-specific labels/promotions/receipts فوق POS pack.
+- [x] **S26-T07** — لا تكرار core POS.
 
 ## C — Restaurant
 
-- [ ] **S26-T08** — KOT variants.
-- [ ] **S26-T09** — table/order tickets.
-- [ ] **S26-T10** — kitchen sections.
-- [ ] **S26-T11** — delivery receipt variants.
+- [x] **S26-T08** — KOT variants.
+- [x] **S26-T09** — table/order tickets.
+- [x] **S26-T10** — kitchen sections.
+- [x] **S26-T11** — delivery receipt variants.
 
 ## D — Construction/Real Estate
 
-- [ ] **S26-T12** — progress certificates.
-- [ ] **S26-T13** — measurement/BOQ-style reports.
-- [ ] **S26-T14** — property/unit/customer documents.
-- [ ] **S26-T15** — project billing extensions.
+- [x] **S26-T12** — progress certificates.
+- [x] **S26-T13** — measurement/BOQ-style reports.
+- [x] **S26-T14** — property/unit/customer documents.
+- [x] **S26-T15** — project billing extensions.
 
 ## E — Healthcare/Education
 
-- [ ] **S26-T16** — industry report shells فقط حيث لا تتطلب domain regulated غير مدروس.
-- [ ] **S26-T17** — استخدام plugin-specific models وعدم إضافتها إلى core.
+- [x] **S26-T16** — industry report shells فقط حيث لا تتطلب domain regulated غير مدروس.
+- [x] **S26-T17** — استخدام plugin-specific models وعدم إضافتها إلى core.
 
 ## F — Automotive/Distribution/Hospitality
 
-- [ ] **S26-T18** — service/vehicle variants.
-- [ ] **S26-T19** — route/distribution variants.
-- [ ] **S26-T20** — guest/folio operational variants.
-- [ ] **S26-T21** — إعادة استخدام service/logistics/transaction families.
+- [x] **S26-T18** — service/vehicle variants.
+- [x] **S26-T19** — route/distribution variants.
+- [x] **S26-T20** — guest/folio operational variants.
+- [x] **S26-T21** — إعادة استخدام service/logistics/transaction families.
 
 ## G — Governance
 
@@ -2376,17 +2376,17 @@ s06_erp_domain_calculation_verification_page.dart
 
 ## Manual Verification Example
 
-- [ ] **S26-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
-- [ ] **S26-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
-- [ ] **S26-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
-- [ ] **S26-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
-- [ ] **S26-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
+- [x] **S26-VX01** — إنشاء/تحديث شاشة تحقق مخصصة لهذا الـ Sprint داخل `example/lib/features/dashboard/presentation/pages` تعرض عمليًا كل ما تمت إضافته أو تطويره.
+- [x] **S26-VX02** — إضافة الشاشة إلى Dashboard/navigation الخاصة بتطبيق المثال لتكون قابلة للفتح مباشرة.
+- [x] **S26-VX03** — تضمين scenarios كافية للتحقق اليدوي من المنطق، بما فيها الحالات الطبيعية والحدّية وLTR/RTL وnull/long-content/multi-page عندما تنطبق على هذا الـ Sprint.
+- [x] **S26-VX04** — جعل الشاشة تستخدم implementation/public API الحقيقي للمكتبة مع Preview/Generate للـ PDF عندما يكون الـ Sprint متعلقًا بالرسم أو المستندات.
+- [x] **S26-VX05** — كتابة Expected Result مختصر وواضح لكل scenario مهم داخل شاشة المثال حتى يمكن مقارنة الناتج يدويًا.
 
 ## Deliverables
 
-- [ ] Plugin/pack contract.
-- [ ] Initial vertical pack skeletons.
-- [ ] Governance documentation.
+- [x] Plugin/pack contract.
+- [x] Initial vertical pack skeletons.
+- [x] Governance documentation.
 
 ## Exit Gate
 

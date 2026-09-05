@@ -32,3 +32,8 @@ export 'src/public/genius_pdf_preview_controller.dart';
 export 'src/families/erp/existing_template_family_registry.dart';
 export 'src/printing/profiles/print_profiles.dart';
 export 'src/packs/erp_packs.dart';
+export 'src/template_engine_vnext/template_engine_vnext.dart';
+export 'src/compliance/compliance.dart';
+export 'src/quality/quality.dart';
+export 'src/template_designer/template_designer.dart';
+export 'src/industry_packs/industry_pack_api.dart';

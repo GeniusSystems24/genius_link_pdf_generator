@@ -1,0 +1,26 @@
+# S20 Maintenance, Service & Logistics semantic QA matrix
+ServiceOrder|normal|null-optionals|long-content
+MaintenanceWorkOrder|asset+technician+checklist
+PreventiveSchedule|last+next+frequency
+MaintenanceChecklist|pass-fail-warning|multi-page
+TechnicianReport|identity+geo+time
+ServiceCompletion|parts+signatures+attachments
+SpareParts|qty+unit+serial+batch+cost
+Warranty|active-expired
+Inspection|checklist+measurement+tolerance
+CalibrationHistory|measurement+next-due
+Shipment|arabic-address|latin-tracking|long-items
+PackingList|packages+weight
+DispatchNote|route+driver+vehicle
+Waybill|references
+Manifest|multi-stop
+TripSheet|route+vehicle+driver
+TripReport|distance+fuel
+ShippingLabel|custom-label|tracking-barcode
+PalletLabel|custom-label|pallet-code
+ContainerList|container+seal+pallets
+FreightSummary|multi-currency-group
+ProofOfDelivery|signature+geo+photo
+Shared|route-reference|identities|checklist|proof|geo|attachments
+QA|multi-stop|long-items|arabic-address+tracking
+QA|label+thermal58+thermal80|pod-signatures

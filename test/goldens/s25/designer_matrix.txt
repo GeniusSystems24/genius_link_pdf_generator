@@ -1,0 +1,4 @@
+# S25 designer matrix
+Designer|state|drag-drop-metadata|properties|style-editor|binding-editor
+Preview|sample-data|EN-AR|bilingual|page-profile|multi-page|validation
+Authoring|tables|sections|conditions|expressions|subtemplates|components|styles

@@ -1,0 +1,7 @@
+# S26 industry pack matrix
+Contract|plugin-boundary|manifest|domain-extension|compliance-hook|version-range
+Retail|labels|promotions|receipt|reuses-pos
+Restaurant|kot|table-ticket|kitchen-section|delivery-receipt
+Construction|progress-certificate|boq|property-unit|project-billing
+HealthcareEducation|generic-shell-only|external-models
+MobilityDistributionHospitality|vehicle-service|route|guest-folio|core-reuse

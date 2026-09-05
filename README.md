@@ -1399,6 +1399,173 @@ null/unit/exchange rate, theme customization, and long multi-page scenarios.
 
 See `docs/sprints/s05/FORMATTING_THEME_CONTRACT.md`.
 
+## 4.0.0 — S26 Industry / Plugin Packs
+
+S26 adds a versioned industry-pack contract plus Retail, Restaurant,
+Construction/Real Estate, Healthcare/Education shell and
+Automotive/Distribution/Hospitality extension packs. These packs reuse existing
+POS, project, service/logistics and transaction foundations instead of
+duplicating them.
+
+Regulated healthcare/education models and jurisdiction law stay in external
+plugins.
+
+See `docs/sprints/s26/INDUSTRY_PACKS.md`.
+
+## 4.0.0 — S25 Template Designer Model
+
+S25 adds designer document state over Template Engine vNext, drag/drop metadata,
+property/style/binding schemas, sample-data preview, direction/page-profile
+switching, validation and schema-native authoring for sections, conditions,
+expressions, subtemplates, named components and styles.
+
+See `docs/sprints/s25/TEMPLATE_DESIGNER.md`.
+
+## 4.0.0 — S24 Performance & Regression
+
+S24 adds family benchmark baselines, safe resource/media/measurement caches,
+large-grid profiling, background/batch benchmark runners, visual-regression
+manifests and semantic extracted-text checks for document number, party, totals,
+tax, page number, currency and configured compliance metadata.
+
+See `docs/sprints/s24/PERFORMANCE_REGRESSION.md`.
+
+## 4.0.0 — S23 Compliance, Signing, Audit & Archival Profiles
+
+S23 adds compliance-profile/plugin contracts, required-field and structured QR
+hooks, copy/reprint policy, signing/timestamp/hash/fingerprint boundaries, XMP
+and attachment abstractions, archive capability flags and audit/generation
+metadata. Enterprise security delegates to the existing
+`GeniusPdfSecurityService`.
+
+The base package contains no jurisdiction-specific legal rules; country
+profiles must be versioned, effective-dated and maintained against official
+sources.
+
+See `docs/sprints/s23/COMPLIANCE_SIGNING_ARCHIVAL.md`.
+
+## 4.0.0 — S22 Template Engine vNext
+
+S22 adds an explicit versioned schema, migration/validation, renderer-neutral
+elements, safe expressions, inheritance/subtemplates, named components/styles,
+document-family binding and a scoped template registry with effective dates,
+fallback, draft/published states, checksum history and rollback.
+
+Expressions are parsed by an allow-listed engine; no arbitrary code execution
+or renderer objects are allowed in serialized schema.
+
+See `docs/sprints/s22/TEMPLATE_ENGINE_VNEXT.md`.
+
+## 4.0.0 — S21 CRM Pack
+
+S21 adds Customer Profile, Lead/Opportunity/Pipeline/Activity/Visit/Call
+reports, Customer History, Proposal and Contract Summary outputs. It also adds
+printable metric, stage/status, timeline, contact and attachment primitives,
+pipeline reconciliation and draft/confidential watermark variants.
+
+See `docs/sprints/s21/CRM_PACK.md`.
+
+## 4.0.0 — S20 Maintenance, Service & Logistics Pack
+
+S20 adds Service/Maintenance Orders, Preventive Schedule, Maintenance
+Checklist, Technician/Completion/Parts/Warranty/Inspection/History reports,
+plus Shipment/Packing/Dispatch/Waybill/Manifest/Trip/Container/Freight/POD
+documents and Shipping/Pallet labels.
+
+The pack reuses S18 checklist/measurement semantics and the S11 label/thermal
+profile engine. Shared route, vehicle/driver/technician, proof/signature,
+geo/time and attachment/photo models are public.
+
+See `docs/sprints/s20/MAINTENANCE_SERVICE_LOGISTICS_PACK.md`.
+
+## 4.0.0 — S19 Fixed Assets & Projects Pack
+
+S19 adds Asset Card/Register/Label/Transfer/Assignment/Return/Disposal,
+Depreciation, Maintenance, Count and Movement reports, plus Project
+Summary/Budget/Cost/Profitability/Timesheet/Expenses/Milestones/Progress,
+Completion Certificate, Billing, Resource Utilization and Purchasing reports.
+
+`GeniusAssetsProjectsService` owns depreciation and multi-period project
+financial calculations before rendering. Asset labels reuse the S11 label/profile
+engine through `GeniusAssetLabelProfiles` and `GeniusAssetLabelDocument`.
+
+See `docs/sprints/s19/FIXED_ASSETS_PROJECTS_PACK.md`.
+
+## 4.0.0 — S18 Manufacturing & Quality Pack
+
+S18 adds BOM, Production/Work Orders, Job Card, material requirement/
+issue/return/receipt, Routing/Traveler, machine/labor/scrap/WIP/variance,
+Quality/Incoming/In-process/Final inspections, NCR, CAPA, COA, Quality
+Checklist, Audit Form and Calibration Record.
+
+The pack adds reusable checklist, status, tolerance, traceability, sign-off and
+nested operation/material table primitives. Nested tables reuse DataGrid group
+rows instead of creating another renderer.
+
+See `docs/sprints/s18/MANUFACTURING_QUALITY_PACK.md`.
+
+## 4.0.0 — S17 HR & Payroll Pack
+
+S17 adds Employee Profile/List, Employment Contract/Action Form, Attendance,
+Timesheet, Overtime, Leave Balance/Request, Payslip, Payroll Sheet/Summary,
+Allowance/Deduction, Loan/Advance, Salary/Employment/Experience certificates,
+End-of-Service and Final Settlement outputs.
+
+`GeniusHrPayrollService` owns payroll and settlement arithmetic before
+rendering. `GeniusHrPrintPolicy` controls field visibility, identifier masking,
+confidential/custom watermarks and role-specific printable hooks.
+
+Certificate output uses `GeniusHrCertificatePolicy` to enforce a conservative
+single-page content contract.
+
+See `docs/sprints/s17/HR_PAYROLL_PACK.md`.
+
+## 4.0.0 — S16 POS & Retail Pack
+
+S16 adds 58mm/80mm sale receipts, Refund, Exchange, Gift Receipt, optional KOT,
+Shift Open/Close, X/Z, Cash Drawer and Payment Method Summary reports.
+
+Receipt inputs support tax summary, discounts/promotions, cash/change,
+multiple payment methods, QR/barcode, copy/reprint, compact Arabic text and
+line notes.
+
+Barcode, Price and Promotion labels reuse the S11 label engine. Gift/KOT
+amount suppression is implemented as a non-breaking extension to the shared
+thermal payload rather than a second receipt renderer.
+
+See `docs/sprints/s16/POS_RETAIL_PACK.md`.
+
+## 4.0.0 — S15 Inventory & WMS Pack
+
+S15 adds Stock Receipt/Issue/Transfer/Warehouse Transfer/Adjustment, stock and
+cycle counts, reconciliation, Item Card, Stock Ledger, Valuation,
+Availability, Reorder, Min/Max, Slow/Dead Stock and batch/serial/expiry
+traceability.
+
+Movement data supports multi-unit/fractional quantities, warehouse/location
+references, batch, serial and expiry values.
+
+Item/Shelf/Batch/Serial/Location labels reuse the calibrated S11 label engine.
+
+See `docs/sprints/s15/INVENTORY_WMS_PACK.md`.
+
+## 4.0.0 — S14 Accounting & Finance Pack
+
+S14 adds General Ledger, Journal Entry/Register, Account Statement, AR/AP
+Aging, customer/supplier balances, cash/bank books, reconciliation, petty
+cash, payment/receipt registers, VAT/tax reports, cost-center/project reports,
+Budget vs Actual and Multi-period Comparison.
+
+`GeniusAccountingService` keeps reconciliation, balances, tax grouping and
+financial aggregation outside PDF rendering. `GeniusAccountingFormat` provides
+accounting negatives and hierarchy presentation, while the shared grid keeps
+debit/credit and structured values direction-safe.
+
+A 10k-row preparation benchmark is included without hard-coded performance
+claims.
+
+See `docs/sprints/s14/ACCOUNTING_FINANCE_PACK.md`.
+
 ## 4.0.0 — S13 Purchasing ERP Pack
 
 The Purchasing pack adds Purchase Requisition, RFQ, Supplier Quotation,

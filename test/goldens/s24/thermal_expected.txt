@@ -1,0 +1,1 @@
+profile=thermal80|document=POS-LATIN-001|total=115.00|currency=SAR
