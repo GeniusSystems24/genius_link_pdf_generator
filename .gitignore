@@ -8,6 +8,7 @@
 .flutter-plugins-dependencies
 /*.py
 *.zip
+/patches/
 
 # S00 generated baseline candidates
 test/sprints/s00/baselines/generated/*.pdf

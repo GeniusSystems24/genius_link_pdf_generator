@@ -127,7 +127,12 @@ class GeniusPdfSummarySection {
   /// This is used by the document builder to decide whether the summary
   /// should stay on the current page or move to the next one intact.
   double estimateHeight([double? availableWidth]) {
-    final contentHeight = _calculateContentHeight(availableWidth);
+    final boxWidth =
+        width ?? (availableWidth == null ? null : availableWidth * 0.4);
+    final contentWidth = boxWidth == null
+        ? null
+        : boxWidth - style.padding.left - style.padding.right;
+    final contentHeight = _calculateContentHeight(contentWidth);
     return contentHeight + style.padding.top + style.padding.bottom;
   }
 
@@ -389,7 +394,12 @@ class GeniusPdfSummarySection {
       item.getLabel(isArabic: isRTL),
       labelFont,
       brush: labelBrush,
-      bounds: Rect.fromLTWH(labelX, currentY, labelWidth, itemH),
+      bounds: Rect.fromLTWH(
+        labelX,
+        currentY,
+        labelWidth,
+        _textBoundsHeight(itemH, item),
+      ),
       format: PdfStringFormat(
         alignment: effectiveLabelStyle.alignment.toPdfTextAlignment(isRTL),
         textDirection: isRTL
@@ -409,7 +419,12 @@ class GeniusPdfSummarySection {
       item.getFormattedValue(),
       valueFont,
       brush: valueBrush,
-      bounds: Rect.fromLTWH(valueX, currentY, valueWidth, itemH),
+      bounds: Rect.fromLTWH(
+        valueX,
+        currentY,
+        valueWidth,
+        _textBoundsHeight(itemH, item),
+      ),
       format: PdfStringFormat(
         alignment: effectiveValueStyle.alignment.toPdfTextAlignment(isRTL),
         textDirection: GeniusPdfComponentDirectionality.valuePdfDirection(
@@ -515,7 +530,7 @@ class GeniusPdfSummarySection {
   }
 
   /// Calculates the total content height with per-item accuracy (v2.12.5).
-  double _calculateContentHeight([double? availableWidth]) {
+  double _calculateContentHeight([double? contentWidth]) {
     double height = 0;
     // Title height
     if (title != null || titleAr != null) {
@@ -531,7 +546,10 @@ class GeniusPdfSummarySection {
         height += _groupHeaderHeight(group) + style.itemSpacing;
         // Group items
         for (final item in group.items) {
-          height += _itemHeight(item) + style.itemSpacing;
+          if (_shouldRenderItem(item)) {
+            height += _itemHeight(item, contentWidth: contentWidth) +
+                style.itemSpacing;
+          }
         }
         // Separator between groups
         if (gi < groups!.length - 1 || items.isNotEmpty) {
@@ -542,7 +560,10 @@ class GeniusPdfSummarySection {
 
     // Top-level items
     for (final item in items) {
-      height += _itemHeight(item) + style.itemSpacing;
+      if (_shouldRenderItem(item)) {
+        height +=
+            _itemHeight(item, contentWidth: contentWidth) + style.itemSpacing;
+      }
     }
 
     return height;
@@ -569,28 +590,65 @@ class GeniusPdfSummarySection {
     final labelSize = item.labelFontSize ?? style.labelStyle.fontSize;
     final valueSize = item.valueFontSize ?? style.valueStyle.fontSize;
     final effectiveSize = labelSize > valueSize ? labelSize : valueSize;
-    final lineHeight = effectiveSize * 1.4;
-    if (contentWidth == null || contentWidth <= 0) return lineHeight;
+    final singleLineHeight = effectiveSize * 1.4;
+    if (contentWidth == null || contentWidth <= 0) return singleLineHeight;
 
-    final indent = item.indent * style.indentWidth;
-    final usable = contentWidth - indent - style.labelValueGap;
-    if (usable <= 0) return lineHeight;
-    final labelWidth = usable * style.labelWidth;
-    final valueWidth = usable - labelWidth;
+    final indentOffset = item.indent * style.indentWidth;
+    final availableTextWidth =
+        contentWidth - indentOffset - style.labelValueGap;
+    if (availableTextWidth <= 0) return singleLineHeight;
 
-    int lines(String value, double width, double fontSize) {
-      if (value.isEmpty || width <= 0) return 1;
-      final result = ((value.runes.length * fontSize * 0.55) / width).ceil();
-      return result < 1 ? 1 : result;
-    }
-
-    final labelLines = lines(
+    final labelWidth = availableTextWidth * style.labelWidth;
+    final valueWidth = availableTextWidth - labelWidth;
+    final labelFont = item.isBold ? boldFont : baseFont;
+    final valueFont = item.isBold ? boldFont : baseFont;
+    final labelHeight = _measureTextHeight(
       item.getLabel(isArabic: isRTL),
+      labelFont,
       labelWidth,
-      labelSize,
+      isRTL
+          ? PdfTextDirection.rightToLeft
+          : PdfTextDirection.leftToRight,
     );
-    final valueLines = lines(item.getFormattedValue(), valueWidth, valueSize);
-    return lineHeight * (labelLines > valueLines ? labelLines : valueLines);
+    final valueHeight = _measureTextHeight(
+      item.getFormattedValue(),
+      valueFont,
+      valueWidth,
+      GeniusPdfComponentDirectionality.valuePdfDirection(
+        context: _effectiveDirectionality,
+        text: item.getFormattedValue(),
+      ),
+    );
+    final measuredHeight =
+        labelHeight > valueHeight ? labelHeight : valueHeight;
+    return measuredHeight > singleLineHeight ? measuredHeight : singleLineHeight;
+  }
+
+  double _measureTextHeight(
+    String text,
+    PdfFont font,
+    double width,
+    PdfTextDirection direction,
+  ) {
+    if (text.isEmpty || width <= 0) return 0;
+    return font
+        .measureString(
+          text,
+          // A zero height means unconstrained height to Syncfusion's string
+          // layouter while the finite width still enables line wrapping.
+          layoutArea: Size(width, 0),
+          format: PdfStringFormat(textDirection: direction),
+        )
+        .height;
+  }
+
+  double _textBoundsHeight(double rowHeight, GeniusPdfSummaryItem item) {
+    if (item.customHeight != null) return 0;
+    final labelSize = item.labelFontSize ?? style.labelStyle.fontSize;
+    final valueSize = item.valueFontSize ?? style.valueStyle.fontSize;
+    final singleLineHeight =
+        (labelSize > valueSize ? labelSize : valueSize) * 1.4;
+    return rowHeight > singleLineHeight ? rowHeight : 0;
   }
 }
 

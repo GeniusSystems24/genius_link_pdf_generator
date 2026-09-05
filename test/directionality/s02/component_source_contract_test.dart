@@ -17,6 +17,12 @@ void main() {
     expect(summary, contains('GeniusPdfComponentDirectionality.endX'));
     expect(summary, contains('valuePdfDirection'));
     expect(summary, contains('hideEmptyValues'));
+    // Summary rows use the PDF font metrics rather than a character-count
+    // approximation, and preserve natural-height bounds for single-line text.
+    expect(summary, contains('.measureString('));
+    expect(summary, contains('labelHeight > valueHeight'));
+    expect(summary, contains('rowHeight > singleLineHeight ? rowHeight : 0'));
+    expect(summary, isNot(contains('value.runes.length * fontSize')));
     expect(info, contains('GeniusPdfLogicalPosition iconPosition'));
     expect(info, contains('followDirection'));
     expect(info, contains('item.valueDirection'));
