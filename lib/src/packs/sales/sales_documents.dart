@@ -1,5 +1,4 @@
 
-import '../../core/pdf_config.dart';
 import '../../families/erp/erp_families.dart';
 import '../shared/erp_pack_shared.dart';
 

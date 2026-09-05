@@ -318,7 +318,7 @@ class GeniusServiceSparePartUsage {
   final String? notesAr;
 
   ErpMoney? get totalCost =>
-      unitCost == null ? null : unitCost!.multiply(quantity);
+      unitCost?.multiply(quantity);
 }
 
 /// Warranty row.

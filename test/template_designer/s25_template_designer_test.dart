@@ -127,17 +127,17 @@ void main() {
   });
 
   test('validation messages stop preview for invalid schema', () {
-    final invalid = GeniusPdfDesignerDocumentState(
+    const invalid = GeniusPdfDesignerDocumentState(
       schema: GeniusPdfTemplateSchema(
         templateId: '',
         templateVersion: 1,
         name: '',
-        elements: const [],
+        elements: [],
       ),
     );
 
     final preview = const GeniusPdfDesignerPreviewService().build(
-      GeniusPdfDesignerPreviewRequest(state: invalid),
+      const GeniusPdfDesignerPreviewRequest(state: invalid),
     );
     expect(preview.canPreview, isFalse);
     expect(preview.validation.messages, isNotEmpty);

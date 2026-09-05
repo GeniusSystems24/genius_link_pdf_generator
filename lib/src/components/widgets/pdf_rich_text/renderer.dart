@@ -284,10 +284,10 @@ class GeniusPdfRichText {
         final baseColor = span.color ?? span.style?.color ?? defaultStyle.color;
         final effectiveColor = span.opacity < 1.0
             ? Color.fromARGB(
-                (baseColor.alpha * span.opacity).round(),
-                baseColor.red,
-                baseColor.green,
-                baseColor.blue,
+                (baseColor.a * 255.0 * span.opacity).round(),
+                (baseColor.r * 255.0).round(),
+                (baseColor.g * 255.0).round(),
+                (baseColor.b * 255.0).round(),
               )
             : baseColor;
         final brush = PdfSolidBrush(effectiveColor.toPdfColor());

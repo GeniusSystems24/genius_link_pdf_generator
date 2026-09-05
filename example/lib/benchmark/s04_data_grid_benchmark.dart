@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart' show TextDirection;
+import 'package:flutter/material.dart' show TextDirection, debugPrint;
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
 GeniusPdfConfig _config() {
@@ -75,7 +75,7 @@ void main() {
       rowLimit: rowCount,
     );
 
-    print('S04 $rowCount rows cold: $cold');
-    print('S04 $rowCount rows warm: $warm');
+    debugPrint('S04 $rowCount rows cold: $cold');
+    debugPrint('S04 $rowCount rows warm: $warm');
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
@@ -227,3 +229,87 @@ PaymentVoucher buildB5PaymentVoucher({required bool isRtl}) {
         PaymentDeduction(name: 'Service Tax', nameAr: '����� ����', amount: 50),
       ]);
 }
+
+// BEGIN MODERN VOUCHER PREVIEW GENERATORS
+
+/// Generates the Modern Sales Voucher example for inline PDF preview.
+///
+/// The returned bytes are the exact bytes shown by `GeniusPdfPreviewWidget`
+/// and later reused by the screen's **Open PDF** action.
+Future<Uint8List> generateModernSalesVoucherPdf(GeniusPdfConfig config) async {
+  final builder = buildModernSalesVoucher(
+    isRtl: config.textDirection == TextDirection.rtl,
+  );
+
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}
+
+/// Generates the Modern Purchase Voucher example for inline PDF preview.
+///
+/// The returned bytes are the exact bytes shown by `GeniusPdfPreviewWidget`
+/// and later reused by the screen's **Open PDF** action.
+Future<Uint8List> generateModernPurchaseVoucherPdf(GeniusPdfConfig config) async {
+  final builder = buildModernPurchaseVoucher(
+    isRtl: config.textDirection == TextDirection.rtl,
+  );
+
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}
+
+/// Generates the Modern Sales Return example for inline PDF preview.
+///
+/// The returned bytes are the exact bytes shown by `GeniusPdfPreviewWidget`
+/// and later reused by the screen's **Open PDF** action.
+Future<Uint8List> generateModernSalesReturnVoucherPdf(GeniusPdfConfig config) async {
+  final builder = buildModernSalesReturnVoucher(
+    isRtl: config.textDirection == TextDirection.rtl,
+  );
+
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}
+
+/// Generates the Modern Purchase Return example for inline PDF preview.
+///
+/// The returned bytes are the exact bytes shown by `GeniusPdfPreviewWidget`
+/// and later reused by the screen's **Open PDF** action.
+Future<Uint8List> generateModernPurchaseReturnVoucherPdf(GeniusPdfConfig config) async {
+  final builder = buildModernPurchaseReturnVoucher(
+    isRtl: config.textDirection == TextDirection.rtl,
+  );
+
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}
+
+/// Generates the B5 Payment Voucher example for inline PDF preview.
+///
+/// The returned bytes are the exact bytes shown by `GeniusPdfPreviewWidget`
+/// and later reused by the screen's **Open PDF** action.
+Future<Uint8List> generateB5PaymentVoucherPdf(GeniusPdfConfig config) async {
+  final builder = buildB5PaymentVoucher(
+    isRtl: config.textDirection == TextDirection.rtl,
+  );
+
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}
+
+// END MODERN VOUCHER PREVIEW GENERATORS

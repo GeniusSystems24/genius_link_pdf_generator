@@ -1,16 +1,15 @@
 
 import '../../components/components.dart';
-import '../../core/pdf_config.dart';
 import '../../families/erp/erp_families.dart';
 import '../shared/erp_pack_shared.dart';
 import 'crm_models.dart';
 
 abstract class GeniusCrmDocumentBase extends GeniusErpRegisterDocument {
   GeniusCrmDocumentBase(
-    GeniusPdfConfig config, {
+    super.config, {
     required this.report,
     this.confidentiality = GeniusCrmConfidentiality.none,
-  }) : super(config);
+  });
 
   final GeniusErpPackReportData report;
   final GeniusCrmConfidentiality confidentiality;
@@ -48,88 +47,88 @@ abstract class GeniusCrmDocumentBase extends GeniusErpRegisterDocument {
 
 class GeniusCustomerProfileDocument extends GeniusCrmDocumentBase {
   GeniusCustomerProfileDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusLeadReportDocument extends GeniusCrmDocumentBase {
   GeniusLeadReportDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusOpportunityReportDocument extends GeniusCrmDocumentBase {
   GeniusOpportunityReportDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusPipelineReportDocument extends GeniusCrmDocumentBase {
   GeniusPipelineReportDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusActivityReportDocument extends GeniusCrmDocumentBase {
   GeniusActivityReportDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusVisitReportDocument extends GeniusCrmDocumentBase {
   GeniusVisitReportDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusCallReportDocument extends GeniusCrmDocumentBase {
   GeniusCallReportDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusCustomerHistoryDocument extends GeniusCrmDocumentBase {
   GeniusCustomerHistoryDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusProposalDocument extends GeniusCrmDocumentBase {
   GeniusProposalDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusContractSummaryDocument extends GeniusCrmDocumentBase {
   GeniusContractSummaryDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }
 
 class GeniusCrmPresentationOverviewDocument extends GeniusCrmDocumentBase {
   GeniusCrmPresentationOverviewDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required super.report,
     super.confidentiality,
-  }) : super(config);
+  });
 }

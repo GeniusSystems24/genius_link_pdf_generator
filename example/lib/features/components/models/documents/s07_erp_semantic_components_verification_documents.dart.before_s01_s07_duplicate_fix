@@ -1,0 +1,3952 @@
+Future<Uint8List> buildS07IdentityPartyVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S07ErpSemanticComponentsDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S07ErpSemanticComponentsScenario.identityParty,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S07ErpSemanticComponentsVerificationPage.
+enum S07ErpSemanticComponentsScenario {
+  identityParty,
+  financial,
+  operational,
+  nullCollapse,
+  emptyState,
+  bilingual,
+  composition,
+  longMultiPage,
+}
+
+class S07ErpSemanticComponentsDocument extends GeniusPdfDocumentBuilder {
+  S07ErpSemanticComponentsDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S07ErpSemanticComponentsScenario scenario;
+
+  ErpDocumentContext _context({
+    bool withAddress = true,
+    bool withTerms = true,
+  }) {
+    final billing = withAddress
+        ? const ErpAddress(
+            role: ErpAddressRole.billing,
+            line1: 'King Fahd Road طريق الملك فهد',
+            city: 'Riyadh الرياض',
+            postalCode: '12211',
+            countryCode: 'SA',
+          )
+        : null;
+
+    return ErpDocumentContext(
+      organization: const ErpOrganization(
+        id: 'ORG-001',
+        legalName: 'Genius Systems',
+        nameAr: 'أنظمة جينيس',
+        taxIdentity: ErpTaxIdentity(
+          taxNumber: '310123456700003',
+          countryCode: 'SA',
+        ),
+      ),
+      identity: ErpDocumentIdentity(
+        kind: ErpDocumentKind.invoice,
+        number: 'INV-2026-000123',
+        issueDate: DateTime(2026, 9, 4),
+        status: ErpDocumentStatus.issued,
+        externalId: 'ERP-INV-8821',
+      ),
+      recipient: ErpParty(
+        id: 'CUST-001',
+        name: 'Acme Trading',
+        nameAr: 'شركة أكمي للتجارة',
+        registrationNumber: 'CR-1010099999',
+        taxIdentity: const ErpTaxIdentity(
+          taxNumber: '310987654300003',
+          countryCode: 'SA',
+        ),
+        addresses: billing == null ? const [] : [billing],
+        contacts: const [
+          ErpContactMetadata(
+            contactName: 'Finance المالية',
+            phone: '+966 50 123 4567',
+            email: 'finance@example.com',
+          ),
+        ],
+      ),
+      billingAddress: billing,
+      shippingAddress: null,
+      documentCurrency: ErpCurrency.sar,
+      references: [
+        ErpDocumentReference(
+          type: 'Purchase Order',
+          number: 'PO-2026-00421',
+          date: DateTime(2026, 9, 1),
+        ),
+      ],
+      lineItems: [
+        ErpLineItem(
+          id: '1',
+          description: 'ERP Consulting',
+          descriptionAr: 'استشارات ERP',
+          sku: 'SKU-ERP-001',
+          quantity: const ErpQuantity(
+            value: 2,
+            unit: ErpUnit.each,
+          ),
+          unitPrice: ErpMoney.fromAmount(
+            1000,
+            currency: ErpCurrency.sar,
+          ),
+          discounts: [
+            ErpDiscount.percentage(percentage: 5),
+          ],
+          charges: [
+            ErpCharge.fixed(
+              amount: ErpMoney.fromAmount(
+                25,
+                currency: ErpCurrency.sar,
+              ),
+            ),
+          ],
+          taxes: const [
+            ErpTaxLine(
+              code: 'VAT',
+              ratePercent: 15,
+            ),
+          ],
+        ),
+      ],
+      approvals: [
+        ErpApproval(
+          stage: 'Finance Review',
+          status: ErpApprovalStatus.approved,
+          approverName: 'A. Reviewer',
+          decidedAt: DateTime(2026, 9, 4, 10, 30),
+          comment: 'Approved for posting',
+        ),
+        const ErpApproval(
+          stage: 'Manager Review',
+          status: ErpApprovalStatus.pending,
+        ),
+      ],
+      terms: withTerms
+          ? 'Payment due within 30 days. Reference the invoice number '
+              'on every payment.'
+          : null,
+    );
+  }
+
+  ErpCalculationResult _calculation(ErpDocumentContext context) {
+    return const ErpCalculationService().calculate(
+      ErpCalculationRequest.fromContext(
+        context,
+        paidAmount: ErpMoney.fromMinorUnits(
+          100000,
+          currency: ErpCurrency.sar,
+        ),
+      ),
+    );
+  }
+
+  void _draw(
+    GeniusPdfErpComponent component, {
+    double spacing = 10,
+  }) {
+    if (!component.isVisible) return;
+    final result = component.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  void _drawGroup(
+    GeniusPdfErpComponentGroup group, {
+    double spacing = 10,
+  }) {
+    if (!group.isVisible) return;
+    final result = group.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  @override
+  void build() {
+    newPage();
+
+    final context = _context();
+    final result = _calculation(context);
+
+    switch (scenario) {
+      case S07ErpSemanticComponentsScenario.identityParty:
+        _draw(
+          GeniusPdfDocumentIdentity(
+            config: config,
+            data: context.identity,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer',
+            titleAr: 'العميل',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            title: 'Billing Address',
+            titleAr: 'عنوان الفوترة',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: context.references,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.financial:
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Grand Total',
+            labelAr: 'الإجمالي',
+            bold: true,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAmountInWords(
+            config: config,
+            amount: result.grandTotal,
+            text: 'Two thousand two hundred and thirteen Saudi riyals '
+                'and seventy-five halalas only',
+            textAr: 'ألفان ومئتان وثلاثة عشر ريالاً سعودياً '
+                'وخمس وسبعون هللة فقط',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAdjustmentSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfTaxSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfBalanceDueBlock(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.operational:
+        _draw(
+          GeniusPdfTermsSection(
+            config: config,
+            text: context.terms,
+            textAr: 'يستحق السداد خلال 30 يوماً. يرجى ذكر رقم الفاتورة '
+                'في كل دفعة.',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: context.approvals,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfStamp(
+            config: config,
+            text: 'APPROVED',
+            textAr: 'معتمد',
+            tone: GeniusPdfSemanticTone.success,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: [
+              GeniusPdfMetricCardData(
+                label: 'Subtotal',
+                labelAr: 'المجموع',
+                value: config.formatter.formatMoney(
+                  result.subtotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'VAT',
+                labelAr: 'الضريبة',
+                value: config.formatter.formatMoney(
+                  result.taxTotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'Due',
+                labelAr: 'المتبقي',
+                value: config.formatter.formatMoney(
+                  result.dueAmount!.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+            ],
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'POSTED-ERP-2026-77',
+            tone: GeniusPdfSemanticTone.info,
+            valueKind: GeniusPdfValueKind.customIdentifier,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.nullCollapse:
+        final nullContext = _context(
+          withAddress: false,
+          withTerms: false,
+        );
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 14,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: nullContext.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: null,
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: null,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: null,
+                textAr: null,
+                directionality: directionality,
+              ),
+              GeniusPdfLabel(
+                config: config,
+                text: 'VISIBLE AFTER NULL SECTIONS',
+                textAr: 'ظاهر بعد الأقسام الفارغة',
+                tone: GeniusPdfSemanticTone.success,
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.emptyState:
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.bilingual:
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer / العميل',
+            titleAr: 'العميل / Customer',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'INV-2026-000123',
+            valueKind: GeniusPdfValueKind.documentNumber,
+            tone: GeniusPdfSemanticTone.info,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Total الإجمالي',
+            labelAr: 'الإجمالي Total',
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.composition:
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 10,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: context.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: context.recipient,
+                title: 'Customer',
+                titleAr: 'العميل',
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: context.shippingAddress,
+                title: 'Shipping Address',
+                titleAr: 'عنوان الشحن',
+                directionality: directionality,
+              ),
+              GeniusPdfTaxSummary(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfBalanceDueBlock(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: context.terms,
+                textAr: 'يستحق السداد خلال 30 يوماً.',
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.longMultiPage:
+        for (var pageIndex = 0; pageIndex < 4; pageIndex++) {
+          if (pageIndex > 0) newPage();
+
+          final references = List<ErpDocumentReference>.generate(
+            8,
+            (index) => ErpDocumentReference(
+              type: 'Reference ${pageIndex * 8 + index + 1}',
+              number:
+                  'REF-2026-${(pageIndex * 8 + index + 1).toString().padLeft(4, '0')}',
+              date: DateTime(2026, 9, 1 + (index % 4)),
+            ),
+          );
+
+          _draw(
+            GeniusPdfReferenceBlock(
+              config: config,
+              references: references,
+              title: 'Page ${pageIndex + 1} References',
+              titleAr: 'مراجع الصفحة ${pageIndex + 1}',
+              directionality: directionality,
+            ),
+            spacing: 8,
+          );
+
+          _draw(
+            GeniusPdfTermsSection(
+              config: config,
+              text: List.filled(
+                6,
+                'Long ERP terms remain reusable and keep identifiers such as '
+                    'INV-2026-000123 unchanged.',
+              ).join(' '),
+              textAr: List.filled(
+                6,
+                'نص شروط طويل للتحقق من الالتفاف مع بقاء المعرف '
+                    'INV-2026-000123 بدون عكس.',
+              ).join(' '),
+              directionality: directionality,
+            ),
+          );
+        }
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS07FinancialVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S07ErpSemanticComponentsDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S07ErpSemanticComponentsScenario.financial,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S07ErpSemanticComponentsVerificationPage.
+enum S07ErpSemanticComponentsScenario {
+  identityParty,
+  financial,
+  operational,
+  nullCollapse,
+  emptyState,
+  bilingual,
+  composition,
+  longMultiPage,
+}
+
+class S07ErpSemanticComponentsDocument extends GeniusPdfDocumentBuilder {
+  S07ErpSemanticComponentsDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S07ErpSemanticComponentsScenario scenario;
+
+  ErpDocumentContext _context({
+    bool withAddress = true,
+    bool withTerms = true,
+  }) {
+    final billing = withAddress
+        ? const ErpAddress(
+            role: ErpAddressRole.billing,
+            line1: 'King Fahd Road طريق الملك فهد',
+            city: 'Riyadh الرياض',
+            postalCode: '12211',
+            countryCode: 'SA',
+          )
+        : null;
+
+    return ErpDocumentContext(
+      organization: const ErpOrganization(
+        id: 'ORG-001',
+        legalName: 'Genius Systems',
+        nameAr: 'أنظمة جينيس',
+        taxIdentity: ErpTaxIdentity(
+          taxNumber: '310123456700003',
+          countryCode: 'SA',
+        ),
+      ),
+      identity: ErpDocumentIdentity(
+        kind: ErpDocumentKind.invoice,
+        number: 'INV-2026-000123',
+        issueDate: DateTime(2026, 9, 4),
+        status: ErpDocumentStatus.issued,
+        externalId: 'ERP-INV-8821',
+      ),
+      recipient: ErpParty(
+        id: 'CUST-001',
+        name: 'Acme Trading',
+        nameAr: 'شركة أكمي للتجارة',
+        registrationNumber: 'CR-1010099999',
+        taxIdentity: const ErpTaxIdentity(
+          taxNumber: '310987654300003',
+          countryCode: 'SA',
+        ),
+        addresses: billing == null ? const [] : [billing],
+        contacts: const [
+          ErpContactMetadata(
+            contactName: 'Finance المالية',
+            phone: '+966 50 123 4567',
+            email: 'finance@example.com',
+          ),
+        ],
+      ),
+      billingAddress: billing,
+      shippingAddress: null,
+      documentCurrency: ErpCurrency.sar,
+      references: [
+        ErpDocumentReference(
+          type: 'Purchase Order',
+          number: 'PO-2026-00421',
+          date: DateTime(2026, 9, 1),
+        ),
+      ],
+      lineItems: [
+        ErpLineItem(
+          id: '1',
+          description: 'ERP Consulting',
+          descriptionAr: 'استشارات ERP',
+          sku: 'SKU-ERP-001',
+          quantity: const ErpQuantity(
+            value: 2,
+            unit: ErpUnit.each,
+          ),
+          unitPrice: ErpMoney.fromAmount(
+            1000,
+            currency: ErpCurrency.sar,
+          ),
+          discounts: [
+            ErpDiscount.percentage(percentage: 5),
+          ],
+          charges: [
+            ErpCharge.fixed(
+              amount: ErpMoney.fromAmount(
+                25,
+                currency: ErpCurrency.sar,
+              ),
+            ),
+          ],
+          taxes: const [
+            ErpTaxLine(
+              code: 'VAT',
+              ratePercent: 15,
+            ),
+          ],
+        ),
+      ],
+      approvals: [
+        ErpApproval(
+          stage: 'Finance Review',
+          status: ErpApprovalStatus.approved,
+          approverName: 'A. Reviewer',
+          decidedAt: DateTime(2026, 9, 4, 10, 30),
+          comment: 'Approved for posting',
+        ),
+        const ErpApproval(
+          stage: 'Manager Review',
+          status: ErpApprovalStatus.pending,
+        ),
+      ],
+      terms: withTerms
+          ? 'Payment due within 30 days. Reference the invoice number '
+              'on every payment.'
+          : null,
+    );
+  }
+
+  ErpCalculationResult _calculation(ErpDocumentContext context) {
+    return const ErpCalculationService().calculate(
+      ErpCalculationRequest.fromContext(
+        context,
+        paidAmount: ErpMoney.fromMinorUnits(
+          100000,
+          currency: ErpCurrency.sar,
+        ),
+      ),
+    );
+  }
+
+  void _draw(
+    GeniusPdfErpComponent component, {
+    double spacing = 10,
+  }) {
+    if (!component.isVisible) return;
+    final result = component.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  void _drawGroup(
+    GeniusPdfErpComponentGroup group, {
+    double spacing = 10,
+  }) {
+    if (!group.isVisible) return;
+    final result = group.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  @override
+  void build() {
+    newPage();
+
+    final context = _context();
+    final result = _calculation(context);
+
+    switch (scenario) {
+      case S07ErpSemanticComponentsScenario.identityParty:
+        _draw(
+          GeniusPdfDocumentIdentity(
+            config: config,
+            data: context.identity,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer',
+            titleAr: 'العميل',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            title: 'Billing Address',
+            titleAr: 'عنوان الفوترة',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: context.references,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.financial:
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Grand Total',
+            labelAr: 'الإجمالي',
+            bold: true,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAmountInWords(
+            config: config,
+            amount: result.grandTotal,
+            text: 'Two thousand two hundred and thirteen Saudi riyals '
+                'and seventy-five halalas only',
+            textAr: 'ألفان ومئتان وثلاثة عشر ريالاً سعودياً '
+                'وخمس وسبعون هللة فقط',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAdjustmentSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfTaxSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfBalanceDueBlock(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.operational:
+        _draw(
+          GeniusPdfTermsSection(
+            config: config,
+            text: context.terms,
+            textAr: 'يستحق السداد خلال 30 يوماً. يرجى ذكر رقم الفاتورة '
+                'في كل دفعة.',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: context.approvals,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfStamp(
+            config: config,
+            text: 'APPROVED',
+            textAr: 'معتمد',
+            tone: GeniusPdfSemanticTone.success,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: [
+              GeniusPdfMetricCardData(
+                label: 'Subtotal',
+                labelAr: 'المجموع',
+                value: config.formatter.formatMoney(
+                  result.subtotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'VAT',
+                labelAr: 'الضريبة',
+                value: config.formatter.formatMoney(
+                  result.taxTotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'Due',
+                labelAr: 'المتبقي',
+                value: config.formatter.formatMoney(
+                  result.dueAmount!.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+            ],
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'POSTED-ERP-2026-77',
+            tone: GeniusPdfSemanticTone.info,
+            valueKind: GeniusPdfValueKind.customIdentifier,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.nullCollapse:
+        final nullContext = _context(
+          withAddress: false,
+          withTerms: false,
+        );
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 14,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: nullContext.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: null,
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: null,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: null,
+                textAr: null,
+                directionality: directionality,
+              ),
+              GeniusPdfLabel(
+                config: config,
+                text: 'VISIBLE AFTER NULL SECTIONS',
+                textAr: 'ظاهر بعد الأقسام الفارغة',
+                tone: GeniusPdfSemanticTone.success,
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.emptyState:
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.bilingual:
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer / العميل',
+            titleAr: 'العميل / Customer',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'INV-2026-000123',
+            valueKind: GeniusPdfValueKind.documentNumber,
+            tone: GeniusPdfSemanticTone.info,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Total الإجمالي',
+            labelAr: 'الإجمالي Total',
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.composition:
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 10,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: context.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: context.recipient,
+                title: 'Customer',
+                titleAr: 'العميل',
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: context.shippingAddress,
+                title: 'Shipping Address',
+                titleAr: 'عنوان الشحن',
+                directionality: directionality,
+              ),
+              GeniusPdfTaxSummary(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfBalanceDueBlock(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: context.terms,
+                textAr: 'يستحق السداد خلال 30 يوماً.',
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.longMultiPage:
+        for (var pageIndex = 0; pageIndex < 4; pageIndex++) {
+          if (pageIndex > 0) newPage();
+
+          final references = List<ErpDocumentReference>.generate(
+            8,
+            (index) => ErpDocumentReference(
+              type: 'Reference ${pageIndex * 8 + index + 1}',
+              number:
+                  'REF-2026-${(pageIndex * 8 + index + 1).toString().padLeft(4, '0')}',
+              date: DateTime(2026, 9, 1 + (index % 4)),
+            ),
+          );
+
+          _draw(
+            GeniusPdfReferenceBlock(
+              config: config,
+              references: references,
+              title: 'Page ${pageIndex + 1} References',
+              titleAr: 'مراجع الصفحة ${pageIndex + 1}',
+              directionality: directionality,
+            ),
+            spacing: 8,
+          );
+
+          _draw(
+            GeniusPdfTermsSection(
+              config: config,
+              text: List.filled(
+                6,
+                'Long ERP terms remain reusable and keep identifiers such as '
+                    'INV-2026-000123 unchanged.',
+              ).join(' '),
+              textAr: List.filled(
+                6,
+                'نص شروط طويل للتحقق من الالتفاف مع بقاء المعرف '
+                    'INV-2026-000123 بدون عكس.',
+              ).join(' '),
+              directionality: directionality,
+            ),
+          );
+        }
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS07OperationalVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S07ErpSemanticComponentsDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S07ErpSemanticComponentsScenario.operational,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S07ErpSemanticComponentsVerificationPage.
+enum S07ErpSemanticComponentsScenario {
+  identityParty,
+  financial,
+  operational,
+  nullCollapse,
+  emptyState,
+  bilingual,
+  composition,
+  longMultiPage,
+}
+
+class S07ErpSemanticComponentsDocument extends GeniusPdfDocumentBuilder {
+  S07ErpSemanticComponentsDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S07ErpSemanticComponentsScenario scenario;
+
+  ErpDocumentContext _context({
+    bool withAddress = true,
+    bool withTerms = true,
+  }) {
+    final billing = withAddress
+        ? const ErpAddress(
+            role: ErpAddressRole.billing,
+            line1: 'King Fahd Road طريق الملك فهد',
+            city: 'Riyadh الرياض',
+            postalCode: '12211',
+            countryCode: 'SA',
+          )
+        : null;
+
+    return ErpDocumentContext(
+      organization: const ErpOrganization(
+        id: 'ORG-001',
+        legalName: 'Genius Systems',
+        nameAr: 'أنظمة جينيس',
+        taxIdentity: ErpTaxIdentity(
+          taxNumber: '310123456700003',
+          countryCode: 'SA',
+        ),
+      ),
+      identity: ErpDocumentIdentity(
+        kind: ErpDocumentKind.invoice,
+        number: 'INV-2026-000123',
+        issueDate: DateTime(2026, 9, 4),
+        status: ErpDocumentStatus.issued,
+        externalId: 'ERP-INV-8821',
+      ),
+      recipient: ErpParty(
+        id: 'CUST-001',
+        name: 'Acme Trading',
+        nameAr: 'شركة أكمي للتجارة',
+        registrationNumber: 'CR-1010099999',
+        taxIdentity: const ErpTaxIdentity(
+          taxNumber: '310987654300003',
+          countryCode: 'SA',
+        ),
+        addresses: billing == null ? const [] : [billing],
+        contacts: const [
+          ErpContactMetadata(
+            contactName: 'Finance المالية',
+            phone: '+966 50 123 4567',
+            email: 'finance@example.com',
+          ),
+        ],
+      ),
+      billingAddress: billing,
+      shippingAddress: null,
+      documentCurrency: ErpCurrency.sar,
+      references: [
+        ErpDocumentReference(
+          type: 'Purchase Order',
+          number: 'PO-2026-00421',
+          date: DateTime(2026, 9, 1),
+        ),
+      ],
+      lineItems: [
+        ErpLineItem(
+          id: '1',
+          description: 'ERP Consulting',
+          descriptionAr: 'استشارات ERP',
+          sku: 'SKU-ERP-001',
+          quantity: const ErpQuantity(
+            value: 2,
+            unit: ErpUnit.each,
+          ),
+          unitPrice: ErpMoney.fromAmount(
+            1000,
+            currency: ErpCurrency.sar,
+          ),
+          discounts: [
+            ErpDiscount.percentage(percentage: 5),
+          ],
+          charges: [
+            ErpCharge.fixed(
+              amount: ErpMoney.fromAmount(
+                25,
+                currency: ErpCurrency.sar,
+              ),
+            ),
+          ],
+          taxes: const [
+            ErpTaxLine(
+              code: 'VAT',
+              ratePercent: 15,
+            ),
+          ],
+        ),
+      ],
+      approvals: [
+        ErpApproval(
+          stage: 'Finance Review',
+          status: ErpApprovalStatus.approved,
+          approverName: 'A. Reviewer',
+          decidedAt: DateTime(2026, 9, 4, 10, 30),
+          comment: 'Approved for posting',
+        ),
+        const ErpApproval(
+          stage: 'Manager Review',
+          status: ErpApprovalStatus.pending,
+        ),
+      ],
+      terms: withTerms
+          ? 'Payment due within 30 days. Reference the invoice number '
+              'on every payment.'
+          : null,
+    );
+  }
+
+  ErpCalculationResult _calculation(ErpDocumentContext context) {
+    return const ErpCalculationService().calculate(
+      ErpCalculationRequest.fromContext(
+        context,
+        paidAmount: ErpMoney.fromMinorUnits(
+          100000,
+          currency: ErpCurrency.sar,
+        ),
+      ),
+    );
+  }
+
+  void _draw(
+    GeniusPdfErpComponent component, {
+    double spacing = 10,
+  }) {
+    if (!component.isVisible) return;
+    final result = component.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  void _drawGroup(
+    GeniusPdfErpComponentGroup group, {
+    double spacing = 10,
+  }) {
+    if (!group.isVisible) return;
+    final result = group.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  @override
+  void build() {
+    newPage();
+
+    final context = _context();
+    final result = _calculation(context);
+
+    switch (scenario) {
+      case S07ErpSemanticComponentsScenario.identityParty:
+        _draw(
+          GeniusPdfDocumentIdentity(
+            config: config,
+            data: context.identity,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer',
+            titleAr: 'العميل',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            title: 'Billing Address',
+            titleAr: 'عنوان الفوترة',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: context.references,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.financial:
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Grand Total',
+            labelAr: 'الإجمالي',
+            bold: true,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAmountInWords(
+            config: config,
+            amount: result.grandTotal,
+            text: 'Two thousand two hundred and thirteen Saudi riyals '
+                'and seventy-five halalas only',
+            textAr: 'ألفان ومئتان وثلاثة عشر ريالاً سعودياً '
+                'وخمس وسبعون هللة فقط',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAdjustmentSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfTaxSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfBalanceDueBlock(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.operational:
+        _draw(
+          GeniusPdfTermsSection(
+            config: config,
+            text: context.terms,
+            textAr: 'يستحق السداد خلال 30 يوماً. يرجى ذكر رقم الفاتورة '
+                'في كل دفعة.',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: context.approvals,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfStamp(
+            config: config,
+            text: 'APPROVED',
+            textAr: 'معتمد',
+            tone: GeniusPdfSemanticTone.success,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: [
+              GeniusPdfMetricCardData(
+                label: 'Subtotal',
+                labelAr: 'المجموع',
+                value: config.formatter.formatMoney(
+                  result.subtotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'VAT',
+                labelAr: 'الضريبة',
+                value: config.formatter.formatMoney(
+                  result.taxTotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'Due',
+                labelAr: 'المتبقي',
+                value: config.formatter.formatMoney(
+                  result.dueAmount!.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+            ],
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'POSTED-ERP-2026-77',
+            tone: GeniusPdfSemanticTone.info,
+            valueKind: GeniusPdfValueKind.customIdentifier,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.nullCollapse:
+        final nullContext = _context(
+          withAddress: false,
+          withTerms: false,
+        );
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 14,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: nullContext.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: null,
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: null,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: null,
+                textAr: null,
+                directionality: directionality,
+              ),
+              GeniusPdfLabel(
+                config: config,
+                text: 'VISIBLE AFTER NULL SECTIONS',
+                textAr: 'ظاهر بعد الأقسام الفارغة',
+                tone: GeniusPdfSemanticTone.success,
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.emptyState:
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.bilingual:
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer / العميل',
+            titleAr: 'العميل / Customer',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'INV-2026-000123',
+            valueKind: GeniusPdfValueKind.documentNumber,
+            tone: GeniusPdfSemanticTone.info,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Total الإجمالي',
+            labelAr: 'الإجمالي Total',
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.composition:
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 10,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: context.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: context.recipient,
+                title: 'Customer',
+                titleAr: 'العميل',
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: context.shippingAddress,
+                title: 'Shipping Address',
+                titleAr: 'عنوان الشحن',
+                directionality: directionality,
+              ),
+              GeniusPdfTaxSummary(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfBalanceDueBlock(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: context.terms,
+                textAr: 'يستحق السداد خلال 30 يوماً.',
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.longMultiPage:
+        for (var pageIndex = 0; pageIndex < 4; pageIndex++) {
+          if (pageIndex > 0) newPage();
+
+          final references = List<ErpDocumentReference>.generate(
+            8,
+            (index) => ErpDocumentReference(
+              type: 'Reference ${pageIndex * 8 + index + 1}',
+              number:
+                  'REF-2026-${(pageIndex * 8 + index + 1).toString().padLeft(4, '0')}',
+              date: DateTime(2026, 9, 1 + (index % 4)),
+            ),
+          );
+
+          _draw(
+            GeniusPdfReferenceBlock(
+              config: config,
+              references: references,
+              title: 'Page ${pageIndex + 1} References',
+              titleAr: 'مراجع الصفحة ${pageIndex + 1}',
+              directionality: directionality,
+            ),
+            spacing: 8,
+          );
+
+          _draw(
+            GeniusPdfTermsSection(
+              config: config,
+              text: List.filled(
+                6,
+                'Long ERP terms remain reusable and keep identifiers such as '
+                    'INV-2026-000123 unchanged.',
+              ).join(' '),
+              textAr: List.filled(
+                6,
+                'نص شروط طويل للتحقق من الالتفاف مع بقاء المعرف '
+                    'INV-2026-000123 بدون عكس.',
+              ).join(' '),
+              directionality: directionality,
+            ),
+          );
+        }
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS07NullCollapseVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S07ErpSemanticComponentsDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S07ErpSemanticComponentsScenario.nullCollapse,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S07ErpSemanticComponentsVerificationPage.
+enum S07ErpSemanticComponentsScenario {
+  identityParty,
+  financial,
+  operational,
+  nullCollapse,
+  emptyState,
+  bilingual,
+  composition,
+  longMultiPage,
+}
+
+class S07ErpSemanticComponentsDocument extends GeniusPdfDocumentBuilder {
+  S07ErpSemanticComponentsDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S07ErpSemanticComponentsScenario scenario;
+
+  ErpDocumentContext _context({
+    bool withAddress = true,
+    bool withTerms = true,
+  }) {
+    final billing = withAddress
+        ? const ErpAddress(
+            role: ErpAddressRole.billing,
+            line1: 'King Fahd Road طريق الملك فهد',
+            city: 'Riyadh الرياض',
+            postalCode: '12211',
+            countryCode: 'SA',
+          )
+        : null;
+
+    return ErpDocumentContext(
+      organization: const ErpOrganization(
+        id: 'ORG-001',
+        legalName: 'Genius Systems',
+        nameAr: 'أنظمة جينيس',
+        taxIdentity: ErpTaxIdentity(
+          taxNumber: '310123456700003',
+          countryCode: 'SA',
+        ),
+      ),
+      identity: ErpDocumentIdentity(
+        kind: ErpDocumentKind.invoice,
+        number: 'INV-2026-000123',
+        issueDate: DateTime(2026, 9, 4),
+        status: ErpDocumentStatus.issued,
+        externalId: 'ERP-INV-8821',
+      ),
+      recipient: ErpParty(
+        id: 'CUST-001',
+        name: 'Acme Trading',
+        nameAr: 'شركة أكمي للتجارة',
+        registrationNumber: 'CR-1010099999',
+        taxIdentity: const ErpTaxIdentity(
+          taxNumber: '310987654300003',
+          countryCode: 'SA',
+        ),
+        addresses: billing == null ? const [] : [billing],
+        contacts: const [
+          ErpContactMetadata(
+            contactName: 'Finance المالية',
+            phone: '+966 50 123 4567',
+            email: 'finance@example.com',
+          ),
+        ],
+      ),
+      billingAddress: billing,
+      shippingAddress: null,
+      documentCurrency: ErpCurrency.sar,
+      references: [
+        ErpDocumentReference(
+          type: 'Purchase Order',
+          number: 'PO-2026-00421',
+          date: DateTime(2026, 9, 1),
+        ),
+      ],
+      lineItems: [
+        ErpLineItem(
+          id: '1',
+          description: 'ERP Consulting',
+          descriptionAr: 'استشارات ERP',
+          sku: 'SKU-ERP-001',
+          quantity: const ErpQuantity(
+            value: 2,
+            unit: ErpUnit.each,
+          ),
+          unitPrice: ErpMoney.fromAmount(
+            1000,
+            currency: ErpCurrency.sar,
+          ),
+          discounts: [
+            ErpDiscount.percentage(percentage: 5),
+          ],
+          charges: [
+            ErpCharge.fixed(
+              amount: ErpMoney.fromAmount(
+                25,
+                currency: ErpCurrency.sar,
+              ),
+            ),
+          ],
+          taxes: const [
+            ErpTaxLine(
+              code: 'VAT',
+              ratePercent: 15,
+            ),
+          ],
+        ),
+      ],
+      approvals: [
+        ErpApproval(
+          stage: 'Finance Review',
+          status: ErpApprovalStatus.approved,
+          approverName: 'A. Reviewer',
+          decidedAt: DateTime(2026, 9, 4, 10, 30),
+          comment: 'Approved for posting',
+        ),
+        const ErpApproval(
+          stage: 'Manager Review',
+          status: ErpApprovalStatus.pending,
+        ),
+      ],
+      terms: withTerms
+          ? 'Payment due within 30 days. Reference the invoice number '
+              'on every payment.'
+          : null,
+    );
+  }
+
+  ErpCalculationResult _calculation(ErpDocumentContext context) {
+    return const ErpCalculationService().calculate(
+      ErpCalculationRequest.fromContext(
+        context,
+        paidAmount: ErpMoney.fromMinorUnits(
+          100000,
+          currency: ErpCurrency.sar,
+        ),
+      ),
+    );
+  }
+
+  void _draw(
+    GeniusPdfErpComponent component, {
+    double spacing = 10,
+  }) {
+    if (!component.isVisible) return;
+    final result = component.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  void _drawGroup(
+    GeniusPdfErpComponentGroup group, {
+    double spacing = 10,
+  }) {
+    if (!group.isVisible) return;
+    final result = group.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  @override
+  void build() {
+    newPage();
+
+    final context = _context();
+    final result = _calculation(context);
+
+    switch (scenario) {
+      case S07ErpSemanticComponentsScenario.identityParty:
+        _draw(
+          GeniusPdfDocumentIdentity(
+            config: config,
+            data: context.identity,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer',
+            titleAr: 'العميل',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            title: 'Billing Address',
+            titleAr: 'عنوان الفوترة',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: context.references,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.financial:
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Grand Total',
+            labelAr: 'الإجمالي',
+            bold: true,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAmountInWords(
+            config: config,
+            amount: result.grandTotal,
+            text: 'Two thousand two hundred and thirteen Saudi riyals '
+                'and seventy-five halalas only',
+            textAr: 'ألفان ومئتان وثلاثة عشر ريالاً سعودياً '
+                'وخمس وسبعون هللة فقط',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAdjustmentSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfTaxSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfBalanceDueBlock(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.operational:
+        _draw(
+          GeniusPdfTermsSection(
+            config: config,
+            text: context.terms,
+            textAr: 'يستحق السداد خلال 30 يوماً. يرجى ذكر رقم الفاتورة '
+                'في كل دفعة.',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: context.approvals,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfStamp(
+            config: config,
+            text: 'APPROVED',
+            textAr: 'معتمد',
+            tone: GeniusPdfSemanticTone.success,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: [
+              GeniusPdfMetricCardData(
+                label: 'Subtotal',
+                labelAr: 'المجموع',
+                value: config.formatter.formatMoney(
+                  result.subtotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'VAT',
+                labelAr: 'الضريبة',
+                value: config.formatter.formatMoney(
+                  result.taxTotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'Due',
+                labelAr: 'المتبقي',
+                value: config.formatter.formatMoney(
+                  result.dueAmount!.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+            ],
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'POSTED-ERP-2026-77',
+            tone: GeniusPdfSemanticTone.info,
+            valueKind: GeniusPdfValueKind.customIdentifier,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.nullCollapse:
+        final nullContext = _context(
+          withAddress: false,
+          withTerms: false,
+        );
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 14,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: nullContext.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: null,
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: null,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: null,
+                textAr: null,
+                directionality: directionality,
+              ),
+              GeniusPdfLabel(
+                config: config,
+                text: 'VISIBLE AFTER NULL SECTIONS',
+                textAr: 'ظاهر بعد الأقسام الفارغة',
+                tone: GeniusPdfSemanticTone.success,
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.emptyState:
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.bilingual:
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer / العميل',
+            titleAr: 'العميل / Customer',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'INV-2026-000123',
+            valueKind: GeniusPdfValueKind.documentNumber,
+            tone: GeniusPdfSemanticTone.info,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Total الإجمالي',
+            labelAr: 'الإجمالي Total',
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.composition:
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 10,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: context.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: context.recipient,
+                title: 'Customer',
+                titleAr: 'العميل',
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: context.shippingAddress,
+                title: 'Shipping Address',
+                titleAr: 'عنوان الشحن',
+                directionality: directionality,
+              ),
+              GeniusPdfTaxSummary(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfBalanceDueBlock(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: context.terms,
+                textAr: 'يستحق السداد خلال 30 يوماً.',
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.longMultiPage:
+        for (var pageIndex = 0; pageIndex < 4; pageIndex++) {
+          if (pageIndex > 0) newPage();
+
+          final references = List<ErpDocumentReference>.generate(
+            8,
+            (index) => ErpDocumentReference(
+              type: 'Reference ${pageIndex * 8 + index + 1}',
+              number:
+                  'REF-2026-${(pageIndex * 8 + index + 1).toString().padLeft(4, '0')}',
+              date: DateTime(2026, 9, 1 + (index % 4)),
+            ),
+          );
+
+          _draw(
+            GeniusPdfReferenceBlock(
+              config: config,
+              references: references,
+              title: 'Page ${pageIndex + 1} References',
+              titleAr: 'مراجع الصفحة ${pageIndex + 1}',
+              directionality: directionality,
+            ),
+            spacing: 8,
+          );
+
+          _draw(
+            GeniusPdfTermsSection(
+              config: config,
+              text: List.filled(
+                6,
+                'Long ERP terms remain reusable and keep identifiers such as '
+                    'INV-2026-000123 unchanged.',
+              ).join(' '),
+              textAr: List.filled(
+                6,
+                'نص شروط طويل للتحقق من الالتفاف مع بقاء المعرف '
+                    'INV-2026-000123 بدون عكس.',
+              ).join(' '),
+              directionality: directionality,
+            ),
+          );
+        }
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS07EmptyStateVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S07ErpSemanticComponentsDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S07ErpSemanticComponentsScenario.emptyState,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S07ErpSemanticComponentsVerificationPage.
+enum S07ErpSemanticComponentsScenario {
+  identityParty,
+  financial,
+  operational,
+  nullCollapse,
+  emptyState,
+  bilingual,
+  composition,
+  longMultiPage,
+}
+
+class S07ErpSemanticComponentsDocument extends GeniusPdfDocumentBuilder {
+  S07ErpSemanticComponentsDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S07ErpSemanticComponentsScenario scenario;
+
+  ErpDocumentContext _context({
+    bool withAddress = true,
+    bool withTerms = true,
+  }) {
+    final billing = withAddress
+        ? const ErpAddress(
+            role: ErpAddressRole.billing,
+            line1: 'King Fahd Road طريق الملك فهد',
+            city: 'Riyadh الرياض',
+            postalCode: '12211',
+            countryCode: 'SA',
+          )
+        : null;
+
+    return ErpDocumentContext(
+      organization: const ErpOrganization(
+        id: 'ORG-001',
+        legalName: 'Genius Systems',
+        nameAr: 'أنظمة جينيس',
+        taxIdentity: ErpTaxIdentity(
+          taxNumber: '310123456700003',
+          countryCode: 'SA',
+        ),
+      ),
+      identity: ErpDocumentIdentity(
+        kind: ErpDocumentKind.invoice,
+        number: 'INV-2026-000123',
+        issueDate: DateTime(2026, 9, 4),
+        status: ErpDocumentStatus.issued,
+        externalId: 'ERP-INV-8821',
+      ),
+      recipient: ErpParty(
+        id: 'CUST-001',
+        name: 'Acme Trading',
+        nameAr: 'شركة أكمي للتجارة',
+        registrationNumber: 'CR-1010099999',
+        taxIdentity: const ErpTaxIdentity(
+          taxNumber: '310987654300003',
+          countryCode: 'SA',
+        ),
+        addresses: billing == null ? const [] : [billing],
+        contacts: const [
+          ErpContactMetadata(
+            contactName: 'Finance المالية',
+            phone: '+966 50 123 4567',
+            email: 'finance@example.com',
+          ),
+        ],
+      ),
+      billingAddress: billing,
+      shippingAddress: null,
+      documentCurrency: ErpCurrency.sar,
+      references: [
+        ErpDocumentReference(
+          type: 'Purchase Order',
+          number: 'PO-2026-00421',
+          date: DateTime(2026, 9, 1),
+        ),
+      ],
+      lineItems: [
+        ErpLineItem(
+          id: '1',
+          description: 'ERP Consulting',
+          descriptionAr: 'استشارات ERP',
+          sku: 'SKU-ERP-001',
+          quantity: const ErpQuantity(
+            value: 2,
+            unit: ErpUnit.each,
+          ),
+          unitPrice: ErpMoney.fromAmount(
+            1000,
+            currency: ErpCurrency.sar,
+          ),
+          discounts: [
+            ErpDiscount.percentage(percentage: 5),
+          ],
+          charges: [
+            ErpCharge.fixed(
+              amount: ErpMoney.fromAmount(
+                25,
+                currency: ErpCurrency.sar,
+              ),
+            ),
+          ],
+          taxes: const [
+            ErpTaxLine(
+              code: 'VAT',
+              ratePercent: 15,
+            ),
+          ],
+        ),
+      ],
+      approvals: [
+        ErpApproval(
+          stage: 'Finance Review',
+          status: ErpApprovalStatus.approved,
+          approverName: 'A. Reviewer',
+          decidedAt: DateTime(2026, 9, 4, 10, 30),
+          comment: 'Approved for posting',
+        ),
+        const ErpApproval(
+          stage: 'Manager Review',
+          status: ErpApprovalStatus.pending,
+        ),
+      ],
+      terms: withTerms
+          ? 'Payment due within 30 days. Reference the invoice number '
+              'on every payment.'
+          : null,
+    );
+  }
+
+  ErpCalculationResult _calculation(ErpDocumentContext context) {
+    return const ErpCalculationService().calculate(
+      ErpCalculationRequest.fromContext(
+        context,
+        paidAmount: ErpMoney.fromMinorUnits(
+          100000,
+          currency: ErpCurrency.sar,
+        ),
+      ),
+    );
+  }
+
+  void _draw(
+    GeniusPdfErpComponent component, {
+    double spacing = 10,
+  }) {
+    if (!component.isVisible) return;
+    final result = component.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  void _drawGroup(
+    GeniusPdfErpComponentGroup group, {
+    double spacing = 10,
+  }) {
+    if (!group.isVisible) return;
+    final result = group.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  @override
+  void build() {
+    newPage();
+
+    final context = _context();
+    final result = _calculation(context);
+
+    switch (scenario) {
+      case S07ErpSemanticComponentsScenario.identityParty:
+        _draw(
+          GeniusPdfDocumentIdentity(
+            config: config,
+            data: context.identity,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer',
+            titleAr: 'العميل',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            title: 'Billing Address',
+            titleAr: 'عنوان الفوترة',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: context.references,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.financial:
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Grand Total',
+            labelAr: 'الإجمالي',
+            bold: true,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAmountInWords(
+            config: config,
+            amount: result.grandTotal,
+            text: 'Two thousand two hundred and thirteen Saudi riyals '
+                'and seventy-five halalas only',
+            textAr: 'ألفان ومئتان وثلاثة عشر ريالاً سعودياً '
+                'وخمس وسبعون هللة فقط',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAdjustmentSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfTaxSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfBalanceDueBlock(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.operational:
+        _draw(
+          GeniusPdfTermsSection(
+            config: config,
+            text: context.terms,
+            textAr: 'يستحق السداد خلال 30 يوماً. يرجى ذكر رقم الفاتورة '
+                'في كل دفعة.',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: context.approvals,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfStamp(
+            config: config,
+            text: 'APPROVED',
+            textAr: 'معتمد',
+            tone: GeniusPdfSemanticTone.success,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: [
+              GeniusPdfMetricCardData(
+                label: 'Subtotal',
+                labelAr: 'المجموع',
+                value: config.formatter.formatMoney(
+                  result.subtotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'VAT',
+                labelAr: 'الضريبة',
+                value: config.formatter.formatMoney(
+                  result.taxTotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'Due',
+                labelAr: 'المتبقي',
+                value: config.formatter.formatMoney(
+                  result.dueAmount!.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+            ],
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'POSTED-ERP-2026-77',
+            tone: GeniusPdfSemanticTone.info,
+            valueKind: GeniusPdfValueKind.customIdentifier,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.nullCollapse:
+        final nullContext = _context(
+          withAddress: false,
+          withTerms: false,
+        );
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 14,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: nullContext.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: null,
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: null,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: null,
+                textAr: null,
+                directionality: directionality,
+              ),
+              GeniusPdfLabel(
+                config: config,
+                text: 'VISIBLE AFTER NULL SECTIONS',
+                textAr: 'ظاهر بعد الأقسام الفارغة',
+                tone: GeniusPdfSemanticTone.success,
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.emptyState:
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.bilingual:
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer / العميل',
+            titleAr: 'العميل / Customer',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'INV-2026-000123',
+            valueKind: GeniusPdfValueKind.documentNumber,
+            tone: GeniusPdfSemanticTone.info,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Total الإجمالي',
+            labelAr: 'الإجمالي Total',
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.composition:
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 10,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: context.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: context.recipient,
+                title: 'Customer',
+                titleAr: 'العميل',
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: context.shippingAddress,
+                title: 'Shipping Address',
+                titleAr: 'عنوان الشحن',
+                directionality: directionality,
+              ),
+              GeniusPdfTaxSummary(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfBalanceDueBlock(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: context.terms,
+                textAr: 'يستحق السداد خلال 30 يوماً.',
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.longMultiPage:
+        for (var pageIndex = 0; pageIndex < 4; pageIndex++) {
+          if (pageIndex > 0) newPage();
+
+          final references = List<ErpDocumentReference>.generate(
+            8,
+            (index) => ErpDocumentReference(
+              type: 'Reference ${pageIndex * 8 + index + 1}',
+              number:
+                  'REF-2026-${(pageIndex * 8 + index + 1).toString().padLeft(4, '0')}',
+              date: DateTime(2026, 9, 1 + (index % 4)),
+            ),
+          );
+
+          _draw(
+            GeniusPdfReferenceBlock(
+              config: config,
+              references: references,
+              title: 'Page ${pageIndex + 1} References',
+              titleAr: 'مراجع الصفحة ${pageIndex + 1}',
+              directionality: directionality,
+            ),
+            spacing: 8,
+          );
+
+          _draw(
+            GeniusPdfTermsSection(
+              config: config,
+              text: List.filled(
+                6,
+                'Long ERP terms remain reusable and keep identifiers such as '
+                    'INV-2026-000123 unchanged.',
+              ).join(' '),
+              textAr: List.filled(
+                6,
+                'نص شروط طويل للتحقق من الالتفاف مع بقاء المعرف '
+                    'INV-2026-000123 بدون عكس.',
+              ).join(' '),
+              directionality: directionality,
+            ),
+          );
+        }
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS07BilingualVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S07ErpSemanticComponentsDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S07ErpSemanticComponentsScenario.bilingual,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S07ErpSemanticComponentsVerificationPage.
+enum S07ErpSemanticComponentsScenario {
+  identityParty,
+  financial,
+  operational,
+  nullCollapse,
+  emptyState,
+  bilingual,
+  composition,
+  longMultiPage,
+}
+
+class S07ErpSemanticComponentsDocument extends GeniusPdfDocumentBuilder {
+  S07ErpSemanticComponentsDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S07ErpSemanticComponentsScenario scenario;
+
+  ErpDocumentContext _context({
+    bool withAddress = true,
+    bool withTerms = true,
+  }) {
+    final billing = withAddress
+        ? const ErpAddress(
+            role: ErpAddressRole.billing,
+            line1: 'King Fahd Road طريق الملك فهد',
+            city: 'Riyadh الرياض',
+            postalCode: '12211',
+            countryCode: 'SA',
+          )
+        : null;
+
+    return ErpDocumentContext(
+      organization: const ErpOrganization(
+        id: 'ORG-001',
+        legalName: 'Genius Systems',
+        nameAr: 'أنظمة جينيس',
+        taxIdentity: ErpTaxIdentity(
+          taxNumber: '310123456700003',
+          countryCode: 'SA',
+        ),
+      ),
+      identity: ErpDocumentIdentity(
+        kind: ErpDocumentKind.invoice,
+        number: 'INV-2026-000123',
+        issueDate: DateTime(2026, 9, 4),
+        status: ErpDocumentStatus.issued,
+        externalId: 'ERP-INV-8821',
+      ),
+      recipient: ErpParty(
+        id: 'CUST-001',
+        name: 'Acme Trading',
+        nameAr: 'شركة أكمي للتجارة',
+        registrationNumber: 'CR-1010099999',
+        taxIdentity: const ErpTaxIdentity(
+          taxNumber: '310987654300003',
+          countryCode: 'SA',
+        ),
+        addresses: billing == null ? const [] : [billing],
+        contacts: const [
+          ErpContactMetadata(
+            contactName: 'Finance المالية',
+            phone: '+966 50 123 4567',
+            email: 'finance@example.com',
+          ),
+        ],
+      ),
+      billingAddress: billing,
+      shippingAddress: null,
+      documentCurrency: ErpCurrency.sar,
+      references: [
+        ErpDocumentReference(
+          type: 'Purchase Order',
+          number: 'PO-2026-00421',
+          date: DateTime(2026, 9, 1),
+        ),
+      ],
+      lineItems: [
+        ErpLineItem(
+          id: '1',
+          description: 'ERP Consulting',
+          descriptionAr: 'استشارات ERP',
+          sku: 'SKU-ERP-001',
+          quantity: const ErpQuantity(
+            value: 2,
+            unit: ErpUnit.each,
+          ),
+          unitPrice: ErpMoney.fromAmount(
+            1000,
+            currency: ErpCurrency.sar,
+          ),
+          discounts: [
+            ErpDiscount.percentage(percentage: 5),
+          ],
+          charges: [
+            ErpCharge.fixed(
+              amount: ErpMoney.fromAmount(
+                25,
+                currency: ErpCurrency.sar,
+              ),
+            ),
+          ],
+          taxes: const [
+            ErpTaxLine(
+              code: 'VAT',
+              ratePercent: 15,
+            ),
+          ],
+        ),
+      ],
+      approvals: [
+        ErpApproval(
+          stage: 'Finance Review',
+          status: ErpApprovalStatus.approved,
+          approverName: 'A. Reviewer',
+          decidedAt: DateTime(2026, 9, 4, 10, 30),
+          comment: 'Approved for posting',
+        ),
+        const ErpApproval(
+          stage: 'Manager Review',
+          status: ErpApprovalStatus.pending,
+        ),
+      ],
+      terms: withTerms
+          ? 'Payment due within 30 days. Reference the invoice number '
+              'on every payment.'
+          : null,
+    );
+  }
+
+  ErpCalculationResult _calculation(ErpDocumentContext context) {
+    return const ErpCalculationService().calculate(
+      ErpCalculationRequest.fromContext(
+        context,
+        paidAmount: ErpMoney.fromMinorUnits(
+          100000,
+          currency: ErpCurrency.sar,
+        ),
+      ),
+    );
+  }
+
+  void _draw(
+    GeniusPdfErpComponent component, {
+    double spacing = 10,
+  }) {
+    if (!component.isVisible) return;
+    final result = component.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  void _drawGroup(
+    GeniusPdfErpComponentGroup group, {
+    double spacing = 10,
+  }) {
+    if (!group.isVisible) return;
+    final result = group.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  @override
+  void build() {
+    newPage();
+
+    final context = _context();
+    final result = _calculation(context);
+
+    switch (scenario) {
+      case S07ErpSemanticComponentsScenario.identityParty:
+        _draw(
+          GeniusPdfDocumentIdentity(
+            config: config,
+            data: context.identity,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer',
+            titleAr: 'العميل',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            title: 'Billing Address',
+            titleAr: 'عنوان الفوترة',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: context.references,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.financial:
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Grand Total',
+            labelAr: 'الإجمالي',
+            bold: true,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAmountInWords(
+            config: config,
+            amount: result.grandTotal,
+            text: 'Two thousand two hundred and thirteen Saudi riyals '
+                'and seventy-five halalas only',
+            textAr: 'ألفان ومئتان وثلاثة عشر ريالاً سعودياً '
+                'وخمس وسبعون هللة فقط',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAdjustmentSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfTaxSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfBalanceDueBlock(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.operational:
+        _draw(
+          GeniusPdfTermsSection(
+            config: config,
+            text: context.terms,
+            textAr: 'يستحق السداد خلال 30 يوماً. يرجى ذكر رقم الفاتورة '
+                'في كل دفعة.',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: context.approvals,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfStamp(
+            config: config,
+            text: 'APPROVED',
+            textAr: 'معتمد',
+            tone: GeniusPdfSemanticTone.success,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: [
+              GeniusPdfMetricCardData(
+                label: 'Subtotal',
+                labelAr: 'المجموع',
+                value: config.formatter.formatMoney(
+                  result.subtotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'VAT',
+                labelAr: 'الضريبة',
+                value: config.formatter.formatMoney(
+                  result.taxTotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'Due',
+                labelAr: 'المتبقي',
+                value: config.formatter.formatMoney(
+                  result.dueAmount!.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+            ],
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'POSTED-ERP-2026-77',
+            tone: GeniusPdfSemanticTone.info,
+            valueKind: GeniusPdfValueKind.customIdentifier,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.nullCollapse:
+        final nullContext = _context(
+          withAddress: false,
+          withTerms: false,
+        );
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 14,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: nullContext.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: null,
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: null,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: null,
+                textAr: null,
+                directionality: directionality,
+              ),
+              GeniusPdfLabel(
+                config: config,
+                text: 'VISIBLE AFTER NULL SECTIONS',
+                textAr: 'ظاهر بعد الأقسام الفارغة',
+                tone: GeniusPdfSemanticTone.success,
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.emptyState:
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.bilingual:
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer / العميل',
+            titleAr: 'العميل / Customer',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'INV-2026-000123',
+            valueKind: GeniusPdfValueKind.documentNumber,
+            tone: GeniusPdfSemanticTone.info,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Total الإجمالي',
+            labelAr: 'الإجمالي Total',
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.composition:
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 10,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: context.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: context.recipient,
+                title: 'Customer',
+                titleAr: 'العميل',
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: context.shippingAddress,
+                title: 'Shipping Address',
+                titleAr: 'عنوان الشحن',
+                directionality: directionality,
+              ),
+              GeniusPdfTaxSummary(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfBalanceDueBlock(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: context.terms,
+                textAr: 'يستحق السداد خلال 30 يوماً.',
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.longMultiPage:
+        for (var pageIndex = 0; pageIndex < 4; pageIndex++) {
+          if (pageIndex > 0) newPage();
+
+          final references = List<ErpDocumentReference>.generate(
+            8,
+            (index) => ErpDocumentReference(
+              type: 'Reference ${pageIndex * 8 + index + 1}',
+              number:
+                  'REF-2026-${(pageIndex * 8 + index + 1).toString().padLeft(4, '0')}',
+              date: DateTime(2026, 9, 1 + (index % 4)),
+            ),
+          );
+
+          _draw(
+            GeniusPdfReferenceBlock(
+              config: config,
+              references: references,
+              title: 'Page ${pageIndex + 1} References',
+              titleAr: 'مراجع الصفحة ${pageIndex + 1}',
+              directionality: directionality,
+            ),
+            spacing: 8,
+          );
+
+          _draw(
+            GeniusPdfTermsSection(
+              config: config,
+              text: List.filled(
+                6,
+                'Long ERP terms remain reusable and keep identifiers such as '
+                    'INV-2026-000123 unchanged.',
+              ).join(' '),
+              textAr: List.filled(
+                6,
+                'نص شروط طويل للتحقق من الالتفاف مع بقاء المعرف '
+                    'INV-2026-000123 بدون عكس.',
+              ).join(' '),
+              directionality: directionality,
+            ),
+          );
+        }
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS07CompositionVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S07ErpSemanticComponentsDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S07ErpSemanticComponentsScenario.composition,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S07ErpSemanticComponentsVerificationPage.
+enum S07ErpSemanticComponentsScenario {
+  identityParty,
+  financial,
+  operational,
+  nullCollapse,
+  emptyState,
+  bilingual,
+  composition,
+  longMultiPage,
+}
+
+class S07ErpSemanticComponentsDocument extends GeniusPdfDocumentBuilder {
+  S07ErpSemanticComponentsDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S07ErpSemanticComponentsScenario scenario;
+
+  ErpDocumentContext _context({
+    bool withAddress = true,
+    bool withTerms = true,
+  }) {
+    final billing = withAddress
+        ? const ErpAddress(
+            role: ErpAddressRole.billing,
+            line1: 'King Fahd Road طريق الملك فهد',
+            city: 'Riyadh الرياض',
+            postalCode: '12211',
+            countryCode: 'SA',
+          )
+        : null;
+
+    return ErpDocumentContext(
+      organization: const ErpOrganization(
+        id: 'ORG-001',
+        legalName: 'Genius Systems',
+        nameAr: 'أنظمة جينيس',
+        taxIdentity: ErpTaxIdentity(
+          taxNumber: '310123456700003',
+          countryCode: 'SA',
+        ),
+      ),
+      identity: ErpDocumentIdentity(
+        kind: ErpDocumentKind.invoice,
+        number: 'INV-2026-000123',
+        issueDate: DateTime(2026, 9, 4),
+        status: ErpDocumentStatus.issued,
+        externalId: 'ERP-INV-8821',
+      ),
+      recipient: ErpParty(
+        id: 'CUST-001',
+        name: 'Acme Trading',
+        nameAr: 'شركة أكمي للتجارة',
+        registrationNumber: 'CR-1010099999',
+        taxIdentity: const ErpTaxIdentity(
+          taxNumber: '310987654300003',
+          countryCode: 'SA',
+        ),
+        addresses: billing == null ? const [] : [billing],
+        contacts: const [
+          ErpContactMetadata(
+            contactName: 'Finance المالية',
+            phone: '+966 50 123 4567',
+            email: 'finance@example.com',
+          ),
+        ],
+      ),
+      billingAddress: billing,
+      shippingAddress: null,
+      documentCurrency: ErpCurrency.sar,
+      references: [
+        ErpDocumentReference(
+          type: 'Purchase Order',
+          number: 'PO-2026-00421',
+          date: DateTime(2026, 9, 1),
+        ),
+      ],
+      lineItems: [
+        ErpLineItem(
+          id: '1',
+          description: 'ERP Consulting',
+          descriptionAr: 'استشارات ERP',
+          sku: 'SKU-ERP-001',
+          quantity: const ErpQuantity(
+            value: 2,
+            unit: ErpUnit.each,
+          ),
+          unitPrice: ErpMoney.fromAmount(
+            1000,
+            currency: ErpCurrency.sar,
+          ),
+          discounts: [
+            ErpDiscount.percentage(percentage: 5),
+          ],
+          charges: [
+            ErpCharge.fixed(
+              amount: ErpMoney.fromAmount(
+                25,
+                currency: ErpCurrency.sar,
+              ),
+            ),
+          ],
+          taxes: const [
+            ErpTaxLine(
+              code: 'VAT',
+              ratePercent: 15,
+            ),
+          ],
+        ),
+      ],
+      approvals: [
+        ErpApproval(
+          stage: 'Finance Review',
+          status: ErpApprovalStatus.approved,
+          approverName: 'A. Reviewer',
+          decidedAt: DateTime(2026, 9, 4, 10, 30),
+          comment: 'Approved for posting',
+        ),
+        const ErpApproval(
+          stage: 'Manager Review',
+          status: ErpApprovalStatus.pending,
+        ),
+      ],
+      terms: withTerms
+          ? 'Payment due within 30 days. Reference the invoice number '
+              'on every payment.'
+          : null,
+    );
+  }
+
+  ErpCalculationResult _calculation(ErpDocumentContext context) {
+    return const ErpCalculationService().calculate(
+      ErpCalculationRequest.fromContext(
+        context,
+        paidAmount: ErpMoney.fromMinorUnits(
+          100000,
+          currency: ErpCurrency.sar,
+        ),
+      ),
+    );
+  }
+
+  void _draw(
+    GeniusPdfErpComponent component, {
+    double spacing = 10,
+  }) {
+    if (!component.isVisible) return;
+    final result = component.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  void _drawGroup(
+    GeniusPdfErpComponentGroup group, {
+    double spacing = 10,
+  }) {
+    if (!group.isVisible) return;
+    final result = group.draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      setCurrentPage(
+        currentPage,
+        y: result.bottom + spacing,
+      );
+    }
+  }
+
+  @override
+  void build() {
+    newPage();
+
+    final context = _context();
+    final result = _calculation(context);
+
+    switch (scenario) {
+      case S07ErpSemanticComponentsScenario.identityParty:
+        _draw(
+          GeniusPdfDocumentIdentity(
+            config: config,
+            data: context.identity,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer',
+            titleAr: 'العميل',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            title: 'Billing Address',
+            titleAr: 'عنوان الفوترة',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: context.references,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.financial:
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Grand Total',
+            labelAr: 'الإجمالي',
+            bold: true,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAmountInWords(
+            config: config,
+            amount: result.grandTotal,
+            text: 'Two thousand two hundred and thirteen Saudi riyals '
+                'and seventy-five halalas only',
+            textAr: 'ألفان ومئتان وثلاثة عشر ريالاً سعودياً '
+                'وخمس وسبعون هللة فقط',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAdjustmentSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfTaxSummary(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfBalanceDueBlock(
+            config: config,
+            result: result,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.operational:
+        _draw(
+          GeniusPdfTermsSection(
+            config: config,
+            text: context.terms,
+            textAr: 'يستحق السداد خلال 30 يوماً. يرجى ذكر رقم الفاتورة '
+                'في كل دفعة.',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: context.approvals,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfStamp(
+            config: config,
+            text: 'APPROVED',
+            textAr: 'معتمد',
+            tone: GeniusPdfSemanticTone.success,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: [
+              GeniusPdfMetricCardData(
+                label: 'Subtotal',
+                labelAr: 'المجموع',
+                value: config.formatter.formatMoney(
+                  result.subtotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'VAT',
+                labelAr: 'الضريبة',
+                value: config.formatter.formatMoney(
+                  result.taxTotal.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+              GeniusPdfMetricCardData(
+                label: 'Due',
+                labelAr: 'المتبقي',
+                value: config.formatter.formatMoney(
+                  result.dueAmount!.toDouble(),
+                  currencyCode: result.currency.code,
+                ),
+                valueKind: GeniusPdfValueKind.money,
+              ),
+            ],
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'POSTED-ERP-2026-77',
+            tone: GeniusPdfSemanticTone.info,
+            valueKind: GeniusPdfValueKind.customIdentifier,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.nullCollapse:
+        final nullContext = _context(
+          withAddress: false,
+          withTerms: false,
+        );
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 14,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: nullContext.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: null,
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: null,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: null,
+                textAr: null,
+                directionality: directionality,
+              ),
+              GeniusPdfLabel(
+                config: config,
+                text: 'VISIBLE AFTER NULL SECTIONS',
+                textAr: 'ظاهر بعد الأقسام الفارغة',
+                tone: GeniusPdfSemanticTone.success,
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.emptyState:
+        _draw(
+          GeniusPdfReferenceBlock(
+            config: config,
+            references: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfApprovalTrail(
+            config: config,
+            approvals: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMetricCards(
+            config: config,
+            cards: const [],
+            emptyPolicy: GeniusPdfEmptySectionPolicy.emptyState,
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.bilingual:
+        _draw(
+          GeniusPdfPartyBlock(
+            config: config,
+            party: context.recipient,
+            title: 'Customer / العميل',
+            titleAr: 'العميل / Customer',
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfAddressBlock(
+            config: config,
+            address: context.billingAddress,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfLabel(
+            config: config,
+            text: 'INV-2026-000123',
+            valueKind: GeniusPdfValueKind.documentNumber,
+            tone: GeniusPdfSemanticTone.info,
+            directionality: directionality,
+          ),
+        );
+        _draw(
+          GeniusPdfMoney(
+            config: config,
+            amount: result.grandTotal,
+            label: 'Total الإجمالي',
+            labelAr: 'الإجمالي Total',
+            directionality: directionality,
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.composition:
+        _drawGroup(
+          GeniusPdfErpComponentGroup(
+            spacing: 10,
+            components: [
+              GeniusPdfDocumentIdentity(
+                config: config,
+                data: context.identity,
+                directionality: directionality,
+              ),
+              GeniusPdfPartyBlock(
+                config: config,
+                party: context.recipient,
+                title: 'Customer',
+                titleAr: 'العميل',
+                directionality: directionality,
+              ),
+              GeniusPdfAddressBlock(
+                config: config,
+                address: context.shippingAddress,
+                title: 'Shipping Address',
+                titleAr: 'عنوان الشحن',
+                directionality: directionality,
+              ),
+              GeniusPdfTaxSummary(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfBalanceDueBlock(
+                config: config,
+                result: result,
+                directionality: directionality,
+              ),
+              GeniusPdfTermsSection(
+                config: config,
+                text: context.terms,
+                textAr: 'يستحق السداد خلال 30 يوماً.',
+                directionality: directionality,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S07ErpSemanticComponentsScenario.longMultiPage:
+        for (var pageIndex = 0; pageIndex < 4; pageIndex++) {
+          if (pageIndex > 0) newPage();
+
+          final references = List<ErpDocumentReference>.generate(
+            8,
+            (index) => ErpDocumentReference(
+              type: 'Reference ${pageIndex * 8 + index + 1}',
+              number:
+                  'REF-2026-${(pageIndex * 8 + index + 1).toString().padLeft(4, '0')}',
+              date: DateTime(2026, 9, 1 + (index % 4)),
+            ),
+          );
+
+          _draw(
+            GeniusPdfReferenceBlock(
+              config: config,
+              references: references,
+              title: 'Page ${pageIndex + 1} References',
+              titleAr: 'مراجع الصفحة ${pageIndex + 1}',
+              directionality: directionality,
+            ),
+            spacing: 8,
+          );
+
+          _draw(
+            GeniusPdfTermsSection(
+              config: config,
+              text: List.filled(
+                6,
+                'Long ERP terms remain reusable and keep identifiers such as '
+                    'INV-2026-000123 unchanged.',
+              ).join(' '),
+              textAr: List.filled(
+                6,
+                'نص شروط طويل للتحقق من الالتفاف مع بقاء المعرف '
+                    'INV-2026-000123 بدون عكس.',
+              ).join(' '),
+              directionality: directionality,
+            ),
+          );
+        }
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS07LongMultiPageVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S07ErpSemanticComponentsDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S07ErpSemanticComponentsScenario.longMultiPage,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}

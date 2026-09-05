@@ -1,5 +1,4 @@
 
-import '../../core/pdf_config.dart';
 import '../../printing/profiles/print_profiles.dart';
 import 'inventory_models.dart';
 
@@ -39,65 +38,45 @@ List<GeniusPdfLabelData> _inventoryLabelData(
 class GeniusInventoryItemLabelDocument
     extends GeniusPdfLabelPrintDocument {
   GeniusInventoryItemLabelDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required List<GeniusInventoryLabelRecord> records,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? _inventoryDefaultLabelProfile(),
-          labels: _inventoryLabelData(records, kind: 'Item'),
-        );
+  }) : super(profile: profile ?? _inventoryDefaultLabelProfile(), labels: _inventoryLabelData(records, kind: 'Item'));
 }
 
 /// S15-T21 — Shelf Label.
 class GeniusShelfLabelDocument extends GeniusPdfLabelPrintDocument {
   GeniusShelfLabelDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required List<GeniusInventoryLabelRecord> records,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? _inventoryDefaultLabelProfile(),
-          labels: _inventoryLabelData(records, kind: 'Shelf'),
-        );
+  }) : super(profile: profile ?? _inventoryDefaultLabelProfile(), labels: _inventoryLabelData(records, kind: 'Shelf'));
 }
 
 /// S15-T22 — Batch Label.
 class GeniusBatchLabelDocument extends GeniusPdfLabelPrintDocument {
   GeniusBatchLabelDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required List<GeniusInventoryLabelRecord> records,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? _inventoryDefaultLabelProfile(),
-          labels: _inventoryLabelData(records, kind: 'Batch'),
-        );
+  }) : super(profile: profile ?? _inventoryDefaultLabelProfile(), labels: _inventoryLabelData(records, kind: 'Batch'));
 }
 
 /// S15-T23 — Serial Label.
 class GeniusSerialLabelDocument extends GeniusPdfLabelPrintDocument {
   GeniusSerialLabelDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required List<GeniusInventoryLabelRecord> records,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? _inventoryDefaultLabelProfile(),
-          labels: _inventoryLabelData(records, kind: 'Serial'),
-        );
+  }) : super(profile: profile ?? _inventoryDefaultLabelProfile(), labels: _inventoryLabelData(records, kind: 'Serial'));
 }
 
 /// S15-T24 — Location Label.
 class GeniusLocationLabelDocument
     extends GeniusPdfLabelPrintDocument {
   GeniusLocationLabelDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required List<GeniusInventoryLabelRecord> records,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? _inventoryDefaultLabelProfile(),
-          labels: _inventoryLabelData(records, kind: 'Location'),
-        );
+  }) : super(profile: profile ?? _inventoryDefaultLabelProfile(), labels: _inventoryLabelData(records, kind: 'Location'));
 }

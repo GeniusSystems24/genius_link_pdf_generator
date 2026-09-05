@@ -1,3 +1,5 @@
+// ignore_for_file: sort_unnamed_constructors_first
+
 import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';

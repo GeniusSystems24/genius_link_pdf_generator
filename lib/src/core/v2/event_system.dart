@@ -127,8 +127,8 @@ class GeniusPdfEventBus {
 /// Base class for all PDF events.
 abstract class GeniusPdfEvent {
   const GeniusPdfEvent({
-    DateTime? timestamp,
-  }) : timestamp = timestamp;
+    this.timestamp,
+  });
 
   /// When the event occurred.
   final DateTime? timestamp;

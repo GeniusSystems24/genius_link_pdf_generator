@@ -1,16 +1,18 @@
-// ignore_for_file: unused_element_parameter
-
 import 'package:flutter/material.dart';
-import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
-import 'package:genius_pdf_example/features/job_manager/presentation/controllers/job_manager_demo_controller.dart';
-import 'package:genius_pdf_example/features/job_manager/presentation/models/job_feature_catalog.dart';
 import 'package:flutter/services.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
+import 'package:super_core/super_core.dart';
 
+import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
+import 'package:genius_pdf_example/features/job_manager/presentation/controllers/job_manager_demo_controller.dart';
+import 'package:genius_pdf_example/features/job_manager/presentation/models/job_feature_catalog.dart';
+import 'package:genius_pdf_example/shared/presentation/widgets/example_page_shell.dart';
+import 'package:genius_pdf_example/shared/presentation/widgets/example_panels.dart';
+import 'package:genius_pdf_example/shared/presentation/widgets/example_section.dart';
+import 'package:genius_pdf_example/shared/presentation/widgets/responsive_split_layout.dart';
 
-import 'package:genius_pdf_example/app/theme/app_theme.dart';
-
+/// Demonstrates queued/background PDF generation and job lifecycle management.
 class JobManagerDemoScreen extends StatefulWidget {
   const JobManagerDemoScreen({super.key, this.controller});
 
@@ -24,41 +26,32 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
   late final JobManagerDemoController _controller;
   late final bool _ownsController;
   PdfFont? _font;
-  // Feature categories for testing.
-  List<JobFeatureCategory> _featureCategories = const [];
+  List<JobFeatureCategory> _categories = const <JobFeatureCategory>[];
+
+  static const _usageCode = r'''// Queue a PDF builder without opening it automatically.
+await controller.addJob(
+  name: 'Trial Balance',
+  builder: builder,
+  onError: (message) {
+    // Surface the generation failure in your application UI.
+  },
+);
+
+// Job lifecycle operations.
+controller.cancelJob(jobId);
+await controller.retryJob(jobId);
+controller.removeJob(jobId);
+
+// A completed demo job can be opened from its saved file path.
+await controller.openFile(filePath);''';
 
   @override
   void initState() {
     super.initState();
     _ownsController = widget.controller == null;
-    _controller = widget.controller ?? JobManagerDemoController(
-      documents: demoDocuments,
-    );
+    _controller = widget.controller ?? JobManagerDemoController(documents: demoDocuments);
     _controller.addListener(_onControllerChanged);
-
     _loadFont();
-  }
-
-
-  void _onControllerChanged() {
-    if (mounted) setState(() {});
-  }
-
-
-
-  Future<void> _loadFont() async {
-    final fontData = await rootBundle.load('assets/fonts/din/din.ttf');
-    final fontBytes = fontData.buffer.asUint8List();
-    final font = PdfTrueTypeFont(fontBytes, 10);
-    if (!mounted) return;
-    setState(() {
-      _font = font;
-      _featureCategories = JobFeatureCatalog(
-        config: geniusPdfConfig,
-        font: font,
-        fontBytes: fontBytes,
-      ).build();
-    });
   }
 
   @override
@@ -68,907 +61,497 @@ class _JobManagerDemoScreenState extends State<JobManagerDemoScreen> {
     super.dispose();
   }
 
+  void _onControllerChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadFont() async {
+    try {
+      final data = await rootBundle.load('assets/fonts/din/din.ttf');
+      final bytes = data.buffer.asUint8List();
+      final font = PdfTrueTypeFont(bytes, 10);
+      if (!mounted) return;
+      setState(() {
+        _font = font;
+        _categories = JobFeatureCatalog(
+          config: geniusPdfConfig,
+          font: font,
+          fontBytes: bytes,
+        ).build();
+      });
+    } catch (error) {
+      if (mounted) _message('Unable to load demo font: $error', error: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final jobs = _controller.jobs;
+    final queued = jobs.where((j) => j.status == GeniusPdfJobStatus.queued).length;
+    final processing = jobs.where((j) => j.status == GeniusPdfJobStatus.processing).length;
+    final completed = jobs.where((j) => j.status == GeniusPdfJobStatus.completed).length;
+    final failed = jobs.where((j) => j.status == GeniusPdfJobStatus.failed).length;
+    final hasQueued = queued > 0;
+    final hasFinished = jobs.any((job) => job.isFinished);
 
-    return Container(
-      color: isDark ? AppColors.darkBg : AppColors.lightBg,
-      child: Column(
-        children: [
-          _buildStatsBar(isDark),
-          Expanded(
-            child: Row(
-              children: [
-                // Features panel
-                Container(
-                  width: 340,
-                  margin: const EdgeInsets.fromLTRB(24, 0, 12, 24),
-                  child: _buildFeaturesPanel(isDark),
-                ),
-                // Jobs list
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(12, 0, 24, 24),
-                    child: _buildJobsPanel(isDark),
-                  ),
-                ),
-              ],
-            ),
+    return ExamplePageShell(
+      title: 'Background Generation & Job Queue',
+      description:
+          'Queue multiple PDF builders, observe concurrency and lifecycle state, then retry, cancel, remove, or open completed jobs.',
+      leading: const Icon(Icons.work_history_outlined),
+      actions: <Widget>[
+        if (hasQueued)
+          OutlinedButton.icon(
+            onPressed: _cancelAllQueued,
+            icon: const Icon(Icons.cancel_outlined),
+            label: const Text('Cancel queued'),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatsBar(bool isDark) {
-    final queued =
-        _controller.jobs.where((j) => j.status == GeniusPdfJobStatus.queued).length;
-    final processing =
-        _controller.jobs.where((j) => j.status == GeniusPdfJobStatus.processing).length;
-    final completed =
-        _controller.jobs.where((j) => j.status == GeniusPdfJobStatus.completed).length;
-    final failed =
-        _controller.jobs.where((j) => j.status == GeniusPdfJobStatus.failed).length;
-
-    return Container(
-      margin: const EdgeInsets.all(24),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        if (hasFinished)
+          OutlinedButton.icon(
+            onPressed: _clearFinished,
+            icon: const Icon(Icons.cleaning_services_outlined),
+            label: const Text('Clear finished'),
+          ),
+        FilledButton.icon(
+          onPressed: _font == null ? null : _testAllFeatures,
+          icon: const Icon(Icons.playlist_add_check_rounded),
+          label: const Text('Queue all'),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: AppColors.primaryGradient),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.analytics_rounded,
-                color: Colors.white, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Feature Testing Dashboard',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.darkText : AppColors.lightText,
-                  ),
-                ),
-                Text(
-                  'Test PDF generation features and monitor job status',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 24),
-          _buildStatChip(isDark, 'Queued', queued, AppColors.primaryGradient,
-              Icons.queue_rounded),
-          const SizedBox(width: 12),
-          _buildStatChip(isDark, 'Processing', processing,
-              AppColors.orangeGradient, Icons.sync_rounded),
-          const SizedBox(width: 12),
-          _buildStatChip(isDark, 'Completed', completed,
-              AppColors.successGradient, Icons.check_circle_rounded),
-          const SizedBox(width: 12),
-          _buildStatChip(isDark, 'Failed', failed, AppColors.errorGradient,
-              Icons.error_rounded),
-          const SizedBox(width: 24),
-          if (_controller.jobs.any((j) => j.status == GeniusPdfJobStatus.queued))
-            _buildHeaderButton(
-              isDark: isDark,
-              label: 'Cancel All',
-              icon: Icons.cancel_rounded,
-              gradient: AppColors.errorGradient,
-              onPressed: _cancelAllQueued,
-            ),
-          if (_controller.jobs.any((j) => j.isFinished)) ...[
-            const SizedBox(width: 8),
-            _buildHeaderButton(
-              isDark: isDark,
-              label: 'Clear',
-              icon: Icons.clear_all_rounded,
-              gradient: AppColors.purpleGradient,
-              onPressed: _clearFinished,
-            ),
-          ],
-          const SizedBox(width: 8),
-          _buildHeaderButton(
-            isDark: isDark,
-            label: 'Test All',
-            icon: Icons.play_arrow_rounded,
-            gradient: AppColors.successGradient,
-            onPressed: _testAllFeatures,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatChip(bool isDark, String label, int value,
-      List<Color> gradient, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: gradient.first.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: gradient.first, size: 18),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value.toString(),
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: gradient.first,
-                ),
-              ),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeaderButton({
-    required bool isDark,
-    required String label,
-    required IconData icon,
-    required List<Color> gradient,
-    required VoidCallback onPressed,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: gradient),
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: gradient.first.withValues(alpha: 0.4),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: Colors.white, size: 18),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
+      ],
+      children: <Widget>[
+        _JobMetrics(
+          queued: queued,
+          processing: processing,
+          completed: completed,
+          failed: failed,
         ),
-      ),
-    );
-  }
-
-  Widget _buildFeaturesPanel(bool isDark) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.extension_rounded,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Feature Tests',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkText : AppColors.lightText,
-                  ),
-                ),
-              ],
+        ResponsiveSplitLayout(
+          breakpoint: 1120,
+          primaryFlex: 10,
+          secondaryFlex: 13,
+          primary: ExampleSection(
+            title: 'Generation catalog',
+            description: _font == null
+                ? 'Loading the demo font before builders can be queued…'
+                : 'Run one builder or enqueue every implemented builder in a category.',
+            leading: const Icon(Icons.widgets_outlined),
+            child: _FeatureCatalog(
+              categories: _categories,
+              enabled: _font != null,
+              onFeature: _testFeature,
+              onCategory: _testCategory,
             ),
           ),
-          Divider(
-            height: 1,
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-          ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _featureCategories.length,
-              itemBuilder: (context, index) {
-                final category = _featureCategories[index];
-                return _buildCategoryCard(category, isDark);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryCard(JobFeatureCategory category, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.black.withValues(alpha: 0.2)
-            : Colors.grey.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Category header
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: category.gradient),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    category.icon,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    category.name,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkText : AppColors.lightText,
-                    ),
-                  ),
-                ),
-                // Test all in category
-                InkWell(
-                  onTap: () => _testCategory(category),
-                  borderRadius: BorderRadius.circular(6),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: category.gradient),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'Test All',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            height: 1,
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-          ),
-          // Feature buttons
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: category.features.map((feature) {
-                return _buildFeatureButton(feature, category.gradient, isDark);
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeatureButton(
-      JobFeature feature, List<Color> gradient, bool isDark) {
-    return Tooltip(
-      message: feature.description,
-      child: InkWell(
-        onTap: () => _testFeature(feature),
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkCard : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-            ),
-          ),
-          child: Text(
-            feature.name,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
+          secondary: ExampleSection(
+            title: 'Job queue',
+            description: 'Newest jobs appear first. Completed jobs can be opened from disk.',
+            leading: const Icon(Icons.queue_outlined),
+            child: _JobQueue(
+              jobs: jobs,
+              paths: _controller.jobFilePaths,
+              onCancel: _controller.cancelJob,
+              onRetry: _controller.retryJob,
+              onRemove: _controller.removeJob,
+              onOpen: _openFile,
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildJobsPanel(bool isDark) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        const CodePreviewPanel(
+          title: 'Dart usage code',
+          code: _usageCode,
+          height: 300,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.work_history_rounded,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Job Queue',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkText : AppColors.lightText,
-                  ),
-                ),
-                const Spacer(),
-                if (_controller.jobs.isNotEmpty)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryGradient.first
-                          .withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${_controller.jobs.length} jobs',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryGradient.first,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          Divider(
-            height: 1,
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-          ),
-          Expanded(
-            child: _controller.jobs.isEmpty
-                ? _buildEmptyState(isDark)
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _controller.jobs.length,
-                    itemBuilder: (context, index) {
-                      final job = _controller.jobs[_controller.jobs.length - 1 - index];
-                      final filePath = _controller.jobFilePaths[job.id];
-                      return _JobCard(
-                        job: job,
-                        isDark: isDark,
-                        onCancel: () => _cancelJob(job.id),
-                        onRetry: () => _retryJob(job.id),
-                        onRemove: () => _removeJob(job.id),
-                        filePath: filePath,
-                        onOpen:
-                            filePath != null ? () => _openFile(filePath) : null,
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
+      ],
     );
   }
-
-  Widget _buildEmptyState(bool isDark) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.black.withValues(alpha: 0.2)
-                  : Colors.grey.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.inbox_rounded,
-              size: 48,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'No test jobs yet',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.darkText : AppColors.lightText,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Click on features to test them individually\nor use "Test All" button',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // === Test Methods ===
 
   Future<void> _testFeature(JobFeature feature) async {
-    if (_font == null) {
-      _showMessage('Font not loaded yet', isError: true);
-      return;
-    }
-
+    if (_font == null) return;
     final builder = feature.builder();
     if (builder == null) {
-      _showMessage('Builder not implemented for ${feature.name}',
-          isError: true);
+      _message('Builder not implemented for ${feature.name}', error: true);
       return;
     }
-
-    await _addTestJob(feature.name, builder);
+    await _addJob(feature.name, builder);
   }
 
   Future<void> _testCategory(JobFeatureCategory category) async {
-    if (_font == null) {
-      _showMessage('Font not loaded yet', isError: true);
-      return;
-    }
-
+    if (_font == null) return;
     for (final feature in category.features) {
       final builder = feature.builder();
-      if (builder != null) {
-        await _addTestJob('${category.name}_${feature.name}', builder);
-      }
+      if (builder != null) await _addJob('${category.name}_${feature.name}', builder);
     }
   }
 
   Future<void> _testAllFeatures() async {
-    if (_font == null) {
-      _showMessage('Font not loaded yet', isError: true);
-      return;
-    }
-
-    for (final category in _featureCategories) {
+    if (_font == null) return;
+    for (final category in _categories) {
       for (final feature in category.features) {
         final builder = feature.builder();
-        if (builder != null) {
-          await _addTestJob('${category.name}_${feature.name}', builder);
-        }
+        if (builder != null) await _addJob('${category.name}_${feature.name}', builder);
       }
     }
   }
 
-  Future<void> _addTestJob(
-    String name,
-    GeniusPdfDocumentBuilder builder,
-  ) =>
-      _controller.addJob(
-        name: name,
-        builder: builder,
-        onError: (message) => _showMessage(message, isError: true),
-      );
+  Future<void> _addJob(String name, GeniusPdfDocumentBuilder builder) {
+    return _controller.addJob(
+      name: name,
+      builder: builder,
+      onError: (message) => _message(message, error: true),
+    );
+  }
 
-  // === Utility Methods ===
-
-  Future<void> _openFile(String filePath) async {
+  Future<void> _openFile(String path) async {
     try {
-      await _controller.openFile(filePath);
+      await _controller.openFile(path);
     } catch (error) {
-      _showMessage('Failed to open file: $error', isError: true);
+      _message('Failed to open file: $error', error: true);
     }
   }
 
-  void _cancelJob(String id) => _controller.cancelJob(id);
-
-  Future<void> _retryJob(String id) => _controller.retryJob(id);
-
-  void _removeJob(String id) => _controller.removeJob(id);
-
   void _cancelAllQueued() {
     final count = _controller.cancelAllQueued();
-    _showMessage('$count jobs cancelled');
+    _message('$count queued job(s) cancelled');
   }
 
   void _clearFinished() {
     final count = _controller.clearFinished();
-    _showMessage('$count jobs cleared');
+    _message('$count finished job(s) cleared');
   }
 
-  void _showMessage(String message, {bool isError = false}) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: isError
-              ? AppColors.errorGradient.first
-              : AppColors.successGradient.first,
-        ),
-      );
-    }
+  void _message(String message, {bool error = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: error ? Theme.of(context).colorScheme.error : null,
+      ),
+    );
   }
 }
 
-// === Data Classes ===
+class _JobMetrics extends StatelessWidget {
+  const _JobMetrics({
+    required this.queued,
+    required this.processing,
+    required this.completed,
+    required this.failed,
+  });
 
+  final int queued;
+  final int processing;
+  final int completed;
+  final int failed;
 
+  @override
+  Widget build(BuildContext context) {
+    final gap = context.superTheme.spacing.space3;
+    return Wrap(
+      spacing: gap,
+      runSpacing: gap,
+      children: <Widget>[
+        _Metric(label: 'Queued', value: queued, icon: Icons.schedule_outlined),
+        _Metric(label: 'Processing', value: processing, icon: Icons.sync_rounded),
+        _Metric(label: 'Completed', value: completed, icon: Icons.check_circle_outline),
+        _Metric(label: 'Failed', value: failed, icon: Icons.error_outline),
+      ],
+    );
+  }
+}
 
+class _Metric extends StatelessWidget {
+  const _Metric({required this.label, required this.value, required this.icon});
+  final String label;
+  final int value;
+  final IconData icon;
 
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    final colors = Theme.of(context).colorScheme;
+    return SizedBox(
+      width: 190,
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: t.spacing.cardPadding,
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  borderRadius: BorderRadius.circular(t.spacing.radiusControl),
+                ),
+                child: Icon(icon, color: colors.onPrimaryContainer),
+              ),
+              SizedBox(width: t.spacing.space3),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('$value', style: context.superTextTheme.titleMd.copyWith(color: t.fg1)),
+                  Text(label, style: context.superTextTheme.bodySm.copyWith(color: t.fg3)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
-// === Job Card Widget ===
+class _FeatureCatalog extends StatelessWidget {
+  const _FeatureCatalog({
+    required this.categories,
+    required this.enabled,
+    required this.onFeature,
+    required this.onCategory,
+  });
 
-class _JobCard extends StatelessWidget {
-  const _JobCard({
-    required this.job,
-    required this.isDark,
+  final List<JobFeatureCategory> categories;
+  final bool enabled;
+  final ValueChanged<JobFeature> onFeature;
+  final ValueChanged<JobFeatureCategory> onCategory;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.superTheme.spacing;
+    if (categories.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return Column(
+      children: <Widget>[
+        for (var i = 0; i < categories.length; i++) ...<Widget>[
+          _CategoryCard(
+            category: categories[i],
+            enabled: enabled,
+            onFeature: onFeature,
+            onRunAll: () => onCategory(categories[i]),
+          ),
+          if (i != categories.length - 1) SizedBox(height: spacing.space3),
+        ],
+      ],
+    );
+  }
+}
+
+class _CategoryCard extends StatelessWidget {
+  const _CategoryCard({
+    required this.category,
+    required this.enabled,
+    required this.onFeature,
+    required this.onRunAll,
+  });
+  final JobFeatureCategory category;
+  final bool enabled;
+  final ValueChanged<JobFeature> onFeature;
+  final VoidCallback onRunAll;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: t.spacing.cardPadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Icon(category.icon, color: Theme.of(context).colorScheme.primary),
+                SizedBox(width: t.spacing.space2),
+                Expanded(child: Text(category.name, style: context.superTextTheme.titleMd.copyWith(color: t.fg1))),
+                TextButton.icon(
+                  onPressed: enabled && category.features.isNotEmpty ? onRunAll : null,
+                  icon: const Icon(Icons.playlist_add_rounded, size: 18),
+                  label: const Text('Queue group'),
+                ),
+              ],
+            ),
+            SizedBox(height: t.spacing.space3),
+            Wrap(
+              spacing: t.spacing.space2,
+              runSpacing: t.spacing.space2,
+              children: <Widget>[
+                for (final feature in category.features)
+                  ActionChip(
+                    avatar: const Icon(Icons.play_arrow_rounded, size: 16),
+                    label: Text(feature.name),
+                    tooltip: feature.description,
+                    onPressed: enabled ? () => onFeature(feature) : null,
+                  ),
+              ],
+            ),
+            if (category.features.isEmpty)
+              Text('No active examples in this category.', style: context.superTextTheme.bodySm.copyWith(color: t.fg3)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _JobQueue extends StatelessWidget {
+  const _JobQueue({
+    required this.jobs,
+    required this.paths,
     required this.onCancel,
     required this.onRetry,
     required this.onRemove,
-    this.filePath,
-    this.onOpen,
+    required this.onOpen,
   });
 
+  final List<GeniusPdfJob> jobs;
+  final Map<String, String> paths;
+  final ValueChanged<String> onCancel;
+  final Future<void> Function(String) onRetry;
+  final ValueChanged<String> onRemove;
+  final Future<void> Function(String) onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.superTheme.spacing;
+    if (jobs.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: spacing.space8),
+        child: Column(
+          children: <Widget>[
+            Icon(Icons.inbox_outlined, size: 42, color: context.superTheme.fg3),
+            SizedBox(height: spacing.space3),
+            Text('No jobs queued', style: context.superTextTheme.titleMd.copyWith(color: context.superTheme.fg1)),
+            SizedBox(height: spacing.space1),
+            Text('Choose a generation example from the catalog.', style: context.superTextTheme.bodySm.copyWith(color: context.superTheme.fg3)),
+          ],
+        ),
+      );
+    }
+    final reversed = jobs.reversed.toList(growable: false);
+    return Column(
+      children: <Widget>[
+        for (var i = 0; i < reversed.length; i++) ...<Widget>[
+          _JobTile(
+            job: reversed[i],
+            onCancel: () => onCancel(reversed[i].id),
+            onRetry: () => onRetry(reversed[i].id),
+            onRemove: () => onRemove(reversed[i].id),
+            onOpen: paths[reversed[i].id] == null ? null : () => onOpen(paths[reversed[i].id]!),
+          ),
+          if (i != reversed.length - 1) SizedBox(height: spacing.space2),
+        ],
+      ],
+    );
+  }
+}
+
+class _JobTile extends StatelessWidget {
+  const _JobTile({
+    required this.job,
+    required this.onCancel,
+    required this.onRetry,
+    required this.onRemove,
+    this.onOpen,
+  });
   final GeniusPdfJob job;
-  final bool isDark;
   final VoidCallback onCancel;
   final VoidCallback onRetry;
   final VoidCallback onRemove;
-  final String? filePath;
   final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
+    final t = context.superTheme;
+    final semantic = _semantic(context);
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(14),
+      padding: t.spacing.cardPadding,
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.black.withValues(alpha: 0.2)
-            : Colors.grey.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _getBorderColor().withValues(alpha: 0.4),
-        ),
+        color: semantic.subtle,
+        border: Border.all(color: semantic.border),
+        borderRadius: t.spacing.cardBorderRadius,
       ),
       child: Row(
-        children: [
-          _buildStatusIcon(),
-          const SizedBox(width: 14),
+        children: <Widget>[
+          job.status == GeniusPdfJobStatus.processing
+              ? SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: semantic.solid),
+                )
+              : Icon(_icon, color: semantic.solid),
+          SizedBox(width: t.spacing.space3),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  job.fileName,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkText : AppColors.lightText,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _getStatusText(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: _getStatusColor(),
-                  ),
-                ),
+              children: <Widget>[
+                Text(job.fileName, style: context.superTextTheme.labelMd.copyWith(color: semantic.onSubtle)),
+                SizedBox(height: t.spacing.space1),
+                Text(_status, style: context.superTextTheme.bodySm.copyWith(color: semantic.onSubtle)),
                 if (job.duration != null)
-                  Text(
-                    'Duration: ${job.duration!.inMilliseconds}ms',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.lightTextSecondary,
-                    ),
-                  ),
+                  Text('${job.duration!.inMilliseconds} ms', style: context.superTextTheme.labelSm.copyWith(color: semantic.onSubtle)),
               ],
             ),
           ),
-          _buildActions(),
+          _actions,
         ],
       ),
     );
   }
 
-  Widget _buildStatusIcon() {
-    final gradient = _getStatusGradient();
-    final icon = _getStatusIcon();
-
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: gradient),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: job.status == GeniusPdfJobStatus.processing
-          ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-          : Icon(icon, color: Colors.white, size: 18),
-    );
+  SuperSemanticColor _semantic(BuildContext context) {
+    final s = SuperSemanticColors.of(context);
+    return switch (job.status) {
+      GeniusPdfJobStatus.queued => s.info,
+      GeniusPdfJobStatus.processing => s.warning,
+      GeniusPdfJobStatus.completed => s.success,
+      GeniusPdfJobStatus.failed => s.danger,
+      GeniusPdfJobStatus.cancelled => s.neutral,
+    };
   }
 
-  IconData _getStatusIcon() {
-    switch (job.status) {
-      case GeniusPdfJobStatus.queued:
-        return Icons.schedule_rounded;
-      case GeniusPdfJobStatus.processing:
-        return Icons.sync_rounded;
-      case GeniusPdfJobStatus.completed:
-        return Icons.check_circle_rounded;
-      case GeniusPdfJobStatus.failed:
-        return Icons.error_rounded;
-      case GeniusPdfJobStatus.cancelled:
-        return Icons.cancel_rounded;
-    }
-  }
+  IconData get _icon => switch (job.status) {
+    GeniusPdfJobStatus.queued => Icons.schedule_outlined,
+    GeniusPdfJobStatus.processing => Icons.sync_rounded,
+    GeniusPdfJobStatus.completed => Icons.check_circle_outline,
+    GeniusPdfJobStatus.failed => Icons.error_outline,
+    GeniusPdfJobStatus.cancelled => Icons.cancel_outlined,
+  };
 
-  List<Color> _getStatusGradient() {
-    switch (job.status) {
-      case GeniusPdfJobStatus.queued:
-        return AppColors.primaryGradient;
-      case GeniusPdfJobStatus.processing:
-        return AppColors.orangeGradient;
-      case GeniusPdfJobStatus.completed:
-        return AppColors.successGradient;
-      case GeniusPdfJobStatus.failed:
-        return AppColors.errorGradient;
-      case GeniusPdfJobStatus.cancelled:
-        return [const Color(0xFF64748B), const Color(0xFF475569)];
-    }
-  }
+  String get _status => switch (job.status) {
+    GeniusPdfJobStatus.queued => 'Waiting in queue',
+    GeniusPdfJobStatus.processing => 'Generating…',
+    GeniusPdfJobStatus.completed => 'Completed',
+    GeniusPdfJobStatus.failed => job.errorMessage ?? 'Failed',
+    GeniusPdfJobStatus.cancelled => 'Cancelled',
+  };
 
-  Color _getStatusColor() {
-    switch (job.status) {
-      case GeniusPdfJobStatus.queued:
-        return AppColors.primaryGradient.first;
-      case GeniusPdfJobStatus.processing:
-        return AppColors.orangeGradient.first;
-      case GeniusPdfJobStatus.completed:
-        return AppColors.successGradient.first;
-      case GeniusPdfJobStatus.failed:
-        return AppColors.errorGradient.first;
-      case GeniusPdfJobStatus.cancelled:
-        return const Color(0xFF64748B);
-    }
-  }
-
-  Color _getBorderColor() {
-    switch (job.status) {
-      case GeniusPdfJobStatus.completed:
-        return AppColors.successGradient.first;
-      case GeniusPdfJobStatus.failed:
-        return AppColors.errorGradient.first;
-      default:
-        return isDark ? AppColors.darkBorder : AppColors.lightBorder;
-    }
-  }
-
-  String _getStatusText() {
-    switch (job.status) {
-      case GeniusPdfJobStatus.queued:
-        return 'Waiting...';
-      case GeniusPdfJobStatus.processing:
-        return 'Generating...';
-      case GeniusPdfJobStatus.completed:
-        return 'Success';
-      case GeniusPdfJobStatus.failed:
-        return job.errorMessage ?? 'Failed';
-      case GeniusPdfJobStatus.cancelled:
-        return 'Cancelled';
-    }
-  }
-
-  Widget _buildActions() {
+  Widget get _actions {
     if (job.status == GeniusPdfJobStatus.queued) {
-      return _buildActionButton(
-        icon: Icons.close_rounded,
-        gradient: AppColors.errorGradient,
-        onPressed: onCancel,
-      );
+      return IconButton(onPressed: onCancel, tooltip: 'Cancel', icon: const Icon(Icons.close_rounded));
     }
-
-    if (job.status == GeniusPdfJobStatus.completed && filePath != null) {
+    if (job.status == GeniusPdfJobStatus.completed && onOpen != null) {
       return Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildActionButton(
-            icon: Icons.open_in_new_rounded,
-            gradient: AppColors.primaryGradient,
-            onPressed: onOpen!,
-          ),
-          const SizedBox(width: 6),
-          _buildActionButton(
-            icon: Icons.close_rounded,
-            gradient: [const Color(0xFF64748B), const Color(0xFF475569)],
-            onPressed: onRemove,
-          ),
+        children: <Widget>[
+          IconButton(onPressed: onOpen, tooltip: 'Open', icon: const Icon(Icons.open_in_new_rounded)),
+          IconButton(onPressed: onRemove, tooltip: 'Remove', icon: const Icon(Icons.delete_outline_rounded)),
         ],
       );
     }
-
     if (job.status == GeniusPdfJobStatus.failed) {
       return Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildActionButton(
-            icon: Icons.refresh_rounded,
-            gradient: AppColors.orangeGradient,
-            onPressed: onRetry,
-          ),
-          const SizedBox(width: 6),
-          _buildActionButton(
-            icon: Icons.close_rounded,
-            gradient: [const Color(0xFF64748B), const Color(0xFF475569)],
-            onPressed: onRemove,
-          ),
+        children: <Widget>[
+          IconButton(onPressed: onRetry, tooltip: 'Retry', icon: const Icon(Icons.refresh_rounded)),
+          IconButton(onPressed: onRemove, tooltip: 'Remove', icon: const Icon(Icons.delete_outline_rounded)),
         ],
       );
     }
-
     if (job.isFinished) {
-      return _buildActionButton(
-        icon: Icons.close_rounded,
-        gradient: [const Color(0xFF64748B), const Color(0xFF475569)],
-        onPressed: onRemove,
-      );
+      return IconButton(onPressed: onRemove, tooltip: 'Remove', icon: const Icon(Icons.delete_outline_rounded));
     }
-
     return const SizedBox.shrink();
   }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required List<Color> gradient,
-    required VoidCallback onPressed,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: gradient),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: Colors.white, size: 16),
-        ),
-      ),
-    );
-  }
 }
-
-// === Test Builders ===
-
-
-
-
-
-

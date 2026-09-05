@@ -667,7 +667,7 @@ class GeniusSmartLayoutEngine {
       descriptionAr: descriptionAr,
       confidence: 0.85,
       parameters: {
-        'colors': colors.map((k, v) => MapEntry(k, v.value)),
+        'colors': colors.map((k, v) => MapEntry(k, v.toARGB32())),
       },
     );
   }

@@ -3,8 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart' show TextDirection;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-
 GeniusPdfConfig _config({
   TextDirection direction = TextDirection.ltr,
 }) {

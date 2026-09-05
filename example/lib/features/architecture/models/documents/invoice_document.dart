@@ -143,7 +143,7 @@ Future<Uint8List> buildInvoiceDocumentBytes() async {
                       ),
                       pw.SizedBox(height: 32),
                       // Table
-                      pw.Table.fromTextArray(
+                      pw.TableHelper.fromTextArray(
                         headerDecoration: const pw.BoxDecoration(
                           color: lightBg,
                           borderRadius: pw.BorderRadius.vertical(

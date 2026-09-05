@@ -1,0 +1,2852 @@
+Future<Uint8List> buildS02MatrixVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S02ComponentsRtlDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S02ComponentsRtlScenario.matrix,
+    showOptional: false,
+    preserveGridOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S02ComponentsRtlVerificationPage.
+enum S02ComponentsRtlScenario {
+  matrix,
+  summary,
+  infoBox,
+  reportHeader,
+  richText,
+  dataGrid,
+  media,
+  nestedOverride,
+  longMultiPage,
+}
+
+class S02ComponentsRtlDocument extends GeniusPdfDocumentBuilder {
+  S02ComponentsRtlDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.showOptional,
+    required this.preserveGridOrder,
+  }) : super(config, directionality: directionality);
+
+  final S02ComponentsRtlScenario scenario;
+  final bool showOptional;
+  final bool preserveGridOrder;
+
+  @override
+  void build() {
+    newPage();
+    switch (scenario) {
+      case S02ComponentsRtlScenario.matrix:
+        summary();
+        addSpace(8);
+        infoBox();
+        addSpace(8);
+        richText();
+        addSpace(8);
+        grid();
+      case S02ComponentsRtlScenario.summary:
+        summary();
+      case S02ComponentsRtlScenario.infoBox:
+        infoBox();
+      case S02ComponentsRtlScenario.reportHeader:
+        header();
+      case S02ComponentsRtlScenario.richText:
+        richText();
+      case S02ComponentsRtlScenario.dataGrid:
+        grid();
+      case S02ComponentsRtlScenario.media:
+        media();
+      case S02ComponentsRtlScenario.nestedOverride:
+        nested();
+      case S02ComponentsRtlScenario.longMultiPage:
+        longPages();
+    }
+  }
+
+  void summary() {
+    addSummary(
+      GeniusPdfSummarySection(
+        config: config,
+        directionality: directionality,
+        hideEmptyValues: !showOptional,
+        items: [
+          GeniusPdfSummaryItem.formatted(
+            label: 'Subtotal',
+            labelAr: 'المجموع الفرعي',
+            rawValue: 13650.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Discount',
+            labelAr: 'الخصم',
+            rawValue: -1250.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'VAT',
+            labelAr: 'ضريبة القيمة المضافة',
+            rawValue: 15.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.percentage(decimalPlaces: 2),
+            isRtl: config.isRTL,
+          ),
+          const GeniusPdfSummaryItem(
+            label: 'Optional charge',
+            labelAr: 'رسم اختياري',
+            value: '',
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Grand Total',
+            labelAr: 'الإجمالي النهائي',
+            rawValue: 15697.5,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isBold: true,
+            isHighlighted: true,
+            isRtl: config.isRTL,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void infoBox() {
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: directionality,
+        title: 'ERP Information',
+        titleAr: 'معلومات ERP',
+        subtitle: 'Mixed values',
+        subtitleAr: 'قيم مختلطة',
+        columns: 2,
+        followDirection: true,
+        iconPosition: GeniusPdfLogicalPosition.leading,
+        items: [
+          for (final row in const <(String, String, String)>[
+            ('Document', 'المستند', 'INV-2026-000123'),
+            ('IBAN', 'الآيبان', 'SA0380000000608010167519'),
+            ('Phone', 'الهاتف', '+966 55 123 4567'),
+            ('Email', 'البريد', 'accounts@example.test'),
+          ])
+            GeniusPdfLabeledValue(
+              config: config,
+              directionality: directionality,
+              label: row.$1,
+              labelAr: row.$2,
+              value: row.$3,
+              valueDirection: GeniusPdfDirection.ltr,
+            ),
+        ],
+      ),
+    );
+  }
+
+  void header() {
+    addReportHeader(
+      GeniusPdfReportHeader(
+        config: config,
+        directionality: directionality,
+        title: 'Directionality Report',
+        titleAr: 'تقرير اتجاه المحتوى',
+        subtitle: 'Metadata stability',
+        subtitleAr: 'ثبات بيانات المستند',
+        documentNumber: 'INV-2026-000123',
+        documentNumberLabel: 'Document No',
+        documentNumberLabelAr: 'رقم المستند',
+        referenceNumber: 'PO-2026-00998',
+        referenceLabel: 'Reference',
+        referenceLabelAr: 'المرجع',
+        printDate: DateTime(2026, 9, 3),
+        showCompanyInfo: false,
+      ),
+      height: 120,
+    );
+  }
+
+  void richText() {
+    final rich = GeniusPdfRichText(
+      config: config,
+      directionality: directionality,
+      spans: const [
+        GeniusPdfTextSpan(
+          text: 'رقم المستند: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: 'INV-2026-000123',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text: ' — الإجمالي: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: '15,697.50 SAR',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text:
+              ' — mixed Arabic/Latin punctuation and a long wrapping sentence.',
+        ),
+      ],
+    );
+    final result = rich.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void grid() {
+    final component = GeniusPdfDataGrid(
+      config: config,
+      directionality: directionality,
+      followDirection: true,
+      preserveDefinitionOrder: preserveGridOrder,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'item',
+          title: 'Item',
+          titleAr: 'الصنف',
+          directionalPadding: GeniusPdfDirectionalInsets(
+            start: 8,
+            end: 4,
+            top: 4,
+            bottom: 4,
+          ),
+        ),
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.quantity(decimalPlaces: 2),
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+        ),
+      ],
+      rows: const [
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'منتج / Product',
+            'sku': 'SKU-AR-ENG-001',
+            'qty': 12.5,
+            'amount': 15697.50,
+          },
+        ),
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'خدمة / Service',
+            'sku': 'SRV-2026-009',
+            'qty': 1,
+            'amount': -1250.00,
+          },
+        ),
+      ],
+    );
+    final result = component.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void media() {
+    final signature = GeniusPdfSignatureArea(
+      config: config,
+      directionality: directionality,
+      title: 'Authorized Signer',
+      titleAr: 'الموقع المعتمد',
+    );
+    final a = signature.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 90),
+    );
+    resetY(a.bottom + 8);
+
+    final barcode = GeniusPdfBarcode(
+      config: config,
+      directionality: directionality,
+      data: 'INV-2026-000123',
+      type: GeniusBarcodeType.code128,
+      caption: 'Document barcode',
+      captionAr: 'باركود المستند',
+    );
+    final b = barcode.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth * .65, 110),
+    );
+    resetY(b.bottom + 8);
+  }
+
+  void nested() {
+    addLine('RTL parent / سياق خارجي');
+    final child = directionality.forComponent(GeniusPdfDirection.ltr);
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: child,
+        title: 'Nested LTR',
+        titleAr: 'كتلة داخلية',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            directionality: child,
+            label: 'Invoice',
+            labelAr: 'الفاتورة',
+            value: 'INV-2026-000123',
+            valueDirection: GeniusPdfDirection.ltr,
+          ),
+        ],
+      ),
+    );
+    addLine('Parent direction is unchanged / الاتجاه الخارجي لم يتغير');
+  }
+
+  void longPages() {
+    const ar =
+        'هذا نص عربي طويل لاختبار اتجاه المحتوى عبر صفحات متعددة مع '
+        'INV-2026-000123 و 15,697.50 SAR. ';
+    const en =
+        'Long English content validates multi-page direction with '
+        'INV-2026-000123 and 15,697.50 SAR. ';
+    for (var p = 0; p < 3; p++) {
+      if (p > 0) newPage();
+      addLine('S02 page ${p + 1}/3');
+      for (var i = 0; i < 10; i++) {
+        addLine(config.isRTL ? '$ar$ar' : '$en$en', topMargin: 6);
+      }
+      summary();
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS02SummaryVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S02ComponentsRtlDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S02ComponentsRtlScenario.summary,
+    showOptional: false,
+    preserveGridOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S02ComponentsRtlVerificationPage.
+enum S02ComponentsRtlScenario {
+  matrix,
+  summary,
+  infoBox,
+  reportHeader,
+  richText,
+  dataGrid,
+  media,
+  nestedOverride,
+  longMultiPage,
+}
+
+class S02ComponentsRtlDocument extends GeniusPdfDocumentBuilder {
+  S02ComponentsRtlDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.showOptional,
+    required this.preserveGridOrder,
+  }) : super(config, directionality: directionality);
+
+  final S02ComponentsRtlScenario scenario;
+  final bool showOptional;
+  final bool preserveGridOrder;
+
+  @override
+  void build() {
+    newPage();
+    switch (scenario) {
+      case S02ComponentsRtlScenario.matrix:
+        summary();
+        addSpace(8);
+        infoBox();
+        addSpace(8);
+        richText();
+        addSpace(8);
+        grid();
+      case S02ComponentsRtlScenario.summary:
+        summary();
+      case S02ComponentsRtlScenario.infoBox:
+        infoBox();
+      case S02ComponentsRtlScenario.reportHeader:
+        header();
+      case S02ComponentsRtlScenario.richText:
+        richText();
+      case S02ComponentsRtlScenario.dataGrid:
+        grid();
+      case S02ComponentsRtlScenario.media:
+        media();
+      case S02ComponentsRtlScenario.nestedOverride:
+        nested();
+      case S02ComponentsRtlScenario.longMultiPage:
+        longPages();
+    }
+  }
+
+  void summary() {
+    addSummary(
+      GeniusPdfSummarySection(
+        config: config,
+        directionality: directionality,
+        hideEmptyValues: !showOptional,
+        items: [
+          GeniusPdfSummaryItem.formatted(
+            label: 'Subtotal',
+            labelAr: 'المجموع الفرعي',
+            rawValue: 13650.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Discount',
+            labelAr: 'الخصم',
+            rawValue: -1250.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'VAT',
+            labelAr: 'ضريبة القيمة المضافة',
+            rawValue: 15.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.percentage(decimalPlaces: 2),
+            isRtl: config.isRTL,
+          ),
+          const GeniusPdfSummaryItem(
+            label: 'Optional charge',
+            labelAr: 'رسم اختياري',
+            value: '',
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Grand Total',
+            labelAr: 'الإجمالي النهائي',
+            rawValue: 15697.5,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isBold: true,
+            isHighlighted: true,
+            isRtl: config.isRTL,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void infoBox() {
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: directionality,
+        title: 'ERP Information',
+        titleAr: 'معلومات ERP',
+        subtitle: 'Mixed values',
+        subtitleAr: 'قيم مختلطة',
+        columns: 2,
+        followDirection: true,
+        iconPosition: GeniusPdfLogicalPosition.leading,
+        items: [
+          for (final row in const <(String, String, String)>[
+            ('Document', 'المستند', 'INV-2026-000123'),
+            ('IBAN', 'الآيبان', 'SA0380000000608010167519'),
+            ('Phone', 'الهاتف', '+966 55 123 4567'),
+            ('Email', 'البريد', 'accounts@example.test'),
+          ])
+            GeniusPdfLabeledValue(
+              config: config,
+              directionality: directionality,
+              label: row.$1,
+              labelAr: row.$2,
+              value: row.$3,
+              valueDirection: GeniusPdfDirection.ltr,
+            ),
+        ],
+      ),
+    );
+  }
+
+  void header() {
+    addReportHeader(
+      GeniusPdfReportHeader(
+        config: config,
+        directionality: directionality,
+        title: 'Directionality Report',
+        titleAr: 'تقرير اتجاه المحتوى',
+        subtitle: 'Metadata stability',
+        subtitleAr: 'ثبات بيانات المستند',
+        documentNumber: 'INV-2026-000123',
+        documentNumberLabel: 'Document No',
+        documentNumberLabelAr: 'رقم المستند',
+        referenceNumber: 'PO-2026-00998',
+        referenceLabel: 'Reference',
+        referenceLabelAr: 'المرجع',
+        printDate: DateTime(2026, 9, 3),
+        showCompanyInfo: false,
+      ),
+      height: 120,
+    );
+  }
+
+  void richText() {
+    final rich = GeniusPdfRichText(
+      config: config,
+      directionality: directionality,
+      spans: const [
+        GeniusPdfTextSpan(
+          text: 'رقم المستند: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: 'INV-2026-000123',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text: ' — الإجمالي: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: '15,697.50 SAR',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text:
+              ' — mixed Arabic/Latin punctuation and a long wrapping sentence.',
+        ),
+      ],
+    );
+    final result = rich.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void grid() {
+    final component = GeniusPdfDataGrid(
+      config: config,
+      directionality: directionality,
+      followDirection: true,
+      preserveDefinitionOrder: preserveGridOrder,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'item',
+          title: 'Item',
+          titleAr: 'الصنف',
+          directionalPadding: GeniusPdfDirectionalInsets(
+            start: 8,
+            end: 4,
+            top: 4,
+            bottom: 4,
+          ),
+        ),
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.quantity(decimalPlaces: 2),
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+        ),
+      ],
+      rows: const [
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'منتج / Product',
+            'sku': 'SKU-AR-ENG-001',
+            'qty': 12.5,
+            'amount': 15697.50,
+          },
+        ),
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'خدمة / Service',
+            'sku': 'SRV-2026-009',
+            'qty': 1,
+            'amount': -1250.00,
+          },
+        ),
+      ],
+    );
+    final result = component.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void media() {
+    final signature = GeniusPdfSignatureArea(
+      config: config,
+      directionality: directionality,
+      title: 'Authorized Signer',
+      titleAr: 'الموقع المعتمد',
+    );
+    final a = signature.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 90),
+    );
+    resetY(a.bottom + 8);
+
+    final barcode = GeniusPdfBarcode(
+      config: config,
+      directionality: directionality,
+      data: 'INV-2026-000123',
+      type: GeniusBarcodeType.code128,
+      caption: 'Document barcode',
+      captionAr: 'باركود المستند',
+    );
+    final b = barcode.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth * .65, 110),
+    );
+    resetY(b.bottom + 8);
+  }
+
+  void nested() {
+    addLine('RTL parent / سياق خارجي');
+    final child = directionality.forComponent(GeniusPdfDirection.ltr);
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: child,
+        title: 'Nested LTR',
+        titleAr: 'كتلة داخلية',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            directionality: child,
+            label: 'Invoice',
+            labelAr: 'الفاتورة',
+            value: 'INV-2026-000123',
+            valueDirection: GeniusPdfDirection.ltr,
+          ),
+        ],
+      ),
+    );
+    addLine('Parent direction is unchanged / الاتجاه الخارجي لم يتغير');
+  }
+
+  void longPages() {
+    const ar =
+        'هذا نص عربي طويل لاختبار اتجاه المحتوى عبر صفحات متعددة مع '
+        'INV-2026-000123 و 15,697.50 SAR. ';
+    const en =
+        'Long English content validates multi-page direction with '
+        'INV-2026-000123 and 15,697.50 SAR. ';
+    for (var p = 0; p < 3; p++) {
+      if (p > 0) newPage();
+      addLine('S02 page ${p + 1}/3');
+      for (var i = 0; i < 10; i++) {
+        addLine(config.isRTL ? '$ar$ar' : '$en$en', topMargin: 6);
+      }
+      summary();
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS02InfoBoxVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S02ComponentsRtlDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S02ComponentsRtlScenario.infoBox,
+    showOptional: false,
+    preserveGridOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S02ComponentsRtlVerificationPage.
+enum S02ComponentsRtlScenario {
+  matrix,
+  summary,
+  infoBox,
+  reportHeader,
+  richText,
+  dataGrid,
+  media,
+  nestedOverride,
+  longMultiPage,
+}
+
+class S02ComponentsRtlDocument extends GeniusPdfDocumentBuilder {
+  S02ComponentsRtlDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.showOptional,
+    required this.preserveGridOrder,
+  }) : super(config, directionality: directionality);
+
+  final S02ComponentsRtlScenario scenario;
+  final bool showOptional;
+  final bool preserveGridOrder;
+
+  @override
+  void build() {
+    newPage();
+    switch (scenario) {
+      case S02ComponentsRtlScenario.matrix:
+        summary();
+        addSpace(8);
+        infoBox();
+        addSpace(8);
+        richText();
+        addSpace(8);
+        grid();
+      case S02ComponentsRtlScenario.summary:
+        summary();
+      case S02ComponentsRtlScenario.infoBox:
+        infoBox();
+      case S02ComponentsRtlScenario.reportHeader:
+        header();
+      case S02ComponentsRtlScenario.richText:
+        richText();
+      case S02ComponentsRtlScenario.dataGrid:
+        grid();
+      case S02ComponentsRtlScenario.media:
+        media();
+      case S02ComponentsRtlScenario.nestedOverride:
+        nested();
+      case S02ComponentsRtlScenario.longMultiPage:
+        longPages();
+    }
+  }
+
+  void summary() {
+    addSummary(
+      GeniusPdfSummarySection(
+        config: config,
+        directionality: directionality,
+        hideEmptyValues: !showOptional,
+        items: [
+          GeniusPdfSummaryItem.formatted(
+            label: 'Subtotal',
+            labelAr: 'المجموع الفرعي',
+            rawValue: 13650.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Discount',
+            labelAr: 'الخصم',
+            rawValue: -1250.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'VAT',
+            labelAr: 'ضريبة القيمة المضافة',
+            rawValue: 15.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.percentage(decimalPlaces: 2),
+            isRtl: config.isRTL,
+          ),
+          const GeniusPdfSummaryItem(
+            label: 'Optional charge',
+            labelAr: 'رسم اختياري',
+            value: '',
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Grand Total',
+            labelAr: 'الإجمالي النهائي',
+            rawValue: 15697.5,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isBold: true,
+            isHighlighted: true,
+            isRtl: config.isRTL,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void infoBox() {
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: directionality,
+        title: 'ERP Information',
+        titleAr: 'معلومات ERP',
+        subtitle: 'Mixed values',
+        subtitleAr: 'قيم مختلطة',
+        columns: 2,
+        followDirection: true,
+        iconPosition: GeniusPdfLogicalPosition.leading,
+        items: [
+          for (final row in const <(String, String, String)>[
+            ('Document', 'المستند', 'INV-2026-000123'),
+            ('IBAN', 'الآيبان', 'SA0380000000608010167519'),
+            ('Phone', 'الهاتف', '+966 55 123 4567'),
+            ('Email', 'البريد', 'accounts@example.test'),
+          ])
+            GeniusPdfLabeledValue(
+              config: config,
+              directionality: directionality,
+              label: row.$1,
+              labelAr: row.$2,
+              value: row.$3,
+              valueDirection: GeniusPdfDirection.ltr,
+            ),
+        ],
+      ),
+    );
+  }
+
+  void header() {
+    addReportHeader(
+      GeniusPdfReportHeader(
+        config: config,
+        directionality: directionality,
+        title: 'Directionality Report',
+        titleAr: 'تقرير اتجاه المحتوى',
+        subtitle: 'Metadata stability',
+        subtitleAr: 'ثبات بيانات المستند',
+        documentNumber: 'INV-2026-000123',
+        documentNumberLabel: 'Document No',
+        documentNumberLabelAr: 'رقم المستند',
+        referenceNumber: 'PO-2026-00998',
+        referenceLabel: 'Reference',
+        referenceLabelAr: 'المرجع',
+        printDate: DateTime(2026, 9, 3),
+        showCompanyInfo: false,
+      ),
+      height: 120,
+    );
+  }
+
+  void richText() {
+    final rich = GeniusPdfRichText(
+      config: config,
+      directionality: directionality,
+      spans: const [
+        GeniusPdfTextSpan(
+          text: 'رقم المستند: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: 'INV-2026-000123',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text: ' — الإجمالي: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: '15,697.50 SAR',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text:
+              ' — mixed Arabic/Latin punctuation and a long wrapping sentence.',
+        ),
+      ],
+    );
+    final result = rich.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void grid() {
+    final component = GeniusPdfDataGrid(
+      config: config,
+      directionality: directionality,
+      followDirection: true,
+      preserveDefinitionOrder: preserveGridOrder,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'item',
+          title: 'Item',
+          titleAr: 'الصنف',
+          directionalPadding: GeniusPdfDirectionalInsets(
+            start: 8,
+            end: 4,
+            top: 4,
+            bottom: 4,
+          ),
+        ),
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.quantity(decimalPlaces: 2),
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+        ),
+      ],
+      rows: const [
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'منتج / Product',
+            'sku': 'SKU-AR-ENG-001',
+            'qty': 12.5,
+            'amount': 15697.50,
+          },
+        ),
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'خدمة / Service',
+            'sku': 'SRV-2026-009',
+            'qty': 1,
+            'amount': -1250.00,
+          },
+        ),
+      ],
+    );
+    final result = component.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void media() {
+    final signature = GeniusPdfSignatureArea(
+      config: config,
+      directionality: directionality,
+      title: 'Authorized Signer',
+      titleAr: 'الموقع المعتمد',
+    );
+    final a = signature.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 90),
+    );
+    resetY(a.bottom + 8);
+
+    final barcode = GeniusPdfBarcode(
+      config: config,
+      directionality: directionality,
+      data: 'INV-2026-000123',
+      type: GeniusBarcodeType.code128,
+      caption: 'Document barcode',
+      captionAr: 'باركود المستند',
+    );
+    final b = barcode.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth * .65, 110),
+    );
+    resetY(b.bottom + 8);
+  }
+
+  void nested() {
+    addLine('RTL parent / سياق خارجي');
+    final child = directionality.forComponent(GeniusPdfDirection.ltr);
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: child,
+        title: 'Nested LTR',
+        titleAr: 'كتلة داخلية',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            directionality: child,
+            label: 'Invoice',
+            labelAr: 'الفاتورة',
+            value: 'INV-2026-000123',
+            valueDirection: GeniusPdfDirection.ltr,
+          ),
+        ],
+      ),
+    );
+    addLine('Parent direction is unchanged / الاتجاه الخارجي لم يتغير');
+  }
+
+  void longPages() {
+    const ar =
+        'هذا نص عربي طويل لاختبار اتجاه المحتوى عبر صفحات متعددة مع '
+        'INV-2026-000123 و 15,697.50 SAR. ';
+    const en =
+        'Long English content validates multi-page direction with '
+        'INV-2026-000123 and 15,697.50 SAR. ';
+    for (var p = 0; p < 3; p++) {
+      if (p > 0) newPage();
+      addLine('S02 page ${p + 1}/3');
+      for (var i = 0; i < 10; i++) {
+        addLine(config.isRTL ? '$ar$ar' : '$en$en', topMargin: 6);
+      }
+      summary();
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS02ReportHeaderVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S02ComponentsRtlDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S02ComponentsRtlScenario.reportHeader,
+    showOptional: false,
+    preserveGridOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S02ComponentsRtlVerificationPage.
+enum S02ComponentsRtlScenario {
+  matrix,
+  summary,
+  infoBox,
+  reportHeader,
+  richText,
+  dataGrid,
+  media,
+  nestedOverride,
+  longMultiPage,
+}
+
+class S02ComponentsRtlDocument extends GeniusPdfDocumentBuilder {
+  S02ComponentsRtlDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.showOptional,
+    required this.preserveGridOrder,
+  }) : super(config, directionality: directionality);
+
+  final S02ComponentsRtlScenario scenario;
+  final bool showOptional;
+  final bool preserveGridOrder;
+
+  @override
+  void build() {
+    newPage();
+    switch (scenario) {
+      case S02ComponentsRtlScenario.matrix:
+        summary();
+        addSpace(8);
+        infoBox();
+        addSpace(8);
+        richText();
+        addSpace(8);
+        grid();
+      case S02ComponentsRtlScenario.summary:
+        summary();
+      case S02ComponentsRtlScenario.infoBox:
+        infoBox();
+      case S02ComponentsRtlScenario.reportHeader:
+        header();
+      case S02ComponentsRtlScenario.richText:
+        richText();
+      case S02ComponentsRtlScenario.dataGrid:
+        grid();
+      case S02ComponentsRtlScenario.media:
+        media();
+      case S02ComponentsRtlScenario.nestedOverride:
+        nested();
+      case S02ComponentsRtlScenario.longMultiPage:
+        longPages();
+    }
+  }
+
+  void summary() {
+    addSummary(
+      GeniusPdfSummarySection(
+        config: config,
+        directionality: directionality,
+        hideEmptyValues: !showOptional,
+        items: [
+          GeniusPdfSummaryItem.formatted(
+            label: 'Subtotal',
+            labelAr: 'المجموع الفرعي',
+            rawValue: 13650.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Discount',
+            labelAr: 'الخصم',
+            rawValue: -1250.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'VAT',
+            labelAr: 'ضريبة القيمة المضافة',
+            rawValue: 15.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.percentage(decimalPlaces: 2),
+            isRtl: config.isRTL,
+          ),
+          const GeniusPdfSummaryItem(
+            label: 'Optional charge',
+            labelAr: 'رسم اختياري',
+            value: '',
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Grand Total',
+            labelAr: 'الإجمالي النهائي',
+            rawValue: 15697.5,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isBold: true,
+            isHighlighted: true,
+            isRtl: config.isRTL,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void infoBox() {
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: directionality,
+        title: 'ERP Information',
+        titleAr: 'معلومات ERP',
+        subtitle: 'Mixed values',
+        subtitleAr: 'قيم مختلطة',
+        columns: 2,
+        followDirection: true,
+        iconPosition: GeniusPdfLogicalPosition.leading,
+        items: [
+          for (final row in const <(String, String, String)>[
+            ('Document', 'المستند', 'INV-2026-000123'),
+            ('IBAN', 'الآيبان', 'SA0380000000608010167519'),
+            ('Phone', 'الهاتف', '+966 55 123 4567'),
+            ('Email', 'البريد', 'accounts@example.test'),
+          ])
+            GeniusPdfLabeledValue(
+              config: config,
+              directionality: directionality,
+              label: row.$1,
+              labelAr: row.$2,
+              value: row.$3,
+              valueDirection: GeniusPdfDirection.ltr,
+            ),
+        ],
+      ),
+    );
+  }
+
+  void header() {
+    addReportHeader(
+      GeniusPdfReportHeader(
+        config: config,
+        directionality: directionality,
+        title: 'Directionality Report',
+        titleAr: 'تقرير اتجاه المحتوى',
+        subtitle: 'Metadata stability',
+        subtitleAr: 'ثبات بيانات المستند',
+        documentNumber: 'INV-2026-000123',
+        documentNumberLabel: 'Document No',
+        documentNumberLabelAr: 'رقم المستند',
+        referenceNumber: 'PO-2026-00998',
+        referenceLabel: 'Reference',
+        referenceLabelAr: 'المرجع',
+        printDate: DateTime(2026, 9, 3),
+        showCompanyInfo: false,
+      ),
+      height: 120,
+    );
+  }
+
+  void richText() {
+    final rich = GeniusPdfRichText(
+      config: config,
+      directionality: directionality,
+      spans: const [
+        GeniusPdfTextSpan(
+          text: 'رقم المستند: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: 'INV-2026-000123',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text: ' — الإجمالي: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: '15,697.50 SAR',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text:
+              ' — mixed Arabic/Latin punctuation and a long wrapping sentence.',
+        ),
+      ],
+    );
+    final result = rich.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void grid() {
+    final component = GeniusPdfDataGrid(
+      config: config,
+      directionality: directionality,
+      followDirection: true,
+      preserveDefinitionOrder: preserveGridOrder,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'item',
+          title: 'Item',
+          titleAr: 'الصنف',
+          directionalPadding: GeniusPdfDirectionalInsets(
+            start: 8,
+            end: 4,
+            top: 4,
+            bottom: 4,
+          ),
+        ),
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.quantity(decimalPlaces: 2),
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+        ),
+      ],
+      rows: const [
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'منتج / Product',
+            'sku': 'SKU-AR-ENG-001',
+            'qty': 12.5,
+            'amount': 15697.50,
+          },
+        ),
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'خدمة / Service',
+            'sku': 'SRV-2026-009',
+            'qty': 1,
+            'amount': -1250.00,
+          },
+        ),
+      ],
+    );
+    final result = component.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void media() {
+    final signature = GeniusPdfSignatureArea(
+      config: config,
+      directionality: directionality,
+      title: 'Authorized Signer',
+      titleAr: 'الموقع المعتمد',
+    );
+    final a = signature.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 90),
+    );
+    resetY(a.bottom + 8);
+
+    final barcode = GeniusPdfBarcode(
+      config: config,
+      directionality: directionality,
+      data: 'INV-2026-000123',
+      type: GeniusBarcodeType.code128,
+      caption: 'Document barcode',
+      captionAr: 'باركود المستند',
+    );
+    final b = barcode.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth * .65, 110),
+    );
+    resetY(b.bottom + 8);
+  }
+
+  void nested() {
+    addLine('RTL parent / سياق خارجي');
+    final child = directionality.forComponent(GeniusPdfDirection.ltr);
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: child,
+        title: 'Nested LTR',
+        titleAr: 'كتلة داخلية',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            directionality: child,
+            label: 'Invoice',
+            labelAr: 'الفاتورة',
+            value: 'INV-2026-000123',
+            valueDirection: GeniusPdfDirection.ltr,
+          ),
+        ],
+      ),
+    );
+    addLine('Parent direction is unchanged / الاتجاه الخارجي لم يتغير');
+  }
+
+  void longPages() {
+    const ar =
+        'هذا نص عربي طويل لاختبار اتجاه المحتوى عبر صفحات متعددة مع '
+        'INV-2026-000123 و 15,697.50 SAR. ';
+    const en =
+        'Long English content validates multi-page direction with '
+        'INV-2026-000123 and 15,697.50 SAR. ';
+    for (var p = 0; p < 3; p++) {
+      if (p > 0) newPage();
+      addLine('S02 page ${p + 1}/3');
+      for (var i = 0; i < 10; i++) {
+        addLine(config.isRTL ? '$ar$ar' : '$en$en', topMargin: 6);
+      }
+      summary();
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS02RichTextVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S02ComponentsRtlDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S02ComponentsRtlScenario.richText,
+    showOptional: false,
+    preserveGridOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S02ComponentsRtlVerificationPage.
+enum S02ComponentsRtlScenario {
+  matrix,
+  summary,
+  infoBox,
+  reportHeader,
+  richText,
+  dataGrid,
+  media,
+  nestedOverride,
+  longMultiPage,
+}
+
+class S02ComponentsRtlDocument extends GeniusPdfDocumentBuilder {
+  S02ComponentsRtlDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.showOptional,
+    required this.preserveGridOrder,
+  }) : super(config, directionality: directionality);
+
+  final S02ComponentsRtlScenario scenario;
+  final bool showOptional;
+  final bool preserveGridOrder;
+
+  @override
+  void build() {
+    newPage();
+    switch (scenario) {
+      case S02ComponentsRtlScenario.matrix:
+        summary();
+        addSpace(8);
+        infoBox();
+        addSpace(8);
+        richText();
+        addSpace(8);
+        grid();
+      case S02ComponentsRtlScenario.summary:
+        summary();
+      case S02ComponentsRtlScenario.infoBox:
+        infoBox();
+      case S02ComponentsRtlScenario.reportHeader:
+        header();
+      case S02ComponentsRtlScenario.richText:
+        richText();
+      case S02ComponentsRtlScenario.dataGrid:
+        grid();
+      case S02ComponentsRtlScenario.media:
+        media();
+      case S02ComponentsRtlScenario.nestedOverride:
+        nested();
+      case S02ComponentsRtlScenario.longMultiPage:
+        longPages();
+    }
+  }
+
+  void summary() {
+    addSummary(
+      GeniusPdfSummarySection(
+        config: config,
+        directionality: directionality,
+        hideEmptyValues: !showOptional,
+        items: [
+          GeniusPdfSummaryItem.formatted(
+            label: 'Subtotal',
+            labelAr: 'المجموع الفرعي',
+            rawValue: 13650.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Discount',
+            labelAr: 'الخصم',
+            rawValue: -1250.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'VAT',
+            labelAr: 'ضريبة القيمة المضافة',
+            rawValue: 15.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.percentage(decimalPlaces: 2),
+            isRtl: config.isRTL,
+          ),
+          const GeniusPdfSummaryItem(
+            label: 'Optional charge',
+            labelAr: 'رسم اختياري',
+            value: '',
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Grand Total',
+            labelAr: 'الإجمالي النهائي',
+            rawValue: 15697.5,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isBold: true,
+            isHighlighted: true,
+            isRtl: config.isRTL,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void infoBox() {
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: directionality,
+        title: 'ERP Information',
+        titleAr: 'معلومات ERP',
+        subtitle: 'Mixed values',
+        subtitleAr: 'قيم مختلطة',
+        columns: 2,
+        followDirection: true,
+        iconPosition: GeniusPdfLogicalPosition.leading,
+        items: [
+          for (final row in const <(String, String, String)>[
+            ('Document', 'المستند', 'INV-2026-000123'),
+            ('IBAN', 'الآيبان', 'SA0380000000608010167519'),
+            ('Phone', 'الهاتف', '+966 55 123 4567'),
+            ('Email', 'البريد', 'accounts@example.test'),
+          ])
+            GeniusPdfLabeledValue(
+              config: config,
+              directionality: directionality,
+              label: row.$1,
+              labelAr: row.$2,
+              value: row.$3,
+              valueDirection: GeniusPdfDirection.ltr,
+            ),
+        ],
+      ),
+    );
+  }
+
+  void header() {
+    addReportHeader(
+      GeniusPdfReportHeader(
+        config: config,
+        directionality: directionality,
+        title: 'Directionality Report',
+        titleAr: 'تقرير اتجاه المحتوى',
+        subtitle: 'Metadata stability',
+        subtitleAr: 'ثبات بيانات المستند',
+        documentNumber: 'INV-2026-000123',
+        documentNumberLabel: 'Document No',
+        documentNumberLabelAr: 'رقم المستند',
+        referenceNumber: 'PO-2026-00998',
+        referenceLabel: 'Reference',
+        referenceLabelAr: 'المرجع',
+        printDate: DateTime(2026, 9, 3),
+        showCompanyInfo: false,
+      ),
+      height: 120,
+    );
+  }
+
+  void richText() {
+    final rich = GeniusPdfRichText(
+      config: config,
+      directionality: directionality,
+      spans: const [
+        GeniusPdfTextSpan(
+          text: 'رقم المستند: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: 'INV-2026-000123',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text: ' — الإجمالي: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: '15,697.50 SAR',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text:
+              ' — mixed Arabic/Latin punctuation and a long wrapping sentence.',
+        ),
+      ],
+    );
+    final result = rich.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void grid() {
+    final component = GeniusPdfDataGrid(
+      config: config,
+      directionality: directionality,
+      followDirection: true,
+      preserveDefinitionOrder: preserveGridOrder,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'item',
+          title: 'Item',
+          titleAr: 'الصنف',
+          directionalPadding: GeniusPdfDirectionalInsets(
+            start: 8,
+            end: 4,
+            top: 4,
+            bottom: 4,
+          ),
+        ),
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.quantity(decimalPlaces: 2),
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+        ),
+      ],
+      rows: const [
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'منتج / Product',
+            'sku': 'SKU-AR-ENG-001',
+            'qty': 12.5,
+            'amount': 15697.50,
+          },
+        ),
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'خدمة / Service',
+            'sku': 'SRV-2026-009',
+            'qty': 1,
+            'amount': -1250.00,
+          },
+        ),
+      ],
+    );
+    final result = component.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void media() {
+    final signature = GeniusPdfSignatureArea(
+      config: config,
+      directionality: directionality,
+      title: 'Authorized Signer',
+      titleAr: 'الموقع المعتمد',
+    );
+    final a = signature.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 90),
+    );
+    resetY(a.bottom + 8);
+
+    final barcode = GeniusPdfBarcode(
+      config: config,
+      directionality: directionality,
+      data: 'INV-2026-000123',
+      type: GeniusBarcodeType.code128,
+      caption: 'Document barcode',
+      captionAr: 'باركود المستند',
+    );
+    final b = barcode.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth * .65, 110),
+    );
+    resetY(b.bottom + 8);
+  }
+
+  void nested() {
+    addLine('RTL parent / سياق خارجي');
+    final child = directionality.forComponent(GeniusPdfDirection.ltr);
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: child,
+        title: 'Nested LTR',
+        titleAr: 'كتلة داخلية',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            directionality: child,
+            label: 'Invoice',
+            labelAr: 'الفاتورة',
+            value: 'INV-2026-000123',
+            valueDirection: GeniusPdfDirection.ltr,
+          ),
+        ],
+      ),
+    );
+    addLine('Parent direction is unchanged / الاتجاه الخارجي لم يتغير');
+  }
+
+  void longPages() {
+    const ar =
+        'هذا نص عربي طويل لاختبار اتجاه المحتوى عبر صفحات متعددة مع '
+        'INV-2026-000123 و 15,697.50 SAR. ';
+    const en =
+        'Long English content validates multi-page direction with '
+        'INV-2026-000123 and 15,697.50 SAR. ';
+    for (var p = 0; p < 3; p++) {
+      if (p > 0) newPage();
+      addLine('S02 page ${p + 1}/3');
+      for (var i = 0; i < 10; i++) {
+        addLine(config.isRTL ? '$ar$ar' : '$en$en', topMargin: 6);
+      }
+      summary();
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS02DataGridVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S02ComponentsRtlDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S02ComponentsRtlScenario.dataGrid,
+    showOptional: false,
+    preserveGridOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S02ComponentsRtlVerificationPage.
+enum S02ComponentsRtlScenario {
+  matrix,
+  summary,
+  infoBox,
+  reportHeader,
+  richText,
+  dataGrid,
+  media,
+  nestedOverride,
+  longMultiPage,
+}
+
+class S02ComponentsRtlDocument extends GeniusPdfDocumentBuilder {
+  S02ComponentsRtlDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.showOptional,
+    required this.preserveGridOrder,
+  }) : super(config, directionality: directionality);
+
+  final S02ComponentsRtlScenario scenario;
+  final bool showOptional;
+  final bool preserveGridOrder;
+
+  @override
+  void build() {
+    newPage();
+    switch (scenario) {
+      case S02ComponentsRtlScenario.matrix:
+        summary();
+        addSpace(8);
+        infoBox();
+        addSpace(8);
+        richText();
+        addSpace(8);
+        grid();
+      case S02ComponentsRtlScenario.summary:
+        summary();
+      case S02ComponentsRtlScenario.infoBox:
+        infoBox();
+      case S02ComponentsRtlScenario.reportHeader:
+        header();
+      case S02ComponentsRtlScenario.richText:
+        richText();
+      case S02ComponentsRtlScenario.dataGrid:
+        grid();
+      case S02ComponentsRtlScenario.media:
+        media();
+      case S02ComponentsRtlScenario.nestedOverride:
+        nested();
+      case S02ComponentsRtlScenario.longMultiPage:
+        longPages();
+    }
+  }
+
+  void summary() {
+    addSummary(
+      GeniusPdfSummarySection(
+        config: config,
+        directionality: directionality,
+        hideEmptyValues: !showOptional,
+        items: [
+          GeniusPdfSummaryItem.formatted(
+            label: 'Subtotal',
+            labelAr: 'المجموع الفرعي',
+            rawValue: 13650.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Discount',
+            labelAr: 'الخصم',
+            rawValue: -1250.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'VAT',
+            labelAr: 'ضريبة القيمة المضافة',
+            rawValue: 15.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.percentage(decimalPlaces: 2),
+            isRtl: config.isRTL,
+          ),
+          const GeniusPdfSummaryItem(
+            label: 'Optional charge',
+            labelAr: 'رسم اختياري',
+            value: '',
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Grand Total',
+            labelAr: 'الإجمالي النهائي',
+            rawValue: 15697.5,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isBold: true,
+            isHighlighted: true,
+            isRtl: config.isRTL,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void infoBox() {
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: directionality,
+        title: 'ERP Information',
+        titleAr: 'معلومات ERP',
+        subtitle: 'Mixed values',
+        subtitleAr: 'قيم مختلطة',
+        columns: 2,
+        followDirection: true,
+        iconPosition: GeniusPdfLogicalPosition.leading,
+        items: [
+          for (final row in const <(String, String, String)>[
+            ('Document', 'المستند', 'INV-2026-000123'),
+            ('IBAN', 'الآيبان', 'SA0380000000608010167519'),
+            ('Phone', 'الهاتف', '+966 55 123 4567'),
+            ('Email', 'البريد', 'accounts@example.test'),
+          ])
+            GeniusPdfLabeledValue(
+              config: config,
+              directionality: directionality,
+              label: row.$1,
+              labelAr: row.$2,
+              value: row.$3,
+              valueDirection: GeniusPdfDirection.ltr,
+            ),
+        ],
+      ),
+    );
+  }
+
+  void header() {
+    addReportHeader(
+      GeniusPdfReportHeader(
+        config: config,
+        directionality: directionality,
+        title: 'Directionality Report',
+        titleAr: 'تقرير اتجاه المحتوى',
+        subtitle: 'Metadata stability',
+        subtitleAr: 'ثبات بيانات المستند',
+        documentNumber: 'INV-2026-000123',
+        documentNumberLabel: 'Document No',
+        documentNumberLabelAr: 'رقم المستند',
+        referenceNumber: 'PO-2026-00998',
+        referenceLabel: 'Reference',
+        referenceLabelAr: 'المرجع',
+        printDate: DateTime(2026, 9, 3),
+        showCompanyInfo: false,
+      ),
+      height: 120,
+    );
+  }
+
+  void richText() {
+    final rich = GeniusPdfRichText(
+      config: config,
+      directionality: directionality,
+      spans: const [
+        GeniusPdfTextSpan(
+          text: 'رقم المستند: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: 'INV-2026-000123',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text: ' — الإجمالي: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: '15,697.50 SAR',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text:
+              ' — mixed Arabic/Latin punctuation and a long wrapping sentence.',
+        ),
+      ],
+    );
+    final result = rich.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void grid() {
+    final component = GeniusPdfDataGrid(
+      config: config,
+      directionality: directionality,
+      followDirection: true,
+      preserveDefinitionOrder: preserveGridOrder,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'item',
+          title: 'Item',
+          titleAr: 'الصنف',
+          directionalPadding: GeniusPdfDirectionalInsets(
+            start: 8,
+            end: 4,
+            top: 4,
+            bottom: 4,
+          ),
+        ),
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.quantity(decimalPlaces: 2),
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+        ),
+      ],
+      rows: const [
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'منتج / Product',
+            'sku': 'SKU-AR-ENG-001',
+            'qty': 12.5,
+            'amount': 15697.50,
+          },
+        ),
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'خدمة / Service',
+            'sku': 'SRV-2026-009',
+            'qty': 1,
+            'amount': -1250.00,
+          },
+        ),
+      ],
+    );
+    final result = component.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void media() {
+    final signature = GeniusPdfSignatureArea(
+      config: config,
+      directionality: directionality,
+      title: 'Authorized Signer',
+      titleAr: 'الموقع المعتمد',
+    );
+    final a = signature.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 90),
+    );
+    resetY(a.bottom + 8);
+
+    final barcode = GeniusPdfBarcode(
+      config: config,
+      directionality: directionality,
+      data: 'INV-2026-000123',
+      type: GeniusBarcodeType.code128,
+      caption: 'Document barcode',
+      captionAr: 'باركود المستند',
+    );
+    final b = barcode.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth * .65, 110),
+    );
+    resetY(b.bottom + 8);
+  }
+
+  void nested() {
+    addLine('RTL parent / سياق خارجي');
+    final child = directionality.forComponent(GeniusPdfDirection.ltr);
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: child,
+        title: 'Nested LTR',
+        titleAr: 'كتلة داخلية',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            directionality: child,
+            label: 'Invoice',
+            labelAr: 'الفاتورة',
+            value: 'INV-2026-000123',
+            valueDirection: GeniusPdfDirection.ltr,
+          ),
+        ],
+      ),
+    );
+    addLine('Parent direction is unchanged / الاتجاه الخارجي لم يتغير');
+  }
+
+  void longPages() {
+    const ar =
+        'هذا نص عربي طويل لاختبار اتجاه المحتوى عبر صفحات متعددة مع '
+        'INV-2026-000123 و 15,697.50 SAR. ';
+    const en =
+        'Long English content validates multi-page direction with '
+        'INV-2026-000123 and 15,697.50 SAR. ';
+    for (var p = 0; p < 3; p++) {
+      if (p > 0) newPage();
+      addLine('S02 page ${p + 1}/3');
+      for (var i = 0; i < 10; i++) {
+        addLine(config.isRTL ? '$ar$ar' : '$en$en', topMargin: 6);
+      }
+      summary();
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS02MediaVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S02ComponentsRtlDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S02ComponentsRtlScenario.media,
+    showOptional: false,
+    preserveGridOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S02ComponentsRtlVerificationPage.
+enum S02ComponentsRtlScenario {
+  matrix,
+  summary,
+  infoBox,
+  reportHeader,
+  richText,
+  dataGrid,
+  media,
+  nestedOverride,
+  longMultiPage,
+}
+
+class S02ComponentsRtlDocument extends GeniusPdfDocumentBuilder {
+  S02ComponentsRtlDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.showOptional,
+    required this.preserveGridOrder,
+  }) : super(config, directionality: directionality);
+
+  final S02ComponentsRtlScenario scenario;
+  final bool showOptional;
+  final bool preserveGridOrder;
+
+  @override
+  void build() {
+    newPage();
+    switch (scenario) {
+      case S02ComponentsRtlScenario.matrix:
+        summary();
+        addSpace(8);
+        infoBox();
+        addSpace(8);
+        richText();
+        addSpace(8);
+        grid();
+      case S02ComponentsRtlScenario.summary:
+        summary();
+      case S02ComponentsRtlScenario.infoBox:
+        infoBox();
+      case S02ComponentsRtlScenario.reportHeader:
+        header();
+      case S02ComponentsRtlScenario.richText:
+        richText();
+      case S02ComponentsRtlScenario.dataGrid:
+        grid();
+      case S02ComponentsRtlScenario.media:
+        media();
+      case S02ComponentsRtlScenario.nestedOverride:
+        nested();
+      case S02ComponentsRtlScenario.longMultiPage:
+        longPages();
+    }
+  }
+
+  void summary() {
+    addSummary(
+      GeniusPdfSummarySection(
+        config: config,
+        directionality: directionality,
+        hideEmptyValues: !showOptional,
+        items: [
+          GeniusPdfSummaryItem.formatted(
+            label: 'Subtotal',
+            labelAr: 'المجموع الفرعي',
+            rawValue: 13650.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Discount',
+            labelAr: 'الخصم',
+            rawValue: -1250.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'VAT',
+            labelAr: 'ضريبة القيمة المضافة',
+            rawValue: 15.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.percentage(decimalPlaces: 2),
+            isRtl: config.isRTL,
+          ),
+          const GeniusPdfSummaryItem(
+            label: 'Optional charge',
+            labelAr: 'رسم اختياري',
+            value: '',
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Grand Total',
+            labelAr: 'الإجمالي النهائي',
+            rawValue: 15697.5,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isBold: true,
+            isHighlighted: true,
+            isRtl: config.isRTL,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void infoBox() {
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: directionality,
+        title: 'ERP Information',
+        titleAr: 'معلومات ERP',
+        subtitle: 'Mixed values',
+        subtitleAr: 'قيم مختلطة',
+        columns: 2,
+        followDirection: true,
+        iconPosition: GeniusPdfLogicalPosition.leading,
+        items: [
+          for (final row in const <(String, String, String)>[
+            ('Document', 'المستند', 'INV-2026-000123'),
+            ('IBAN', 'الآيبان', 'SA0380000000608010167519'),
+            ('Phone', 'الهاتف', '+966 55 123 4567'),
+            ('Email', 'البريد', 'accounts@example.test'),
+          ])
+            GeniusPdfLabeledValue(
+              config: config,
+              directionality: directionality,
+              label: row.$1,
+              labelAr: row.$2,
+              value: row.$3,
+              valueDirection: GeniusPdfDirection.ltr,
+            ),
+        ],
+      ),
+    );
+  }
+
+  void header() {
+    addReportHeader(
+      GeniusPdfReportHeader(
+        config: config,
+        directionality: directionality,
+        title: 'Directionality Report',
+        titleAr: 'تقرير اتجاه المحتوى',
+        subtitle: 'Metadata stability',
+        subtitleAr: 'ثبات بيانات المستند',
+        documentNumber: 'INV-2026-000123',
+        documentNumberLabel: 'Document No',
+        documentNumberLabelAr: 'رقم المستند',
+        referenceNumber: 'PO-2026-00998',
+        referenceLabel: 'Reference',
+        referenceLabelAr: 'المرجع',
+        printDate: DateTime(2026, 9, 3),
+        showCompanyInfo: false,
+      ),
+      height: 120,
+    );
+  }
+
+  void richText() {
+    final rich = GeniusPdfRichText(
+      config: config,
+      directionality: directionality,
+      spans: const [
+        GeniusPdfTextSpan(
+          text: 'رقم المستند: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: 'INV-2026-000123',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text: ' — الإجمالي: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: '15,697.50 SAR',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text:
+              ' — mixed Arabic/Latin punctuation and a long wrapping sentence.',
+        ),
+      ],
+    );
+    final result = rich.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void grid() {
+    final component = GeniusPdfDataGrid(
+      config: config,
+      directionality: directionality,
+      followDirection: true,
+      preserveDefinitionOrder: preserveGridOrder,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'item',
+          title: 'Item',
+          titleAr: 'الصنف',
+          directionalPadding: GeniusPdfDirectionalInsets(
+            start: 8,
+            end: 4,
+            top: 4,
+            bottom: 4,
+          ),
+        ),
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.quantity(decimalPlaces: 2),
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+        ),
+      ],
+      rows: const [
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'منتج / Product',
+            'sku': 'SKU-AR-ENG-001',
+            'qty': 12.5,
+            'amount': 15697.50,
+          },
+        ),
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'خدمة / Service',
+            'sku': 'SRV-2026-009',
+            'qty': 1,
+            'amount': -1250.00,
+          },
+        ),
+      ],
+    );
+    final result = component.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void media() {
+    final signature = GeniusPdfSignatureArea(
+      config: config,
+      directionality: directionality,
+      title: 'Authorized Signer',
+      titleAr: 'الموقع المعتمد',
+    );
+    final a = signature.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 90),
+    );
+    resetY(a.bottom + 8);
+
+    final barcode = GeniusPdfBarcode(
+      config: config,
+      directionality: directionality,
+      data: 'INV-2026-000123',
+      type: GeniusBarcodeType.code128,
+      caption: 'Document barcode',
+      captionAr: 'باركود المستند',
+    );
+    final b = barcode.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth * .65, 110),
+    );
+    resetY(b.bottom + 8);
+  }
+
+  void nested() {
+    addLine('RTL parent / سياق خارجي');
+    final child = directionality.forComponent(GeniusPdfDirection.ltr);
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: child,
+        title: 'Nested LTR',
+        titleAr: 'كتلة داخلية',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            directionality: child,
+            label: 'Invoice',
+            labelAr: 'الفاتورة',
+            value: 'INV-2026-000123',
+            valueDirection: GeniusPdfDirection.ltr,
+          ),
+        ],
+      ),
+    );
+    addLine('Parent direction is unchanged / الاتجاه الخارجي لم يتغير');
+  }
+
+  void longPages() {
+    const ar =
+        'هذا نص عربي طويل لاختبار اتجاه المحتوى عبر صفحات متعددة مع '
+        'INV-2026-000123 و 15,697.50 SAR. ';
+    const en =
+        'Long English content validates multi-page direction with '
+        'INV-2026-000123 and 15,697.50 SAR. ';
+    for (var p = 0; p < 3; p++) {
+      if (p > 0) newPage();
+      addLine('S02 page ${p + 1}/3');
+      for (var i = 0; i < 10; i++) {
+        addLine(config.isRTL ? '$ar$ar' : '$en$en', topMargin: 6);
+      }
+      summary();
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS02NestedOverrideVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S02ComponentsRtlDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S02ComponentsRtlScenario.nestedOverride,
+    showOptional: false,
+    preserveGridOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S02ComponentsRtlVerificationPage.
+enum S02ComponentsRtlScenario {
+  matrix,
+  summary,
+  infoBox,
+  reportHeader,
+  richText,
+  dataGrid,
+  media,
+  nestedOverride,
+  longMultiPage,
+}
+
+class S02ComponentsRtlDocument extends GeniusPdfDocumentBuilder {
+  S02ComponentsRtlDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.showOptional,
+    required this.preserveGridOrder,
+  }) : super(config, directionality: directionality);
+
+  final S02ComponentsRtlScenario scenario;
+  final bool showOptional;
+  final bool preserveGridOrder;
+
+  @override
+  void build() {
+    newPage();
+    switch (scenario) {
+      case S02ComponentsRtlScenario.matrix:
+        summary();
+        addSpace(8);
+        infoBox();
+        addSpace(8);
+        richText();
+        addSpace(8);
+        grid();
+      case S02ComponentsRtlScenario.summary:
+        summary();
+      case S02ComponentsRtlScenario.infoBox:
+        infoBox();
+      case S02ComponentsRtlScenario.reportHeader:
+        header();
+      case S02ComponentsRtlScenario.richText:
+        richText();
+      case S02ComponentsRtlScenario.dataGrid:
+        grid();
+      case S02ComponentsRtlScenario.media:
+        media();
+      case S02ComponentsRtlScenario.nestedOverride:
+        nested();
+      case S02ComponentsRtlScenario.longMultiPage:
+        longPages();
+    }
+  }
+
+  void summary() {
+    addSummary(
+      GeniusPdfSummarySection(
+        config: config,
+        directionality: directionality,
+        hideEmptyValues: !showOptional,
+        items: [
+          GeniusPdfSummaryItem.formatted(
+            label: 'Subtotal',
+            labelAr: 'المجموع الفرعي',
+            rawValue: 13650.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Discount',
+            labelAr: 'الخصم',
+            rawValue: -1250.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isRtl: config.isRTL,
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'VAT',
+            labelAr: 'ضريبة القيمة المضافة',
+            rawValue: 15.0,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.percentage(decimalPlaces: 2),
+            isRtl: config.isRTL,
+          ),
+          const GeniusPdfSummaryItem(
+            label: 'Optional charge',
+            labelAr: 'رسم اختياري',
+            value: '',
+          ),
+          GeniusPdfSummaryItem.formatted(
+            label: 'Grand Total',
+            labelAr: 'الإجمالي النهائي',
+            rawValue: 15697.5,
+            formatter: config.formatter,
+            formatSpec: const GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+            isBold: true,
+            isHighlighted: true,
+            isRtl: config.isRTL,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void infoBox() {
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: directionality,
+        title: 'ERP Information',
+        titleAr: 'معلومات ERP',
+        subtitle: 'Mixed values',
+        subtitleAr: 'قيم مختلطة',
+        columns: 2,
+        followDirection: true,
+        iconPosition: GeniusPdfLogicalPosition.leading,
+        items: [
+          for (final row in const <(String, String, String)>[
+            ('Document', 'المستند', 'INV-2026-000123'),
+            ('IBAN', 'الآيبان', 'SA0380000000608010167519'),
+            ('Phone', 'الهاتف', '+966 55 123 4567'),
+            ('Email', 'البريد', 'accounts@example.test'),
+          ])
+            GeniusPdfLabeledValue(
+              config: config,
+              directionality: directionality,
+              label: row.$1,
+              labelAr: row.$2,
+              value: row.$3,
+              valueDirection: GeniusPdfDirection.ltr,
+            ),
+        ],
+      ),
+    );
+  }
+
+  void header() {
+    addReportHeader(
+      GeniusPdfReportHeader(
+        config: config,
+        directionality: directionality,
+        title: 'Directionality Report',
+        titleAr: 'تقرير اتجاه المحتوى',
+        subtitle: 'Metadata stability',
+        subtitleAr: 'ثبات بيانات المستند',
+        documentNumber: 'INV-2026-000123',
+        documentNumberLabel: 'Document No',
+        documentNumberLabelAr: 'رقم المستند',
+        referenceNumber: 'PO-2026-00998',
+        referenceLabel: 'Reference',
+        referenceLabelAr: 'المرجع',
+        printDate: DateTime(2026, 9, 3),
+        showCompanyInfo: false,
+      ),
+      height: 120,
+    );
+  }
+
+  void richText() {
+    final rich = GeniusPdfRichText(
+      config: config,
+      directionality: directionality,
+      spans: const [
+        GeniusPdfTextSpan(
+          text: 'رقم المستند: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: 'INV-2026-000123',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text: ' — الإجمالي: ',
+          direction: GeniusPdfDirection.rtl,
+        ),
+        GeniusPdfTextSpan(
+          text: '15,697.50 SAR',
+          direction: GeniusPdfDirection.ltr,
+          isBold: true,
+        ),
+        GeniusPdfTextSpan(
+          text:
+              ' — mixed Arabic/Latin punctuation and a long wrapping sentence.',
+        ),
+      ],
+    );
+    final result = rich.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void grid() {
+    final component = GeniusPdfDataGrid(
+      config: config,
+      directionality: directionality,
+      followDirection: true,
+      preserveDefinitionOrder: preserveGridOrder,
+      columns: const [
+        GeniusPdfGridColumn(
+          id: 'item',
+          title: 'Item',
+          titleAr: 'الصنف',
+          directionalPadding: GeniusPdfDirectionalInsets(
+            start: 8,
+            end: 4,
+            top: 4,
+            bottom: 4,
+          ),
+        ),
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.quantity(decimalPlaces: 2),
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+          formatSpec: GeniusPdfFormatSpec.money(currencyCode: 'SAR'),
+        ),
+      ],
+      rows: const [
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'منتج / Product',
+            'sku': 'SKU-AR-ENG-001',
+            'qty': 12.5,
+            'amount': 15697.50,
+          },
+        ),
+        GeniusPdfGridRow(
+          cells: {
+            'item': 'خدمة / Service',
+            'sku': 'SRV-2026-009',
+            'qty': 1,
+            'amount': -1250.00,
+          },
+        ),
+      ],
+    );
+    final result = component.draw(page: currentPage, bounds: contentBounds);
+    if (result != null) updateFromLayoutResult(result, spacing: 8);
+  }
+
+  void media() {
+    final signature = GeniusPdfSignatureArea(
+      config: config,
+      directionality: directionality,
+      title: 'Authorized Signer',
+      titleAr: 'الموقع المعتمد',
+    );
+    final a = signature.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth, 90),
+    );
+    resetY(a.bottom + 8);
+
+    final barcode = GeniusPdfBarcode(
+      config: config,
+      directionality: directionality,
+      data: 'INV-2026-000123',
+      type: GeniusBarcodeType.code128,
+      caption: 'Document barcode',
+      captionAr: 'باركود المستند',
+    );
+    final b = barcode.draw(
+      page: currentPage,
+      bounds: Rect.fromLTWH(0, currentY, pageWidth * .65, 110),
+    );
+    resetY(b.bottom + 8);
+  }
+
+  void nested() {
+    addLine('RTL parent / سياق خارجي');
+    final child = directionality.forComponent(GeniusPdfDirection.ltr);
+    addInfoBox(
+      GeniusPdfInfoBox(
+        config: config,
+        directionality: child,
+        title: 'Nested LTR',
+        titleAr: 'كتلة داخلية',
+        items: [
+          GeniusPdfLabeledValue(
+            config: config,
+            directionality: child,
+            label: 'Invoice',
+            labelAr: 'الفاتورة',
+            value: 'INV-2026-000123',
+            valueDirection: GeniusPdfDirection.ltr,
+          ),
+        ],
+      ),
+    );
+    addLine('Parent direction is unchanged / الاتجاه الخارجي لم يتغير');
+  }
+
+  void longPages() {
+    const ar =
+        'هذا نص عربي طويل لاختبار اتجاه المحتوى عبر صفحات متعددة مع '
+        'INV-2026-000123 و 15,697.50 SAR. ';
+    const en =
+        'Long English content validates multi-page direction with '
+        'INV-2026-000123 and 15,697.50 SAR. ';
+    for (var p = 0; p < 3; p++) {
+      if (p > 0) newPage();
+      addLine('S02 page ${p + 1}/3');
+      for (var i = 0; i < 10; i++) {
+        addLine(config.isRTL ? '$ar$ar' : '$en$en', topMargin: 6);
+      }
+      summary();
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS02LongMultiPageVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S02ComponentsRtlDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S02ComponentsRtlScenario.longMultiPage,
+    showOptional: false,
+    preserveGridOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}

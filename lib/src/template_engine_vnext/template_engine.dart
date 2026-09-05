@@ -1,7 +1,6 @@
 
 import '../builders/pdf_document_builder.dart';
 import '../core/directionality.dart';
-import '../core/pdf_config.dart';
 import 'safe_expression_engine.dart';
 import 'template_elements.dart';
 import 'template_registry.dart';
@@ -531,9 +530,9 @@ class GeniusPdfTemplateRendererRegistry {
 class GeniusPdfTemplateDiagnosticsDocument
     extends GeniusPdfDocumentBuilder {
   GeniusPdfTemplateDiagnosticsDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required this.template,
-  }) : super(config);
+  });
 
   final GeniusPdfResolvedTemplate template;
 

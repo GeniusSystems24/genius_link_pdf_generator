@@ -79,7 +79,7 @@ Future<Uint8List> buildMultiPageReportBytes() async {
     mp.heading('Revenue Analysis', level: 2);
     mp.paragraph(
         'Total revenue for the month reached 1.5 million SAR, representing a 15% increase compared to the same period last year.');
-    mp.add(pw.Table.fromTextArray(
+    mp.add(pw.TableHelper.fromTextArray(
       data: [
         ['Riyadh', '620K SAR', '+12%'],
         ['Jeddah', '540K SAR', '+18%'],

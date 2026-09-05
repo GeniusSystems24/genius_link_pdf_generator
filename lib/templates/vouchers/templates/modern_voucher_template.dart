@@ -160,8 +160,8 @@ abstract class ModernVoucherTemplate extends GeniusPdfVoucherTemplate {
     final grid = GeniusPdfDataGrid(
       config: config,
       columns: items
-          .map((_) => GeniusPdfGridColumn(
-              id: _.labelEn,
+          .map((item) => GeniusPdfGridColumn(
+              id: item.labelEn,
               title: '',
               flexFactor: 1,
               alignment: GeniusPdfTextAlign.center))

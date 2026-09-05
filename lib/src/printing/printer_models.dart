@@ -1,3 +1,5 @@
+// ignore_for_file: sort_constructors_first
+
 /// Printer Models
 ///
 /// Data models for printer information and print jobs.

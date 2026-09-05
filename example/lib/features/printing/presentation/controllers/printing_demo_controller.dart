@@ -28,9 +28,10 @@ final class PrintingDemoController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> initialize() async {
+  Future<void> initialize() {
     loadProfiles();
-    await generateSamplePdf();
+    updateStatus('Ready. Generate the sample PDF when you want to print or preview it.');
+    return Future<void>.value();
   }
 
   void loadProfiles() {

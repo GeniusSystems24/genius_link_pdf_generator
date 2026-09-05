@@ -10,6 +10,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'share_models.dart';
 
+
+Future<ShareResult> _shareFiles(
+  List<XFile> files, {
+  String? subject,
+  String? text,
+}) =>
+    SharePlus.instance.share(
+      ShareParams(
+        files: files,
+        subject: subject,
+        text: text,
+      ),
+    );
 /// Bluetooth device type.
 enum GeniusBluetoothDeviceType {
   /// Unknown device type
@@ -503,7 +516,7 @@ class GeniusBluetoothShareService {
 
       // Use system share with Bluetooth hint
       // On Android, this may allow direct Bluetooth selection
-      final result = await Share.shareXFiles(
+      final result = await _shareFiles(
         [XFile(file.path)],
         subject: fileName,
       );
@@ -557,7 +570,7 @@ class GeniusBluetoothShareService {
       await file.writeAsBytes(pdfBytes);
 
       // Use system share which will show Nearby Share/AirDrop option
-      final result = await Share.shareXFiles([XFile(file.path)]);
+      final result = await _shareFiles([XFile(file.path)]);
 
       if (result.status == ShareResultStatus.success) {
         return GeniusShareResult.success(

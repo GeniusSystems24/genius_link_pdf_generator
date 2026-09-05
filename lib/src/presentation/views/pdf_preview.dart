@@ -59,7 +59,10 @@ class GeniusPdfPreviewPage extends StatelessWidget {
             ),
         ],
       ),
-      body: GeniusPdfPreviewWidget(pdfData: pdfData),
+      body: GeniusPdfPreviewWidget(
+        pdfData: pdfData,
+        fullscreenTitle: title,
+      ),
     );
   }
 
@@ -97,20 +100,33 @@ class GeniusPdfPreviewWidget extends StatelessWidget {
     this.canChangePageFormat = false,
     this.loadingWidget,
     this.errorBuilder,
+    this.allowFullscreen = true,
+    this.fullscreenTitle = 'PDF Preview',
+    this.maxPageWidth,
   });
 
   final Uint8List pdfData;
   final double? width;
-
-  /// Requested preview height.
-  ///
-  /// If null, the widget uses the available bounded height. Inside a
-  /// vertically unbounded parent it derives a finite responsive height.
   final double? height;
   final bool canChangeOrientation;
   final bool canChangePageFormat;
   final Widget? loadingWidget;
   final Widget Function(BuildContext, Object?)? errorBuilder;
+
+  /// Whether an expand button is shown over the preview.
+  ///
+  /// The button opens the same PDF in a dedicated full-window preview route.
+  /// It defaults to `true` for backward-compatible opt-out behavior.
+  final bool allowFullscreen;
+
+  /// Title used by the full-window preview page.
+  final String fullscreenTitle;
+
+  /// Optional maximum rendered PDF page width.
+  ///
+  /// When omitted, [width] is used when supplied; otherwise the embedded
+  /// preview keeps the historical 700 logical-pixel limit.
+  final double? maxPageWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -120,64 +136,70 @@ class GeniusPdfPreviewWidget extends StatelessWidget {
           _buildErrorState(context, error);
     }
 
-    // PdfPreview contains flex children and therefore must never receive an
-    // unbounded vertical constraint. This commonly happens when the preview is
-    // embedded in SingleChildScrollView or another shrink-wrapping parent.
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final resolvedHeight =
-            height ?? _resolvePreviewHeight(context, constraints);
-
-        return SizedBox(
-          width: width,
-          height: resolvedHeight,
-          child: PdfPreview(
-            build: (_) => pdfData,
-            canChangeOrientation: canChangeOrientation,
-            canChangePageFormat: canChangePageFormat,
-            canDebug: false,
-            maxPageWidth: width ?? 700,
-            padding: const EdgeInsets.all(8),
-            actions: const [],
-            loadingWidget: loadingWidget ?? _buildDefaultLoading(context),
-            onError: errorBuilder ?? _buildErrorState,
-            useActions: false,
-            shouldRepaint: false,
-            pdfPreviewPageDecoration: const BoxDecoration(
-              color: Colors.white,
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
+    final preview = PdfPreview(
+      build: (_) => pdfData,
+      canChangeOrientation: canChangeOrientation,
+      canChangePageFormat: canChangePageFormat,
+      canDebug: false,
+      maxPageWidth: maxPageWidth ?? width ?? 700,
+      padding: const EdgeInsets.all(8),
+      actions: const [],
+      loadingWidget: loadingWidget ?? _buildDefaultLoading(context),
+      onError: errorBuilder ?? _buildErrorState,
+      useActions: false,
+      shouldRepaint: false,
+      pdfPreviewPageDecoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: Offset(0, 4),
           ),
-        );
-      },
+        ],
+      ),
+    );
+
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        children: <Widget>[
+          Positioned.fill(child: preview),
+          if (allowFullscreen)
+            PositionedDirectional(
+              top: 12,
+              end: 12,
+              child: Material(
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                elevation: 2,
+                shape: const CircleBorder(),
+                clipBehavior: Clip.antiAlias,
+                child: IconButton(
+                  tooltip: 'Full screen',
+                  onPressed: () => _openFullscreen(context),
+                  icon: const Icon(Icons.fullscreen_rounded),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
-  double _resolvePreviewHeight(
-    BuildContext context,
-    BoxConstraints constraints,
-  ) {
-    if (constraints.hasBoundedHeight && constraints.maxHeight.isFinite) {
-      return constraints.maxHeight;
-    }
-
-    final viewportHeight = MediaQuery.sizeOf(context).height;
-    var fallbackHeight = (viewportHeight * 0.72).clamp(480.0, 900.0).toDouble();
-
-    // Respect a finite minimum imposed by the caller while still guaranteeing
-    // that the height passed to PdfPreview is finite.
-    if (constraints.minHeight.isFinite &&
-        constraints.minHeight > fallbackHeight) {
-      fallbackHeight = constraints.minHeight;
-    }
-
-    return fallbackHeight;
+  Future<void> _openFullscreen(BuildContext context) {
+    return Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => _GeniusPdfFullscreenPreviewPage(
+          title: fullscreenTitle,
+          pdfData: pdfData,
+          canChangeOrientation: canChangeOrientation,
+          canChangePageFormat: canChangePageFormat,
+          loadingWidget: loadingWidget,
+          errorBuilder: errorBuilder,
+        ),
+      ),
+    );
   }
 
   Widget _buildDefaultLoading(BuildContext context) => Center(
@@ -218,6 +240,59 @@ class GeniusPdfPreviewWidget extends StatelessWidget {
           ],
         ),
       );
+}
+
+class _GeniusPdfFullscreenPreviewPage extends StatelessWidget {
+  const _GeniusPdfFullscreenPreviewPage({
+    required this.title,
+    required this.pdfData,
+    required this.canChangeOrientation,
+    required this.canChangePageFormat,
+    this.loadingWidget,
+    this.errorBuilder,
+  });
+
+  final String title;
+  final Uint8List pdfData;
+  final bool canChangeOrientation;
+  final bool canChangePageFormat;
+  final Widget? loadingWidget;
+  final Widget Function(BuildContext, Object?)? errorBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        actions: <Widget>[
+          IconButton(
+            tooltip: 'Close full screen',
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: const Icon(Icons.fullscreen_exit_rounded),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final availableWidth = constraints.maxWidth > 32
+                ? constraints.maxWidth - 32
+                : constraints.maxWidth;
+            return GeniusPdfPreviewWidget(
+              pdfData: pdfData,
+              canChangeOrientation: canChangeOrientation,
+              canChangePageFormat: canChangePageFormat,
+              loadingWidget: loadingWidget,
+              errorBuilder: errorBuilder,
+              allowFullscreen: false,
+              fullscreenTitle: title,
+              maxPageWidth: availableWidth,
+            );
+          },
+        ),
+      ),
+    );
+  }
 }
 
 class GeniusPdfFilePreviewPage extends StatelessWidget {
@@ -366,7 +441,12 @@ class GeniusPdfPreviewDialog extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(child: GeniusPdfPreviewWidget(pdfData: pdfData)),
+            Expanded(
+              child: GeniusPdfPreviewWidget(
+                pdfData: pdfData,
+                fullscreenTitle: title,
+              ),
+            ),
           ],
         ),
       ),

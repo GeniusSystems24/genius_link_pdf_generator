@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_syntax_view/flutter_syntax_view.dart';
-import 'package:genius_pdf_example/app/theme/app_theme.dart';
+import 'package:super_core/super_core.dart';
 
 class CodeViewer extends StatelessWidget {
   const CodeViewer({
@@ -9,111 +9,95 @@ class CodeViewer extends StatelessWidget {
     required this.code,
     this.language = Syntax.DART,
     this.height,
+    this.title = 'Dart usage code',
   });
 
   final String code;
   final Syntax language;
   final double? height;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: themeController,
-      builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = Theme.of(context).colorScheme;
+    final t = context.superTheme;
+    final text = context.superTextTheme;
 
-        return Container(
-          height: height ?? 300,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+    return Container(
+      height: height ?? 320,
+      decoration: BoxDecoration(
+        borderRadius: t.spacing.cardBorderRadius,
+        border: Border.all(color: colors.outlineVariant),
+        color: colors.surfaceContainerLow,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: t.spacing.space3,
+              vertical: t.spacing.space2,
             ),
-            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                color:
-                    isDark ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? Colors.blue.withValues(alpha: 0.2)
-                                : Colors.blue.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Icon(
-                            Icons.code_rounded,
-                            size: 14,
-                            color: isDark ? Colors.blue[200] : Colors.blue[700],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Example Code',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white70 : Colors.black87,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.copy_rounded, size: 16),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: code));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Code copied to clipboard',
-                              style: TextStyle(
-                                color: isDark ? Colors.black : Colors.white,
-                              ),
-                            ),
-                            behavior: SnackBarBehavior.floating,
-                            backgroundColor:
-                                isDark ? Colors.white : Colors.black87,
-                          ),
-                        );
-                      },
-                      tooltip: 'Copy Code',
-                      style: IconButton.styleFrom(
-                        visualDensity: VisualDensity.compact,
-                        foregroundColor:
-                            isDark ? Colors.white70 : Colors.black54,
+            decoration: BoxDecoration(
+              color: colors.surfaceContainer,
+              border: Border(
+                bottom: BorderSide(color: colors.outlineVariant),
+              ),
+            ),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: colors.primaryContainer,
+                    borderRadius: BorderRadius.circular(t.spacing.radiusControl),
+                  ),
+                  child: Icon(
+                    Icons.code_rounded,
+                    size: 16,
+                    color: colors.onPrimaryContainer,
+                  ),
+                ),
+                SizedBox(width: t.spacing.space2),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: text.labelMd.copyWith(color: t.fg1),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.copy_rounded, size: 18),
+                  tooltip: 'Copy code',
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: code));
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content: Text('Code copied to clipboard'),
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              ),
-              Expanded(
-                child: SyntaxView(
-                  code: code,
-                  syntax: language,
-                  syntaxTheme:
-                      isDark ? SyntaxTheme.dracula() : SyntaxTheme.ayuLight(),
-                  fontSize: 12.0,
-                  withZoom: false,
-                  withLinesCount: true,
-                  expanded: true,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        );
-      },
+          Expanded(
+            child: SyntaxView(
+              code: code,
+              syntax: language,
+              syntaxTheme: isDark ? SyntaxTheme.dracula() : SyntaxTheme.ayuLight(),
+              fontSize: 12,
+              withZoom: false,
+              withLinesCount: true,
+              expanded: true,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

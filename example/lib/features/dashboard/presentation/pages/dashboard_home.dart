@@ -1,831 +1,105 @@
-// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:genius_pdf_example/app/theme/app_theme.dart';
-import 'package:genius_pdf_example/features/dashboard/presentation/widgets/dashboard_widgets.dart';
+import 'package:super_core/super_core.dart';
 
-/// Modern Dashboard Home Screen
+import 'package:genius_pdf_example/shared/presentation/widgets/example_page_shell.dart';
+import 'package:genius_pdf_example/shared/presentation/widgets/example_section.dart';
+import 'package:genius_pdf_example/shared/presentation/widgets/feature_card.dart';
+
 class DashboardHome extends StatelessWidget {
-  final Function(String) onNavigate;
-
   const DashboardHome({super.key, required this.onNavigate});
+
+  final ValueChanged<String> onNavigate;
 
   @override
   Widget build(BuildContext context) {
-    // Get theme from context for responsiveness
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isWide = screenWidth > 1200;
-    final isMedium = screenWidth > 800;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 32),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeroSection(context, isDark, theme),
-          const SizedBox(height: 32),
-          _buildQuickActions(isDark),
-          const SizedBox(height: 48),
-          _buildStatsGrid(isDark, isWide, isMedium),
-          const SizedBox(height: 48),
-          _buildFeatureSpotlight(isDark, isWide),
-          const SizedBox(height: 48),
-          _buildBottomGrid(isDark, isWide),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeroSection(BuildContext context, bool isDark, ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  AppColors.primaryDark,
-                  AppColors.darkSurface,
-                ]
-              : [
-                  AppColors.primary,
-                  AppColors.primaryLight,
-                ],
+    return ExamplePageShell(
+      title: 'Genius Link PDF Generator',
+      description:
+          'Explore document generation, reusable PDF components, RTL/LTR behavior, templates, delivery workflows, job queues, security, and advanced package modules without losing any existing example coverage.',
+      leading: const Icon(Icons.picture_as_pdf_outlined),
+      actions: <Widget>[
+        FilledButton.icon(
+          onPressed: () => onNavigate('examples'),
+          icon: const Icon(Icons.play_arrow_rounded),
+          label: const Text('Open showcase'),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Decorative background circles
-          Positioned(
-            right: -20,
-            top: -20,
-            child: Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Positioned(
-            left: -40,
-            bottom: -40,
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-
-          Row(
-            children: [
-              _QuickActionCard(
-                label: 'S24 Performance & Regression',
-                icon: Icons.speed_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s24_performance_regression'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S25 Template Designer',
-                icon: Icons.design_services_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s25_template_designer'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S26 Industry / Plugin Packs',
-                icon: Icons.extension_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s26_industry_packs'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S21 CRM Pack',
-                icon: Icons.people_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s21_crm_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S22 Template Engine vNext',
-                icon: Icons.settings_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s22_template_engine_vnext'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S23 Compliance, Signing & Archival',
-                icon: Icons.security_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s23_compliance_signing_archival'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S19 Fixed Assets & Projects Pack',
-                icon: Icons.business_center_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s19_fixed_assets_projects_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S20 Maintenance, Service & Logistics Pack',
-                icon: Icons.local_shipping_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s20_maintenance_service_logistics_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S17 HR & Payroll Pack',
-                icon: Icons.people_alt_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s17_hr_payroll_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S18 Manufacturing & Quality Pack',
-                icon: Icons.precision_manufacturing_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s18_manufacturing_quality_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S14 Accounting & Finance Pack',
-                icon: Icons.account_balance_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s14_accounting_finance_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S15 Inventory & WMS Pack',
-                icon: Icons.inventory_2_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s15_inventory_wms_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S16 POS & Retail Pack',
-                icon: Icons.point_of_sale_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s16_pos_retail_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S12 Sales ERP Pack',
-                icon: Icons.point_of_sale_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s12_sales_erp_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S13 Purchasing ERP Pack',
-                icon: Icons.shopping_cart_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s13_purchasing_erp_pack'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S10 Template Family Consolidation',
-                icon: Icons.hub_rounded,
-                color: AppColors.info,
-                onTap: () =>
-                    onNavigate('s10_template_family_consolidation'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S11 Print Profiles',
-                icon: Icons.print_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s11_print_profiles'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S08 ERP Document Families',
-                icon: Icons.account_tree_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s08_erp_document_families'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S09 Migrated Transaction Templates',
-                icon: Icons.description_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s09_migrated_transaction_templates'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S07 ERP Semantic Components',
-                icon: Icons.widgets_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s07_erp_semantic_components'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S06 ERP Domain & Calculations',
-                icon: Icons.calculate_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s06_erp_domain_calculation'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S05 Formatting & Theme',
-                icon: Icons.format_paint_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s05_formatting_theme'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S04 DataGrid vNext',
-                icon: Icons.table_chart_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s04_data_grid_vnext'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S03 Flow Layout',
-                icon: Icons.view_stream_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s03_flow_layout'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'S02 Components RTL',
-                icon: Icons.compare_arrows_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s02_components_rtl'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.star_rounded,
-                              color: Colors.amber, size: 16),
-                          SizedBox(width: 8),
-                          Text(
-                            'v4.0.0 — S00 Baseline',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Welcome to Genius PDF',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -1,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'The most powerful Flutter PDF generation library. Create invoices, reports, and documents with RTL support.',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () => onNavigate('examples'),
-                          icon: const Icon(Icons.play_arrow_rounded),
-                          label: const Text('View Examples'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
-                          ),
-                        ),
-                        OutlinedButton.icon(
-                          onPressed: () => onNavigate('new_templates'),
-                          icon: const Icon(Icons.dashboard_customize_rounded),
-                          label: const Text('Browse Templates'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            side: const BorderSide(color: Colors.white),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              if (MediaQuery.of(context).size.width > 800) ...[
-                const SizedBox(width: 48),
-                Container(
-                  width: 140,
-                  height: 140,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(32),
-                    border:
-                        Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.picture_as_pdf_rounded,
-                      size: 64,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActions(bool isDark) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Actions',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: isDark ? AppColors.darkText : AppColors.lightText,
-          ),
+        OutlinedButton.icon(
+          onPressed: () => onNavigate('s00_baseline'),
+          icon: const Icon(Icons.fact_check_outlined),
+          label: const Text('Getting started'),
         ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 120,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            clipBehavior: Clip.none,
-            children: [
-              _QuickActionCard(
-                label: 'S01 Directionality',
-                icon: Icons.swap_horiz_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('s01_directionality'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'New Invoice',
-                icon: Icons.receipt_long_rounded,
-                color: AppColors.primary,
-                onTap: () => onNavigate('invoices'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'Financial Report',
-                icon: Icons.analytics_rounded,
-                color: AppColors.success,
-                onTap: () => onNavigate('financial'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'Export Data',
-                icon: Icons.upload_file_rounded,
-                color: AppColors.warning,
-                onTap: () => onNavigate('export'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'Print',
-                icon: Icons.print_rounded,
-                color: AppColors.info,
-                onTap: () => onNavigate('printing'),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              _QuickActionCard(
-                label: 'Scan QR',
-                icon: Icons.qr_code_scanner_rounded,
-                color: AppColors.secondary,
-                onTap: () => onNavigate('barcodes'),
-                isDark: isDark,
-              ),
+      ],
+      children: <Widget>[
+        _PackageSummary(onNavigate: onNavigate),
+        _FeatureGrid(onNavigate: onNavigate),
+        ExampleSection(
+          title: 'Coverage is preserved',
+          description:
+              'The navigation keeps the original S00-S26 verification modules and all existing demos as separate destinations. Similar examples are grouped together rather than merged or removed.',
+          leading: const Icon(Icons.verified_outlined),
+          child: Wrap(
+            spacing: context.superTheme.spacing.space2,
+            runSpacing: context.superTheme.spacing.space2,
+            children: const <Widget>[
+              Chip(label: Text('S00-S26 modules')),
+              Chip(label: Text('Components')),
+              Chip(label: Text('Templates')),
+              Chip(label: Text('Reports')),
+              Chip(label: Text('Export')),
+              Chip(label: Text('Printing')),
+              Chip(label: Text('Sharing')),
+              Chip(label: Text('Security')),
+              Chip(label: Text('Job queue')),
+              Chip(label: Text('AI / Advanced')),
             ],
           ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildStatsGrid(bool isDark, bool isWide, bool isMedium) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final childAspectRatio = isWide ? 1.4 : (isMedium ? 1.6 : 2.5);
+class _PackageSummary extends StatelessWidget {
+  const _PackageSummary({required this.onNavigate});
 
-        return GridView(
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 300,
-            mainAxisSpacing: 24,
-            crossAxisSpacing: 24,
-            childAspectRatio: childAspectRatio,
-          ),
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            StatCard(
-              title: 'Components',
-              value: '15+',
-              subtitle: 'Core Widgets',
-              icon: Icons.widgets_rounded,
-              gradient: AppColors.primaryGradient,
-              change: 'Updated',
-              onTap: () => onNavigate('components'),
-            ),
-            StatCard(
-              title: 'Templates',
-              value: '24',
-              subtitle: 'Ready to use',
-              icon: Icons.description_rounded,
-              gradient: AppColors.successGradient,
-              change: '+4 New',
-              onTap: () => onNavigate('templates'),
-            ),
-            StatCard(
-              title: 'Barcodes',
-              value: '10+',
-              subtitle: 'QR & More',
-              icon: Icons.qr_code_rounded,
-              gradient: AppColors.warningGradient,
-              change: 'ZATCA',
-              onTap: () => onNavigate('barcodes'),
-            ),
-            StatCard(
-              title: 'Formats',
-              value: '5',
-              subtitle: 'Export Options',
-              icon: Icons.file_download_rounded,
-              gradient: AppColors.infoGradient,
-              change: 'Multi',
-              onTap: () => onNavigate('export'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  final ValueChanged<String> onNavigate;
 
-  Widget _buildFeatureSpotlight(bool isDark, bool isWide) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Feature Spotlight',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? AppColors.darkText : AppColors.lightText,
-              ),
-            ),
-            TextButton(
-              onPressed: () => onNavigate('advanced'),
-              child: const Text('View All'),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final cardWidth = isWide
-                ? (constraints.maxWidth - 48) / 3
-                : (constraints.maxWidth);
-
-            return Wrap(
-              spacing: 24,
-              runSpacing: 24,
-              children: [
-                SizedBox(
-                  width: cardWidth,
-                  child: FeatureCard(
-                    title: 'Smart Tables',
-                    description: 'RTL support, pagination, custom styling',
-                    icon: Icons.table_chart_rounded,
-                    gradient: AppColors.primaryGradient,
-                    tags: const ['RTL', 'Paginated'],
-                    onTap: () => onNavigate('data_grid'),
-                  ),
-                ),
-                SizedBox(
-                  width: cardWidth,
-                  child: FeatureCard(
-                    title: 'Rich Text',
-                    description: 'Styled mixed content with inline formatting',
-                    icon: Icons.text_fields_rounded,
-                    gradient: AppColors.purpleGradient,
-                    tags: const ['Markdown', 'HTML'],
-                    onTap: () => onNavigate('rich_text'),
-                  ),
-                ),
-                SizedBox(
-                  width: cardWidth,
-                  child: FeatureCard(
-                    title: 'AI Assistant',
-                    description: 'Content generation and layout optimization',
-                    icon: Icons.smart_toy_rounded,
-                    gradient: AppColors.tealGradient,
-                    tags: const ['Smart', 'Beta'],
-                    isPro: true,
-                    onTap: () => onNavigate('ai_features'),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottomGrid(bool isDark, bool isWide) {
-    return isWide
-        ? Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(flex: 3, child: _buildTemplatesList(isDark)),
-              const SizedBox(width: 32),
-              Expanded(flex: 2, child: _buildActivityFeed(isDark)),
-            ],
-          )
-        : Column(
-            children: [
-              _buildTemplatesList(isDark),
-              const SizedBox(height: 32),
-              _buildActivityFeed(isDark),
-            ],
-          );
-  }
-
-  Widget _buildTemplatesList(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+  @override
+  Widget build(BuildContext context) {
+    return ExampleSection(
+      title: 'Start with the workflow you need',
+      description:
+          'The example application is organized by responsibility instead of release sequence. Screen codes remain searchable for developers who know the S00-S26 module names.',
+      leading: const Icon(Icons.route_outlined),
+      child: Wrap(
+        spacing: context.superTheme.spacing.space2,
+        runSpacing: context.superTheme.spacing.space2,
+        children: <Widget>[
+          ActionChip(
+            avatar: const Icon(Icons.widgets_outlined, size: 18),
+            label: const Text('Components'),
+            onPressed: () => onNavigate('components'),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionHeader(
-            title: 'Popular Templates',
-            subtitle: 'Start with a pre-built design',
-            icon: Icons.folder_special_rounded,
+          ActionChip(
+            avatar: const Icon(Icons.description_outlined, size: 18),
+            label: const Text('Templates'),
+            onPressed: () => onNavigate('templates'),
           ),
-          const SizedBox(height: 16),
-          _buildTemplateRow(
-            'Tax Invoice',
-            'ZATCA compliant, QR code',
-            Icons.receipt,
-            AppColors.primaryGradient,
-            () => onNavigate('invoices'),
-            isDark,
+          ActionChip(
+            avatar: const Icon(Icons.work_history_outlined, size: 18),
+            label: const Text('Job queue'),
+            onPressed: () => onNavigate('job_manager'),
           ),
-          _buildTemplateRow(
-            'Payslip',
-            'Earnings, deductions, net',
-            Icons.payments_rounded,
-            AppColors.successGradient,
-            () => onNavigate('hr'),
-            isDark,
+          ActionChip(
+            avatar: const Icon(Icons.print_outlined, size: 18),
+            label: const Text('Printing'),
+            onPressed: () => onNavigate('printing'),
           ),
-          _buildTemplateRow(
-            'Sales Offer',
-            'Quotation with terms',
-            Icons.local_offer_rounded,
-            AppColors.orangeGradient,
-            () => onNavigate('sales'),
-            isDark,
-          ),
-          _buildTemplateRow(
-            'Certificate',
-            'Award and completion',
-            Icons.workspace_premium_rounded,
-            AppColors.purpleGradient,
-            () => onNavigate('templates'),
-            isDark,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTemplateRow(
-    String title,
-    String subtitle,
-    IconData icon,
-    List<Color> gradient,
-    VoidCallback onTap,
-    bool isDark,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: gradient),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: Colors.white, size: 20),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color:
-                              isDark ? AppColors.darkText : AppColors.lightText,
-                        ),
-                      ),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 14,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActivityFeed(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionHeader(
-            title: 'Recent Updates',
-            subtitle: 'New features & fixes',
-            icon: Icons.history_rounded,
-          ),
-          const SizedBox(height: 24),
-          // Timeline Style
-          Stack(
-            children: [
-              Positioned(
-                left: 19,
-                top: 0,
-                bottom: 0,
-                child: Container(
-                  width: 2,
-                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-                ),
-              ),
-              Column(
-                children: const [
-                  ActivityItem(
-                    title: 'Config Instance Pattern',
-                    description: 'Removed singleton, added builder config',
-                    time: 'Just now',
-                    icon: Icons.architecture_rounded,
-                    color: AppColors.primary,
-                  ),
-                  ActivityItem(
-                    title: 'App Sharing',
-                    description: 'WhatsApp & Telegram integration',
-                    time: '1 day ago',
-                    icon: Icons.share_rounded,
-                    color: AppColors.success,
-                  ),
-                  ActivityItem(
-                    title: 'Report Headers',
-                    description: 'Fixed bilingual RTL layout',
-                    time: '3 days ago',
-                    icon: Icons.article_rounded,
-                    color: AppColors.warning,
-                  ),
-                  ActivityItem(
-                    title: 'Dark Mode',
-                    description: 'Full dark theme support',
-                    time: '1 week ago',
-                    icon: Icons.dark_mode_rounded,
-                    color: AppColors.secondary,
-                  ),
-                ],
-              ),
-            ],
+          ActionChip(
+            avatar: const Icon(Icons.speed_outlined, size: 18),
+            label: const Text('Performance'),
+            onPressed: () => onNavigate('s24_performance_regression'),
           ),
         ],
       ),
@@ -833,64 +107,106 @@ class DashboardHome extends StatelessWidget {
   }
 }
 
-class _QuickActionCard extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-  final bool isDark;
+class _FeatureGrid extends StatelessWidget {
+  const _FeatureGrid({required this.onNavigate});
 
-  const _QuickActionCard({
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-    required this.isDark,
-  });
+  final ValueChanged<String> onNavigate;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          width: 120,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkCard : AppColors.lightCard,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: color, size: 24),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkText : AppColors.lightText,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
+    final items = <_DashboardFeature>[
+      const _DashboardFeature(
+        id: 's03_flow_layout',
+        title: 'Document Builder',
+        description: 'Flow layout, pagination, page setup, and document construction.',
+        icon: Icons.view_stream_outlined,
       ),
+      const _DashboardFeature(
+        id: 'components',
+        title: 'Components',
+        description: 'Tables, summaries, headers, rich text, info boxes, QR combinations, and RTL cases.',
+        icon: Icons.widgets_outlined,
+      ),
+      const _DashboardFeature(
+        id: 'business_balance_sheet',
+        title: 'Business Templates',
+        description: 'Open a dedicated business-template example; choose other financial, sales, and HR templates from the sidebar.',
+        icon: Icons.business_center_outlined,
+      ),
+      const _DashboardFeature(
+        id: 'template_engine',
+        title: 'Template Engine',
+        description: 'Built-in templates, JSON-backed templates, vNext engine, consolidation, and designer examples.',
+        icon: Icons.account_tree_outlined,
+      ),
+      const _DashboardFeature(
+        id: 'export',
+        title: 'Delivery',
+        description: 'Export, save/open workflows, sharing, printing profiles, and security/compliance examples.',
+        icon: Icons.outbox_outlined,
+      ),
+      const _DashboardFeature(
+        id: 'job_manager',
+        title: 'Background Generation',
+        description: 'Job manager, queues, batch/background workflows, status, and result handling.',
+        icon: Icons.work_history_outlined,
+      ),
+      const _DashboardFeature(
+        id: 'v2_architecture',
+        title: 'Architecture',
+        description: 'Application integration, advanced APIs, ERP domain calculations, and extension points.',
+        icon: Icons.architecture_outlined,
+      ),
+      const _DashboardFeature(
+        id: 's24_performance_regression',
+        title: 'Benchmark & Performance',
+        description: 'Regression verification and performance-oriented examples.',
+        icon: Icons.speed_outlined,
+      ),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth >= 1200
+            ? 4
+            : constraints.maxWidth >= 760
+                ? 2
+                : 1;
+        final gap = context.superTheme.spacing.space4;
+        final width = columns == 1
+            ? constraints.maxWidth
+            : (constraints.maxWidth - gap * (columns - 1)) / columns;
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: <Widget>[
+            for (final item in items)
+              SizedBox(
+                width: width,
+                child: ExampleFeatureCard(
+                  title: item.title,
+                  description: item.description,
+                  icon: item.icon,
+                  onTap: () => onNavigate(item.id),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
+}
+
+class _DashboardFeature {
+  const _DashboardFeature({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
+
+  final String id;
+  final String title;
+  final String description;
+  final IconData icon;
 }

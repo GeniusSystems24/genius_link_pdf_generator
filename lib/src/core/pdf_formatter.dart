@@ -28,7 +28,6 @@ enum GeniusPdfNegativeFormat { minus, accounting }
 
 /// Shared policy for null values.
 class GeniusPdfNullPlaceholderPolicy {
-  const GeniusPdfNullPlaceholderPolicy._(this.placeholder);
   const GeniusPdfNullPlaceholderPolicy.empty() : placeholder = '';
   const GeniusPdfNullPlaceholderPolicy.dash() : placeholder = '-';
   const GeniusPdfNullPlaceholderPolicy.emDash() : placeholder = '—';

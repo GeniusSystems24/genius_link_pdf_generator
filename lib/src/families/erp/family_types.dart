@@ -1,7 +1,4 @@
 
-import '../../core/directionality.dart';
-import '../../core/pdf_config.dart';
-import '../../core/pdf_theme.dart';
 import 'family_document.dart';
 import 'family_models.dart';
 

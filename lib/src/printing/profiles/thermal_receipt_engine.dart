@@ -115,7 +115,7 @@ GeniusPdfConfig _thermalReceiptConfig(
 
   // Variable-height receipt. The estimate deliberately includes generous
   // wrapping allowance so the generated page does not clip at the cut edge.
-  int _estimatedThermalItemLines(
+  int estimatedThermalItemLines(
     GeniusPdfThermalLineItem item,
   ) {
     final longest = item.description.length >
@@ -132,7 +132,7 @@ GeniusPdfConfig _thermalReceiptConfig(
   final itemHeight = data.items.fold<double>(
     0,
     (sum, item) =>
-        sum + 18 + _estimatedThermalItemLines(item) * 16,
+        sum + 18 + estimatedThermalItemLines(item) * 16,
   );
   final paymentHeight = data.payments.length * 18.0;
   final codesHeight =

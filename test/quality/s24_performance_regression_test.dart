@@ -92,7 +92,7 @@ void main() {
   });
 
   test('golden manifest covers component family pack and directions', () {
-    final manifest = GeniusPdfGoldenManifest.core;
+    const manifest = GeniusPdfGoldenManifest.core;
     expect(
       manifest.cases.any(
         (item) => item.kind == GeniusPdfRegressionSubjectKind.component,

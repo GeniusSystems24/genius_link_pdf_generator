@@ -9,6 +9,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'share_models.dart';
 
+
+Future<ShareResult> _shareFiles(
+  List<XFile> files, {
+  String? subject,
+  String? text,
+}) =>
+    SharePlus.instance.share(
+      ShareParams(
+        files: files,
+        subject: subject,
+        text: text,
+      ),
+    );
 /// Unified sharing service for PDF files.
 ///
 /// Provides a single interface for sharing PDFs through various channels:
@@ -251,7 +264,7 @@ class GeniusShareService {
     String? body,
   ) async {
     try {
-      final result = await Share.shareXFiles(
+      final result = await _shareFiles(
         [XFile(file.path)],
         subject: subject,
         text: body,
@@ -298,7 +311,7 @@ class GeniusShareService {
           _config.defaultBody ??
           '';
 
-      final result = await Share.shareXFiles(
+      final result = await _shareFiles(
         [XFile(file.path)],
         subject: emailSubject,
         text: emailBody,
@@ -334,7 +347,7 @@ class GeniusShareService {
     // Bluetooth sharing will be implemented in v2.3.2
     // For now, use system share
     try {
-      final result = await Share.shareXFiles([XFile(file.path)]);
+      final result = await _shareFiles([XFile(file.path)]);
 
       if (result.status == ShareResultStatus.success) {
         return GeniusShareResult.success(
@@ -368,7 +381,7 @@ class GeniusShareService {
     // Direct app sharing will be enhanced in v2.3.3
     // For now, use system share
     try {
-      final result = await Share.shareXFiles(
+      final result = await _shareFiles(
         [XFile(file.path)],
         subject: subject,
         text: body,
@@ -406,7 +419,7 @@ class GeniusShareService {
     // For now, use system share
     try {
       onProgress?.call(0.5);
-      final result = await Share.shareXFiles([XFile(file.path)]);
+      final result = await _shareFiles([XFile(file.path)]);
       onProgress?.call(0.9);
 
       if (result.status == ShareResultStatus.success) {

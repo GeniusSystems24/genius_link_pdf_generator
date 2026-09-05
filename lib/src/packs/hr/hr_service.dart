@@ -816,7 +816,7 @@ class GeniusHrPayrollService {
         cells: {
           'type': 'Earning',
           'code': 'BASE',
-          'description': GeniusErpPackLocalizedValue(
+          'description': const GeniusErpPackLocalizedValue(
             value: 'Base Salary',
             valueAr: 'الراتب الأساسي',
           ),
@@ -854,7 +854,7 @@ class GeniusHrPayrollService {
         cells: {
           'type': 'Net',
           'code': '',
-          'description': GeniusErpPackLocalizedValue(
+          'description': const GeniusErpPackLocalizedValue(
             value: 'Net Pay',
             valueAr: 'صافي الراتب',
           ),

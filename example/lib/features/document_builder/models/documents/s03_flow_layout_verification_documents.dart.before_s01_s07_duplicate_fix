@@ -1,0 +1,3026 @@
+Future<Uint8List> buildS03OnePageVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S03FlowLayoutDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S03FlowLayoutScenario.onePage,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S03FlowLayoutVerificationPage.
+enum S03FlowLayoutScenario {
+  onePage,
+  fiftyRows,
+  fiveHundredRows,
+  keepTogether,
+  repeatedHeaders,
+  longNotes,
+  pageMetadata,
+  customLandscape,
+  compatibilityAdapter,
+}
+
+class S03FlowLayoutDocument extends GeniusPdfDocumentBuilder {
+  S03FlowLayoutDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S03FlowLayoutScenario scenario;
+
+  bool get _rtl =>
+      directionality.resolve().direction ==
+      GeniusPdfResolvedDirection.rtl;
+
+  String _rowText(int index) => _rtl
+      ? 'السطر ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR'
+      : 'Row ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR';
+
+  PdfTextBand _header({
+    String id = 'page-header',
+    String text = 'ERP FLOW REPORT',
+    String textAr = 'تقرير تدفق ERP',
+  }) {
+    return PdfTextBand(
+      id: id,
+      text: text,
+      textAr: textAr,
+      height: 28,
+      placement: PdfBandPlacement.top,
+      kind: PdfBandKind.pageHeader,
+      font: config.boldFont,
+    );
+  }
+
+  PdfPageNumberBand _pageNumbers() {
+    return const PdfPageNumberBand(
+      id: 'page-x-of-y',
+      scope: PdfPageNumberScope.section,
+      height: 22,
+    );
+  }
+
+  List<PdfBlock> _rows(
+    int count, {
+    double padding = 2,
+  }) {
+    return List<PdfBlock>.generate(
+      count,
+      (index) => PdfTextBlock(
+        id: 'row-$index',
+        text: _rowText(index),
+        paddingTop: padding,
+        paddingBottom: padding,
+        minOrphanLines: 1,
+        minWidowLines: 1,
+      ),
+    );
+  }
+
+  @override
+  void build() {
+    switch (scenario) {
+      case S03FlowLayoutScenario.onePage:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'one-page',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(12),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiftyRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'fifty-rows',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(50),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiveHundredRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'five-hundred-rows',
+            directionality: directionality,
+            pageHeader: _header(
+              text: '500 ROW STRESS FLOW',
+              textAr: 'اختبار تدفق 500 سطر',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(500, padding: 1),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.keepTogether:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'keep-together',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              ..._rows(28),
+              PdfKeepTogether(
+                PdfCallbackBlock(
+                  id: 'keep-together-card',
+                  measureCallback: (_) =>
+                      const PdfBlockMeasurement(height: 125),
+                  renderCallback: (context) {
+                    context.page.graphics.drawRectangle(
+                      pen: PdfPen(PdfColor(80, 80, 80)),
+                      bounds: context.bounds,
+                    );
+                    context.page.graphics.drawString(
+                      _rtl
+                          ? 'هذه البطاقة يجب أن تبقى كاملة في صفحة واحدة'
+                          : 'This card must remain together on one page',
+                      config.boldFont,
+                      bounds: context.bounds.deflate(10),
+                      format: PdfStringFormat(
+                        alignment: _rtl
+                            ? PdfTextAlignment.right
+                            : PdfTextAlignment.left,
+                        textDirection: _rtl
+                            ? PdfTextDirection.rightToLeft
+                            : PdfTextDirection.leftToRight,
+                      ),
+                    );
+                    return const PdfBlockRenderResult(
+                      usedHeight: 125,
+                    );
+                  },
+                ),
+              ),
+              PdfTextBlock(
+                id: 'keep-with-next-heading',
+                text: _rtl ? 'عنوان القسم' : 'Section heading',
+                font: config.boldFont,
+                breakPolicy: const PdfPageBreakPolicy(
+                  keepWithNext: true,
+                ),
+              ),
+              PdfFixedBlock(
+                id: 'keep-with-next-detail',
+                height: 100,
+                renderer: (context) {
+                  context.page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(120, 120, 120)),
+                    bounds: context.bounds,
+                  );
+                  return const PdfBlockRenderResult(
+                    usedHeight: 100,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.repeatedHeaders:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'repeated',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            repeatableBands: [
+              PdfRepeatableBand(
+                id: 'table-header',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.tableHeader,
+                child: PdfTextBand(
+                  text: 'Item | Document | Amount',
+                  textAr: 'الصنف | المستند | المبلغ',
+                  height: 24,
+                  placement: PdfBandPlacement.top,
+                  kind: PdfBandKind.tableHeader,
+                  font: config.boldFont,
+                ),
+              ),
+            ],
+            blocks: _rows(90),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.longNotes:
+        final note = _rtl
+            ? List<String>.filled(
+                180,
+                'هذه ملاحظة عربية طويلة لاختبار تقسيم النص وحماية الأسطر '
+                    'حول فاصل الصفحة مع الحفاظ على INV-2026-000123 و '
+                    '15,697.50 SAR.',
+              ).join(' ')
+            : List<String>.filled(
+                180,
+                'This is a long ERP note that verifies wrapping, page splitting '
+                    'and orphan/widow protection while preserving '
+                    'INV-2026-000123 and 15,697.50 SAR.',
+              ).join(' ');
+
+        addFlowSection(
+          PdfFlowSection(
+            id: 'long-notes',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfTextBlock(
+                id: 'long-note',
+                text: note,
+                minOrphanLines: 2,
+                minWidowLines: 2,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.pageMetadata:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'metadata',
+            directionality: directionality,
+            firstPageHeader: _header(
+              id: 'first-page-header',
+              text: 'FIRST PAGE — ERP DOCUMENT',
+              textAr: 'الصفحة الأولى — مستند ERP',
+            ),
+            pageHeader: _header(
+              id: 'normal-page-header',
+              text: 'CONTINUED ERP DOCUMENT',
+              textAr: 'متابعة مستند ERP',
+            ),
+            pageFooter: _pageNumbers(),
+            lastPageFooter: PdfTextBand(
+              id: 'last-page-footer',
+              text: 'END OF DOCUMENT',
+              textAr: 'نهاية المستند',
+              height: 24,
+              placement: PdfBandPlacement.bottom,
+              kind: PdfBandKind.pageFooter,
+              font: config.boldFont,
+              alignment: GeniusPdfLogicalAlignment.center,
+            ),
+            repeatableBands: const [
+              PdfRepeatableBand(
+                id: 'original-marker',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.documentMarker,
+                child: PdfDocumentMarkerBand(
+                  text: 'ORIGINAL',
+                  textAr: 'أصل',
+                  placement: PdfBandPlacement.top,
+                ),
+              ),
+              PdfRepeatableBand(
+                id: 'page-number-repeat',
+                placement: PdfBandPlacement.bottom,
+                kind: PdfBandKind.pageFooter,
+                child: PdfPageNumberBand(),
+              ),
+            ],
+            documentStatus: 'POSTED',
+            copyLabel: _rtl ? 'أصل' : 'ORIGINAL',
+            blocks: _rows(75),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.customLandscape:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'custom-landscape',
+            directionality: directionality,
+            pageSpec: const PdfFlowPageSpec(
+              size: Size(420, 595),
+              orientation: PdfPageOrientation.landscape,
+            ),
+            pageHeader: _header(
+              text: 'CUSTOM LANDSCAPE SECTION',
+              textAr: 'قسم أفقي مخصص',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(55),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.compatibilityAdapter:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'legacy-adapter',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfLegacyCallbackBlock(
+                id: 'legacy-callback',
+                estimatedHeight: 100,
+                callback: (page, bounds) {
+                  page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(60, 60, 60)),
+                    bounds: bounds,
+                  );
+                  page.graphics.drawString(
+                    _rtl
+                        ? 'تم الرسم باستخدام callback القديم (PdfPage, Rect)'
+                        : 'Rendered with the legacy (PdfPage, Rect) callback',
+                    config.boldFont,
+                    bounds: bounds.deflate(12),
+                    format: PdfStringFormat(
+                      alignment: _rtl
+                          ? PdfTextAlignment.right
+                          : PdfTextAlignment.left,
+                      textDirection: _rtl
+                          ? PdfTextDirection.rightToLeft
+                          : PdfTextDirection.leftToRight,
+                    ),
+                  );
+                  return 100;
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS03FiftyRowsVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S03FlowLayoutDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S03FlowLayoutScenario.fiftyRows,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S03FlowLayoutVerificationPage.
+enum S03FlowLayoutScenario {
+  onePage,
+  fiftyRows,
+  fiveHundredRows,
+  keepTogether,
+  repeatedHeaders,
+  longNotes,
+  pageMetadata,
+  customLandscape,
+  compatibilityAdapter,
+}
+
+class S03FlowLayoutDocument extends GeniusPdfDocumentBuilder {
+  S03FlowLayoutDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S03FlowLayoutScenario scenario;
+
+  bool get _rtl =>
+      directionality.resolve().direction ==
+      GeniusPdfResolvedDirection.rtl;
+
+  String _rowText(int index) => _rtl
+      ? 'السطر ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR'
+      : 'Row ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR';
+
+  PdfTextBand _header({
+    String id = 'page-header',
+    String text = 'ERP FLOW REPORT',
+    String textAr = 'تقرير تدفق ERP',
+  }) {
+    return PdfTextBand(
+      id: id,
+      text: text,
+      textAr: textAr,
+      height: 28,
+      placement: PdfBandPlacement.top,
+      kind: PdfBandKind.pageHeader,
+      font: config.boldFont,
+    );
+  }
+
+  PdfPageNumberBand _pageNumbers() {
+    return const PdfPageNumberBand(
+      id: 'page-x-of-y',
+      scope: PdfPageNumberScope.section,
+      height: 22,
+    );
+  }
+
+  List<PdfBlock> _rows(
+    int count, {
+    double padding = 2,
+  }) {
+    return List<PdfBlock>.generate(
+      count,
+      (index) => PdfTextBlock(
+        id: 'row-$index',
+        text: _rowText(index),
+        paddingTop: padding,
+        paddingBottom: padding,
+        minOrphanLines: 1,
+        minWidowLines: 1,
+      ),
+    );
+  }
+
+  @override
+  void build() {
+    switch (scenario) {
+      case S03FlowLayoutScenario.onePage:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'one-page',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(12),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiftyRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'fifty-rows',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(50),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiveHundredRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'five-hundred-rows',
+            directionality: directionality,
+            pageHeader: _header(
+              text: '500 ROW STRESS FLOW',
+              textAr: 'اختبار تدفق 500 سطر',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(500, padding: 1),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.keepTogether:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'keep-together',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              ..._rows(28),
+              PdfKeepTogether(
+                PdfCallbackBlock(
+                  id: 'keep-together-card',
+                  measureCallback: (_) =>
+                      const PdfBlockMeasurement(height: 125),
+                  renderCallback: (context) {
+                    context.page.graphics.drawRectangle(
+                      pen: PdfPen(PdfColor(80, 80, 80)),
+                      bounds: context.bounds,
+                    );
+                    context.page.graphics.drawString(
+                      _rtl
+                          ? 'هذه البطاقة يجب أن تبقى كاملة في صفحة واحدة'
+                          : 'This card must remain together on one page',
+                      config.boldFont,
+                      bounds: context.bounds.deflate(10),
+                      format: PdfStringFormat(
+                        alignment: _rtl
+                            ? PdfTextAlignment.right
+                            : PdfTextAlignment.left,
+                        textDirection: _rtl
+                            ? PdfTextDirection.rightToLeft
+                            : PdfTextDirection.leftToRight,
+                      ),
+                    );
+                    return const PdfBlockRenderResult(
+                      usedHeight: 125,
+                    );
+                  },
+                ),
+              ),
+              PdfTextBlock(
+                id: 'keep-with-next-heading',
+                text: _rtl ? 'عنوان القسم' : 'Section heading',
+                font: config.boldFont,
+                breakPolicy: const PdfPageBreakPolicy(
+                  keepWithNext: true,
+                ),
+              ),
+              PdfFixedBlock(
+                id: 'keep-with-next-detail',
+                height: 100,
+                renderer: (context) {
+                  context.page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(120, 120, 120)),
+                    bounds: context.bounds,
+                  );
+                  return const PdfBlockRenderResult(
+                    usedHeight: 100,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.repeatedHeaders:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'repeated',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            repeatableBands: [
+              PdfRepeatableBand(
+                id: 'table-header',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.tableHeader,
+                child: PdfTextBand(
+                  text: 'Item | Document | Amount',
+                  textAr: 'الصنف | المستند | المبلغ',
+                  height: 24,
+                  placement: PdfBandPlacement.top,
+                  kind: PdfBandKind.tableHeader,
+                  font: config.boldFont,
+                ),
+              ),
+            ],
+            blocks: _rows(90),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.longNotes:
+        final note = _rtl
+            ? List<String>.filled(
+                180,
+                'هذه ملاحظة عربية طويلة لاختبار تقسيم النص وحماية الأسطر '
+                    'حول فاصل الصفحة مع الحفاظ على INV-2026-000123 و '
+                    '15,697.50 SAR.',
+              ).join(' ')
+            : List<String>.filled(
+                180,
+                'This is a long ERP note that verifies wrapping, page splitting '
+                    'and orphan/widow protection while preserving '
+                    'INV-2026-000123 and 15,697.50 SAR.',
+              ).join(' ');
+
+        addFlowSection(
+          PdfFlowSection(
+            id: 'long-notes',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfTextBlock(
+                id: 'long-note',
+                text: note,
+                minOrphanLines: 2,
+                minWidowLines: 2,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.pageMetadata:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'metadata',
+            directionality: directionality,
+            firstPageHeader: _header(
+              id: 'first-page-header',
+              text: 'FIRST PAGE — ERP DOCUMENT',
+              textAr: 'الصفحة الأولى — مستند ERP',
+            ),
+            pageHeader: _header(
+              id: 'normal-page-header',
+              text: 'CONTINUED ERP DOCUMENT',
+              textAr: 'متابعة مستند ERP',
+            ),
+            pageFooter: _pageNumbers(),
+            lastPageFooter: PdfTextBand(
+              id: 'last-page-footer',
+              text: 'END OF DOCUMENT',
+              textAr: 'نهاية المستند',
+              height: 24,
+              placement: PdfBandPlacement.bottom,
+              kind: PdfBandKind.pageFooter,
+              font: config.boldFont,
+              alignment: GeniusPdfLogicalAlignment.center,
+            ),
+            repeatableBands: const [
+              PdfRepeatableBand(
+                id: 'original-marker',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.documentMarker,
+                child: PdfDocumentMarkerBand(
+                  text: 'ORIGINAL',
+                  textAr: 'أصل',
+                  placement: PdfBandPlacement.top,
+                ),
+              ),
+              PdfRepeatableBand(
+                id: 'page-number-repeat',
+                placement: PdfBandPlacement.bottom,
+                kind: PdfBandKind.pageFooter,
+                child: PdfPageNumberBand(),
+              ),
+            ],
+            documentStatus: 'POSTED',
+            copyLabel: _rtl ? 'أصل' : 'ORIGINAL',
+            blocks: _rows(75),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.customLandscape:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'custom-landscape',
+            directionality: directionality,
+            pageSpec: const PdfFlowPageSpec(
+              size: Size(420, 595),
+              orientation: PdfPageOrientation.landscape,
+            ),
+            pageHeader: _header(
+              text: 'CUSTOM LANDSCAPE SECTION',
+              textAr: 'قسم أفقي مخصص',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(55),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.compatibilityAdapter:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'legacy-adapter',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfLegacyCallbackBlock(
+                id: 'legacy-callback',
+                estimatedHeight: 100,
+                callback: (page, bounds) {
+                  page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(60, 60, 60)),
+                    bounds: bounds,
+                  );
+                  page.graphics.drawString(
+                    _rtl
+                        ? 'تم الرسم باستخدام callback القديم (PdfPage, Rect)'
+                        : 'Rendered with the legacy (PdfPage, Rect) callback',
+                    config.boldFont,
+                    bounds: bounds.deflate(12),
+                    format: PdfStringFormat(
+                      alignment: _rtl
+                          ? PdfTextAlignment.right
+                          : PdfTextAlignment.left,
+                      textDirection: _rtl
+                          ? PdfTextDirection.rightToLeft
+                          : PdfTextDirection.leftToRight,
+                    ),
+                  );
+                  return 100;
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS03FiveHundredRowsVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S03FlowLayoutDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S03FlowLayoutScenario.fiveHundredRows,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S03FlowLayoutVerificationPage.
+enum S03FlowLayoutScenario {
+  onePage,
+  fiftyRows,
+  fiveHundredRows,
+  keepTogether,
+  repeatedHeaders,
+  longNotes,
+  pageMetadata,
+  customLandscape,
+  compatibilityAdapter,
+}
+
+class S03FlowLayoutDocument extends GeniusPdfDocumentBuilder {
+  S03FlowLayoutDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S03FlowLayoutScenario scenario;
+
+  bool get _rtl =>
+      directionality.resolve().direction ==
+      GeniusPdfResolvedDirection.rtl;
+
+  String _rowText(int index) => _rtl
+      ? 'السطر ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR'
+      : 'Row ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR';
+
+  PdfTextBand _header({
+    String id = 'page-header',
+    String text = 'ERP FLOW REPORT',
+    String textAr = 'تقرير تدفق ERP',
+  }) {
+    return PdfTextBand(
+      id: id,
+      text: text,
+      textAr: textAr,
+      height: 28,
+      placement: PdfBandPlacement.top,
+      kind: PdfBandKind.pageHeader,
+      font: config.boldFont,
+    );
+  }
+
+  PdfPageNumberBand _pageNumbers() {
+    return const PdfPageNumberBand(
+      id: 'page-x-of-y',
+      scope: PdfPageNumberScope.section,
+      height: 22,
+    );
+  }
+
+  List<PdfBlock> _rows(
+    int count, {
+    double padding = 2,
+  }) {
+    return List<PdfBlock>.generate(
+      count,
+      (index) => PdfTextBlock(
+        id: 'row-$index',
+        text: _rowText(index),
+        paddingTop: padding,
+        paddingBottom: padding,
+        minOrphanLines: 1,
+        minWidowLines: 1,
+      ),
+    );
+  }
+
+  @override
+  void build() {
+    switch (scenario) {
+      case S03FlowLayoutScenario.onePage:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'one-page',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(12),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiftyRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'fifty-rows',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(50),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiveHundredRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'five-hundred-rows',
+            directionality: directionality,
+            pageHeader: _header(
+              text: '500 ROW STRESS FLOW',
+              textAr: 'اختبار تدفق 500 سطر',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(500, padding: 1),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.keepTogether:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'keep-together',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              ..._rows(28),
+              PdfKeepTogether(
+                PdfCallbackBlock(
+                  id: 'keep-together-card',
+                  measureCallback: (_) =>
+                      const PdfBlockMeasurement(height: 125),
+                  renderCallback: (context) {
+                    context.page.graphics.drawRectangle(
+                      pen: PdfPen(PdfColor(80, 80, 80)),
+                      bounds: context.bounds,
+                    );
+                    context.page.graphics.drawString(
+                      _rtl
+                          ? 'هذه البطاقة يجب أن تبقى كاملة في صفحة واحدة'
+                          : 'This card must remain together on one page',
+                      config.boldFont,
+                      bounds: context.bounds.deflate(10),
+                      format: PdfStringFormat(
+                        alignment: _rtl
+                            ? PdfTextAlignment.right
+                            : PdfTextAlignment.left,
+                        textDirection: _rtl
+                            ? PdfTextDirection.rightToLeft
+                            : PdfTextDirection.leftToRight,
+                      ),
+                    );
+                    return const PdfBlockRenderResult(
+                      usedHeight: 125,
+                    );
+                  },
+                ),
+              ),
+              PdfTextBlock(
+                id: 'keep-with-next-heading',
+                text: _rtl ? 'عنوان القسم' : 'Section heading',
+                font: config.boldFont,
+                breakPolicy: const PdfPageBreakPolicy(
+                  keepWithNext: true,
+                ),
+              ),
+              PdfFixedBlock(
+                id: 'keep-with-next-detail',
+                height: 100,
+                renderer: (context) {
+                  context.page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(120, 120, 120)),
+                    bounds: context.bounds,
+                  );
+                  return const PdfBlockRenderResult(
+                    usedHeight: 100,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.repeatedHeaders:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'repeated',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            repeatableBands: [
+              PdfRepeatableBand(
+                id: 'table-header',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.tableHeader,
+                child: PdfTextBand(
+                  text: 'Item | Document | Amount',
+                  textAr: 'الصنف | المستند | المبلغ',
+                  height: 24,
+                  placement: PdfBandPlacement.top,
+                  kind: PdfBandKind.tableHeader,
+                  font: config.boldFont,
+                ),
+              ),
+            ],
+            blocks: _rows(90),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.longNotes:
+        final note = _rtl
+            ? List<String>.filled(
+                180,
+                'هذه ملاحظة عربية طويلة لاختبار تقسيم النص وحماية الأسطر '
+                    'حول فاصل الصفحة مع الحفاظ على INV-2026-000123 و '
+                    '15,697.50 SAR.',
+              ).join(' ')
+            : List<String>.filled(
+                180,
+                'This is a long ERP note that verifies wrapping, page splitting '
+                    'and orphan/widow protection while preserving '
+                    'INV-2026-000123 and 15,697.50 SAR.',
+              ).join(' ');
+
+        addFlowSection(
+          PdfFlowSection(
+            id: 'long-notes',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfTextBlock(
+                id: 'long-note',
+                text: note,
+                minOrphanLines: 2,
+                minWidowLines: 2,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.pageMetadata:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'metadata',
+            directionality: directionality,
+            firstPageHeader: _header(
+              id: 'first-page-header',
+              text: 'FIRST PAGE — ERP DOCUMENT',
+              textAr: 'الصفحة الأولى — مستند ERP',
+            ),
+            pageHeader: _header(
+              id: 'normal-page-header',
+              text: 'CONTINUED ERP DOCUMENT',
+              textAr: 'متابعة مستند ERP',
+            ),
+            pageFooter: _pageNumbers(),
+            lastPageFooter: PdfTextBand(
+              id: 'last-page-footer',
+              text: 'END OF DOCUMENT',
+              textAr: 'نهاية المستند',
+              height: 24,
+              placement: PdfBandPlacement.bottom,
+              kind: PdfBandKind.pageFooter,
+              font: config.boldFont,
+              alignment: GeniusPdfLogicalAlignment.center,
+            ),
+            repeatableBands: const [
+              PdfRepeatableBand(
+                id: 'original-marker',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.documentMarker,
+                child: PdfDocumentMarkerBand(
+                  text: 'ORIGINAL',
+                  textAr: 'أصل',
+                  placement: PdfBandPlacement.top,
+                ),
+              ),
+              PdfRepeatableBand(
+                id: 'page-number-repeat',
+                placement: PdfBandPlacement.bottom,
+                kind: PdfBandKind.pageFooter,
+                child: PdfPageNumberBand(),
+              ),
+            ],
+            documentStatus: 'POSTED',
+            copyLabel: _rtl ? 'أصل' : 'ORIGINAL',
+            blocks: _rows(75),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.customLandscape:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'custom-landscape',
+            directionality: directionality,
+            pageSpec: const PdfFlowPageSpec(
+              size: Size(420, 595),
+              orientation: PdfPageOrientation.landscape,
+            ),
+            pageHeader: _header(
+              text: 'CUSTOM LANDSCAPE SECTION',
+              textAr: 'قسم أفقي مخصص',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(55),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.compatibilityAdapter:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'legacy-adapter',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfLegacyCallbackBlock(
+                id: 'legacy-callback',
+                estimatedHeight: 100,
+                callback: (page, bounds) {
+                  page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(60, 60, 60)),
+                    bounds: bounds,
+                  );
+                  page.graphics.drawString(
+                    _rtl
+                        ? 'تم الرسم باستخدام callback القديم (PdfPage, Rect)'
+                        : 'Rendered with the legacy (PdfPage, Rect) callback',
+                    config.boldFont,
+                    bounds: bounds.deflate(12),
+                    format: PdfStringFormat(
+                      alignment: _rtl
+                          ? PdfTextAlignment.right
+                          : PdfTextAlignment.left,
+                      textDirection: _rtl
+                          ? PdfTextDirection.rightToLeft
+                          : PdfTextDirection.leftToRight,
+                    ),
+                  );
+                  return 100;
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS03KeepTogetherVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S03FlowLayoutDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S03FlowLayoutScenario.keepTogether,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S03FlowLayoutVerificationPage.
+enum S03FlowLayoutScenario {
+  onePage,
+  fiftyRows,
+  fiveHundredRows,
+  keepTogether,
+  repeatedHeaders,
+  longNotes,
+  pageMetadata,
+  customLandscape,
+  compatibilityAdapter,
+}
+
+class S03FlowLayoutDocument extends GeniusPdfDocumentBuilder {
+  S03FlowLayoutDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S03FlowLayoutScenario scenario;
+
+  bool get _rtl =>
+      directionality.resolve().direction ==
+      GeniusPdfResolvedDirection.rtl;
+
+  String _rowText(int index) => _rtl
+      ? 'السطر ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR'
+      : 'Row ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR';
+
+  PdfTextBand _header({
+    String id = 'page-header',
+    String text = 'ERP FLOW REPORT',
+    String textAr = 'تقرير تدفق ERP',
+  }) {
+    return PdfTextBand(
+      id: id,
+      text: text,
+      textAr: textAr,
+      height: 28,
+      placement: PdfBandPlacement.top,
+      kind: PdfBandKind.pageHeader,
+      font: config.boldFont,
+    );
+  }
+
+  PdfPageNumberBand _pageNumbers() {
+    return const PdfPageNumberBand(
+      id: 'page-x-of-y',
+      scope: PdfPageNumberScope.section,
+      height: 22,
+    );
+  }
+
+  List<PdfBlock> _rows(
+    int count, {
+    double padding = 2,
+  }) {
+    return List<PdfBlock>.generate(
+      count,
+      (index) => PdfTextBlock(
+        id: 'row-$index',
+        text: _rowText(index),
+        paddingTop: padding,
+        paddingBottom: padding,
+        minOrphanLines: 1,
+        minWidowLines: 1,
+      ),
+    );
+  }
+
+  @override
+  void build() {
+    switch (scenario) {
+      case S03FlowLayoutScenario.onePage:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'one-page',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(12),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiftyRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'fifty-rows',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(50),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiveHundredRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'five-hundred-rows',
+            directionality: directionality,
+            pageHeader: _header(
+              text: '500 ROW STRESS FLOW',
+              textAr: 'اختبار تدفق 500 سطر',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(500, padding: 1),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.keepTogether:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'keep-together',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              ..._rows(28),
+              PdfKeepTogether(
+                PdfCallbackBlock(
+                  id: 'keep-together-card',
+                  measureCallback: (_) =>
+                      const PdfBlockMeasurement(height: 125),
+                  renderCallback: (context) {
+                    context.page.graphics.drawRectangle(
+                      pen: PdfPen(PdfColor(80, 80, 80)),
+                      bounds: context.bounds,
+                    );
+                    context.page.graphics.drawString(
+                      _rtl
+                          ? 'هذه البطاقة يجب أن تبقى كاملة في صفحة واحدة'
+                          : 'This card must remain together on one page',
+                      config.boldFont,
+                      bounds: context.bounds.deflate(10),
+                      format: PdfStringFormat(
+                        alignment: _rtl
+                            ? PdfTextAlignment.right
+                            : PdfTextAlignment.left,
+                        textDirection: _rtl
+                            ? PdfTextDirection.rightToLeft
+                            : PdfTextDirection.leftToRight,
+                      ),
+                    );
+                    return const PdfBlockRenderResult(
+                      usedHeight: 125,
+                    );
+                  },
+                ),
+              ),
+              PdfTextBlock(
+                id: 'keep-with-next-heading',
+                text: _rtl ? 'عنوان القسم' : 'Section heading',
+                font: config.boldFont,
+                breakPolicy: const PdfPageBreakPolicy(
+                  keepWithNext: true,
+                ),
+              ),
+              PdfFixedBlock(
+                id: 'keep-with-next-detail',
+                height: 100,
+                renderer: (context) {
+                  context.page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(120, 120, 120)),
+                    bounds: context.bounds,
+                  );
+                  return const PdfBlockRenderResult(
+                    usedHeight: 100,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.repeatedHeaders:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'repeated',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            repeatableBands: [
+              PdfRepeatableBand(
+                id: 'table-header',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.tableHeader,
+                child: PdfTextBand(
+                  text: 'Item | Document | Amount',
+                  textAr: 'الصنف | المستند | المبلغ',
+                  height: 24,
+                  placement: PdfBandPlacement.top,
+                  kind: PdfBandKind.tableHeader,
+                  font: config.boldFont,
+                ),
+              ),
+            ],
+            blocks: _rows(90),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.longNotes:
+        final note = _rtl
+            ? List<String>.filled(
+                180,
+                'هذه ملاحظة عربية طويلة لاختبار تقسيم النص وحماية الأسطر '
+                    'حول فاصل الصفحة مع الحفاظ على INV-2026-000123 و '
+                    '15,697.50 SAR.',
+              ).join(' ')
+            : List<String>.filled(
+                180,
+                'This is a long ERP note that verifies wrapping, page splitting '
+                    'and orphan/widow protection while preserving '
+                    'INV-2026-000123 and 15,697.50 SAR.',
+              ).join(' ');
+
+        addFlowSection(
+          PdfFlowSection(
+            id: 'long-notes',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfTextBlock(
+                id: 'long-note',
+                text: note,
+                minOrphanLines: 2,
+                minWidowLines: 2,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.pageMetadata:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'metadata',
+            directionality: directionality,
+            firstPageHeader: _header(
+              id: 'first-page-header',
+              text: 'FIRST PAGE — ERP DOCUMENT',
+              textAr: 'الصفحة الأولى — مستند ERP',
+            ),
+            pageHeader: _header(
+              id: 'normal-page-header',
+              text: 'CONTINUED ERP DOCUMENT',
+              textAr: 'متابعة مستند ERP',
+            ),
+            pageFooter: _pageNumbers(),
+            lastPageFooter: PdfTextBand(
+              id: 'last-page-footer',
+              text: 'END OF DOCUMENT',
+              textAr: 'نهاية المستند',
+              height: 24,
+              placement: PdfBandPlacement.bottom,
+              kind: PdfBandKind.pageFooter,
+              font: config.boldFont,
+              alignment: GeniusPdfLogicalAlignment.center,
+            ),
+            repeatableBands: const [
+              PdfRepeatableBand(
+                id: 'original-marker',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.documentMarker,
+                child: PdfDocumentMarkerBand(
+                  text: 'ORIGINAL',
+                  textAr: 'أصل',
+                  placement: PdfBandPlacement.top,
+                ),
+              ),
+              PdfRepeatableBand(
+                id: 'page-number-repeat',
+                placement: PdfBandPlacement.bottom,
+                kind: PdfBandKind.pageFooter,
+                child: PdfPageNumberBand(),
+              ),
+            ],
+            documentStatus: 'POSTED',
+            copyLabel: _rtl ? 'أصل' : 'ORIGINAL',
+            blocks: _rows(75),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.customLandscape:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'custom-landscape',
+            directionality: directionality,
+            pageSpec: const PdfFlowPageSpec(
+              size: Size(420, 595),
+              orientation: PdfPageOrientation.landscape,
+            ),
+            pageHeader: _header(
+              text: 'CUSTOM LANDSCAPE SECTION',
+              textAr: 'قسم أفقي مخصص',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(55),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.compatibilityAdapter:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'legacy-adapter',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfLegacyCallbackBlock(
+                id: 'legacy-callback',
+                estimatedHeight: 100,
+                callback: (page, bounds) {
+                  page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(60, 60, 60)),
+                    bounds: bounds,
+                  );
+                  page.graphics.drawString(
+                    _rtl
+                        ? 'تم الرسم باستخدام callback القديم (PdfPage, Rect)'
+                        : 'Rendered with the legacy (PdfPage, Rect) callback',
+                    config.boldFont,
+                    bounds: bounds.deflate(12),
+                    format: PdfStringFormat(
+                      alignment: _rtl
+                          ? PdfTextAlignment.right
+                          : PdfTextAlignment.left,
+                      textDirection: _rtl
+                          ? PdfTextDirection.rightToLeft
+                          : PdfTextDirection.leftToRight,
+                    ),
+                  );
+                  return 100;
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS03RepeatedHeadersVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S03FlowLayoutDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S03FlowLayoutScenario.repeatedHeaders,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S03FlowLayoutVerificationPage.
+enum S03FlowLayoutScenario {
+  onePage,
+  fiftyRows,
+  fiveHundredRows,
+  keepTogether,
+  repeatedHeaders,
+  longNotes,
+  pageMetadata,
+  customLandscape,
+  compatibilityAdapter,
+}
+
+class S03FlowLayoutDocument extends GeniusPdfDocumentBuilder {
+  S03FlowLayoutDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S03FlowLayoutScenario scenario;
+
+  bool get _rtl =>
+      directionality.resolve().direction ==
+      GeniusPdfResolvedDirection.rtl;
+
+  String _rowText(int index) => _rtl
+      ? 'السطر ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR'
+      : 'Row ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR';
+
+  PdfTextBand _header({
+    String id = 'page-header',
+    String text = 'ERP FLOW REPORT',
+    String textAr = 'تقرير تدفق ERP',
+  }) {
+    return PdfTextBand(
+      id: id,
+      text: text,
+      textAr: textAr,
+      height: 28,
+      placement: PdfBandPlacement.top,
+      kind: PdfBandKind.pageHeader,
+      font: config.boldFont,
+    );
+  }
+
+  PdfPageNumberBand _pageNumbers() {
+    return const PdfPageNumberBand(
+      id: 'page-x-of-y',
+      scope: PdfPageNumberScope.section,
+      height: 22,
+    );
+  }
+
+  List<PdfBlock> _rows(
+    int count, {
+    double padding = 2,
+  }) {
+    return List<PdfBlock>.generate(
+      count,
+      (index) => PdfTextBlock(
+        id: 'row-$index',
+        text: _rowText(index),
+        paddingTop: padding,
+        paddingBottom: padding,
+        minOrphanLines: 1,
+        minWidowLines: 1,
+      ),
+    );
+  }
+
+  @override
+  void build() {
+    switch (scenario) {
+      case S03FlowLayoutScenario.onePage:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'one-page',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(12),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiftyRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'fifty-rows',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(50),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiveHundredRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'five-hundred-rows',
+            directionality: directionality,
+            pageHeader: _header(
+              text: '500 ROW STRESS FLOW',
+              textAr: 'اختبار تدفق 500 سطر',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(500, padding: 1),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.keepTogether:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'keep-together',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              ..._rows(28),
+              PdfKeepTogether(
+                PdfCallbackBlock(
+                  id: 'keep-together-card',
+                  measureCallback: (_) =>
+                      const PdfBlockMeasurement(height: 125),
+                  renderCallback: (context) {
+                    context.page.graphics.drawRectangle(
+                      pen: PdfPen(PdfColor(80, 80, 80)),
+                      bounds: context.bounds,
+                    );
+                    context.page.graphics.drawString(
+                      _rtl
+                          ? 'هذه البطاقة يجب أن تبقى كاملة في صفحة واحدة'
+                          : 'This card must remain together on one page',
+                      config.boldFont,
+                      bounds: context.bounds.deflate(10),
+                      format: PdfStringFormat(
+                        alignment: _rtl
+                            ? PdfTextAlignment.right
+                            : PdfTextAlignment.left,
+                        textDirection: _rtl
+                            ? PdfTextDirection.rightToLeft
+                            : PdfTextDirection.leftToRight,
+                      ),
+                    );
+                    return const PdfBlockRenderResult(
+                      usedHeight: 125,
+                    );
+                  },
+                ),
+              ),
+              PdfTextBlock(
+                id: 'keep-with-next-heading',
+                text: _rtl ? 'عنوان القسم' : 'Section heading',
+                font: config.boldFont,
+                breakPolicy: const PdfPageBreakPolicy(
+                  keepWithNext: true,
+                ),
+              ),
+              PdfFixedBlock(
+                id: 'keep-with-next-detail',
+                height: 100,
+                renderer: (context) {
+                  context.page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(120, 120, 120)),
+                    bounds: context.bounds,
+                  );
+                  return const PdfBlockRenderResult(
+                    usedHeight: 100,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.repeatedHeaders:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'repeated',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            repeatableBands: [
+              PdfRepeatableBand(
+                id: 'table-header',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.tableHeader,
+                child: PdfTextBand(
+                  text: 'Item | Document | Amount',
+                  textAr: 'الصنف | المستند | المبلغ',
+                  height: 24,
+                  placement: PdfBandPlacement.top,
+                  kind: PdfBandKind.tableHeader,
+                  font: config.boldFont,
+                ),
+              ),
+            ],
+            blocks: _rows(90),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.longNotes:
+        final note = _rtl
+            ? List<String>.filled(
+                180,
+                'هذه ملاحظة عربية طويلة لاختبار تقسيم النص وحماية الأسطر '
+                    'حول فاصل الصفحة مع الحفاظ على INV-2026-000123 و '
+                    '15,697.50 SAR.',
+              ).join(' ')
+            : List<String>.filled(
+                180,
+                'This is a long ERP note that verifies wrapping, page splitting '
+                    'and orphan/widow protection while preserving '
+                    'INV-2026-000123 and 15,697.50 SAR.',
+              ).join(' ');
+
+        addFlowSection(
+          PdfFlowSection(
+            id: 'long-notes',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfTextBlock(
+                id: 'long-note',
+                text: note,
+                minOrphanLines: 2,
+                minWidowLines: 2,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.pageMetadata:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'metadata',
+            directionality: directionality,
+            firstPageHeader: _header(
+              id: 'first-page-header',
+              text: 'FIRST PAGE — ERP DOCUMENT',
+              textAr: 'الصفحة الأولى — مستند ERP',
+            ),
+            pageHeader: _header(
+              id: 'normal-page-header',
+              text: 'CONTINUED ERP DOCUMENT',
+              textAr: 'متابعة مستند ERP',
+            ),
+            pageFooter: _pageNumbers(),
+            lastPageFooter: PdfTextBand(
+              id: 'last-page-footer',
+              text: 'END OF DOCUMENT',
+              textAr: 'نهاية المستند',
+              height: 24,
+              placement: PdfBandPlacement.bottom,
+              kind: PdfBandKind.pageFooter,
+              font: config.boldFont,
+              alignment: GeniusPdfLogicalAlignment.center,
+            ),
+            repeatableBands: const [
+              PdfRepeatableBand(
+                id: 'original-marker',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.documentMarker,
+                child: PdfDocumentMarkerBand(
+                  text: 'ORIGINAL',
+                  textAr: 'أصل',
+                  placement: PdfBandPlacement.top,
+                ),
+              ),
+              PdfRepeatableBand(
+                id: 'page-number-repeat',
+                placement: PdfBandPlacement.bottom,
+                kind: PdfBandKind.pageFooter,
+                child: PdfPageNumberBand(),
+              ),
+            ],
+            documentStatus: 'POSTED',
+            copyLabel: _rtl ? 'أصل' : 'ORIGINAL',
+            blocks: _rows(75),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.customLandscape:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'custom-landscape',
+            directionality: directionality,
+            pageSpec: const PdfFlowPageSpec(
+              size: Size(420, 595),
+              orientation: PdfPageOrientation.landscape,
+            ),
+            pageHeader: _header(
+              text: 'CUSTOM LANDSCAPE SECTION',
+              textAr: 'قسم أفقي مخصص',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(55),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.compatibilityAdapter:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'legacy-adapter',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfLegacyCallbackBlock(
+                id: 'legacy-callback',
+                estimatedHeight: 100,
+                callback: (page, bounds) {
+                  page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(60, 60, 60)),
+                    bounds: bounds,
+                  );
+                  page.graphics.drawString(
+                    _rtl
+                        ? 'تم الرسم باستخدام callback القديم (PdfPage, Rect)'
+                        : 'Rendered with the legacy (PdfPage, Rect) callback',
+                    config.boldFont,
+                    bounds: bounds.deflate(12),
+                    format: PdfStringFormat(
+                      alignment: _rtl
+                          ? PdfTextAlignment.right
+                          : PdfTextAlignment.left,
+                      textDirection: _rtl
+                          ? PdfTextDirection.rightToLeft
+                          : PdfTextDirection.leftToRight,
+                    ),
+                  );
+                  return 100;
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS03LongNotesVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S03FlowLayoutDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S03FlowLayoutScenario.longNotes,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S03FlowLayoutVerificationPage.
+enum S03FlowLayoutScenario {
+  onePage,
+  fiftyRows,
+  fiveHundredRows,
+  keepTogether,
+  repeatedHeaders,
+  longNotes,
+  pageMetadata,
+  customLandscape,
+  compatibilityAdapter,
+}
+
+class S03FlowLayoutDocument extends GeniusPdfDocumentBuilder {
+  S03FlowLayoutDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S03FlowLayoutScenario scenario;
+
+  bool get _rtl =>
+      directionality.resolve().direction ==
+      GeniusPdfResolvedDirection.rtl;
+
+  String _rowText(int index) => _rtl
+      ? 'السطر ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR'
+      : 'Row ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR';
+
+  PdfTextBand _header({
+    String id = 'page-header',
+    String text = 'ERP FLOW REPORT',
+    String textAr = 'تقرير تدفق ERP',
+  }) {
+    return PdfTextBand(
+      id: id,
+      text: text,
+      textAr: textAr,
+      height: 28,
+      placement: PdfBandPlacement.top,
+      kind: PdfBandKind.pageHeader,
+      font: config.boldFont,
+    );
+  }
+
+  PdfPageNumberBand _pageNumbers() {
+    return const PdfPageNumberBand(
+      id: 'page-x-of-y',
+      scope: PdfPageNumberScope.section,
+      height: 22,
+    );
+  }
+
+  List<PdfBlock> _rows(
+    int count, {
+    double padding = 2,
+  }) {
+    return List<PdfBlock>.generate(
+      count,
+      (index) => PdfTextBlock(
+        id: 'row-$index',
+        text: _rowText(index),
+        paddingTop: padding,
+        paddingBottom: padding,
+        minOrphanLines: 1,
+        minWidowLines: 1,
+      ),
+    );
+  }
+
+  @override
+  void build() {
+    switch (scenario) {
+      case S03FlowLayoutScenario.onePage:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'one-page',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(12),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiftyRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'fifty-rows',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(50),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiveHundredRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'five-hundred-rows',
+            directionality: directionality,
+            pageHeader: _header(
+              text: '500 ROW STRESS FLOW',
+              textAr: 'اختبار تدفق 500 سطر',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(500, padding: 1),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.keepTogether:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'keep-together',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              ..._rows(28),
+              PdfKeepTogether(
+                PdfCallbackBlock(
+                  id: 'keep-together-card',
+                  measureCallback: (_) =>
+                      const PdfBlockMeasurement(height: 125),
+                  renderCallback: (context) {
+                    context.page.graphics.drawRectangle(
+                      pen: PdfPen(PdfColor(80, 80, 80)),
+                      bounds: context.bounds,
+                    );
+                    context.page.graphics.drawString(
+                      _rtl
+                          ? 'هذه البطاقة يجب أن تبقى كاملة في صفحة واحدة'
+                          : 'This card must remain together on one page',
+                      config.boldFont,
+                      bounds: context.bounds.deflate(10),
+                      format: PdfStringFormat(
+                        alignment: _rtl
+                            ? PdfTextAlignment.right
+                            : PdfTextAlignment.left,
+                        textDirection: _rtl
+                            ? PdfTextDirection.rightToLeft
+                            : PdfTextDirection.leftToRight,
+                      ),
+                    );
+                    return const PdfBlockRenderResult(
+                      usedHeight: 125,
+                    );
+                  },
+                ),
+              ),
+              PdfTextBlock(
+                id: 'keep-with-next-heading',
+                text: _rtl ? 'عنوان القسم' : 'Section heading',
+                font: config.boldFont,
+                breakPolicy: const PdfPageBreakPolicy(
+                  keepWithNext: true,
+                ),
+              ),
+              PdfFixedBlock(
+                id: 'keep-with-next-detail',
+                height: 100,
+                renderer: (context) {
+                  context.page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(120, 120, 120)),
+                    bounds: context.bounds,
+                  );
+                  return const PdfBlockRenderResult(
+                    usedHeight: 100,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.repeatedHeaders:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'repeated',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            repeatableBands: [
+              PdfRepeatableBand(
+                id: 'table-header',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.tableHeader,
+                child: PdfTextBand(
+                  text: 'Item | Document | Amount',
+                  textAr: 'الصنف | المستند | المبلغ',
+                  height: 24,
+                  placement: PdfBandPlacement.top,
+                  kind: PdfBandKind.tableHeader,
+                  font: config.boldFont,
+                ),
+              ),
+            ],
+            blocks: _rows(90),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.longNotes:
+        final note = _rtl
+            ? List<String>.filled(
+                180,
+                'هذه ملاحظة عربية طويلة لاختبار تقسيم النص وحماية الأسطر '
+                    'حول فاصل الصفحة مع الحفاظ على INV-2026-000123 و '
+                    '15,697.50 SAR.',
+              ).join(' ')
+            : List<String>.filled(
+                180,
+                'This is a long ERP note that verifies wrapping, page splitting '
+                    'and orphan/widow protection while preserving '
+                    'INV-2026-000123 and 15,697.50 SAR.',
+              ).join(' ');
+
+        addFlowSection(
+          PdfFlowSection(
+            id: 'long-notes',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfTextBlock(
+                id: 'long-note',
+                text: note,
+                minOrphanLines: 2,
+                minWidowLines: 2,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.pageMetadata:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'metadata',
+            directionality: directionality,
+            firstPageHeader: _header(
+              id: 'first-page-header',
+              text: 'FIRST PAGE — ERP DOCUMENT',
+              textAr: 'الصفحة الأولى — مستند ERP',
+            ),
+            pageHeader: _header(
+              id: 'normal-page-header',
+              text: 'CONTINUED ERP DOCUMENT',
+              textAr: 'متابعة مستند ERP',
+            ),
+            pageFooter: _pageNumbers(),
+            lastPageFooter: PdfTextBand(
+              id: 'last-page-footer',
+              text: 'END OF DOCUMENT',
+              textAr: 'نهاية المستند',
+              height: 24,
+              placement: PdfBandPlacement.bottom,
+              kind: PdfBandKind.pageFooter,
+              font: config.boldFont,
+              alignment: GeniusPdfLogicalAlignment.center,
+            ),
+            repeatableBands: const [
+              PdfRepeatableBand(
+                id: 'original-marker',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.documentMarker,
+                child: PdfDocumentMarkerBand(
+                  text: 'ORIGINAL',
+                  textAr: 'أصل',
+                  placement: PdfBandPlacement.top,
+                ),
+              ),
+              PdfRepeatableBand(
+                id: 'page-number-repeat',
+                placement: PdfBandPlacement.bottom,
+                kind: PdfBandKind.pageFooter,
+                child: PdfPageNumberBand(),
+              ),
+            ],
+            documentStatus: 'POSTED',
+            copyLabel: _rtl ? 'أصل' : 'ORIGINAL',
+            blocks: _rows(75),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.customLandscape:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'custom-landscape',
+            directionality: directionality,
+            pageSpec: const PdfFlowPageSpec(
+              size: Size(420, 595),
+              orientation: PdfPageOrientation.landscape,
+            ),
+            pageHeader: _header(
+              text: 'CUSTOM LANDSCAPE SECTION',
+              textAr: 'قسم أفقي مخصص',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(55),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.compatibilityAdapter:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'legacy-adapter',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfLegacyCallbackBlock(
+                id: 'legacy-callback',
+                estimatedHeight: 100,
+                callback: (page, bounds) {
+                  page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(60, 60, 60)),
+                    bounds: bounds,
+                  );
+                  page.graphics.drawString(
+                    _rtl
+                        ? 'تم الرسم باستخدام callback القديم (PdfPage, Rect)'
+                        : 'Rendered with the legacy (PdfPage, Rect) callback',
+                    config.boldFont,
+                    bounds: bounds.deflate(12),
+                    format: PdfStringFormat(
+                      alignment: _rtl
+                          ? PdfTextAlignment.right
+                          : PdfTextAlignment.left,
+                      textDirection: _rtl
+                          ? PdfTextDirection.rightToLeft
+                          : PdfTextDirection.leftToRight,
+                    ),
+                  );
+                  return 100;
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS03PageMetadataVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S03FlowLayoutDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S03FlowLayoutScenario.pageMetadata,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S03FlowLayoutVerificationPage.
+enum S03FlowLayoutScenario {
+  onePage,
+  fiftyRows,
+  fiveHundredRows,
+  keepTogether,
+  repeatedHeaders,
+  longNotes,
+  pageMetadata,
+  customLandscape,
+  compatibilityAdapter,
+}
+
+class S03FlowLayoutDocument extends GeniusPdfDocumentBuilder {
+  S03FlowLayoutDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S03FlowLayoutScenario scenario;
+
+  bool get _rtl =>
+      directionality.resolve().direction ==
+      GeniusPdfResolvedDirection.rtl;
+
+  String _rowText(int index) => _rtl
+      ? 'السطر ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR'
+      : 'Row ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR';
+
+  PdfTextBand _header({
+    String id = 'page-header',
+    String text = 'ERP FLOW REPORT',
+    String textAr = 'تقرير تدفق ERP',
+  }) {
+    return PdfTextBand(
+      id: id,
+      text: text,
+      textAr: textAr,
+      height: 28,
+      placement: PdfBandPlacement.top,
+      kind: PdfBandKind.pageHeader,
+      font: config.boldFont,
+    );
+  }
+
+  PdfPageNumberBand _pageNumbers() {
+    return const PdfPageNumberBand(
+      id: 'page-x-of-y',
+      scope: PdfPageNumberScope.section,
+      height: 22,
+    );
+  }
+
+  List<PdfBlock> _rows(
+    int count, {
+    double padding = 2,
+  }) {
+    return List<PdfBlock>.generate(
+      count,
+      (index) => PdfTextBlock(
+        id: 'row-$index',
+        text: _rowText(index),
+        paddingTop: padding,
+        paddingBottom: padding,
+        minOrphanLines: 1,
+        minWidowLines: 1,
+      ),
+    );
+  }
+
+  @override
+  void build() {
+    switch (scenario) {
+      case S03FlowLayoutScenario.onePage:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'one-page',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(12),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiftyRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'fifty-rows',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(50),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiveHundredRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'five-hundred-rows',
+            directionality: directionality,
+            pageHeader: _header(
+              text: '500 ROW STRESS FLOW',
+              textAr: 'اختبار تدفق 500 سطر',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(500, padding: 1),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.keepTogether:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'keep-together',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              ..._rows(28),
+              PdfKeepTogether(
+                PdfCallbackBlock(
+                  id: 'keep-together-card',
+                  measureCallback: (_) =>
+                      const PdfBlockMeasurement(height: 125),
+                  renderCallback: (context) {
+                    context.page.graphics.drawRectangle(
+                      pen: PdfPen(PdfColor(80, 80, 80)),
+                      bounds: context.bounds,
+                    );
+                    context.page.graphics.drawString(
+                      _rtl
+                          ? 'هذه البطاقة يجب أن تبقى كاملة في صفحة واحدة'
+                          : 'This card must remain together on one page',
+                      config.boldFont,
+                      bounds: context.bounds.deflate(10),
+                      format: PdfStringFormat(
+                        alignment: _rtl
+                            ? PdfTextAlignment.right
+                            : PdfTextAlignment.left,
+                        textDirection: _rtl
+                            ? PdfTextDirection.rightToLeft
+                            : PdfTextDirection.leftToRight,
+                      ),
+                    );
+                    return const PdfBlockRenderResult(
+                      usedHeight: 125,
+                    );
+                  },
+                ),
+              ),
+              PdfTextBlock(
+                id: 'keep-with-next-heading',
+                text: _rtl ? 'عنوان القسم' : 'Section heading',
+                font: config.boldFont,
+                breakPolicy: const PdfPageBreakPolicy(
+                  keepWithNext: true,
+                ),
+              ),
+              PdfFixedBlock(
+                id: 'keep-with-next-detail',
+                height: 100,
+                renderer: (context) {
+                  context.page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(120, 120, 120)),
+                    bounds: context.bounds,
+                  );
+                  return const PdfBlockRenderResult(
+                    usedHeight: 100,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.repeatedHeaders:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'repeated',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            repeatableBands: [
+              PdfRepeatableBand(
+                id: 'table-header',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.tableHeader,
+                child: PdfTextBand(
+                  text: 'Item | Document | Amount',
+                  textAr: 'الصنف | المستند | المبلغ',
+                  height: 24,
+                  placement: PdfBandPlacement.top,
+                  kind: PdfBandKind.tableHeader,
+                  font: config.boldFont,
+                ),
+              ),
+            ],
+            blocks: _rows(90),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.longNotes:
+        final note = _rtl
+            ? List<String>.filled(
+                180,
+                'هذه ملاحظة عربية طويلة لاختبار تقسيم النص وحماية الأسطر '
+                    'حول فاصل الصفحة مع الحفاظ على INV-2026-000123 و '
+                    '15,697.50 SAR.',
+              ).join(' ')
+            : List<String>.filled(
+                180,
+                'This is a long ERP note that verifies wrapping, page splitting '
+                    'and orphan/widow protection while preserving '
+                    'INV-2026-000123 and 15,697.50 SAR.',
+              ).join(' ');
+
+        addFlowSection(
+          PdfFlowSection(
+            id: 'long-notes',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfTextBlock(
+                id: 'long-note',
+                text: note,
+                minOrphanLines: 2,
+                minWidowLines: 2,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.pageMetadata:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'metadata',
+            directionality: directionality,
+            firstPageHeader: _header(
+              id: 'first-page-header',
+              text: 'FIRST PAGE — ERP DOCUMENT',
+              textAr: 'الصفحة الأولى — مستند ERP',
+            ),
+            pageHeader: _header(
+              id: 'normal-page-header',
+              text: 'CONTINUED ERP DOCUMENT',
+              textAr: 'متابعة مستند ERP',
+            ),
+            pageFooter: _pageNumbers(),
+            lastPageFooter: PdfTextBand(
+              id: 'last-page-footer',
+              text: 'END OF DOCUMENT',
+              textAr: 'نهاية المستند',
+              height: 24,
+              placement: PdfBandPlacement.bottom,
+              kind: PdfBandKind.pageFooter,
+              font: config.boldFont,
+              alignment: GeniusPdfLogicalAlignment.center,
+            ),
+            repeatableBands: const [
+              PdfRepeatableBand(
+                id: 'original-marker',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.documentMarker,
+                child: PdfDocumentMarkerBand(
+                  text: 'ORIGINAL',
+                  textAr: 'أصل',
+                  placement: PdfBandPlacement.top,
+                ),
+              ),
+              PdfRepeatableBand(
+                id: 'page-number-repeat',
+                placement: PdfBandPlacement.bottom,
+                kind: PdfBandKind.pageFooter,
+                child: PdfPageNumberBand(),
+              ),
+            ],
+            documentStatus: 'POSTED',
+            copyLabel: _rtl ? 'أصل' : 'ORIGINAL',
+            blocks: _rows(75),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.customLandscape:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'custom-landscape',
+            directionality: directionality,
+            pageSpec: const PdfFlowPageSpec(
+              size: Size(420, 595),
+              orientation: PdfPageOrientation.landscape,
+            ),
+            pageHeader: _header(
+              text: 'CUSTOM LANDSCAPE SECTION',
+              textAr: 'قسم أفقي مخصص',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(55),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.compatibilityAdapter:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'legacy-adapter',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfLegacyCallbackBlock(
+                id: 'legacy-callback',
+                estimatedHeight: 100,
+                callback: (page, bounds) {
+                  page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(60, 60, 60)),
+                    bounds: bounds,
+                  );
+                  page.graphics.drawString(
+                    _rtl
+                        ? 'تم الرسم باستخدام callback القديم (PdfPage, Rect)'
+                        : 'Rendered with the legacy (PdfPage, Rect) callback',
+                    config.boldFont,
+                    bounds: bounds.deflate(12),
+                    format: PdfStringFormat(
+                      alignment: _rtl
+                          ? PdfTextAlignment.right
+                          : PdfTextAlignment.left,
+                      textDirection: _rtl
+                          ? PdfTextDirection.rightToLeft
+                          : PdfTextDirection.leftToRight,
+                    ),
+                  );
+                  return 100;
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS03CustomLandscapeVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S03FlowLayoutDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S03FlowLayoutScenario.customLandscape,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S03FlowLayoutVerificationPage.
+enum S03FlowLayoutScenario {
+  onePage,
+  fiftyRows,
+  fiveHundredRows,
+  keepTogether,
+  repeatedHeaders,
+  longNotes,
+  pageMetadata,
+  customLandscape,
+  compatibilityAdapter,
+}
+
+class S03FlowLayoutDocument extends GeniusPdfDocumentBuilder {
+  S03FlowLayoutDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+  }) : super(config, directionality: directionality);
+
+  final S03FlowLayoutScenario scenario;
+
+  bool get _rtl =>
+      directionality.resolve().direction ==
+      GeniusPdfResolvedDirection.rtl;
+
+  String _rowText(int index) => _rtl
+      ? 'السطر ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR'
+      : 'Row ${index + 1} — INV-2026-${(index + 1).toString().padLeft(5, '0')} — 15,697.50 SAR';
+
+  PdfTextBand _header({
+    String id = 'page-header',
+    String text = 'ERP FLOW REPORT',
+    String textAr = 'تقرير تدفق ERP',
+  }) {
+    return PdfTextBand(
+      id: id,
+      text: text,
+      textAr: textAr,
+      height: 28,
+      placement: PdfBandPlacement.top,
+      kind: PdfBandKind.pageHeader,
+      font: config.boldFont,
+    );
+  }
+
+  PdfPageNumberBand _pageNumbers() {
+    return const PdfPageNumberBand(
+      id: 'page-x-of-y',
+      scope: PdfPageNumberScope.section,
+      height: 22,
+    );
+  }
+
+  List<PdfBlock> _rows(
+    int count, {
+    double padding = 2,
+  }) {
+    return List<PdfBlock>.generate(
+      count,
+      (index) => PdfTextBlock(
+        id: 'row-$index',
+        text: _rowText(index),
+        paddingTop: padding,
+        paddingBottom: padding,
+        minOrphanLines: 1,
+        minWidowLines: 1,
+      ),
+    );
+  }
+
+  @override
+  void build() {
+    switch (scenario) {
+      case S03FlowLayoutScenario.onePage:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'one-page',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(12),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiftyRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'fifty-rows',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(50),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.fiveHundredRows:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'five-hundred-rows',
+            directionality: directionality,
+            pageHeader: _header(
+              text: '500 ROW STRESS FLOW',
+              textAr: 'اختبار تدفق 500 سطر',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(500, padding: 1),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.keepTogether:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'keep-together',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              ..._rows(28),
+              PdfKeepTogether(
+                PdfCallbackBlock(
+                  id: 'keep-together-card',
+                  measureCallback: (_) =>
+                      const PdfBlockMeasurement(height: 125),
+                  renderCallback: (context) {
+                    context.page.graphics.drawRectangle(
+                      pen: PdfPen(PdfColor(80, 80, 80)),
+                      bounds: context.bounds,
+                    );
+                    context.page.graphics.drawString(
+                      _rtl
+                          ? 'هذه البطاقة يجب أن تبقى كاملة في صفحة واحدة'
+                          : 'This card must remain together on one page',
+                      config.boldFont,
+                      bounds: context.bounds.deflate(10),
+                      format: PdfStringFormat(
+                        alignment: _rtl
+                            ? PdfTextAlignment.right
+                            : PdfTextAlignment.left,
+                        textDirection: _rtl
+                            ? PdfTextDirection.rightToLeft
+                            : PdfTextDirection.leftToRight,
+                      ),
+                    );
+                    return const PdfBlockRenderResult(
+                      usedHeight: 125,
+                    );
+                  },
+                ),
+              ),
+              PdfTextBlock(
+                id: 'keep-with-next-heading',
+                text: _rtl ? 'عنوان القسم' : 'Section heading',
+                font: config.boldFont,
+                breakPolicy: const PdfPageBreakPolicy(
+                  keepWithNext: true,
+                ),
+              ),
+              PdfFixedBlock(
+                id: 'keep-with-next-detail',
+                height: 100,
+                renderer: (context) {
+                  context.page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(120, 120, 120)),
+                    bounds: context.bounds,
+                  );
+                  return const PdfBlockRenderResult(
+                    usedHeight: 100,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.repeatedHeaders:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'repeated',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            repeatableBands: [
+              PdfRepeatableBand(
+                id: 'table-header',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.tableHeader,
+                child: PdfTextBand(
+                  text: 'Item | Document | Amount',
+                  textAr: 'الصنف | المستند | المبلغ',
+                  height: 24,
+                  placement: PdfBandPlacement.top,
+                  kind: PdfBandKind.tableHeader,
+                  font: config.boldFont,
+                ),
+              ),
+            ],
+            blocks: _rows(90),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.longNotes:
+        final note = _rtl
+            ? List<String>.filled(
+                180,
+                'هذه ملاحظة عربية طويلة لاختبار تقسيم النص وحماية الأسطر '
+                    'حول فاصل الصفحة مع الحفاظ على INV-2026-000123 و '
+                    '15,697.50 SAR.',
+              ).join(' ')
+            : List<String>.filled(
+                180,
+                'This is a long ERP note that verifies wrapping, page splitting '
+                    'and orphan/widow protection while preserving '
+                    'INV-2026-000123 and 15,697.50 SAR.',
+              ).join(' ');
+
+        addFlowSection(
+          PdfFlowSection(
+            id: 'long-notes',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfTextBlock(
+                id: 'long-note',
+                text: note,
+                minOrphanLines: 2,
+                minWidowLines: 2,
+              ),
+            ],
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.pageMetadata:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'metadata',
+            directionality: directionality,
+            firstPageHeader: _header(
+              id: 'first-page-header',
+              text: 'FIRST PAGE — ERP DOCUMENT',
+              textAr: 'الصفحة الأولى — مستند ERP',
+            ),
+            pageHeader: _header(
+              id: 'normal-page-header',
+              text: 'CONTINUED ERP DOCUMENT',
+              textAr: 'متابعة مستند ERP',
+            ),
+            pageFooter: _pageNumbers(),
+            lastPageFooter: PdfTextBand(
+              id: 'last-page-footer',
+              text: 'END OF DOCUMENT',
+              textAr: 'نهاية المستند',
+              height: 24,
+              placement: PdfBandPlacement.bottom,
+              kind: PdfBandKind.pageFooter,
+              font: config.boldFont,
+              alignment: GeniusPdfLogicalAlignment.center,
+            ),
+            repeatableBands: const [
+              PdfRepeatableBand(
+                id: 'original-marker',
+                placement: PdfBandPlacement.top,
+                kind: PdfBandKind.documentMarker,
+                child: PdfDocumentMarkerBand(
+                  text: 'ORIGINAL',
+                  textAr: 'أصل',
+                  placement: PdfBandPlacement.top,
+                ),
+              ),
+              PdfRepeatableBand(
+                id: 'page-number-repeat',
+                placement: PdfBandPlacement.bottom,
+                kind: PdfBandKind.pageFooter,
+                child: PdfPageNumberBand(),
+              ),
+            ],
+            documentStatus: 'POSTED',
+            copyLabel: _rtl ? 'أصل' : 'ORIGINAL',
+            blocks: _rows(75),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.customLandscape:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'custom-landscape',
+            directionality: directionality,
+            pageSpec: const PdfFlowPageSpec(
+              size: Size(420, 595),
+              orientation: PdfPageOrientation.landscape,
+            ),
+            pageHeader: _header(
+              text: 'CUSTOM LANDSCAPE SECTION',
+              textAr: 'قسم أفقي مخصص',
+            ),
+            pageFooter: _pageNumbers(),
+            blocks: _rows(55),
+          ),
+        );
+        return;
+
+      case S03FlowLayoutScenario.compatibilityAdapter:
+        addFlowSection(
+          PdfFlowSection(
+            id: 'legacy-adapter',
+            directionality: directionality,
+            pageHeader: _header(),
+            pageFooter: _pageNumbers(),
+            blocks: [
+              PdfLegacyCallbackBlock(
+                id: 'legacy-callback',
+                estimatedHeight: 100,
+                callback: (page, bounds) {
+                  page.graphics.drawRectangle(
+                    pen: PdfPen(PdfColor(60, 60, 60)),
+                    bounds: bounds,
+                  );
+                  page.graphics.drawString(
+                    _rtl
+                        ? 'تم الرسم باستخدام callback القديم (PdfPage, Rect)'
+                        : 'Rendered with the legacy (PdfPage, Rect) callback',
+                    config.boldFont,
+                    bounds: bounds.deflate(12),
+                    format: PdfStringFormat(
+                      alignment: _rtl
+                          ? PdfTextAlignment.right
+                          : PdfTextAlignment.left,
+                      textDirection: _rtl
+                          ? PdfTextDirection.rightToLeft
+                          : PdfTextDirection.leftToRight,
+                    ),
+                  );
+                  return 100;
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+    }
+  }
+}
+
+
+
+Future<Uint8List> buildS03CompatibilityAdapterVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S03FlowLayoutDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S03FlowLayoutScenario.compatibilityAdapter,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}

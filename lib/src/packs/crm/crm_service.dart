@@ -214,16 +214,16 @@ class GeniusCrmService {
     List<GeniusCrmOpportunity> opportunities,
   ) {
     if (opportunities.isEmpty) {
-      return GeniusErpPackReportData(
+      return const GeniusErpPackReportData(
         title: 'Pipeline Report',
         titleAr: 'تقرير مسار المبيعات',
-        columns: const [
+        columns: [
           GeniusErpPackReportColumn(id: 'stage', title: 'Stage', titleAr: 'المرحلة'),
           GeniusErpPackReportColumn(id: 'count', title: 'Count', titleAr: 'العدد'),
           GeniusErpPackReportColumn(id: 'amount', title: 'Amount', titleAr: 'القيمة'),
           GeniusErpPackReportColumn(id: 'weighted', title: 'Weighted', titleAr: 'المرجحة'),
         ],
-        rows: const [],
+        rows: [],
       );
     }
 

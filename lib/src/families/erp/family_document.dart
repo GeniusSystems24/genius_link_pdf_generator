@@ -8,7 +8,6 @@ import '../../core/component_directionality.dart';
 import '../../core/directionality.dart';
 import '../../core/pdf_config.dart';
 import '../../core/pdf_theme.dart';
-import '../../domain/erp/erp.dart';
 import 'family_models.dart';
 
 GeniusPdfConfig _resolveFamilyConfig(

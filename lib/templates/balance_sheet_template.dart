@@ -231,7 +231,7 @@ class BalanceSheetTemplate extends GeniusErpAnalyticalReport {
         ),
       ],
       rows: rows,
-      style: GeniusPdfGridStyle.classic(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     final result = grid.drawAt(

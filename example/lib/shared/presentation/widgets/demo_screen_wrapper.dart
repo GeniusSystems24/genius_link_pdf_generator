@@ -1,15 +1,13 @@
+
 import 'package:flutter/material.dart';
-import 'package:genius_pdf_example/app/theme/app_theme.dart';
 
-/// Wrapper widget for demo screens in the dashboard layout
-/// Provides consistent styling and removes duplicate AppBars
+import 'package:genius_pdf_example/shared/presentation/widgets/example_action_toolbar.dart';
+import 'package:genius_pdf_example/shared/presentation/widgets/example_page_shell.dart';
+import 'package:genius_pdf_example/shared/presentation/widgets/example_panels.dart';
+import 'package:genius_pdf_example/shared/presentation/widgets/responsive_split_layout.dart';
+
+/// Compatibility wrapper for demo screens hosted by the dashboard scaffold.
 class DemoScreenWrapper extends StatelessWidget {
-  final Widget child;
-  final String? title;
-  final List<Widget>? actions;
-  final Widget? floatingActionButton;
-  final bool showInternalAppBar;
-
   const DemoScreenWrapper({
     super.key,
     required this.child,
@@ -19,28 +17,18 @@ class DemoScreenWrapper extends StatelessWidget {
     this.showInternalAppBar = false,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  final Widget child;
+  final String? title;
+  final List<Widget>? actions;
+  final Widget? floatingActionButton;
+  final bool showInternalAppBar;
 
-    return Container(
-      color: isDark ? AppColors.darkBg : AppColors.lightBg,
-      child: child,
-    );
-  }
+  @override
+  Widget build(BuildContext context) => child;
 }
 
-/// Demo Page Layout with consistent styling
+/// General purpose example page retained for compatibility with existing code.
 class DemoPage extends StatelessWidget {
-  final String title;
-  final String description;
-  final Widget? options;
-  final Widget content;
-  final Widget? codeExample;
-  final VoidCallback? onGenerate;
-  final bool isGenerating;
-  final String? generateLabel;
-
   const DemoPage({
     super.key,
     required this.title,
@@ -53,246 +41,92 @@ class DemoPage extends StatelessWidget {
     this.generateLabel,
   });
 
+  final String title;
+  final String description;
+  final Widget? options;
+  final Widget content;
+  final Widget? codeExample;
+  final VoidCallback? onGenerate;
+  final bool isGenerating;
+  final String? generateLabel;
+
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(isDark),
-          if (options != null) ...[
-            const SizedBox(height: 20),
-            _buildOptionsSection(isDark),
-          ],
-          const SizedBox(height: 24),
-          _buildPreviewSection(isDark),
-          if (codeExample != null) ...[
-            const SizedBox(height: 24),
-            _buildCodeSection(isDark),
-          ],
-          const SizedBox(height: 24),
-          if (onGenerate != null) _buildGenerateButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08),
-            AppColors.secondary.withValues(alpha: isDark ? 0.08 : 0.04),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: AppColors.primaryGradient,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.code_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.darkText : AppColors.lightText,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 14,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
-              height: 1.5,
+    return ExamplePageShell(
+      title: title,
+      description: description,
+      children: <Widget>[
+        if (options != null) ExampleSettingsPanel(child: options!),
+        if (codeExample == null)
+          PdfPreviewPanel(child: content)
+        else
+          ResponsiveSplitLayout(
+            primary: PdfPreviewPanel(child: content),
+            secondary: ExampleSectionAdapter(
+              title: 'Code example',
+              icon: Icons.code_rounded,
+              child: codeExample!,
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOptionsSection(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.tune_rounded,
-                size: 18,
-                color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Options',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkText : AppColors.lightText,
+        if (onGenerate != null)
+          ExampleActionToolbar(
+            actions: <Widget>[
+              FilledButton.icon(
+                onPressed: isGenerating ? null : onGenerate,
+                icon: isGenerating
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.picture_as_pdf_outlined),
+                label: Text(
+                  isGenerating ? 'Generating…' : (generateLabel ?? 'Generate PDF'),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          options!,
-        ],
-      ),
+      ],
     );
   }
+}
 
-  Widget _buildPreviewSection(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.preview_rounded,
-                size: 18,
-                color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Preview',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkText : AppColors.lightText,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          content,
-        ],
-      ),
-    );
-  }
+class ExampleSectionAdapter extends StatelessWidget {
+  const ExampleSectionAdapter({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.child,
+  });
 
-  Widget _buildCodeSection(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.code_rounded,
-                size: 18,
-                color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Code Example',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkText : AppColors.lightText,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          codeExample!,
-        ],
-      ),
-    );
-  }
+  final String title;
+  final IconData icon;
+  final Widget child;
 
-  Widget _buildGenerateButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: isGenerating ? null : onGenerate,
-        icon: isGenerating
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : const Icon(Icons.picture_as_pdf_rounded),
-        label: Text(generateLabel ?? 'Generate PDF'),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Icon(icon),
+                const SizedBox(width: 8),
+                Text(title, style: Theme.of(context).textTheme.titleMedium),
+              ],
+            ),
+            const SizedBox(height: 16),
+            child,
+          ],
         ),
       ),
     );
   }
 }
 
-/// Status chip for demo screens
 class StatusChip extends StatelessWidget {
-  final String label;
-  final Color color;
-  final IconData? icon;
-
   const StatusChip({
     super.key,
     required this.label,
@@ -300,31 +134,17 @@ class StatusChip extends StatelessWidget {
     this.icon,
   });
 
+  final String label;
+  final Color color;
+  final IconData? icon;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 4),
-          ],
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
-          ),
-        ],
-      ),
+    return Chip(
+      avatar: icon == null ? null : Icon(icon, size: 16, color: color),
+      label: Text(label),
+      side: BorderSide(color: color.withValues(alpha: 0.35)),
+      backgroundColor: color.withValues(alpha: 0.10),
     );
   }
 }

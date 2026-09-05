@@ -1,0 +1,3595 @@
+Future<Uint8List> buildS04SizingVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S04DataGridVNextDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S04DataGridVNextScenario.sizing,
+    preserveOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S04DataGridVNextVerificationPage.
+enum S04DataGridVNextScenario {
+  sizing,
+  longContent,
+  pagination,
+  grouping,
+  spansAndBuilders,
+  erpFormatting,
+  directionality,
+  emptyState,
+  largeData,
+}
+
+class S04DataGridVNextDocument extends GeniusPdfDocumentBuilder {
+  S04DataGridVNextDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.preserveOrder,
+  }) : super(config, directionality: directionality);
+
+  final S04DataGridVNextScenario scenario;
+  final bool preserveOrder;
+
+  @override
+  void build() {
+    newPage();
+    final result = _buildGrid().draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 8);
+    }
+  }
+
+  List<GeniusPdfGridColumn> get _columns => const [
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'description',
+          title: 'Description',
+          titleAr: 'الوصف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+        ),
+      ];
+
+  Map<String, GeniusPdfGridColumnPolicy> get _standardPolicies => const {
+        'sku': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 90,
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        'description': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.flex,
+          flex: 3,
+          minWidth: 170,
+          overflow: GeniusPdfGridTextOverflow.wrap,
+        ),
+        'qty': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 55,
+          valueKind: GeniusPdfGridValueKind.quantity,
+        ),
+        'amount': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 115,
+          valueKind: GeniusPdfGridValueKind.money,
+          currencyCode: 'SAR',
+        ),
+      };
+
+  GeniusPdfDataGridVNext _buildGrid() {
+    switch (scenario) {
+      case S04DataGridVNextScenario.sizing:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(18),
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 86,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              minWidth: 145,
+              maxWidth: 250,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+              minWidth: 92,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.longContent:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: [
+            ..._rows(8),
+            const GeniusPdfGridRow(
+              cells: {
+                'sku': 'LONG-001',
+                'description':
+                    'وصف عربي طويل جدًا مع English product description '
+                    'وملاحظات إضافية لاختبار الالتفاف وعدم تداخل النص.',
+                'qty': 2,
+                'amount': 15697.50,
+              },
+            ),
+          ],
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 80,
+              overflow: GeniusPdfGridTextOverflow.ellipsis,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+              overflow: GeniusPdfGridTextOverflow.wrap,
+              minWidth: 180,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 55,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 105,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.pagination:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(140),
+          repeatHeaderOnPages: true,
+          rowSplitPolicy: GeniusPdfGridRowSplitPolicy.keepTogether,
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.grouping:
+        final rows = List<GeniusPdfGridRow>.generate(
+          90,
+          (index) => GeniusPdfGridRow(
+            cells: {
+              'sku': 'SKU-${index.toString().padLeft(4, '0')}',
+              'description': 'Grouped ERP item $index',
+              'qty': (index % 8) + 1,
+              'amount': (index + 1) * 17.25,
+              'region': index.isEven ? 'north' : 'south',
+              'category': index % 3 == 0 ? 'hardware' : 'services',
+            },
+          ),
+        );
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: rows,
+          repeatHeaderOnPages: true,
+          repeatGroupHeaders: true,
+          groupBy: [
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['region'],
+              titleBuilder: (key) => 'Region: $key',
+              titleArBuilder: (key) => 'المنطقة: $key',
+            ),
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['category'],
+              titleBuilder: (key) => 'Category: $key',
+              titleArBuilder: (key) => 'الفئة: $key',
+            ),
+          ],
+          groupSummaries: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Subtotal',
+              labelAr: 'المجموع الفرعي',
+              labelColumnId: 'description',
+            ),
+          ],
+          grandTotals: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Grand Total',
+              labelAr: 'الإجمالي العام',
+              labelColumnId: 'description',
+            ),
+          ],
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.spansAndBuilders:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(20),
+          cellSpans: const [
+            GeniusPdfGridCellSpan(
+              rowIndex: 0,
+              columnId: 'sku',
+              rowSpan: 2,
+              columnSpan: 2,
+            ),
+          ],
+          rowStyleBuilder: (context) {
+            if (context.rowIndex == 5) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFFFF3CD),
+              );
+            }
+            return null;
+          },
+          cellStyleBuilder: (context) {
+            if (context.column.id == 'amount' &&
+                context.value is num &&
+                (context.value as num) > 200) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFE8F5E9),
+              );
+            }
+            return null;
+          },
+          cellBuilder: (context) {
+            if (context.column.id == 'description' &&
+                context.rowIndex == 3) {
+              return const GeniusPdfGridCellBuildResult(
+                value: 'Built by cellBuilder',
+              );
+            }
+            return null;
+          },
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.erpFormatting:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'INV-2026-000123',
+                'description': 'Debit / مدين',
+                'qty': 0.15,
+                'amount': -1250.0,
+                'currency': 'SAR',
+              },
+            ),
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'PO-2026-00998',
+                'description': 'Credit / دائن',
+                'qty': 12.5,
+                'amount': 2047.50,
+                'currency': 'USD',
+              },
+            ),
+          ],
+          columnPolicies: {
+            'sku': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              valueKind: GeniusPdfGridValueKind.identifier,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+            ),
+            'qty': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 68,
+              valueKind: GeniusPdfGridValueKind.percentage,
+              percentageIsFraction: true,
+              decimalPlaces: 2,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 120,
+              valueKind: GeniusPdfGridValueKind.money,
+              accountingNegative: true,
+              currencyResolver: (row) =>
+                  row.cells['currency']?.toString(),
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.directionality:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(40),
+          followDirection: true,
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 92,
+              contentDirection: GeniusPdfDirection.ltr,
+              headerPadding: GeniusPdfGridDirectionalPadding(
+                start: 10,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+              cellPadding: GeniusPdfGridDirectionalPadding(
+                start: 8,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 115,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.emptyState:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [],
+          emptyState: const GeniusPdfGridEmptyState(
+            message: 'No inventory transactions',
+            messageAr: 'لا توجد حركات مخزون',
+          ),
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.largeData:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rowSource: GeniusPdfGridLazyRowSource(
+            length: 1000,
+            builder: (index) => GeniusPdfGridRow(
+              cells: {
+                'sku': 'SKU-${index.toString().padLeft(6, '0')}',
+                'description': 'Large-data item $index',
+                'qty': (index % 100) + 1,
+                'amount': index * 3.75,
+              },
+            ),
+          ),
+          repeatHeaderOnPages: true,
+          performance: const GeniusPdfGridPerformanceOptions(
+            veryLargeDataMode: true,
+            autoFitSampleSize: 50,
+            cacheMeasuredWidths: true,
+            cacheResolvedStyles: true,
+          ),
+          columnPolicies: _standardPolicies,
+        );
+    }
+  }
+
+  List<GeniusPdfGridRow> _rows(int count) {
+    return List<GeniusPdfGridRow>.generate(
+      count,
+      (index) => GeniusPdfGridRow(
+        cells: {
+          'sku': 'SKU-${index.toString().padLeft(5, '0')}',
+          'description': index % 4 == 0
+              ? 'منتج تجريبي مع English description $index'
+              : 'Demo item $index',
+          'qty': (index % 12) + 1,
+          'amount': (index + 1) * 13.65,
+        },
+      ),
+    );
+  }
+}
+
+
+
+Future<Uint8List> buildS04LongContentVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S04DataGridVNextDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S04DataGridVNextScenario.longContent,
+    preserveOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S04DataGridVNextVerificationPage.
+enum S04DataGridVNextScenario {
+  sizing,
+  longContent,
+  pagination,
+  grouping,
+  spansAndBuilders,
+  erpFormatting,
+  directionality,
+  emptyState,
+  largeData,
+}
+
+class S04DataGridVNextDocument extends GeniusPdfDocumentBuilder {
+  S04DataGridVNextDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.preserveOrder,
+  }) : super(config, directionality: directionality);
+
+  final S04DataGridVNextScenario scenario;
+  final bool preserveOrder;
+
+  @override
+  void build() {
+    newPage();
+    final result = _buildGrid().draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 8);
+    }
+  }
+
+  List<GeniusPdfGridColumn> get _columns => const [
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'description',
+          title: 'Description',
+          titleAr: 'الوصف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+        ),
+      ];
+
+  Map<String, GeniusPdfGridColumnPolicy> get _standardPolicies => const {
+        'sku': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 90,
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        'description': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.flex,
+          flex: 3,
+          minWidth: 170,
+          overflow: GeniusPdfGridTextOverflow.wrap,
+        ),
+        'qty': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 55,
+          valueKind: GeniusPdfGridValueKind.quantity,
+        ),
+        'amount': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 115,
+          valueKind: GeniusPdfGridValueKind.money,
+          currencyCode: 'SAR',
+        ),
+      };
+
+  GeniusPdfDataGridVNext _buildGrid() {
+    switch (scenario) {
+      case S04DataGridVNextScenario.sizing:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(18),
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 86,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              minWidth: 145,
+              maxWidth: 250,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+              minWidth: 92,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.longContent:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: [
+            ..._rows(8),
+            const GeniusPdfGridRow(
+              cells: {
+                'sku': 'LONG-001',
+                'description':
+                    'وصف عربي طويل جدًا مع English product description '
+                    'وملاحظات إضافية لاختبار الالتفاف وعدم تداخل النص.',
+                'qty': 2,
+                'amount': 15697.50,
+              },
+            ),
+          ],
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 80,
+              overflow: GeniusPdfGridTextOverflow.ellipsis,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+              overflow: GeniusPdfGridTextOverflow.wrap,
+              minWidth: 180,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 55,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 105,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.pagination:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(140),
+          repeatHeaderOnPages: true,
+          rowSplitPolicy: GeniusPdfGridRowSplitPolicy.keepTogether,
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.grouping:
+        final rows = List<GeniusPdfGridRow>.generate(
+          90,
+          (index) => GeniusPdfGridRow(
+            cells: {
+              'sku': 'SKU-${index.toString().padLeft(4, '0')}',
+              'description': 'Grouped ERP item $index',
+              'qty': (index % 8) + 1,
+              'amount': (index + 1) * 17.25,
+              'region': index.isEven ? 'north' : 'south',
+              'category': index % 3 == 0 ? 'hardware' : 'services',
+            },
+          ),
+        );
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: rows,
+          repeatHeaderOnPages: true,
+          repeatGroupHeaders: true,
+          groupBy: [
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['region'],
+              titleBuilder: (key) => 'Region: $key',
+              titleArBuilder: (key) => 'المنطقة: $key',
+            ),
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['category'],
+              titleBuilder: (key) => 'Category: $key',
+              titleArBuilder: (key) => 'الفئة: $key',
+            ),
+          ],
+          groupSummaries: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Subtotal',
+              labelAr: 'المجموع الفرعي',
+              labelColumnId: 'description',
+            ),
+          ],
+          grandTotals: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Grand Total',
+              labelAr: 'الإجمالي العام',
+              labelColumnId: 'description',
+            ),
+          ],
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.spansAndBuilders:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(20),
+          cellSpans: const [
+            GeniusPdfGridCellSpan(
+              rowIndex: 0,
+              columnId: 'sku',
+              rowSpan: 2,
+              columnSpan: 2,
+            ),
+          ],
+          rowStyleBuilder: (context) {
+            if (context.rowIndex == 5) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFFFF3CD),
+              );
+            }
+            return null;
+          },
+          cellStyleBuilder: (context) {
+            if (context.column.id == 'amount' &&
+                context.value is num &&
+                (context.value as num) > 200) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFE8F5E9),
+              );
+            }
+            return null;
+          },
+          cellBuilder: (context) {
+            if (context.column.id == 'description' &&
+                context.rowIndex == 3) {
+              return const GeniusPdfGridCellBuildResult(
+                value: 'Built by cellBuilder',
+              );
+            }
+            return null;
+          },
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.erpFormatting:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'INV-2026-000123',
+                'description': 'Debit / مدين',
+                'qty': 0.15,
+                'amount': -1250.0,
+                'currency': 'SAR',
+              },
+            ),
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'PO-2026-00998',
+                'description': 'Credit / دائن',
+                'qty': 12.5,
+                'amount': 2047.50,
+                'currency': 'USD',
+              },
+            ),
+          ],
+          columnPolicies: {
+            'sku': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              valueKind: GeniusPdfGridValueKind.identifier,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+            ),
+            'qty': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 68,
+              valueKind: GeniusPdfGridValueKind.percentage,
+              percentageIsFraction: true,
+              decimalPlaces: 2,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 120,
+              valueKind: GeniusPdfGridValueKind.money,
+              accountingNegative: true,
+              currencyResolver: (row) =>
+                  row.cells['currency']?.toString(),
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.directionality:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(40),
+          followDirection: true,
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 92,
+              contentDirection: GeniusPdfDirection.ltr,
+              headerPadding: GeniusPdfGridDirectionalPadding(
+                start: 10,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+              cellPadding: GeniusPdfGridDirectionalPadding(
+                start: 8,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 115,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.emptyState:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [],
+          emptyState: const GeniusPdfGridEmptyState(
+            message: 'No inventory transactions',
+            messageAr: 'لا توجد حركات مخزون',
+          ),
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.largeData:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rowSource: GeniusPdfGridLazyRowSource(
+            length: 1000,
+            builder: (index) => GeniusPdfGridRow(
+              cells: {
+                'sku': 'SKU-${index.toString().padLeft(6, '0')}',
+                'description': 'Large-data item $index',
+                'qty': (index % 100) + 1,
+                'amount': index * 3.75,
+              },
+            ),
+          ),
+          repeatHeaderOnPages: true,
+          performance: const GeniusPdfGridPerformanceOptions(
+            veryLargeDataMode: true,
+            autoFitSampleSize: 50,
+            cacheMeasuredWidths: true,
+            cacheResolvedStyles: true,
+          ),
+          columnPolicies: _standardPolicies,
+        );
+    }
+  }
+
+  List<GeniusPdfGridRow> _rows(int count) {
+    return List<GeniusPdfGridRow>.generate(
+      count,
+      (index) => GeniusPdfGridRow(
+        cells: {
+          'sku': 'SKU-${index.toString().padLeft(5, '0')}',
+          'description': index % 4 == 0
+              ? 'منتج تجريبي مع English description $index'
+              : 'Demo item $index',
+          'qty': (index % 12) + 1,
+          'amount': (index + 1) * 13.65,
+        },
+      ),
+    );
+  }
+}
+
+
+
+Future<Uint8List> buildS04PaginationVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S04DataGridVNextDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S04DataGridVNextScenario.pagination,
+    preserveOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S04DataGridVNextVerificationPage.
+enum S04DataGridVNextScenario {
+  sizing,
+  longContent,
+  pagination,
+  grouping,
+  spansAndBuilders,
+  erpFormatting,
+  directionality,
+  emptyState,
+  largeData,
+}
+
+class S04DataGridVNextDocument extends GeniusPdfDocumentBuilder {
+  S04DataGridVNextDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.preserveOrder,
+  }) : super(config, directionality: directionality);
+
+  final S04DataGridVNextScenario scenario;
+  final bool preserveOrder;
+
+  @override
+  void build() {
+    newPage();
+    final result = _buildGrid().draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 8);
+    }
+  }
+
+  List<GeniusPdfGridColumn> get _columns => const [
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'description',
+          title: 'Description',
+          titleAr: 'الوصف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+        ),
+      ];
+
+  Map<String, GeniusPdfGridColumnPolicy> get _standardPolicies => const {
+        'sku': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 90,
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        'description': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.flex,
+          flex: 3,
+          minWidth: 170,
+          overflow: GeniusPdfGridTextOverflow.wrap,
+        ),
+        'qty': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 55,
+          valueKind: GeniusPdfGridValueKind.quantity,
+        ),
+        'amount': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 115,
+          valueKind: GeniusPdfGridValueKind.money,
+          currencyCode: 'SAR',
+        ),
+      };
+
+  GeniusPdfDataGridVNext _buildGrid() {
+    switch (scenario) {
+      case S04DataGridVNextScenario.sizing:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(18),
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 86,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              minWidth: 145,
+              maxWidth: 250,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+              minWidth: 92,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.longContent:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: [
+            ..._rows(8),
+            const GeniusPdfGridRow(
+              cells: {
+                'sku': 'LONG-001',
+                'description':
+                    'وصف عربي طويل جدًا مع English product description '
+                    'وملاحظات إضافية لاختبار الالتفاف وعدم تداخل النص.',
+                'qty': 2,
+                'amount': 15697.50,
+              },
+            ),
+          ],
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 80,
+              overflow: GeniusPdfGridTextOverflow.ellipsis,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+              overflow: GeniusPdfGridTextOverflow.wrap,
+              minWidth: 180,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 55,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 105,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.pagination:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(140),
+          repeatHeaderOnPages: true,
+          rowSplitPolicy: GeniusPdfGridRowSplitPolicy.keepTogether,
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.grouping:
+        final rows = List<GeniusPdfGridRow>.generate(
+          90,
+          (index) => GeniusPdfGridRow(
+            cells: {
+              'sku': 'SKU-${index.toString().padLeft(4, '0')}',
+              'description': 'Grouped ERP item $index',
+              'qty': (index % 8) + 1,
+              'amount': (index + 1) * 17.25,
+              'region': index.isEven ? 'north' : 'south',
+              'category': index % 3 == 0 ? 'hardware' : 'services',
+            },
+          ),
+        );
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: rows,
+          repeatHeaderOnPages: true,
+          repeatGroupHeaders: true,
+          groupBy: [
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['region'],
+              titleBuilder: (key) => 'Region: $key',
+              titleArBuilder: (key) => 'المنطقة: $key',
+            ),
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['category'],
+              titleBuilder: (key) => 'Category: $key',
+              titleArBuilder: (key) => 'الفئة: $key',
+            ),
+          ],
+          groupSummaries: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Subtotal',
+              labelAr: 'المجموع الفرعي',
+              labelColumnId: 'description',
+            ),
+          ],
+          grandTotals: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Grand Total',
+              labelAr: 'الإجمالي العام',
+              labelColumnId: 'description',
+            ),
+          ],
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.spansAndBuilders:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(20),
+          cellSpans: const [
+            GeniusPdfGridCellSpan(
+              rowIndex: 0,
+              columnId: 'sku',
+              rowSpan: 2,
+              columnSpan: 2,
+            ),
+          ],
+          rowStyleBuilder: (context) {
+            if (context.rowIndex == 5) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFFFF3CD),
+              );
+            }
+            return null;
+          },
+          cellStyleBuilder: (context) {
+            if (context.column.id == 'amount' &&
+                context.value is num &&
+                (context.value as num) > 200) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFE8F5E9),
+              );
+            }
+            return null;
+          },
+          cellBuilder: (context) {
+            if (context.column.id == 'description' &&
+                context.rowIndex == 3) {
+              return const GeniusPdfGridCellBuildResult(
+                value: 'Built by cellBuilder',
+              );
+            }
+            return null;
+          },
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.erpFormatting:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'INV-2026-000123',
+                'description': 'Debit / مدين',
+                'qty': 0.15,
+                'amount': -1250.0,
+                'currency': 'SAR',
+              },
+            ),
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'PO-2026-00998',
+                'description': 'Credit / دائن',
+                'qty': 12.5,
+                'amount': 2047.50,
+                'currency': 'USD',
+              },
+            ),
+          ],
+          columnPolicies: {
+            'sku': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              valueKind: GeniusPdfGridValueKind.identifier,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+            ),
+            'qty': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 68,
+              valueKind: GeniusPdfGridValueKind.percentage,
+              percentageIsFraction: true,
+              decimalPlaces: 2,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 120,
+              valueKind: GeniusPdfGridValueKind.money,
+              accountingNegative: true,
+              currencyResolver: (row) =>
+                  row.cells['currency']?.toString(),
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.directionality:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(40),
+          followDirection: true,
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 92,
+              contentDirection: GeniusPdfDirection.ltr,
+              headerPadding: GeniusPdfGridDirectionalPadding(
+                start: 10,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+              cellPadding: GeniusPdfGridDirectionalPadding(
+                start: 8,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 115,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.emptyState:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [],
+          emptyState: const GeniusPdfGridEmptyState(
+            message: 'No inventory transactions',
+            messageAr: 'لا توجد حركات مخزون',
+          ),
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.largeData:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rowSource: GeniusPdfGridLazyRowSource(
+            length: 1000,
+            builder: (index) => GeniusPdfGridRow(
+              cells: {
+                'sku': 'SKU-${index.toString().padLeft(6, '0')}',
+                'description': 'Large-data item $index',
+                'qty': (index % 100) + 1,
+                'amount': index * 3.75,
+              },
+            ),
+          ),
+          repeatHeaderOnPages: true,
+          performance: const GeniusPdfGridPerformanceOptions(
+            veryLargeDataMode: true,
+            autoFitSampleSize: 50,
+            cacheMeasuredWidths: true,
+            cacheResolvedStyles: true,
+          ),
+          columnPolicies: _standardPolicies,
+        );
+    }
+  }
+
+  List<GeniusPdfGridRow> _rows(int count) {
+    return List<GeniusPdfGridRow>.generate(
+      count,
+      (index) => GeniusPdfGridRow(
+        cells: {
+          'sku': 'SKU-${index.toString().padLeft(5, '0')}',
+          'description': index % 4 == 0
+              ? 'منتج تجريبي مع English description $index'
+              : 'Demo item $index',
+          'qty': (index % 12) + 1,
+          'amount': (index + 1) * 13.65,
+        },
+      ),
+    );
+  }
+}
+
+
+
+Future<Uint8List> buildS04GroupingVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S04DataGridVNextDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S04DataGridVNextScenario.grouping,
+    preserveOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S04DataGridVNextVerificationPage.
+enum S04DataGridVNextScenario {
+  sizing,
+  longContent,
+  pagination,
+  grouping,
+  spansAndBuilders,
+  erpFormatting,
+  directionality,
+  emptyState,
+  largeData,
+}
+
+class S04DataGridVNextDocument extends GeniusPdfDocumentBuilder {
+  S04DataGridVNextDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.preserveOrder,
+  }) : super(config, directionality: directionality);
+
+  final S04DataGridVNextScenario scenario;
+  final bool preserveOrder;
+
+  @override
+  void build() {
+    newPage();
+    final result = _buildGrid().draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 8);
+    }
+  }
+
+  List<GeniusPdfGridColumn> get _columns => const [
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'description',
+          title: 'Description',
+          titleAr: 'الوصف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+        ),
+      ];
+
+  Map<String, GeniusPdfGridColumnPolicy> get _standardPolicies => const {
+        'sku': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 90,
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        'description': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.flex,
+          flex: 3,
+          minWidth: 170,
+          overflow: GeniusPdfGridTextOverflow.wrap,
+        ),
+        'qty': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 55,
+          valueKind: GeniusPdfGridValueKind.quantity,
+        ),
+        'amount': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 115,
+          valueKind: GeniusPdfGridValueKind.money,
+          currencyCode: 'SAR',
+        ),
+      };
+
+  GeniusPdfDataGridVNext _buildGrid() {
+    switch (scenario) {
+      case S04DataGridVNextScenario.sizing:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(18),
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 86,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              minWidth: 145,
+              maxWidth: 250,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+              minWidth: 92,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.longContent:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: [
+            ..._rows(8),
+            const GeniusPdfGridRow(
+              cells: {
+                'sku': 'LONG-001',
+                'description':
+                    'وصف عربي طويل جدًا مع English product description '
+                    'وملاحظات إضافية لاختبار الالتفاف وعدم تداخل النص.',
+                'qty': 2,
+                'amount': 15697.50,
+              },
+            ),
+          ],
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 80,
+              overflow: GeniusPdfGridTextOverflow.ellipsis,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+              overflow: GeniusPdfGridTextOverflow.wrap,
+              minWidth: 180,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 55,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 105,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.pagination:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(140),
+          repeatHeaderOnPages: true,
+          rowSplitPolicy: GeniusPdfGridRowSplitPolicy.keepTogether,
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.grouping:
+        final rows = List<GeniusPdfGridRow>.generate(
+          90,
+          (index) => GeniusPdfGridRow(
+            cells: {
+              'sku': 'SKU-${index.toString().padLeft(4, '0')}',
+              'description': 'Grouped ERP item $index',
+              'qty': (index % 8) + 1,
+              'amount': (index + 1) * 17.25,
+              'region': index.isEven ? 'north' : 'south',
+              'category': index % 3 == 0 ? 'hardware' : 'services',
+            },
+          ),
+        );
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: rows,
+          repeatHeaderOnPages: true,
+          repeatGroupHeaders: true,
+          groupBy: [
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['region'],
+              titleBuilder: (key) => 'Region: $key',
+              titleArBuilder: (key) => 'المنطقة: $key',
+            ),
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['category'],
+              titleBuilder: (key) => 'Category: $key',
+              titleArBuilder: (key) => 'الفئة: $key',
+            ),
+          ],
+          groupSummaries: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Subtotal',
+              labelAr: 'المجموع الفرعي',
+              labelColumnId: 'description',
+            ),
+          ],
+          grandTotals: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Grand Total',
+              labelAr: 'الإجمالي العام',
+              labelColumnId: 'description',
+            ),
+          ],
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.spansAndBuilders:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(20),
+          cellSpans: const [
+            GeniusPdfGridCellSpan(
+              rowIndex: 0,
+              columnId: 'sku',
+              rowSpan: 2,
+              columnSpan: 2,
+            ),
+          ],
+          rowStyleBuilder: (context) {
+            if (context.rowIndex == 5) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFFFF3CD),
+              );
+            }
+            return null;
+          },
+          cellStyleBuilder: (context) {
+            if (context.column.id == 'amount' &&
+                context.value is num &&
+                (context.value as num) > 200) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFE8F5E9),
+              );
+            }
+            return null;
+          },
+          cellBuilder: (context) {
+            if (context.column.id == 'description' &&
+                context.rowIndex == 3) {
+              return const GeniusPdfGridCellBuildResult(
+                value: 'Built by cellBuilder',
+              );
+            }
+            return null;
+          },
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.erpFormatting:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'INV-2026-000123',
+                'description': 'Debit / مدين',
+                'qty': 0.15,
+                'amount': -1250.0,
+                'currency': 'SAR',
+              },
+            ),
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'PO-2026-00998',
+                'description': 'Credit / دائن',
+                'qty': 12.5,
+                'amount': 2047.50,
+                'currency': 'USD',
+              },
+            ),
+          ],
+          columnPolicies: {
+            'sku': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              valueKind: GeniusPdfGridValueKind.identifier,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+            ),
+            'qty': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 68,
+              valueKind: GeniusPdfGridValueKind.percentage,
+              percentageIsFraction: true,
+              decimalPlaces: 2,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 120,
+              valueKind: GeniusPdfGridValueKind.money,
+              accountingNegative: true,
+              currencyResolver: (row) =>
+                  row.cells['currency']?.toString(),
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.directionality:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(40),
+          followDirection: true,
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 92,
+              contentDirection: GeniusPdfDirection.ltr,
+              headerPadding: GeniusPdfGridDirectionalPadding(
+                start: 10,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+              cellPadding: GeniusPdfGridDirectionalPadding(
+                start: 8,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 115,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.emptyState:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [],
+          emptyState: const GeniusPdfGridEmptyState(
+            message: 'No inventory transactions',
+            messageAr: 'لا توجد حركات مخزون',
+          ),
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.largeData:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rowSource: GeniusPdfGridLazyRowSource(
+            length: 1000,
+            builder: (index) => GeniusPdfGridRow(
+              cells: {
+                'sku': 'SKU-${index.toString().padLeft(6, '0')}',
+                'description': 'Large-data item $index',
+                'qty': (index % 100) + 1,
+                'amount': index * 3.75,
+              },
+            ),
+          ),
+          repeatHeaderOnPages: true,
+          performance: const GeniusPdfGridPerformanceOptions(
+            veryLargeDataMode: true,
+            autoFitSampleSize: 50,
+            cacheMeasuredWidths: true,
+            cacheResolvedStyles: true,
+          ),
+          columnPolicies: _standardPolicies,
+        );
+    }
+  }
+
+  List<GeniusPdfGridRow> _rows(int count) {
+    return List<GeniusPdfGridRow>.generate(
+      count,
+      (index) => GeniusPdfGridRow(
+        cells: {
+          'sku': 'SKU-${index.toString().padLeft(5, '0')}',
+          'description': index % 4 == 0
+              ? 'منتج تجريبي مع English description $index'
+              : 'Demo item $index',
+          'qty': (index % 12) + 1,
+          'amount': (index + 1) * 13.65,
+        },
+      ),
+    );
+  }
+}
+
+
+
+Future<Uint8List> buildS04SpansAndBuildersVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S04DataGridVNextDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S04DataGridVNextScenario.spansAndBuilders,
+    preserveOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S04DataGridVNextVerificationPage.
+enum S04DataGridVNextScenario {
+  sizing,
+  longContent,
+  pagination,
+  grouping,
+  spansAndBuilders,
+  erpFormatting,
+  directionality,
+  emptyState,
+  largeData,
+}
+
+class S04DataGridVNextDocument extends GeniusPdfDocumentBuilder {
+  S04DataGridVNextDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.preserveOrder,
+  }) : super(config, directionality: directionality);
+
+  final S04DataGridVNextScenario scenario;
+  final bool preserveOrder;
+
+  @override
+  void build() {
+    newPage();
+    final result = _buildGrid().draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 8);
+    }
+  }
+
+  List<GeniusPdfGridColumn> get _columns => const [
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'description',
+          title: 'Description',
+          titleAr: 'الوصف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+        ),
+      ];
+
+  Map<String, GeniusPdfGridColumnPolicy> get _standardPolicies => const {
+        'sku': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 90,
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        'description': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.flex,
+          flex: 3,
+          minWidth: 170,
+          overflow: GeniusPdfGridTextOverflow.wrap,
+        ),
+        'qty': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 55,
+          valueKind: GeniusPdfGridValueKind.quantity,
+        ),
+        'amount': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 115,
+          valueKind: GeniusPdfGridValueKind.money,
+          currencyCode: 'SAR',
+        ),
+      };
+
+  GeniusPdfDataGridVNext _buildGrid() {
+    switch (scenario) {
+      case S04DataGridVNextScenario.sizing:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(18),
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 86,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              minWidth: 145,
+              maxWidth: 250,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+              minWidth: 92,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.longContent:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: [
+            ..._rows(8),
+            const GeniusPdfGridRow(
+              cells: {
+                'sku': 'LONG-001',
+                'description':
+                    'وصف عربي طويل جدًا مع English product description '
+                    'وملاحظات إضافية لاختبار الالتفاف وعدم تداخل النص.',
+                'qty': 2,
+                'amount': 15697.50,
+              },
+            ),
+          ],
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 80,
+              overflow: GeniusPdfGridTextOverflow.ellipsis,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+              overflow: GeniusPdfGridTextOverflow.wrap,
+              minWidth: 180,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 55,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 105,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.pagination:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(140),
+          repeatHeaderOnPages: true,
+          rowSplitPolicy: GeniusPdfGridRowSplitPolicy.keepTogether,
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.grouping:
+        final rows = List<GeniusPdfGridRow>.generate(
+          90,
+          (index) => GeniusPdfGridRow(
+            cells: {
+              'sku': 'SKU-${index.toString().padLeft(4, '0')}',
+              'description': 'Grouped ERP item $index',
+              'qty': (index % 8) + 1,
+              'amount': (index + 1) * 17.25,
+              'region': index.isEven ? 'north' : 'south',
+              'category': index % 3 == 0 ? 'hardware' : 'services',
+            },
+          ),
+        );
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: rows,
+          repeatHeaderOnPages: true,
+          repeatGroupHeaders: true,
+          groupBy: [
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['region'],
+              titleBuilder: (key) => 'Region: $key',
+              titleArBuilder: (key) => 'المنطقة: $key',
+            ),
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['category'],
+              titleBuilder: (key) => 'Category: $key',
+              titleArBuilder: (key) => 'الفئة: $key',
+            ),
+          ],
+          groupSummaries: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Subtotal',
+              labelAr: 'المجموع الفرعي',
+              labelColumnId: 'description',
+            ),
+          ],
+          grandTotals: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Grand Total',
+              labelAr: 'الإجمالي العام',
+              labelColumnId: 'description',
+            ),
+          ],
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.spansAndBuilders:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(20),
+          cellSpans: const [
+            GeniusPdfGridCellSpan(
+              rowIndex: 0,
+              columnId: 'sku',
+              rowSpan: 2,
+              columnSpan: 2,
+            ),
+          ],
+          rowStyleBuilder: (context) {
+            if (context.rowIndex == 5) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFFFF3CD),
+              );
+            }
+            return null;
+          },
+          cellStyleBuilder: (context) {
+            if (context.column.id == 'amount' &&
+                context.value is num &&
+                (context.value as num) > 200) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFE8F5E9),
+              );
+            }
+            return null;
+          },
+          cellBuilder: (context) {
+            if (context.column.id == 'description' &&
+                context.rowIndex == 3) {
+              return const GeniusPdfGridCellBuildResult(
+                value: 'Built by cellBuilder',
+              );
+            }
+            return null;
+          },
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.erpFormatting:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'INV-2026-000123',
+                'description': 'Debit / مدين',
+                'qty': 0.15,
+                'amount': -1250.0,
+                'currency': 'SAR',
+              },
+            ),
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'PO-2026-00998',
+                'description': 'Credit / دائن',
+                'qty': 12.5,
+                'amount': 2047.50,
+                'currency': 'USD',
+              },
+            ),
+          ],
+          columnPolicies: {
+            'sku': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              valueKind: GeniusPdfGridValueKind.identifier,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+            ),
+            'qty': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 68,
+              valueKind: GeniusPdfGridValueKind.percentage,
+              percentageIsFraction: true,
+              decimalPlaces: 2,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 120,
+              valueKind: GeniusPdfGridValueKind.money,
+              accountingNegative: true,
+              currencyResolver: (row) =>
+                  row.cells['currency']?.toString(),
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.directionality:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(40),
+          followDirection: true,
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 92,
+              contentDirection: GeniusPdfDirection.ltr,
+              headerPadding: GeniusPdfGridDirectionalPadding(
+                start: 10,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+              cellPadding: GeniusPdfGridDirectionalPadding(
+                start: 8,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 115,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.emptyState:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [],
+          emptyState: const GeniusPdfGridEmptyState(
+            message: 'No inventory transactions',
+            messageAr: 'لا توجد حركات مخزون',
+          ),
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.largeData:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rowSource: GeniusPdfGridLazyRowSource(
+            length: 1000,
+            builder: (index) => GeniusPdfGridRow(
+              cells: {
+                'sku': 'SKU-${index.toString().padLeft(6, '0')}',
+                'description': 'Large-data item $index',
+                'qty': (index % 100) + 1,
+                'amount': index * 3.75,
+              },
+            ),
+          ),
+          repeatHeaderOnPages: true,
+          performance: const GeniusPdfGridPerformanceOptions(
+            veryLargeDataMode: true,
+            autoFitSampleSize: 50,
+            cacheMeasuredWidths: true,
+            cacheResolvedStyles: true,
+          ),
+          columnPolicies: _standardPolicies,
+        );
+    }
+  }
+
+  List<GeniusPdfGridRow> _rows(int count) {
+    return List<GeniusPdfGridRow>.generate(
+      count,
+      (index) => GeniusPdfGridRow(
+        cells: {
+          'sku': 'SKU-${index.toString().padLeft(5, '0')}',
+          'description': index % 4 == 0
+              ? 'منتج تجريبي مع English description $index'
+              : 'Demo item $index',
+          'qty': (index % 12) + 1,
+          'amount': (index + 1) * 13.65,
+        },
+      ),
+    );
+  }
+}
+
+
+
+Future<Uint8List> buildS04ErpFormattingVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S04DataGridVNextDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S04DataGridVNextScenario.erpFormatting,
+    preserveOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S04DataGridVNextVerificationPage.
+enum S04DataGridVNextScenario {
+  sizing,
+  longContent,
+  pagination,
+  grouping,
+  spansAndBuilders,
+  erpFormatting,
+  directionality,
+  emptyState,
+  largeData,
+}
+
+class S04DataGridVNextDocument extends GeniusPdfDocumentBuilder {
+  S04DataGridVNextDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.preserveOrder,
+  }) : super(config, directionality: directionality);
+
+  final S04DataGridVNextScenario scenario;
+  final bool preserveOrder;
+
+  @override
+  void build() {
+    newPage();
+    final result = _buildGrid().draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 8);
+    }
+  }
+
+  List<GeniusPdfGridColumn> get _columns => const [
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'description',
+          title: 'Description',
+          titleAr: 'الوصف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+        ),
+      ];
+
+  Map<String, GeniusPdfGridColumnPolicy> get _standardPolicies => const {
+        'sku': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 90,
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        'description': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.flex,
+          flex: 3,
+          minWidth: 170,
+          overflow: GeniusPdfGridTextOverflow.wrap,
+        ),
+        'qty': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 55,
+          valueKind: GeniusPdfGridValueKind.quantity,
+        ),
+        'amount': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 115,
+          valueKind: GeniusPdfGridValueKind.money,
+          currencyCode: 'SAR',
+        ),
+      };
+
+  GeniusPdfDataGridVNext _buildGrid() {
+    switch (scenario) {
+      case S04DataGridVNextScenario.sizing:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(18),
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 86,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              minWidth: 145,
+              maxWidth: 250,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+              minWidth: 92,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.longContent:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: [
+            ..._rows(8),
+            const GeniusPdfGridRow(
+              cells: {
+                'sku': 'LONG-001',
+                'description':
+                    'وصف عربي طويل جدًا مع English product description '
+                    'وملاحظات إضافية لاختبار الالتفاف وعدم تداخل النص.',
+                'qty': 2,
+                'amount': 15697.50,
+              },
+            ),
+          ],
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 80,
+              overflow: GeniusPdfGridTextOverflow.ellipsis,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+              overflow: GeniusPdfGridTextOverflow.wrap,
+              minWidth: 180,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 55,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 105,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.pagination:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(140),
+          repeatHeaderOnPages: true,
+          rowSplitPolicy: GeniusPdfGridRowSplitPolicy.keepTogether,
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.grouping:
+        final rows = List<GeniusPdfGridRow>.generate(
+          90,
+          (index) => GeniusPdfGridRow(
+            cells: {
+              'sku': 'SKU-${index.toString().padLeft(4, '0')}',
+              'description': 'Grouped ERP item $index',
+              'qty': (index % 8) + 1,
+              'amount': (index + 1) * 17.25,
+              'region': index.isEven ? 'north' : 'south',
+              'category': index % 3 == 0 ? 'hardware' : 'services',
+            },
+          ),
+        );
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: rows,
+          repeatHeaderOnPages: true,
+          repeatGroupHeaders: true,
+          groupBy: [
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['region'],
+              titleBuilder: (key) => 'Region: $key',
+              titleArBuilder: (key) => 'المنطقة: $key',
+            ),
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['category'],
+              titleBuilder: (key) => 'Category: $key',
+              titleArBuilder: (key) => 'الفئة: $key',
+            ),
+          ],
+          groupSummaries: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Subtotal',
+              labelAr: 'المجموع الفرعي',
+              labelColumnId: 'description',
+            ),
+          ],
+          grandTotals: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Grand Total',
+              labelAr: 'الإجمالي العام',
+              labelColumnId: 'description',
+            ),
+          ],
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.spansAndBuilders:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(20),
+          cellSpans: const [
+            GeniusPdfGridCellSpan(
+              rowIndex: 0,
+              columnId: 'sku',
+              rowSpan: 2,
+              columnSpan: 2,
+            ),
+          ],
+          rowStyleBuilder: (context) {
+            if (context.rowIndex == 5) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFFFF3CD),
+              );
+            }
+            return null;
+          },
+          cellStyleBuilder: (context) {
+            if (context.column.id == 'amount' &&
+                context.value is num &&
+                (context.value as num) > 200) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFE8F5E9),
+              );
+            }
+            return null;
+          },
+          cellBuilder: (context) {
+            if (context.column.id == 'description' &&
+                context.rowIndex == 3) {
+              return const GeniusPdfGridCellBuildResult(
+                value: 'Built by cellBuilder',
+              );
+            }
+            return null;
+          },
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.erpFormatting:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'INV-2026-000123',
+                'description': 'Debit / مدين',
+                'qty': 0.15,
+                'amount': -1250.0,
+                'currency': 'SAR',
+              },
+            ),
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'PO-2026-00998',
+                'description': 'Credit / دائن',
+                'qty': 12.5,
+                'amount': 2047.50,
+                'currency': 'USD',
+              },
+            ),
+          ],
+          columnPolicies: {
+            'sku': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              valueKind: GeniusPdfGridValueKind.identifier,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+            ),
+            'qty': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 68,
+              valueKind: GeniusPdfGridValueKind.percentage,
+              percentageIsFraction: true,
+              decimalPlaces: 2,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 120,
+              valueKind: GeniusPdfGridValueKind.money,
+              accountingNegative: true,
+              currencyResolver: (row) =>
+                  row.cells['currency']?.toString(),
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.directionality:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(40),
+          followDirection: true,
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 92,
+              contentDirection: GeniusPdfDirection.ltr,
+              headerPadding: GeniusPdfGridDirectionalPadding(
+                start: 10,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+              cellPadding: GeniusPdfGridDirectionalPadding(
+                start: 8,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 115,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.emptyState:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [],
+          emptyState: const GeniusPdfGridEmptyState(
+            message: 'No inventory transactions',
+            messageAr: 'لا توجد حركات مخزون',
+          ),
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.largeData:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rowSource: GeniusPdfGridLazyRowSource(
+            length: 1000,
+            builder: (index) => GeniusPdfGridRow(
+              cells: {
+                'sku': 'SKU-${index.toString().padLeft(6, '0')}',
+                'description': 'Large-data item $index',
+                'qty': (index % 100) + 1,
+                'amount': index * 3.75,
+              },
+            ),
+          ),
+          repeatHeaderOnPages: true,
+          performance: const GeniusPdfGridPerformanceOptions(
+            veryLargeDataMode: true,
+            autoFitSampleSize: 50,
+            cacheMeasuredWidths: true,
+            cacheResolvedStyles: true,
+          ),
+          columnPolicies: _standardPolicies,
+        );
+    }
+  }
+
+  List<GeniusPdfGridRow> _rows(int count) {
+    return List<GeniusPdfGridRow>.generate(
+      count,
+      (index) => GeniusPdfGridRow(
+        cells: {
+          'sku': 'SKU-${index.toString().padLeft(5, '0')}',
+          'description': index % 4 == 0
+              ? 'منتج تجريبي مع English description $index'
+              : 'Demo item $index',
+          'qty': (index % 12) + 1,
+          'amount': (index + 1) * 13.65,
+        },
+      ),
+    );
+  }
+}
+
+
+
+Future<Uint8List> buildS04DirectionalityVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S04DataGridVNextDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S04DataGridVNextScenario.directionality,
+    preserveOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S04DataGridVNextVerificationPage.
+enum S04DataGridVNextScenario {
+  sizing,
+  longContent,
+  pagination,
+  grouping,
+  spansAndBuilders,
+  erpFormatting,
+  directionality,
+  emptyState,
+  largeData,
+}
+
+class S04DataGridVNextDocument extends GeniusPdfDocumentBuilder {
+  S04DataGridVNextDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.preserveOrder,
+  }) : super(config, directionality: directionality);
+
+  final S04DataGridVNextScenario scenario;
+  final bool preserveOrder;
+
+  @override
+  void build() {
+    newPage();
+    final result = _buildGrid().draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 8);
+    }
+  }
+
+  List<GeniusPdfGridColumn> get _columns => const [
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'description',
+          title: 'Description',
+          titleAr: 'الوصف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+        ),
+      ];
+
+  Map<String, GeniusPdfGridColumnPolicy> get _standardPolicies => const {
+        'sku': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 90,
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        'description': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.flex,
+          flex: 3,
+          minWidth: 170,
+          overflow: GeniusPdfGridTextOverflow.wrap,
+        ),
+        'qty': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 55,
+          valueKind: GeniusPdfGridValueKind.quantity,
+        ),
+        'amount': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 115,
+          valueKind: GeniusPdfGridValueKind.money,
+          currencyCode: 'SAR',
+        ),
+      };
+
+  GeniusPdfDataGridVNext _buildGrid() {
+    switch (scenario) {
+      case S04DataGridVNextScenario.sizing:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(18),
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 86,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              minWidth: 145,
+              maxWidth: 250,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+              minWidth: 92,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.longContent:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: [
+            ..._rows(8),
+            const GeniusPdfGridRow(
+              cells: {
+                'sku': 'LONG-001',
+                'description':
+                    'وصف عربي طويل جدًا مع English product description '
+                    'وملاحظات إضافية لاختبار الالتفاف وعدم تداخل النص.',
+                'qty': 2,
+                'amount': 15697.50,
+              },
+            ),
+          ],
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 80,
+              overflow: GeniusPdfGridTextOverflow.ellipsis,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+              overflow: GeniusPdfGridTextOverflow.wrap,
+              minWidth: 180,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 55,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 105,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.pagination:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(140),
+          repeatHeaderOnPages: true,
+          rowSplitPolicy: GeniusPdfGridRowSplitPolicy.keepTogether,
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.grouping:
+        final rows = List<GeniusPdfGridRow>.generate(
+          90,
+          (index) => GeniusPdfGridRow(
+            cells: {
+              'sku': 'SKU-${index.toString().padLeft(4, '0')}',
+              'description': 'Grouped ERP item $index',
+              'qty': (index % 8) + 1,
+              'amount': (index + 1) * 17.25,
+              'region': index.isEven ? 'north' : 'south',
+              'category': index % 3 == 0 ? 'hardware' : 'services',
+            },
+          ),
+        );
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: rows,
+          repeatHeaderOnPages: true,
+          repeatGroupHeaders: true,
+          groupBy: [
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['region'],
+              titleBuilder: (key) => 'Region: $key',
+              titleArBuilder: (key) => 'المنطقة: $key',
+            ),
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['category'],
+              titleBuilder: (key) => 'Category: $key',
+              titleArBuilder: (key) => 'الفئة: $key',
+            ),
+          ],
+          groupSummaries: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Subtotal',
+              labelAr: 'المجموع الفرعي',
+              labelColumnId: 'description',
+            ),
+          ],
+          grandTotals: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Grand Total',
+              labelAr: 'الإجمالي العام',
+              labelColumnId: 'description',
+            ),
+          ],
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.spansAndBuilders:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(20),
+          cellSpans: const [
+            GeniusPdfGridCellSpan(
+              rowIndex: 0,
+              columnId: 'sku',
+              rowSpan: 2,
+              columnSpan: 2,
+            ),
+          ],
+          rowStyleBuilder: (context) {
+            if (context.rowIndex == 5) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFFFF3CD),
+              );
+            }
+            return null;
+          },
+          cellStyleBuilder: (context) {
+            if (context.column.id == 'amount' &&
+                context.value is num &&
+                (context.value as num) > 200) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFE8F5E9),
+              );
+            }
+            return null;
+          },
+          cellBuilder: (context) {
+            if (context.column.id == 'description' &&
+                context.rowIndex == 3) {
+              return const GeniusPdfGridCellBuildResult(
+                value: 'Built by cellBuilder',
+              );
+            }
+            return null;
+          },
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.erpFormatting:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'INV-2026-000123',
+                'description': 'Debit / مدين',
+                'qty': 0.15,
+                'amount': -1250.0,
+                'currency': 'SAR',
+              },
+            ),
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'PO-2026-00998',
+                'description': 'Credit / دائن',
+                'qty': 12.5,
+                'amount': 2047.50,
+                'currency': 'USD',
+              },
+            ),
+          ],
+          columnPolicies: {
+            'sku': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              valueKind: GeniusPdfGridValueKind.identifier,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+            ),
+            'qty': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 68,
+              valueKind: GeniusPdfGridValueKind.percentage,
+              percentageIsFraction: true,
+              decimalPlaces: 2,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 120,
+              valueKind: GeniusPdfGridValueKind.money,
+              accountingNegative: true,
+              currencyResolver: (row) =>
+                  row.cells['currency']?.toString(),
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.directionality:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(40),
+          followDirection: true,
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 92,
+              contentDirection: GeniusPdfDirection.ltr,
+              headerPadding: GeniusPdfGridDirectionalPadding(
+                start: 10,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+              cellPadding: GeniusPdfGridDirectionalPadding(
+                start: 8,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 115,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.emptyState:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [],
+          emptyState: const GeniusPdfGridEmptyState(
+            message: 'No inventory transactions',
+            messageAr: 'لا توجد حركات مخزون',
+          ),
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.largeData:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rowSource: GeniusPdfGridLazyRowSource(
+            length: 1000,
+            builder: (index) => GeniusPdfGridRow(
+              cells: {
+                'sku': 'SKU-${index.toString().padLeft(6, '0')}',
+                'description': 'Large-data item $index',
+                'qty': (index % 100) + 1,
+                'amount': index * 3.75,
+              },
+            ),
+          ),
+          repeatHeaderOnPages: true,
+          performance: const GeniusPdfGridPerformanceOptions(
+            veryLargeDataMode: true,
+            autoFitSampleSize: 50,
+            cacheMeasuredWidths: true,
+            cacheResolvedStyles: true,
+          ),
+          columnPolicies: _standardPolicies,
+        );
+    }
+  }
+
+  List<GeniusPdfGridRow> _rows(int count) {
+    return List<GeniusPdfGridRow>.generate(
+      count,
+      (index) => GeniusPdfGridRow(
+        cells: {
+          'sku': 'SKU-${index.toString().padLeft(5, '0')}',
+          'description': index % 4 == 0
+              ? 'منتج تجريبي مع English description $index'
+              : 'Demo item $index',
+          'qty': (index % 12) + 1,
+          'amount': (index + 1) * 13.65,
+        },
+      ),
+    );
+  }
+}
+
+
+
+Future<Uint8List> buildS04EmptyStateVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S04DataGridVNextDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S04DataGridVNextScenario.emptyState,
+    preserveOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
+    hide EdgeInsets, Colors;
+
+/// Focused scenarios extracted from the former S04DataGridVNextVerificationPage.
+enum S04DataGridVNextScenario {
+  sizing,
+  longContent,
+  pagination,
+  grouping,
+  spansAndBuilders,
+  erpFormatting,
+  directionality,
+  emptyState,
+  largeData,
+}
+
+class S04DataGridVNextDocument extends GeniusPdfDocumentBuilder {
+  S04DataGridVNextDocument({
+    required GeniusPdfConfig config,
+    required GeniusPdfDirectionality directionality,
+    required this.scenario,
+    required this.preserveOrder,
+  }) : super(config, directionality: directionality);
+
+  final S04DataGridVNextScenario scenario;
+  final bool preserveOrder;
+
+  @override
+  void build() {
+    newPage();
+    final result = _buildGrid().draw(
+      page: currentPage,
+      bounds: contentBounds,
+    );
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 8);
+    }
+  }
+
+  List<GeniusPdfGridColumn> get _columns => const [
+        GeniusPdfGridColumn(
+          id: 'sku',
+          title: 'SKU',
+          titleAr: 'رمز الصنف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'description',
+          title: 'Description',
+          titleAr: 'الوصف',
+        ),
+        GeniusPdfGridColumn(
+          id: 'qty',
+          title: 'Qty',
+          titleAr: 'الكمية',
+          isNumeric: true,
+        ),
+        GeniusPdfGridColumn(
+          id: 'amount',
+          title: 'Amount',
+          titleAr: 'المبلغ',
+          isNumeric: true,
+        ),
+      ];
+
+  Map<String, GeniusPdfGridColumnPolicy> get _standardPolicies => const {
+        'sku': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 90,
+          contentDirection: GeniusPdfDirection.ltr,
+        ),
+        'description': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.flex,
+          flex: 3,
+          minWidth: 170,
+          overflow: GeniusPdfGridTextOverflow.wrap,
+        ),
+        'qty': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 55,
+          valueKind: GeniusPdfGridValueKind.quantity,
+        ),
+        'amount': GeniusPdfGridColumnPolicy(
+          widthMode: GeniusPdfGridWidthMode.fixed,
+          fixedWidth: 115,
+          valueKind: GeniusPdfGridValueKind.money,
+          currencyCode: 'SAR',
+        ),
+      };
+
+  GeniusPdfDataGridVNext _buildGrid() {
+    switch (scenario) {
+      case S04DataGridVNextScenario.sizing:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(18),
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 86,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              minWidth: 145,
+              maxWidth: 250,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+              minWidth: 92,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.longContent:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: [
+            ..._rows(8),
+            const GeniusPdfGridRow(
+              cells: {
+                'sku': 'LONG-001',
+                'description':
+                    'وصف عربي طويل جدًا مع English product description '
+                    'وملاحظات إضافية لاختبار الالتفاف وعدم تداخل النص.',
+                'qty': 2,
+                'amount': 15697.50,
+              },
+            ),
+          ],
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 80,
+              overflow: GeniusPdfGridTextOverflow.ellipsis,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+              overflow: GeniusPdfGridTextOverflow.wrap,
+              minWidth: 180,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 55,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 105,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.pagination:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(140),
+          repeatHeaderOnPages: true,
+          rowSplitPolicy: GeniusPdfGridRowSplitPolicy.keepTogether,
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.grouping:
+        final rows = List<GeniusPdfGridRow>.generate(
+          90,
+          (index) => GeniusPdfGridRow(
+            cells: {
+              'sku': 'SKU-${index.toString().padLeft(4, '0')}',
+              'description': 'Grouped ERP item $index',
+              'qty': (index % 8) + 1,
+              'amount': (index + 1) * 17.25,
+              'region': index.isEven ? 'north' : 'south',
+              'category': index % 3 == 0 ? 'hardware' : 'services',
+            },
+          ),
+        );
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: rows,
+          repeatHeaderOnPages: true,
+          repeatGroupHeaders: true,
+          groupBy: [
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['region'],
+              titleBuilder: (key) => 'Region: $key',
+              titleArBuilder: (key) => 'المنطقة: $key',
+            ),
+            GeniusPdfGridGroupDefinition(
+              keySelector: (row) => row.cells['category'],
+              titleBuilder: (key) => 'Category: $key',
+              titleArBuilder: (key) => 'الفئة: $key',
+            ),
+          ],
+          groupSummaries: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Subtotal',
+              labelAr: 'المجموع الفرعي',
+              labelColumnId: 'description',
+            ),
+          ],
+          grandTotals: const [
+            GeniusPdfGridSummaryExpression.sum(
+              outputColumnId: 'amount',
+              sourceColumnId: 'amount',
+              label: 'Grand Total',
+              labelAr: 'الإجمالي العام',
+              labelColumnId: 'description',
+            ),
+          ],
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.spansAndBuilders:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(20),
+          cellSpans: const [
+            GeniusPdfGridCellSpan(
+              rowIndex: 0,
+              columnId: 'sku',
+              rowSpan: 2,
+              columnSpan: 2,
+            ),
+          ],
+          rowStyleBuilder: (context) {
+            if (context.rowIndex == 5) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFFFF3CD),
+              );
+            }
+            return null;
+          },
+          cellStyleBuilder: (context) {
+            if (context.column.id == 'amount' &&
+                context.value is num &&
+                (context.value as num) > 200) {
+              return const GeniusPdfCellStyle(
+                backgroundColor: Color(0xFFE8F5E9),
+              );
+            }
+            return null;
+          },
+          cellBuilder: (context) {
+            if (context.column.id == 'description' &&
+                context.rowIndex == 3) {
+              return const GeniusPdfGridCellBuildResult(
+                value: 'Built by cellBuilder',
+              );
+            }
+            return null;
+          },
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.erpFormatting:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'INV-2026-000123',
+                'description': 'Debit / مدين',
+                'qty': 0.15,
+                'amount': -1250.0,
+                'currency': 'SAR',
+              },
+            ),
+            GeniusPdfGridRow(
+              cells: {
+                'sku': 'PO-2026-00998',
+                'description': 'Credit / دائن',
+                'qty': 12.5,
+                'amount': 2047.50,
+                'currency': 'USD',
+              },
+            ),
+          ],
+          columnPolicies: {
+            'sku': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.autoFit,
+              valueKind: GeniusPdfGridValueKind.identifier,
+              contentDirection: GeniusPdfDirection.ltr,
+            ),
+            'description': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 2,
+            ),
+            'qty': const GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 68,
+              valueKind: GeniusPdfGridValueKind.percentage,
+              percentageIsFraction: true,
+              decimalPlaces: 2,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 120,
+              valueKind: GeniusPdfGridValueKind.money,
+              accountingNegative: true,
+              currencyResolver: (row) =>
+                  row.cells['currency']?.toString(),
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.directionality:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: _rows(40),
+          followDirection: true,
+          preserveDefinitionOrder: preserveOrder,
+          columnPolicies: const {
+            'sku': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 92,
+              contentDirection: GeniusPdfDirection.ltr,
+              headerPadding: GeniusPdfGridDirectionalPadding(
+                start: 10,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+              cellPadding: GeniusPdfGridDirectionalPadding(
+                start: 8,
+                end: 4,
+                top: 4,
+                bottom: 4,
+              ),
+            ),
+            'description': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.flex,
+              flex: 3,
+            ),
+            'qty': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 58,
+              valueKind: GeniusPdfGridValueKind.quantity,
+            ),
+            'amount': GeniusPdfGridColumnPolicy(
+              widthMode: GeniusPdfGridWidthMode.fixed,
+              fixedWidth: 115,
+              valueKind: GeniusPdfGridValueKind.money,
+              currencyCode: 'SAR',
+            ),
+          },
+        );
+
+      case S04DataGridVNextScenario.emptyState:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rows: const [],
+          emptyState: const GeniusPdfGridEmptyState(
+            message: 'No inventory transactions',
+            messageAr: 'لا توجد حركات مخزون',
+          ),
+          columnPolicies: _standardPolicies,
+        );
+
+      case S04DataGridVNextScenario.largeData:
+        return GeniusPdfDataGridVNext(
+          config: config,
+          columns: _columns,
+          rowSource: GeniusPdfGridLazyRowSource(
+            length: 1000,
+            builder: (index) => GeniusPdfGridRow(
+              cells: {
+                'sku': 'SKU-${index.toString().padLeft(6, '0')}',
+                'description': 'Large-data item $index',
+                'qty': (index % 100) + 1,
+                'amount': index * 3.75,
+              },
+            ),
+          ),
+          repeatHeaderOnPages: true,
+          performance: const GeniusPdfGridPerformanceOptions(
+            veryLargeDataMode: true,
+            autoFitSampleSize: 50,
+            cacheMeasuredWidths: true,
+            cacheResolvedStyles: true,
+          ),
+          columnPolicies: _standardPolicies,
+        );
+    }
+  }
+
+  List<GeniusPdfGridRow> _rows(int count) {
+    return List<GeniusPdfGridRow>.generate(
+      count,
+      (index) => GeniusPdfGridRow(
+        cells: {
+          'sku': 'SKU-${index.toString().padLeft(5, '0')}',
+          'description': index % 4 == 0
+              ? 'منتج تجريبي مع English description $index'
+              : 'Demo item $index',
+          'qty': (index % 12) + 1,
+          'amount': (index + 1) * 13.65,
+        },
+      ),
+    );
+  }
+}
+
+
+
+Future<Uint8List> buildS04LargeDataVerificationPdf(GeniusPdfConfig config) async {
+  final direction = config.textDirection == TextDirection.rtl
+      ? GeniusPdfDirection.rtl
+      : GeniusPdfDirection.ltr;
+  final directionality = GeniusPdfDirectionality(
+    documentDirection: direction,
+  );
+  final builder = S04DataGridVNextDocument(
+    config: config,
+    directionality: directionality,
+    scenario: S04DataGridVNextScenario.largeData,
+    preserveOrder: false,
+  );
+  try {
+    return Uint8List.fromList(builder.generate());
+  } finally {
+    builder.dispose();
+  }
+}

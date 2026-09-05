@@ -1,7 +1,6 @@
 
 import '../builders/pdf_document_builder.dart';
 import '../components/components.dart';
-import '../core/pdf_config.dart';
 import '../printing/printing.dart';
 import 'compliance_models.dart';
 import 'compliance_profile.dart';
@@ -14,11 +13,11 @@ import 'compliance_profile.dart';
 class GeniusPdfComplianceDiagnosticsDocument
     extends GeniusPdfDocumentBuilder {
   GeniusPdfComplianceDiagnosticsDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required this.profile,
     required this.metadata,
     required this.documentData,
-  }) : super(config);
+  });
 
   final GeniusPdfComplianceProfile profile;
   final GeniusPdfEnterpriseDocumentMetadata metadata;

@@ -8,6 +8,19 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
+
+Future<ShareResult> _shareFiles(
+  List<XFile> files, {
+  String? subject,
+  String? text,
+}) =>
+    SharePlus.instance.share(
+      ShareParams(
+        files: files,
+        subject: subject,
+        text: text,
+      ),
+    );
 /// Known app identifiers for direct sharing.
 class GeniusKnownApps {
   GeniusKnownApps._();
@@ -393,7 +406,7 @@ class GeniusAppShareService {
 
       // Try to share using share_plus
       // On some platforms this may allow specifying the target app
-      final result = await Share.shareXFiles(
+      final result = await _shareFiles(
         [XFile(file.path)],
         text: message,
       );
@@ -445,7 +458,7 @@ class GeniusAppShareService {
       }
 
       // Use regular share
-      final result = await Share.shareXFiles(
+      final result = await _shareFiles(
         [XFile(file.path)],
         text: message,
       );
@@ -578,7 +591,7 @@ class GeniusAppShareService {
       }
 
       // Fallback to share sheet
-      final result = await Share.shareXFiles([XFile(file.path)]);
+      final result = await _shareFiles([XFile(file.path)]);
 
       if (result.status == ShareResultStatus.success) {
         return GeniusAppShareResult.success(

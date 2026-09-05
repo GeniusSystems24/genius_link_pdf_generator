@@ -1,3 +1,4 @@
+// ignore_for_file: sort_constructors_first
 
 import 'dart:convert';
 
@@ -143,7 +144,7 @@ class GeniusPdfTemplateSchema {
   factory GeniusPdfTemplateSchema.fromMap(
     Map<String, Object?> raw,
   ) {
-    final migrated = GeniusPdfTemplateSchemaMigrator().migrate(raw);
+    final migrated = const GeniusPdfTemplateSchemaMigrator().migrate(raw);
     final stateName = migrated['state']?.toString() ?? 'draft';
     final state = GeniusPdfTemplateState.values
         .where((value) => value.name == stateName)
@@ -264,7 +265,7 @@ class GeniusPdfTemplateSchemaMigrator {
         (current['schemaVersion'] as num?)?.toInt() ?? 1;
 
     if (version < 1) {
-      throw GeniusPdfTemplateSchemaException(
+      throw const GeniusPdfTemplateSchemaException(
         'schemaVersion must be >= 1.',
       );
     }

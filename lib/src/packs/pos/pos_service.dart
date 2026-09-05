@@ -1,5 +1,4 @@
 
-import '../../domain/erp/erp.dart';
 import '../../printing/profiles/print_profiles.dart';
 import '../shared/erp_pack_shared.dart';
 import 'pos_models.dart';

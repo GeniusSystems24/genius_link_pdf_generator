@@ -517,9 +517,6 @@ class GeniusPdfSummarySection {
   /// Calculates the total content height with per-item accuracy (v2.12.5).
   double _calculateContentHeight([double? availableWidth]) {
     double height = 0;
-    final boxWidth = width ?? ((availableWidth ?? 600) * 0.4);
-    final estimatedContentWidth = boxWidth - style.padding.left - style.padding.right;
-
     // Title height
     if (title != null || titleAr != null) {
       final effectiveTitleStyle = style.titleStyle ?? style.labelStyle;

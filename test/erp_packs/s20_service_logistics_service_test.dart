@@ -184,7 +184,7 @@ void main() {
         ),
       ],
       attachments: [
-        GeniusServiceAttachmentReference(
+        const GeniusServiceAttachmentReference(
           reference: 'PHOTO-POD-001',
           label: 'Delivery photo',
           labelAr: 'صورة التسليم',

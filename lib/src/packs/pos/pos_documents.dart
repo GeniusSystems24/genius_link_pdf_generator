@@ -1,5 +1,4 @@
 
-import '../../core/pdf_config.dart';
 import '../../families/erp/erp_families.dart';
 import '../../printing/profiles/print_profiles.dart';
 import '../shared/erp_pack_shared.dart';
@@ -10,39 +9,28 @@ import 'pos_service.dart';
 class GeniusPosReceipt58Document
     extends GeniusPdfThermalReceiptEngine {
   GeniusPosReceipt58Document({
-    required GeniusPdfConfig config,
+    required super.config,
     required GeniusPosReceiptRequest request,
-  }) : super(
-          config: config,
-          profile: const GeniusPosService().profile58(),
-          data: const GeniusPosService().thermalData(request),
-        );
+  }) : super(profile: const GeniusPosService().profile58(), data: const GeniusPosService().thermalData(request));
 }
 
 /// S16-T02 — 80mm receipt.
 class GeniusPosReceipt80Document
     extends GeniusPdfThermalReceiptEngine {
   GeniusPosReceipt80Document({
-    required GeniusPdfConfig config,
+    required super.config,
     required GeniusPosReceiptRequest request,
-  }) : super(
-          config: config,
-          profile: const GeniusPosService().profile80(),
-          data: const GeniusPosService().thermalData(request),
-        );
+  }) : super(profile: const GeniusPosService().profile80(), data: const GeniusPosService().thermalData(request));
 }
 
 /// S16-T03 — Refund Receipt.
 class GeniusRefundReceiptDocument
     extends GeniusPdfThermalReceiptEngine {
   GeniusRefundReceiptDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required GeniusPosReceiptRequest request,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? const GeniusPosService().profile80(),
-          data: const GeniusPosService().thermalData(
+  }) : super(profile: profile ?? const GeniusPosService().profile80(), data: const GeniusPosService().thermalData(
             GeniusPosReceiptRequest(
               merchantName: request.merchantName,
               merchantNameAr: request.merchantNameAr,
@@ -64,21 +52,17 @@ class GeniusRefundReceiptDocument
               footer: request.footer,
               footerAr: request.footerAr,
             ),
-          ),
-        );
+          ));
 }
 
 /// S16-T04 — Exchange Receipt.
 class GeniusExchangeReceiptDocument
     extends GeniusPdfThermalReceiptEngine {
   GeniusExchangeReceiptDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required GeniusPosReceiptRequest request,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? const GeniusPosService().profile80(),
-          data: const GeniusPosService().thermalData(
+  }) : super(profile: profile ?? const GeniusPosService().profile80(), data: const GeniusPosService().thermalData(
             GeniusPosReceiptRequest(
               merchantName: request.merchantName,
               merchantNameAr: request.merchantNameAr,
@@ -100,8 +84,7 @@ class GeniusExchangeReceiptDocument
               footer: request.footer,
               footerAr: request.footerAr,
             ),
-          ),
-        );
+          ));
 }
 
 /// S16-T05 — Gift Receipt.
@@ -111,13 +94,10 @@ class GeniusExchangeReceiptDocument
 class GeniusGiftReceiptDocument
     extends GeniusPdfThermalReceiptEngine {
   GeniusGiftReceiptDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required GeniusPosReceiptRequest request,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? const GeniusPosService().profile80(),
-          data: const GeniusPosService().thermalData(
+  }) : super(profile: profile ?? const GeniusPosService().profile80(), data: const GeniusPosService().thermalData(
             GeniusPosReceiptRequest(
               merchantName: request.merchantName,
               merchantNameAr: request.merchantNameAr,
@@ -134,8 +114,7 @@ class GeniusGiftReceiptDocument
               footer: request.footer,
               footerAr: request.footerAr,
             ),
-          ),
-        );
+          ));
 }
 
 /// S16-T06 — optional Kitchen Order Ticket.
@@ -145,13 +124,10 @@ class GeniusGiftReceiptDocument
 class GeniusKitchenOrderTicketDocument
     extends GeniusPdfThermalReceiptEngine {
   GeniusKitchenOrderTicketDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required GeniusPosReceiptRequest request,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? const GeniusPosService().profile80(),
-          data: const GeniusPosService().thermalData(
+  }) : super(profile: profile ?? const GeniusPosService().profile80(), data: const GeniusPosService().thermalData(
             GeniusPosReceiptRequest(
               merchantName: request.merchantName,
               merchantNameAr: request.merchantNameAr,
@@ -165,15 +141,14 @@ class GeniusKitchenOrderTicketDocument
               footer: 'KITCHEN ORDER TICKET',
               footerAr: 'تذكرة طلب المطبخ',
             ),
-          ),
-        );
+          ));
 }
 
 abstract class _PosRegisterDocument extends GeniusErpRegisterDocument {
   _PosRegisterDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required this.report,
-  }) : super(config);
+  });
 
   final GeniusErpPackReportData report;
 
@@ -184,9 +159,9 @@ abstract class _PosRegisterDocument extends GeniusErpRegisterDocument {
 abstract class _PosAnalyticalDocument
     extends GeniusErpAnalyticalReport {
   _PosAnalyticalDocument(
-    GeniusPdfConfig config, {
+    super.config, {
     required this.report,
-  }) : super(config);
+  });
 
   final GeniusErpPackReportData report;
 
@@ -197,48 +172,48 @@ abstract class _PosAnalyticalDocument
 /// S16-T07.
 class GeniusShiftOpenReport extends _PosRegisterDocument {
   GeniusShiftOpenReport(
-    GeniusPdfConfig config, {
-    required GeniusErpPackReportData report,
-  }) : super(config, report: report);
+    super.config, {
+    required super.report,
+  });
 }
 
 /// S16-T08.
 class GeniusShiftCloseReport extends _PosRegisterDocument {
   GeniusShiftCloseReport(
-    GeniusPdfConfig config, {
-    required GeniusErpPackReportData report,
-  }) : super(config, report: report);
+    super.config, {
+    required super.report,
+  });
 }
 
 /// S16-T09.
 class GeniusXReport extends _PosAnalyticalDocument {
   GeniusXReport(
-    GeniusPdfConfig config, {
-    required GeniusErpPackReportData report,
-  }) : super(config, report: report);
+    super.config, {
+    required super.report,
+  });
 }
 
 /// S16-T10.
 class GeniusZReport extends _PosAnalyticalDocument {
   GeniusZReport(
-    GeniusPdfConfig config, {
-    required GeniusErpPackReportData report,
-  }) : super(config, report: report);
+    super.config, {
+    required super.report,
+  });
 }
 
 /// S16-T11.
 class GeniusCashDrawerReport extends _PosRegisterDocument {
   GeniusCashDrawerReport(
-    GeniusPdfConfig config, {
-    required GeniusErpPackReportData report,
-  }) : super(config, report: report);
+    super.config, {
+    required super.report,
+  });
 }
 
 /// S16-T12.
 class GeniusPaymentMethodSummaryReport
     extends _PosAnalyticalDocument {
   GeniusPaymentMethodSummaryReport(
-    GeniusPdfConfig config, {
-    required GeniusErpPackReportData report,
-  }) : super(config, report: report);
+    super.config, {
+    required super.report,
+  });
 }

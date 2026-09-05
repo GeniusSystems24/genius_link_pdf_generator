@@ -1,5 +1,4 @@
 
-import '../../core/pdf_config.dart';
 import '../../printing/profiles/print_profiles.dart';
 import 'pos_models.dart';
 
@@ -38,40 +37,28 @@ List<GeniusPdfLabelData> _retailLabels(
 class GeniusRetailBarcodeLabelDocument
     extends GeniusPdfLabelPrintDocument {
   GeniusRetailBarcodeLabelDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required List<GeniusPosRetailLabel> labels,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? _retailLabelProfile(),
-          labels: _retailLabels(labels, kind: 'Barcode'),
-        );
+  }) : super(profile: profile ?? _retailLabelProfile(), labels: _retailLabels(labels, kind: 'Barcode'));
 }
 
 /// S16-T14 — Price label.
 class GeniusRetailPriceLabelDocument
     extends GeniusPdfLabelPrintDocument {
   GeniusRetailPriceLabelDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required List<GeniusPosRetailLabel> labels,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? _retailLabelProfile(),
-          labels: _retailLabels(labels, kind: 'Price'),
-        );
+  }) : super(profile: profile ?? _retailLabelProfile(), labels: _retailLabels(labels, kind: 'Price'));
 }
 
 /// S16-T15 — Promotion label.
 class GeniusRetailPromotionLabelDocument
     extends GeniusPdfLabelPrintDocument {
   GeniusRetailPromotionLabelDocument({
-    required GeniusPdfConfig config,
+    required super.config,
     required List<GeniusPosRetailLabel> labels,
     GeniusPdfPrintProfile? profile,
-  }) : super(
-          config: config,
-          profile: profile ?? _retailLabelProfile(),
-          labels: _retailLabels(labels, kind: 'Promotion'),
-        );
+  }) : super(profile: profile ?? _retailLabelProfile(), labels: _retailLabels(labels, kind: 'Promotion'));
 }
