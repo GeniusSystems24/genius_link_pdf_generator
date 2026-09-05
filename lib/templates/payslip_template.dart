@@ -492,7 +492,7 @@ class PayslipTemplate extends GeniusErpOperationalForm {
           'amount': total,
         }),
       ],
-      style: GeniusPdfGridStyle.modern(),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
     final result = grid.drawAt(

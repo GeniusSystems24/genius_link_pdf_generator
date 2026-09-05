@@ -139,9 +139,6 @@ class IncomeStatementTemplate extends GeniusErpAnalyticalReport {
   /// Cached bold font — created once, reused across all methods.
   late final PdfFont _cachedBoldFont = boldFont ?? config.boldFont;
 
-  /// Cached net income font (slightly larger, bold).
-  late final PdfFont _cachedNetFont =
-      config.fontBuild(fontSize: config.printTheme.typography.bodySize + 2);
 
   @override
   void build() {
@@ -149,69 +146,10 @@ class IncomeStatementTemplate extends GeniusErpAnalyticalReport {
 
     _drawHeader();
 
-    // Revenue
-    _drawSectionWithTotal(
-      data.revenue,
-      'Total Revenue',
-      'إجمالي الإيرادات',
-    );
-    addSpace(10);
-
-    // Cost of Sales
-    _drawSectionWithTotal(
-      data.costOfSales,
-      'Total Cost of Sales',
-      'إجمالي تكلفة المبيعات',
-    );
-
-    // Gross Profit
-    _drawSubtotalLine('Gross Profit', 'إجمالي الربح', data.grossProfit);
-    addSpace(10);
-
-    // Operating Expenses
-    _drawSectionWithTotal(
-      data.operatingExpenses,
-      'Total Operating Expenses',
-      'إجمالي المصروفات التشغيلية',
-    );
-
-    // Operating Income
-    _drawSubtotalLine(
-        'Operating Income', 'الدخل التشغيلي', data.operatingIncome);
-    addSpace(10);
-
-    // Other Income
-    if (data.otherIncome != null && data.otherIncome!.items.isNotEmpty) {
-      _drawSectionWithTotal(
-        data.otherIncome!,
-        'Total Other Income',
-        'إجمالي الإيرادات الأخرى',
-      );
-    }
-
-    // Other Expenses
-    if (data.otherExpenses != null && data.otherExpenses!.items.isNotEmpty) {
-      _drawSectionWithTotal(
-        data.otherExpenses!,
-        'Total Other Expenses',
-        'إجمالي المصروفات الأخرى',
-      );
-    }
-
-    // Income Before Tax
-    _drawSubtotalLine(
-        'Income Before Tax', 'الدخل قبل الضريبة', data.incomeBeforeTax);
-
-    // Tax Expense
-    if (data.taxExpense != null) {
-      _drawSimpleLine('Tax Expense', 'مصروف الضريبة', data.taxExpense!);
-    }
+    // Income statement grid
+    _drawIncomeStatementGrid();
 
     addSpace(10);
-
-    // Net Income
-    _drawNetIncome();
-
     // Profitability Ratios
     if (showPercentages) {
       _drawProfitabilityRatios();
@@ -254,73 +192,112 @@ class IncomeStatementTemplate extends GeniusErpAnalyticalReport {
   // Section with Items Grid + Total
   // ──────────────────────────────────────────────────────────
 
-  void _drawSectionWithTotal(
-    IncomeStatementSection section,
-    String totalLabel,
-    String totalLabelAr,
-  ) {
-    // Section title
-    final titleText =
-        config.isRTL ? (section.titleAr ?? section.title) : section.title;
+  void _drawIncomeStatementGrid() {
+    final columns = [
+      const GeniusPdfGridColumn(
+        id: 'code',
+        title: 'Code',
+        titleAr: 'الكود',
+        width: 80,
+      ),
+      const GeniusPdfGridColumn(
+        id: 'account',
+        title: 'Description',
+        titleAr: 'البيان',
+        flexFactor: 3,
+      ),
+      GeniusPdfGridColumn.currency(
+        id: 'amount',
+        title: 'Amount (${data.currency})',
+        titleAr: 'المبلغ (${data.currency})',
+        width: 120,
+        currencySymbol: '',
+      ),
+    ];
 
-    addLine(titleText, font: _cachedBoldFont, topMargin: 5);
-
-    // Section items
     final rows = <GeniusPdfGridRow>[];
-    for (final item in section.items) {
-      final indent = '  ' * item.level;
-      final accountName = config.isRTL
-          ? (item.accountNameAr ?? item.accountName)
-          : item.accountName;
 
-      rows.add(GeniusPdfGridRow(
-        cells: {
-          'code': item.accountCode,
-          'account': '$indent$accountName',
-          'amount': item.amount,
-        },
-        isTotal: item.isSubtotal,
-      ));
+    _appendSectionRows(
+      rows: rows,
+      section: data.revenue,
+      totalLabel: 'Total Revenue',
+      totalLabelAr: 'إجمالي الإيرادات',
+    );
+
+    _appendSectionRows(
+      rows: rows,
+      section: data.costOfSales,
+      totalLabel: 'Total Cost of Sales',
+      totalLabelAr: 'إجمالي تكلفة المبيعات',
+    );
+
+    _appendCalculatedRow(
+      rows,
+      label: 'Gross Profit',
+      labelAr: 'إجمالي الربح',
+      amount: data.grossProfit,
+    );
+
+    _appendSectionRows(
+      rows: rows,
+      section: data.operatingExpenses,
+      totalLabel: 'Total Operating Expenses',
+      totalLabelAr: 'إجمالي المصروفات التشغيلية',
+    );
+
+    _appendCalculatedRow(
+      rows,
+      label: 'Operating Income',
+      labelAr: 'الدخل التشغيلي',
+      amount: data.operatingIncome,
+    );
+
+    if (data.otherIncome != null && data.otherIncome!.items.isNotEmpty) {
+      _appendSectionRows(
+        rows: rows,
+        section: data.otherIncome!,
+        totalLabel: 'Total Other Income',
+        totalLabelAr: 'إجمالي الإيرادات الأخرى',
+      );
     }
 
-    // Section total row
-    rows.add(GeniusPdfGridRow(
-      cells: {
-        'code': '',
-        'account': config.isRTL ? totalLabelAr : totalLabel,
-        'amount': section.total,
-      },
-      isHeader: true,
-    ));
+    if (data.otherExpenses != null && data.otherExpenses!.items.isNotEmpty) {
+      _appendSectionRows(
+        rows: rows,
+        section: data.otherExpenses!,
+        totalLabel: 'Total Other Expenses',
+        totalLabelAr: 'إجمالي المصروفات الأخرى',
+      );
+    }
+
+    _appendCalculatedRow(
+      rows,
+      label: 'Income Before Tax',
+      labelAr: 'الدخل قبل الضريبة',
+      amount: data.incomeBeforeTax,
+    );
+
+    if (data.taxExpense != null) {
+      rows.add(
+        GeniusPdfGridRow(
+          cells: {
+            'code': '',
+            'account': config.isRTL ? 'مصروف الضريبة' : 'Tax Expense',
+            'amount': data.taxExpense,
+          },
+        ),
+      );
+    }
+
+    _appendNetIncomeRow(rows);
 
     final grid = GeniusPdfDataGrid(
       config: config,
-      columns: [
-        const GeniusPdfGridColumn(
-          id: 'code',
-          title: 'Code',
-          titleAr: 'الكود',
-          width: 80,
-        ),
-        const GeniusPdfGridColumn(
-          id: 'account',
-          title: 'Description',
-          titleAr: 'البيان',
-          flexFactor: 3,
-        ),
-        GeniusPdfGridColumn.currency(
-          id: 'amount',
-          title: 'Amount (${data.currency})',
-          titleAr: 'المبلغ (${data.currency})',
-          width: 120,
-          currencySymbol: '',
-        ),
-      ],
+      columns: columns,
       rows: rows,
-      style: const GeniusPdfGridStyle(showHeader: false),
+      style: const GeniusPdfGridStyle.classic(),
     );
 
-    // Use drawAt + updateFromLayoutResult for multi-page safety.
     final result = grid.drawAt(
       page: currentPage,
       x: 0,
@@ -329,151 +306,127 @@ class IncomeStatementTemplate extends GeniusErpAnalyticalReport {
     );
 
     if (result != null) {
-      updateFromLayoutResult(result, spacing: 5);
+      // Keep currentPage/currentY synchronized with Grid pagination,
+      // matching TrialBalanceTemplate's multi-page handling.
+      updateFromLayoutResult(result, spacing: 10);
     }
   }
 
-  // ──────────────────────────────────────────────────────────
-  // Subtotal Line (highlighted background)
-  // ──────────────────────────────────────────────────────────
-
-  void _drawSubtotalLine(String label, String labelAr, double amount) {
-    // Ensure space before drawing.
-    const lineHeight = 22.0;
-    if (remainingHeight < lineHeight + 6) newPage();
-
-    final displayLabel = config.isRTL ? labelAr : label;
-    final isProfit = amount >= 0;
-    final color = isProfit ? PdfColor(0, 100, 0) : PdfColor(180, 0, 0);
-
-    final page = currentPage;
-    final labelX = config.isRTL ? pageWidth * 0.4 : 10.0;
-    final labelW = pageWidth * 0.6 - 10;
-    final amountX = config.isRTL ? 10.0 : pageWidth * 0.6;
-    final amountW = pageWidth * 0.4 - 10;
-
-    page.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(240, 240, 240)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, lineHeight),
-    );
-
-    page.graphics.drawString(
-      displayLabel,
-      _cachedBoldFont,
-      bounds: Rect.fromLTWH(labelX, currentY + 4, labelW, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
+  void _appendSectionRows({
+    required List<GeniusPdfGridRow> rows,
+    required IncomeStatementSection section,
+    required String totalLabel,
+    required String totalLabelAr,
+  }) {
+    rows.add(
+      GeniusPdfGridRow.groupHeader(
+        config.isRTL ? (section.titleAr ?? section.title) : section.title,
+        style: const GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1565C0),
+          ),
+          backgroundColor: Color(0xFFE3F2FD),
+          border: GeniusPdfBorderStyle.all(),
+          padding: GeniusPdfCellPadding.all(5),
+        ),
       ),
     );
 
-    page.graphics.drawString(
-      _formatCurrency(amount),
-      _cachedBoldFont,
-      brush: PdfSolidBrush(color),
-      bounds: Rect.fromLTWH(amountX, currentY + 4, amountW, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
+    for (final item in section.items) {
+      final indent = '  ' * item.level;
+      final accountName = config.isRTL
+          ? (item.accountNameAr ?? item.accountName)
+          : item.accountName;
+
+      rows.add(
+        GeniusPdfGridRow(
+          cells: {
+            'code': item.accountCode,
+            'account': '$indent$accountName',
+            'amount': item.amount,
+          },
+          style: item.isSubtotal ? _subtotalRowStyle : null,
+        ),
+      );
+    }
+
+    rows.add(
+      GeniusPdfGridRow(
+        cells: {
+          'code': '',
+          'account': config.isRTL ? totalLabelAr : totalLabel,
+          'amount': section.total,
+        },
+        style: _subtotalRowStyle,
       ),
     );
-
-    addSpace(lineHeight + 6);
   }
 
-  // ──────────────────────────────────────────────────────────
-  // Simple Line (indented, for deductions like tax)
-  // ──────────────────────────────────────────────────────────
-
-  void _drawSimpleLine(String label, String labelAr, double amount) {
-    if (remainingHeight < 22) newPage();
-
-    final displayLabel = config.isRTL ? labelAr : label;
-    final page = currentPage;
-
-    final labelX = config.isRTL ? pageWidth * 0.4 : 20.0;
-    final labelW = pageWidth * 0.6 - 20;
-    final amountX = config.isRTL ? 10.0 : pageWidth * 0.6;
-    final amountW = pageWidth * 0.4 - 10;
-
-    page.graphics.drawString(
-      displayLabel,
-      baseFont,
-      bounds: Rect.fromLTWH(labelX, currentY, labelW, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
+  void _appendCalculatedRow(
+    List<GeniusPdfGridRow> rows, {
+    required String label,
+    required String labelAr,
+    required double amount,
+  }) {
+    rows.add(
+      GeniusPdfGridRow(
+        cells: {
+          'code': '',
+          'account': config.isRTL ? labelAr : label,
+          'amount': amount,
+        },
+        style: const GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+          ),
+          backgroundColor: Color(0xFFE8EAF6),
+          border: GeniusPdfBorderStyle.horizontal(),
+          padding: GeniusPdfCellPadding.all(5),
+        ),
       ),
     );
-
-    page.graphics.drawString(
-      '(${_formatCurrency(amount)})',
-      baseFont,
-      bounds: Rect.fromLTWH(amountX, currentY, amountW, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(22);
   }
 
-  // ──────────────────────────────────────────────────────────
-  // Net Income (highlighted box)
-  // ──────────────────────────────────────────────────────────
-
-  void _drawNetIncome() {
-    const boxHeight = 30.0;
-    if (remainingHeight < boxHeight + 10) newPage();
-
-    final label = config.isRTL ? 'صافي الدخل' : 'Net Income';
+  void _appendNetIncomeRow(List<GeniusPdfGridRow> rows) {
     final isProfit = data.netIncome >= 0;
-    final bgColor =
-        isProfit ? PdfColor(200, 255, 200) : PdfColor(255, 200, 200);
-    final textColor = isProfit ? PdfColor(0, 100, 0) : PdfColor(180, 0, 0);
 
-    final page = currentPage;
-    final labelX = config.isRTL ? pageWidth * 0.4 : 10.0;
-    final labelW = pageWidth * 0.6 - 10;
-    final amountX = config.isRTL ? 10.0 : pageWidth * 0.6;
-    final amountW = pageWidth * 0.4 - 10;
-
-    page.graphics.drawRectangle(
-      brush: PdfSolidBrush(bgColor),
-      pen: PdfPen(PdfColor(100, 100, 100)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, boxHeight),
-    );
-
-    page.graphics.drawString(
-      label,
-      _cachedNetFont,
-      bounds: Rect.fromLTWH(labelX, currentY + 7, labelW, 20),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
+    rows.add(
+      GeniusPdfGridRow(
+        cells: {
+          'code': '',
+          'account': config.isRTL ? 'صافي الدخل' : 'Net Income',
+          'amount': data.netIncome,
+        },
+        style: GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: isProfit
+                ? const Color(0xFF1B5E20)
+                : const Color(0xFFB71C1C),
+          ),
+          backgroundColor: isProfit
+              ? const Color(0xFFE8F5E9)
+              : const Color(0xFFFFEBEE),
+          border: const GeniusPdfBorderStyle.all(),
+          padding: const GeniusPdfCellPadding.all(6),
+        ),
       ),
     );
-
-    page.graphics.drawString(
-      _formatCurrency(data.netIncome),
-      _cachedNetFont,
-      brush: PdfSolidBrush(textColor),
-      bounds: Rect.fromLTWH(amountX, currentY + 7, amountW, 20),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(boxHeight + 10);
   }
+
+  GeniusPdfCellStyle get _subtotalRowStyle => const GeniusPdfCellStyle(
+        textStyle: GeniusPdfTextStyle(
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
+        ),
+        backgroundColor: Color(0xFFF5F5F5),
+        border: GeniusPdfBorderStyle.horizontal(),
+        padding: GeniusPdfCellPadding.all(4),
+      );
 
   // ──────────────────────────────────────────────────────────
   // Profitability Ratios
@@ -533,14 +486,4 @@ class IncomeStatementTemplate extends GeniusErpAnalyticalReport {
         '${date.year}';
   }
 
-  String _formatCurrency(double amount) {
-    final isNegative = amount < 0;
-    final absAmount = amount.abs();
-    final formatted = absAmount.toStringAsFixed(2).replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
-    final value = '$formatted ${data.currency}';
-    return isNegative ? '($value)' : value;
-  }
 }

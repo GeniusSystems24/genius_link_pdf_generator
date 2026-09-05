@@ -410,7 +410,7 @@ class TrialBalanceTemplate extends GeniusErpRegisterDocument {
     final summary = GeniusPdfSummarySection(
       config: config,
       items: summaryItems,
-      style: const GeniusPdfSummaryStyle.bordered(),
+      style: const GeniusPdfSummaryStyle.card(),
       alignment: GeniusPdfSummaryAlignment.right,
       width: pageWidth * 0.45,
     );

@@ -107,13 +107,6 @@ class BalanceSheetTemplate extends GeniusErpAnalyticalReport {
   final PdfFont? boldFont;
   final bool showComparative;
 
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
-
   @override
   void build() {
     newPage();
@@ -121,21 +114,10 @@ class BalanceSheetTemplate extends GeniusErpAnalyticalReport {
     // Header
     _drawHeader();
 
-    // Assets section
-    _drawSection(data.assets, 'Total Assets', 'إجمالي الأصول');
+    // Balance sheet grid
+    _drawBalanceSheetGrid();
 
     addSpace(15);
-
-    // Liabilities section
-    _drawSection(data.liabilities, 'Total Liabilities', 'إجمالي الالتزامات');
-
-    addSpace(15);
-
-    // Equity section
-    _drawSection(data.equity, 'Total Equity', 'إجمالي حقوق الملكية');
-
-    addSpace(15);
-
     // Total Liabilities & Equity
     _drawGrandTotal();
 
@@ -172,64 +154,53 @@ class BalanceSheetTemplate extends GeniusErpAnalyticalReport {
     addSpace(110);
   }
 
-  void _drawSection(
-      BalanceSheetSection section, String totalLabel, String totalLabelAr) {
-    // Section title
-    final titleText =
-        config.isRTL ? (section.titleAr ?? section.title) : section.title;
-
-    currentPage.graphics.drawString(
-      titleText,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 20),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
+  void _drawBalanceSheetGrid() {
+    final columns = [
+      const GeniusPdfGridColumn(
+        id: 'code',
+        title: 'Code',
+        titleAr: 'الكود',
+        width: 80,
       ),
+      const GeniusPdfGridColumn(
+        id: 'account',
+        title: 'Account',
+        titleAr: 'الحساب',
+        flexFactor: 3,
+      ),
+      GeniusPdfGridColumn.currency(
+        id: 'amount',
+        title: 'Amount (${data.currency})',
+        titleAr: 'المبلغ (${data.currency})',
+        width: 120,
+        currencySymbol: '',
+      ),
+    ];
+
+    final rows = <GeniusPdfGridRow>[];
+
+    _appendSectionRows(
+      rows: rows,
+      section: data.assets,
+      totalLabel: 'Total Assets',
+      totalLabelAr: 'إجمالي الأصول',
+    );
+    _appendSectionRows(
+      rows: rows,
+      section: data.liabilities,
+      totalLabel: 'Total Liabilities',
+      totalLabelAr: 'إجمالي الالتزامات',
+    );
+    _appendSectionRows(
+      rows: rows,
+      section: data.equity,
+      totalLabel: 'Total Equity',
+      totalLabelAr: 'إجمالي حقوق الملكية',
     );
 
-    addSpace(25);
-
-    // Section items
-    final rows = <GeniusPdfGridRow>[];
-    for (final item in section.items) {
-      _addItemRows(rows, item);
-    }
-
-    // Section total row
-    rows.add(GeniusPdfGridRow(
-      cells: {
-        'code': '',
-        'account': config.isRTL ? totalLabelAr : totalLabel,
-        'amount': section.total,
-      },
-      isGroupHeader: true,
-      
-    ));
     final grid = GeniusPdfDataGrid(
       config: config,
-      columns: [
-        const GeniusPdfGridColumn(
-          id: 'code',
-          title: 'Code',
-          titleAr: 'الكود',
-          width: 80,
-        ),
-        const GeniusPdfGridColumn(
-          id: 'account',
-          title: 'Account',
-          titleAr: 'الحساب',
-          flexFactor: 3,
-        ),
-        GeniusPdfGridColumn.currency(
-          id: 'amount',
-          title: 'Amount (${data.currency})',
-          titleAr: 'المبلغ (${data.currency})',
-          width: 120,
-          currencySymbol: '',
-        ),
-      ],
+      columns: columns,
       rows: rows,
       style: const GeniusPdfGridStyle.classic(),
     );
@@ -242,8 +213,56 @@ class BalanceSheetTemplate extends GeniusErpAnalyticalReport {
     );
 
     if (result != null) {
-      addSpace(result.bounds.height + 10);
+      // Keep the current page/Y synchronized with multi-page Grid output,
+      // matching the approach used by TrialBalanceTemplate.
+      updateFromLayoutResult(result, spacing: 10);
     }
+  }
+
+  void _appendSectionRows({
+    required List<GeniusPdfGridRow> rows,
+    required BalanceSheetSection section,
+    required String totalLabel,
+    required String totalLabelAr,
+  }) {
+    rows.add(
+      GeniusPdfGridRow.groupHeader(
+        config.isRTL ? (section.titleAr ?? section.title) : section.title,
+        style: const GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1565C0),
+          ),
+          backgroundColor: Color(0xFFE3F2FD),
+          border: GeniusPdfBorderStyle.all(),
+          padding: GeniusPdfCellPadding.all(5),
+        ),
+      ),
+    );
+
+    for (final item in section.items) {
+      _addItemRows(rows, item);
+    }
+
+    rows.add(
+      GeniusPdfGridRow(
+        cells: {
+          'code': '',
+          'account': config.isRTL ? totalLabelAr : totalLabel,
+          'amount': section.total,
+        },
+        style: const GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+          ),
+          backgroundColor: Color(0xFFF5F5F5),
+          border: GeniusPdfBorderStyle.horizontal(),
+          padding: GeniusPdfCellPadding.all(4),
+        ),
+      ),
+    );
   }
 
   void _addItemRows(List<GeniusPdfGridRow> rows, BalanceSheetItem item) {

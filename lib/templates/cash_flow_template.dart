@@ -130,13 +130,6 @@ class CashFlowTemplate extends GeniusErpAnalyticalReport {
   final CashFlowData data;
   final PdfFont? boldFont;
 
-  PdfFont get _boldFont =>
-      boldFont ??
-      (config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-              style: PdfFontStyle.bold));
-
   @override
   void build() {
     newPage();
@@ -144,21 +137,10 @@ class CashFlowTemplate extends GeniusErpAnalyticalReport {
     // Header
     _drawHeader();
 
-    // Operating Activities
-    _drawSection(data.operatingActivities);
+    // Cash flow statement grid
+    _drawCashFlowGrid();
 
-    // Investing Activities
-    _drawSection(data.investingActivities);
-
-    // Financing Activities
-    _drawSection(data.financingActivities);
-
-    // Net Change in Cash
-    _drawNetChange();
-
-    // Cash Reconciliation
-    _drawCashReconciliation();
-
+    addSpace(10);
     // Notes
     if (data.notes != null || data.notesAr != null) {
       _drawNotes();
@@ -192,290 +174,276 @@ class CashFlowTemplate extends GeniusErpAnalyticalReport {
     addSpace(110);
   }
 
-  void _drawSection(CashFlowSection section) {
-    // Section title
+  void _drawCashFlowGrid() {
+    final columns = [
+      const GeniusPdfGridColumn(
+        id: 'description',
+        title: 'Description',
+        titleAr: 'البيان',
+        flexFactor: 3,
+      ),
+      GeniusPdfGridColumn.numeric(
+        id: 'amount',
+        title: 'Amount (${data.currency})',
+        titleAr: 'المبلغ (${data.currency})',
+        width: 130,
+        alignment: GeniusPdfTextAlign.end,
+        valueFormatter: (value) {
+          if (value == null) return '';
+          final amount = (value as num).toDouble();
+          return amount >= 0
+              ? _formatCurrency(amount)
+              : '(${_formatCurrency(amount.abs())})';
+        },
+      ),
+    ];
+
+    final rows = <GeniusPdfGridRow>[];
+
+    _appendActivityRows(rows, data.operatingActivities);
+    _appendActivityRows(rows, data.investingActivities);
+    _appendActivityRows(rows, data.financingActivities);
+    _appendNetChangeRow(rows);
+    _appendCashReconciliationRows(rows);
+
+    final grid = GeniusPdfDataGrid(
+      config: config,
+      columns: columns,
+      rows: rows,
+      style: const GeniusPdfGridStyle.classic(),
+    );
+
+    final result = grid.drawAt(
+      page: currentPage,
+      x: 0,
+      y: currentY,
+      width: pageWidth,
+    );
+
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 10);
+    }
+  }
+
+  void _appendActivityRows(
+    List<GeniusPdfGridRow> rows,
+    CashFlowSection section,
+  ) {
     final titleText = config.isRTL
         ? (section.titleAr ?? section.defaultTitleAr)
         : (section.title.isNotEmpty ? section.title : section.defaultTitle);
 
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(230, 230, 250)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 22),
-    );
-
-    currentPage.graphics.drawString(
-      titleText,
-      _boldFont,
-      bounds: Rect.fromLTWH(5, currentY + 4, pageWidth - 10, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
+    // Section identity is structural, so all activity headers use the same
+    // neutral slate treatment. Financial meaning is carried by signed rows.
+    rows.add(
+      GeniusPdfGridRow.groupHeader(
+        titleText,
+        style: _cashFlowSectionHeaderStyle(),
       ),
     );
 
-    addSpace(28);
-
-    // Section items
     for (final item in section.items) {
-      _drawCashFlowItem(item);
-    }
+      final description = config.isRTL
+          ? (item.descriptionAr ?? item.description)
+          : item.description;
+      final indent = '  ' * item.level;
 
-    // Section net cash flow
-    _drawSectionTotal(section);
-
-    addSpace(15);
-  }
-
-  void _drawCashFlowItem(CashFlowItem item) {
-    final indent = 10.0 + (item.level * 15.0);
-    final description = config.isRTL
-        ? (item.descriptionAr ?? item.description)
-        : item.description;
-
-    final font = item.isSubtotal
-        ? _boldFont
-        : baseFont;
-
-    if (item.isSubtotal) {
-      currentPage.graphics.drawRectangle(
-        brush: PdfSolidBrush(PdfColor(245, 245, 245)),
-        bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
+      rows.add(
+        GeniusPdfGridRow(
+          cells: {
+            'description': '$indent$description',
+            'amount': item.amount,
+          },
+          style: item.isSubtotal
+              ? _cashFlowSignedStyle(
+                  item.amount,
+                  emphasized: true,
+                  subtle: true,
+                )
+              : _cashFlowSignedStyle(
+                  item.amount,
+                  emphasized: false,
+                  subtle: true,
+                ),
+          keepTogether: true,
+        ),
       );
     }
 
-    currentPage.graphics.drawString(
-      description,
-      font,
-      bounds: Rect.fromLTWH(indent, currentY + 2, pageWidth * 0.65, 16),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
+    rows.add(
+      GeniusPdfGridRow.total(
+        {
+          'description': _sectionTotalLabel(section.type),
+          'amount': section.netCashFlow,
+        },
+        style: _cashFlowSignedStyle(
+          section.netCashFlow,
+          emphasized: true,
+          subtle: false,
+        ),
       ),
     );
-
-    final amountText = item.amount >= 0
-        ? _formatCurrency(item.amount)
-        : '(${_formatCurrency(item.amount.abs())})';
-
-    currentPage.graphics.drawString(
-      amountText,
-      font,
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.65, currentY + 2, pageWidth * 0.35 - 5, 16),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(20);
   }
 
-  void _drawSectionTotal(CashFlowSection section) {
-    String totalLabel;
-    switch (section.type) {
+  void _appendNetChangeRow(List<GeniusPdfGridRow> rows) {
+    rows.add(
+      GeniusPdfGridRow.total(
+        {
+          'description':
+              config.isRTL ? 'صافي التغير في النقد' : 'Net Change in Cash',
+          'amount': data.netChangeInCash,
+        },
+        style: _cashFlowSignedStyle(
+          data.netChangeInCash,
+          emphasized: true,
+          subtle: false,
+          fontSize: 10,
+          padding: 6,
+        ),
+      ),
+    );
+  }
+
+  void _appendCashReconciliationRows(List<GeniusPdfGridRow> rows) {
+    rows.add(
+      GeniusPdfGridRow.groupHeader(
+        config.isRTL ? 'تسوية النقد' : 'Cash Reconciliation',
+        style: const GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1E3A5F),
+          ),
+          backgroundColor: Color(0xFFEFF6FF),
+          border: GeniusPdfBorderStyle.all(color: Color(0xFFBFDBFE)),
+          padding: GeniusPdfCellPadding.all(5),
+        ),
+      ),
+    );
+
+    rows.add(
+      GeniusPdfGridRow(
+        cells: {
+          'description': config.isRTL
+              ? 'رصيد النقد في بداية الفترة'
+              : 'Cash at Beginning of Period',
+          'amount': data.beginningCashBalance,
+        },
+        style: const GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(color: Color(0xFF334155)),
+          backgroundColor: Color(0xFFF8FAFC),
+          border: GeniusPdfBorderStyle.horizontal(color: Color(0xFFE2E8F0)),
+          padding: GeniusPdfCellPadding.all(5),
+        ),
+      ),
+    );
+
+    rows.add(
+      GeniusPdfGridRow(
+        cells: {
+          'description':
+              config.isRTL ? 'صافي التغير في النقد' : 'Net Change in Cash',
+          'amount': data.netChangeInCash,
+        },
+        style: _cashFlowSignedStyle(
+          data.netChangeInCash,
+          emphasized: false,
+          subtle: true,
+        ),
+      ),
+    );
+
+    rows.add(
+      GeniusPdfGridRow.total(
+        {
+          'description': config.isRTL
+              ? 'رصيد النقد في نهاية الفترة'
+              : 'Cash at End of Period',
+          'amount': data.endingCashBalance,
+        },
+        style: _cashFlowSignedStyle(
+          data.endingCashBalance,
+          emphasized: true,
+          subtle: false,
+          fontSize: 10,
+          padding: 6,
+        ),
+      ),
+    );
+  }
+
+  String _sectionTotalLabel(CashFlowActivityType type) {
+    switch (type) {
       case CashFlowActivityType.operating:
-        totalLabel = config.isRTL
+        return config.isRTL
             ? 'صافي النقد من الأنشطة التشغيلية'
             : 'Net Cash from Operating Activities';
-        break;
       case CashFlowActivityType.investing:
-        totalLabel = config.isRTL
+        return config.isRTL
             ? 'صافي النقد من الأنشطة الاستثمارية'
             : 'Net Cash from Investing Activities';
-        break;
       case CashFlowActivityType.financing:
-        totalLabel = config.isRTL
+        return config.isRTL
             ? 'صافي النقد من الأنشطة التمويلية'
             : 'Net Cash from Financing Activities';
-        break;
+    }
+  }
+
+  GeniusPdfCellStyle _cashFlowSectionHeaderStyle() {
+    return const GeniusPdfCellStyle(
+      textStyle: GeniusPdfTextStyle(
+        fontSize: 10,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF334155),
+      ),
+      backgroundColor: Color(0xFFF1F5F9),
+      border: GeniusPdfBorderStyle.all(color: Color(0xFFCBD5E1)),
+      padding: GeniusPdfCellPadding.all(5),
+    );
+  }
+
+  GeniusPdfCellStyle _cashFlowSignedStyle(
+    double amount, {
+    required bool emphasized,
+    required bool subtle,
+    double fontSize = 9,
+    double padding = 5,
+  }) {
+    if (amount == 0) {
+      return GeniusPdfCellStyle(
+        textStyle: GeniusPdfTextStyle(
+          fontSize: fontSize,
+          fontWeight: emphasized ? FontWeight.bold : FontWeight.normal,
+          color: const Color(0xFF475569),
+        ),
+        backgroundColor:
+            subtle ? const Color(0xFFF8FAFC) : const Color(0xFFE2E8F0),
+        border: const GeniusPdfBorderStyle.horizontal(
+          color: Color(0xFFCBD5E1),
+        ),
+        padding: GeniusPdfCellPadding.all(padding),
+      );
     }
 
-    final netCashFlow = section.netCashFlow;
-    final isPositive = netCashFlow >= 0;
-    final bgColor =
-        isPositive ? PdfColor(220, 255, 220) : PdfColor(255, 220, 220);
+    final isInflow = amount > 0;
+    final background = isInflow
+        ? (subtle ? const Color(0xFFF0FDF4) : const Color(0xFFDCFCE7))
+        : (subtle ? const Color(0xFFFEF2F2) : const Color(0xFFFEE2E2));
+    final textColor =
+        isInflow ? const Color(0xFF166534) : const Color(0xFF991B1B);
+    final borderColor =
+        isInflow ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA);
 
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(bgColor),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 22),
-    );
-
-    currentPage.graphics.drawString(
-      totalLabel,
-      _boldFont,
-      bounds: Rect.fromLTWH(5, currentY + 4, pageWidth * 0.65, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
+    return GeniusPdfCellStyle(
+      textStyle: GeniusPdfTextStyle(
+        fontSize: fontSize,
+        fontWeight: emphasized ? FontWeight.bold : FontWeight.normal,
+        color: textColor,
       ),
+      backgroundColor: background,
+      border: GeniusPdfBorderStyle.horizontal(color: borderColor),
+      padding: GeniusPdfCellPadding.all(padding),
     );
-
-    final amountText = isPositive
-        ? _formatCurrency(netCashFlow)
-        : '(${_formatCurrency(netCashFlow.abs())})';
-
-    currentPage.graphics.drawString(
-      amountText,
-      _boldFont,
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.65, currentY + 4, pageWidth * 0.35 - 5, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(28);
-  }
-
-  void _drawNetChange() {
-    final label = config.isRTL ? 'صافي التغير في النقد' : 'Net Change in Cash';
-
-    final netChange = data.netChangeInCash;
-    final isPositive = netChange >= 0;
-    final color = isPositive ? PdfColor(0, 100, 0) : PdfColor(180, 0, 0);
-
-    final netChangeFont = config.configAssets == null
-        ? config.baseFont
-        : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-            style: PdfFontStyle.bold);
-
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(200, 200, 255)),
-      pen: PdfPen(PdfColor(100, 100, 150)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 26),
-    );
-
-    currentPage.graphics.drawString(
-      label,
-      netChangeFont,
-      bounds: Rect.fromLTWH(5, currentY + 5, pageWidth * 0.65, 20),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    final amountText = isPositive
-        ? _formatCurrency(netChange)
-        : '(${_formatCurrency(netChange.abs())})';
-
-    currentPage.graphics.drawString(
-      amountText,
-      netChangeFont,
-      brush: PdfSolidBrush(color),
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.65, currentY + 5, pageWidth * 0.35 - 5, 20),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(35);
-  }
-
-  void _drawCashReconciliation() {
-    final title = config.isRTL ? 'تسوية النقد' : 'Cash Reconciliation';
-
-    currentPage.graphics.drawString(
-      title,
-      _boldFont,
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 20),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(25);
-
-    // Beginning balance
-    _drawReconciliationLine(
-      config.isRTL
-          ? 'رصيد النقد في بداية الفترة'
-          : 'Cash at Beginning of Period',
-      data.beginningCashBalance,
-    );
-
-    // Net change
-    _drawReconciliationLine(
-      config.isRTL ? 'صافي التغير في النقد' : 'Net Change in Cash',
-      data.netChangeInCash,
-    );
-
-    // Ending balance
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(220, 255, 220)),
-      pen: PdfPen(PdfColor(0, 150, 0)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 24),
-    );
-
-    currentPage.graphics.drawString(
-      config.isRTL ? 'رصيد النقد في نهاية الفترة' : 'Cash at End of Period',
-      _boldFont,
-      bounds: Rect.fromLTWH(5, currentY + 5, pageWidth * 0.65, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    currentPage.graphics.drawString(
-      _formatCurrency(data.endingCashBalance),
-      _boldFont,
-      brush: PdfSolidBrush(PdfColor(0, 100, 0)),
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.65, currentY + 5, pageWidth * 0.35 - 5, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(35);
-  }
-
-  void _drawReconciliationLine(String label, double amount) {
-    currentPage.graphics.drawString(
-      label,
-      baseFont,
-      bounds: Rect.fromLTWH(10, currentY, pageWidth * 0.65, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    final amountText = amount >= 0
-        ? _formatCurrency(amount)
-        : '(${_formatCurrency(amount.abs())})';
-
-    currentPage.graphics.drawString(
-      amountText,
-      baseFont,
-      bounds:
-          Rect.fromLTWH(pageWidth * 0.65, currentY, pageWidth * 0.35 - 5, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.left : PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(22);
   }
 
   void _drawNotes() {

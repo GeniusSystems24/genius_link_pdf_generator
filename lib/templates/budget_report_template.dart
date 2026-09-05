@@ -140,16 +140,10 @@ class BudgetReportTemplate extends GeniusErpAnalyticalReport {
     // Header
     _drawHeader();
 
-    // Column headers
-    _drawColumnHeaders();
+    // Budget comparison grid
+    _drawBudgetGrid();
 
-    // Sections
-    for (final section in data.sections) {
-      _drawSection(section);
-    }
-
-    // Grand total
-    _drawGrandTotal();
+    addSpace(20);
 
     // Variance summary
     _drawVarianceSummary();
@@ -189,349 +183,251 @@ class BudgetReportTemplate extends GeniusErpAnalyticalReport {
     addSpace(110);
   }
 
-  void _drawColumnHeaders() {
-    final columns = [
-      (config.isRTL ? 'البند' : 'Category', 0.35),
-      (config.isRTL ? 'الميزانية' : 'Budget', 0.18),
-      (config.isRTL ? 'الفعلي' : 'Actual', 0.18),
-      (config.isRTL ? 'الفرق' : 'Variance', 0.15),
-      if (showVariancePercent) ('%', 0.14),
+  void _drawBudgetGrid() {
+    final columns = <GeniusPdfGridColumn>[
+      const GeniusPdfGridColumn(
+        id: 'category',
+        title: 'Category',
+        titleAr: 'البند',
+        flexFactor: 3,
+      ),
+      GeniusPdfGridColumn.numeric(
+        id: 'budget',
+        title: 'Budget',
+        titleAr: 'الميزانية',
+        width: 92,
+        alignment: GeniusPdfTextAlign.end,
+        valueFormatter: (value) => _formatSignedNumber(value as num?),
+      ),
+      GeniusPdfGridColumn.numeric(
+        id: 'actual',
+        title: 'Actual',
+        titleAr: 'الفعلي',
+        width: 92,
+        alignment: GeniusPdfTextAlign.end,
+        valueFormatter: (value) => _formatSignedNumber(value as num?),
+      ),
+      GeniusPdfGridColumn.numeric(
+        id: 'variance',
+        title: 'Variance',
+        titleAr: 'الفرق',
+        width: 92,
+        alignment: GeniusPdfTextAlign.end,
+        valueFormatter: (value) => _formatSignedNumber(value as num?),
+      ),
+      if (showVariancePercent)
+        GeniusPdfGridColumn.numeric(
+          id: 'variancePercent',
+          title: 'Variance %',
+          titleAr: 'نسبة الفرق',
+          width: 72,
+          alignment: GeniusPdfTextAlign.end,
+          valueFormatter: (value) {
+            if (value == null) return '';
+            return '${(value as num).toDouble().toStringAsFixed(1)}%';
+          },
+        ),
     ];
 
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(60, 60, 100)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 24),
-    );
+    final rows = <GeniusPdfGridRow>[];
 
-    double xOffset = 0;
-    for (final column in columns) {
-      currentPage.graphics.drawString(
-        column.$1,
-        config.configAssets == null
-            ? config.baseFont
-            : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 10,
-                style: PdfFontStyle.bold),
-        brush: PdfBrushes.white,
-        bounds: Rect.fromLTWH(
-            xOffset + 5, currentY + 5, pageWidth * column.$2 - 10, 18),
-        format: PdfStringFormat(
-          alignment: xOffset == 0
-              ? (config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left)
-              : PdfTextAlignment.right,
-          textDirection: config.pdfTextDirection
-        ),
-      );
-      xOffset += pageWidth * column.$2;
+    for (final section in data.sections) {
+      _appendBudgetSectionRows(rows, section);
     }
 
-    addSpace(28);
+    // Do not infer favorable/unfavorable from the cross-section grand total.
+    // Income and expense sections have opposite variance semantics, so the
+    // aggregate is intentionally styled as a neutral report total.
+    rows.add(
+      GeniusPdfGridRow.total(
+        {
+          'category': config.isRTL ? 'الإجمالي الكلي' : 'Grand Total',
+          'budget': data.totalBudgeted,
+          'actual': data.totalActual,
+          'variance': data.totalVariance,
+          if (showVariancePercent)
+            'variancePercent': data.overallVariancePercent,
+        },
+        style: const GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFFFFFFFF),
+          ),
+          backgroundColor: Color(0xFF334155),
+          border: GeniusPdfBorderStyle.all(color: Color(0xFF1E293B)),
+          padding: GeniusPdfCellPadding.all(6),
+        ),
+      ),
+    );
+
+    final grid = GeniusPdfDataGrid(
+      config: config,
+      columns: columns,
+      rows: rows,
+      style: const GeniusPdfGridStyle.classic(),
+    );
+
+    final result = grid.drawAt(
+      page: currentPage,
+      x: 0,
+      y: currentY,
+      width: pageWidth,
+    );
+
+    if (result != null) {
+      updateFromLayoutResult(result, spacing: 10);
+    }
   }
 
-  void _drawSection(BudgetSection section) {
-    // Section title
-    final titleText =
+  void _appendBudgetSectionRows(
+    List<GeniusPdfGridRow> rows,
+    BudgetSection section,
+  ) {
+    final title =
         config.isRTL ? (section.titleAr ?? section.title) : section.title;
 
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(220, 220, 240)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 22),
-    );
-
-    currentPage.graphics.drawString(
-      titleText,
-      _boldFont,
-      bounds: Rect.fromLTWH(5, currentY + 4, pageWidth - 10, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    addSpace(26);
-
-    // Section items
-    for (final item in section.items) {
-      _drawBudgetItem(item);
-    }
-
-    // Section total
-    _drawSectionTotal(section);
-
-    addSpace(10);
-  }
-
-  void _drawBudgetItem(BudgetItem item) {
-    final indent = '  ' * item.level;
-    final category =
-        config.isRTL ? (item.categoryAr ?? item.category) : item.category;
-
-    // Determine row color based on variance
-    PdfBrush? rowBrush;
-    if (highlightVariances) {
-      if (item.isOverBudget) {
-        rowBrush = PdfSolidBrush(PdfColor(255, 235, 235));
-      } else if (item.isUnderBudget &&
-          item.variance.abs() > item.budgetedAmount * 0.1) {
-        rowBrush = PdfSolidBrush(PdfColor(235, 255, 235));
-      }
-    }
-
-    if (rowBrush != null) {
-      currentPage.graphics.drawRectangle(
-        brush: rowBrush,
-        bounds: Rect.fromLTWH(0, currentY, pageWidth, 18),
-      );
-    }
-
-    final font = baseFont;
-
-    // Category
-    currentPage.graphics.drawString(
-      '$indent$category',
-      font,
-      bounds: Rect.fromLTWH(5, currentY + 2, pageWidth * 0.35 - 10, 16),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    // Budget
-    currentPage.graphics.drawString(
-      _formatNumber(item.budgetedAmount),
-      font,
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.35, currentY + 2, pageWidth * 0.18 - 5, 16),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    // Actual
-    currentPage.graphics.drawString(
-      _formatNumber(item.actualAmount),
-      font,
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.53, currentY + 2, pageWidth * 0.18 - 5, 16),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    // Variance
-    final varianceColor =
-        item.variance >= 0 ? PdfColor(0, 120, 0) : PdfColor(180, 0, 0);
-    final varianceText = item.variance >= 0
-        ? _formatNumber(item.variance)
-        : '(${_formatNumber(item.variance.abs())})';
-
-    currentPage.graphics.drawString(
-      varianceText,
-      font,
-      brush: PdfSolidBrush(varianceColor),
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.71, currentY + 2, pageWidth * 0.15 - 5, 16),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    // Variance %
-    if (showVariancePercent) {
-      currentPage.graphics.drawString(
-        '${item.variancePercent.toStringAsFixed(1)}%',
-        font,
-        brush: PdfSolidBrush(varianceColor),
-        bounds: Rect.fromLTWH(
-            pageWidth * 0.86, currentY + 2, pageWidth * 0.14 - 5, 16),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.right,
-          textDirection: config.pdfTextDirection
+    rows.add(
+      GeniusPdfGridRow.groupHeader(
+        title,
+        style: const GeniusPdfCellStyle(
+          textStyle: GeniusPdfTextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF334155),
+          ),
+          backgroundColor: Color(0xFFF1F5F9),
+          border: GeniusPdfBorderStyle.all(color: Color(0xFFCBD5E1)),
+          padding: GeniusPdfCellPadding.all(5),
         ),
-      );
+      ),
+    );
+
+    for (final item in section.items) {
+      _appendBudgetItemRows(rows, item, section: section);
     }
 
-    addSpace(20);
-
-    // Sub-items
-    for (final subItem in item.subItems) {
-      _drawBudgetItem(subItem);
-    }
-  }
-
-  void _drawSectionTotal(BudgetSection section) {
     final totalLabel = config.isRTL
         ? 'إجمالي ${section.titleAr ?? section.title}'
         : 'Total ${section.title}';
 
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(200, 200, 220)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 20),
-    );
-
-    currentPage.graphics.drawString(
-      totalLabel,
-      _boldFont,
-      bounds: Rect.fromLTWH(5, currentY + 3, pageWidth * 0.35 - 10, 16),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    currentPage.graphics.drawString(
-      _formatNumber(section.totalBudgeted),
-      _boldFont,
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.35, currentY + 3, pageWidth * 0.18 - 5, 16),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    currentPage.graphics.drawString(
-      _formatNumber(section.totalActual),
-      _boldFont,
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.53, currentY + 3, pageWidth * 0.18 - 5, 16),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    final varianceColor =
-        section.totalVariance >= 0 ? PdfColor(0, 100, 0) : PdfColor(180, 0, 0);
-    final varianceText = section.totalVariance >= 0
-        ? _formatNumber(section.totalVariance)
-        : '(${_formatNumber(section.totalVariance.abs())})';
-
-    currentPage.graphics.drawString(
-      varianceText,
-      _boldFont,
-      brush: PdfSolidBrush(varianceColor),
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.71, currentY + 3, pageWidth * 0.15 - 5, 16),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    if (showVariancePercent) {
-      currentPage.graphics.drawString(
-        '${section.variancePercent.toStringAsFixed(1)}%',
-        _boldFont,
-        brush: PdfSolidBrush(varianceColor),
-        bounds: Rect.fromLTWH(
-            pageWidth * 0.86, currentY + 3, pageWidth * 0.14 - 5, 16),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.right,
-          textDirection: config.pdfTextDirection
+    rows.add(
+      GeniusPdfGridRow.total(
+        {
+          'category': totalLabel,
+          'budget': section.totalBudgeted,
+          'actual': section.totalActual,
+          'variance': section.totalVariance,
+          if (showVariancePercent)
+            'variancePercent': section.variancePercent,
+        },
+        style: _budgetVarianceStyle(
+          variance: section.totalVariance,
+          budgeted: section.totalBudgeted,
+          isExpense: section.isExpense,
+          emphasized: true,
+          forceColor: true,
         ),
-      );
-    }
-
-    addSpace(24);
+      ),
+    );
   }
 
-  void _drawGrandTotal() {
-    final totalLabel = config.isRTL ? 'الإجمالي الكلي' : 'Grand Total';
+  void _appendBudgetItemRows(
+    List<GeniusPdfGridRow> rows,
+    BudgetItem item, {
+    required BudgetSection section,
+  }) {
+    final category =
+        config.isRTL ? (item.categoryAr ?? item.category) : item.category;
+    final indent = '  ' * item.level;
+    final hasChildren = item.subItems.isNotEmpty;
 
-    currentPage.graphics.drawRectangle(
-      brush: PdfSolidBrush(PdfColor(60, 60, 100)),
-      bounds: Rect.fromLTWH(0, currentY, pageWidth, 26),
-    );
-
-    currentPage.graphics.drawString(
-      totalLabel,
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-              style: PdfFontStyle.bold),
-      brush: PdfBrushes.white,
-      bounds: Rect.fromLTWH(5, currentY + 5, pageWidth * 0.35 - 10, 18),
-      format: PdfStringFormat(
-        alignment:
-            config.isRTL ? PdfTextAlignment.right : PdfTextAlignment.left,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    currentPage.graphics.drawString(
-      _formatNumber(data.totalBudgeted),
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-              style: PdfFontStyle.bold),
-      brush: PdfBrushes.white,
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.35, currentY + 5, pageWidth * 0.18 - 5, 18),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    currentPage.graphics.drawString(
-      _formatNumber(data.totalActual),
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-              style: PdfFontStyle.bold),
-      brush: PdfBrushes.white,
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.53, currentY + 5, pageWidth * 0.18 - 5, 18),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    final varianceText = data.totalVariance >= 0
-        ? _formatNumber(data.totalVariance)
-        : '(${_formatNumber(data.totalVariance.abs())})';
-
-    currentPage.graphics.drawString(
-      varianceText,
-      config.configAssets == null
-          ? config.baseFont
-          : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-              style: PdfFontStyle.bold),
-      brush: PdfBrushes.white,
-      bounds: Rect.fromLTWH(
-          pageWidth * 0.71, currentY + 5, pageWidth * 0.15 - 5, 18),
-      format: PdfStringFormat(
-        alignment: PdfTextAlignment.right,
-        textDirection: config.pdfTextDirection
-      ),
-    );
-
-    if (showVariancePercent) {
-      currentPage.graphics.drawString(
-        '${data.overallVariancePercent.toStringAsFixed(1)}%',
-        config.configAssets == null
-            ? config.baseFont
-            : PdfTrueTypeFont(config.configAssets!.primaryFont.toList(), 11,
-                style: PdfFontStyle.bold),
-        brush: PdfBrushes.white,
-        bounds: Rect.fromLTWH(
-            pageWidth * 0.86, currentY + 5, pageWidth * 0.14 - 5, 18),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.right,
-          textDirection: config.pdfTextDirection
+    rows.add(
+      GeniusPdfGridRow(
+        cells: {
+          'category': '$indent$category',
+          'budget': item.budgetedAmount,
+          'actual': item.actualAmount,
+          'variance': item.variance,
+          if (showVariancePercent) 'variancePercent': item.variancePercent,
+        },
+        style: _budgetVarianceStyle(
+          variance: item.variance,
+          budgeted: item.budgetedAmount,
+          isExpense: section.isExpense,
+          emphasized: hasChildren,
+          forceColor: false,
         ),
+        keepTogether: true,
+      ),
+    );
+
+    for (final subItem in item.subItems) {
+      _appendBudgetItemRows(rows, subItem, section: section);
+    }
+  }
+
+  GeniusPdfCellStyle _budgetVarianceStyle({
+    required double variance,
+    required double budgeted,
+    required bool isExpense,
+    required bool emphasized,
+    required bool forceColor,
+  }) {
+    final isZero = variance.abs() < 0.005;
+    final material = budgeted.abs() < 0.005
+        ? !isZero
+        : (variance.abs() / budgeted.abs()) >= 0.10;
+    final shouldColor = highlightVariances && (forceColor || material);
+
+    if (isZero || !shouldColor) {
+      return GeniusPdfCellStyle(
+        textStyle: GeniusPdfTextStyle(
+          fontWeight: emphasized ? FontWeight.bold : FontWeight.normal,
+          color: const Color(0xFF475569),
+        ),
+        backgroundColor: emphasized ? const Color(0xFFF8FAFC) : null,
+        border: const GeniusPdfBorderStyle.horizontal(
+          color: Color(0xFFE2E8F0),
+        ),
+        padding: const GeniusPdfCellPadding.all(4),
       );
     }
 
-    addSpace(35);
+    // Expense: spending less than budget is favorable.
+    // Income/non-expense: actual above budget is favorable.
+    final favorable = isExpense ? variance < 0 : variance > 0;
+
+    return GeniusPdfCellStyle(
+      textStyle: GeniusPdfTextStyle(
+        fontWeight: emphasized ? FontWeight.bold : FontWeight.normal,
+        color: favorable
+            ? const Color(0xFF166534)
+            : const Color(0xFF991B1B),
+      ),
+      backgroundColor: favorable
+          ? (emphasized
+              ? const Color(0xFFDCFCE7)
+              : const Color(0xFFF0FDF4))
+          : (emphasized
+              ? const Color(0xFFFEE2E2)
+              : const Color(0xFFFEF2F2)),
+      border: GeniusPdfBorderStyle.horizontal(
+        color: favorable
+            ? const Color(0xFFBBF7D0)
+            : const Color(0xFFFECACA),
+      ),
+      padding: const GeniusPdfCellPadding.all(4),
+    );
+  }
+
+  String _formatSignedNumber(num? value) {
+    if (value == null) return '';
+    final amount = value.toDouble();
+    if (amount < 0) {
+      return '(${_formatNumber(amount.abs())})';
+    }
+    return _formatNumber(amount);
   }
 
   void _drawVarianceSummary() {
