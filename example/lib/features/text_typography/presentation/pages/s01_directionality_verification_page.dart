@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/precedence_verification_example_screen.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/precedence_verify_screen.dart';
 
 /// Compatibility entry point for the former aggregate S01 Directionality page.
 ///

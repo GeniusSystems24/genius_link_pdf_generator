@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/matrix_verification_example_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/matrix_verify_screen.dart';
 
 /// Compatibility entry point for the former aggregate S02 Components RTL page.
 ///

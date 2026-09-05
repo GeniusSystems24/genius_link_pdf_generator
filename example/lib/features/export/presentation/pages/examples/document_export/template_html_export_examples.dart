@@ -8,6 +8,6 @@ export 'delivery_note_html_export_example_screen.dart';
 export 'credit_note_html_export_example_screen.dart';
 export 'payslip_html_export_example_screen.dart';
 export 'employee_report_html_export_example_screen.dart';
-export 'attendance_report_html_export_example_screen.dart';
+export 'attendance_report_html_export_ex_screen.dart';
 export 'leave_report_html_export_example_screen.dart';
 export 'trial_balance_html_export_example_screen.dart';

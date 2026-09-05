@@ -10,14 +10,14 @@ void main() {
     'example/lib/features/dashboard/presentation/pages/s03_flow_layout_verification_page.dart',
     'example/lib/features/dashboard/presentation/pages/s04_data_grid_vnext_verification_page.dart',
     'example/lib/features/dashboard/presentation/pages/s05_formatting_theme_verification_page.dart',
-    'example/lib/features/dashboard/presentation/pages/s06_erp_domain_calculation_verification_page.dart',
-    'example/lib/features/dashboard/presentation/pages/s07_erp_semantic_components_verification_page.dart',
-    'example/lib/features/dashboard/presentation/pages/s08_erp_document_families_verification_page.dart',
-    'example/lib/features/dashboard/presentation/pages/s09_migrated_transaction_templates_verification_page.dart',
-    'example/lib/features/dashboard/presentation/pages/s10_template_family_consolidation_verification_page.dart',
+    'example/lib/features/dashboard/presentation/pages/s06_erp_calc_verification_page.dart',
+    'example/lib/features/dashboard/presentation/pages/s07_erp_components_verification_page.dart',
+    'example/lib/features/dashboard/presentation/pages/s08_doc_families_verification_page.dart',
+    'example/lib/features/dashboard/presentation/pages/s09_migrated_tx_verification_page.dart',
+    'example/lib/features/dashboard/presentation/pages/s10_family_merge_verification_page.dart',
     'example/lib/features/dashboard/presentation/pages/s11_print_profiles_verification_page.dart',
-    'example/lib/features/dashboard/presentation/pages/s12_sales_erp_pack_verification_page.dart',
-    'example/lib/features/dashboard/presentation/pages/s13_purchasing_erp_pack_verification_page.dart',
+    'example/lib/features/dashboard/presentation/pages/s12_sales_verification_page.dart',
+    'example/lib/features/dashboard/presentation/pages/s13_purchasing_verification_page.dart',
   ];
 
   test('S00..S13 verification pages expose create-save-open', () {

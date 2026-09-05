@@ -26,26 +26,26 @@ Version 3.0.0 introduces a comprehensive **Service Voucher System** for generati
 ```
 lib/src/templates/vouchers/
 ├── models/
-│   ├── voucher_models.dart           # Core voucher data models
-│   ├── voucher_style.dart            # Styling configuration
-│   └── voucher_enums.dart            # Service IDs & enums
+│   ├── models.dart           # Core voucher data models
+│   ├── style.dart            # Styling configuration
+│   └── enums.dart            # Service IDs & enums
 ├── templates/
-│   ├── accounting_entry_voucher.dart  # 00001–00004
-│   ├── receipt_voucher.dart           # 00100–00103
-│   ├── payment_voucher.dart           # 00200–00203
-│   ├── tax_voucher.dart               # 00300–00304
-│   ├── bank_deposit_voucher.dart      # 10000–10002
-│   ├── bank_withdrawal_voucher.dart   # 10100–10102
-│   ├── transfer_voucher.dart          # 10200–10203
-│   ├── bill_payment_voucher.dart      # 10300–10305
-│   ├── remittance_outgoing_voucher.dart   # 10400–10401, 10500–10501
-│   ├── remittance_incoming_voucher.dart   # 10450–10451, 10550–10551
-│   ├── purchase_voucher.dart          # 20000–20003
-│   ├── sales_voucher.dart             # 20200–20203
-│   ├── purchase_return_voucher.dart   # 20400–20403
-│   ├── sales_return_voucher.dart      # 20450–20453
-│   ├── gift_voucher.dart              # 20500–20501
-│   └── inventory_voucher.dart         # 20600–20604
+│   ├── accounting_entry.dart  # 00001–00004
+│   ├── receipt.dart           # 00100–00103
+│   ├── payment.dart           # 00200–00203
+│   ├── tax.dart               # 00300–00304
+│   ├── bank_deposit.dart      # 10000–10002
+│   ├── bank_withdrawal.dart   # 10100–10102
+│   ├── transfer.dart          # 10200–10203
+│   ├── bill_payment.dart      # 10300–10305
+│   ├── remittance_outgoing.dart   # 10400–10401, 10500–10501
+│   ├── remittance_incoming.dart   # 10450–10451, 10550–10551
+│   ├── purchase.dart          # 20000–20003
+│   ├── pack.dart             # 20200–20203
+│   ├── purchase_return.dart   # 20400–20403
+│   ├── sales_return.dart      # 20450–20453
+│   ├── gift.dart              # 20500–20501
+│   └── pack.dart         # 20600–20604
 └── vouchers.dart                      # Barrel export
 ```
 
@@ -86,6 +86,7 @@ abstract class GeniusPdfVoucherTemplate extends GeniusPdfDocumentBuilder {
 **Template: `AccountingEntryVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company logo, name (AR/EN), VAT number, CR number
 2. **Voucher Title** — "قيد بسيط / Simple Entry" with service ID badge
 3. **Voucher Info Row** — Voucher number, date, fiscal period, reference number
@@ -115,6 +116,7 @@ Layout per voucher page:
 **Template: `ReceiptVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info with logo
 2. **Voucher Title** — "سند قبض نقدي / Cash Receipt Voucher" + service ID
 3. **Voucher Info** — Number, date, reference
@@ -145,6 +147,7 @@ Layout per voucher page:
 **Template: `PaymentVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info with logo
 2. **Voucher Title** — "سند صرف نقدي / Cash Payment Voucher" + service ID
 3. **Voucher Info** — Number, date, reference
@@ -178,6 +181,7 @@ Layout per voucher page:
 **Template: `TaxVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info + Tax Registration Number (TIN/VAT Number)
 2. **Voucher Title** — Tax type specific title
 3. **Tax Period** — From date / To date / Filing deadline
@@ -207,6 +211,7 @@ Layout per voucher page:
 **Template: `BankDepositVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Deposit type title
 3. **Bank Info** — Bank name, branch, account number, IBAN
@@ -233,6 +238,7 @@ Layout per voucher page:
 **Template: `BankWithdrawalVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Withdrawal type title
 3. **Bank Info** — Bank name, branch, account number, IBAN
@@ -260,6 +266,7 @@ Layout per voucher page:
 **Template: `TransferVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Transfer type title
 3. **Source Account** — Bank, account number, IBAN, currency, balance before
@@ -291,6 +298,7 @@ Layout per voucher page:
 **Template: `BillPaymentVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Bill type title
 3. **Service Provider** — Provider name, account/subscriber number
@@ -322,6 +330,7 @@ Layout per voucher page:
 **Template: `RemittanceOutgoingVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Remittance type title + Domestic/International badge
 3. **Sender Info** — Name (AR/EN), ID number, phone, address
@@ -350,6 +359,7 @@ Layout per voucher page:
 **Template: `RemittanceIncomingVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Remittance type title + Domestic/International badge
 3. **Sender Info** — Name, country (for international), bank, reference
@@ -377,6 +387,7 @@ Layout per voucher page:
 **Template: `PurchaseVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Purchase type title
 3. **Supplier Info** — Name (AR/EN), code, VAT number, address, phone
@@ -412,6 +423,7 @@ Layout per voucher page:
 **Template: `SalesVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Sale type title
 3. **Customer Info** — Name (AR/EN), code, VAT number, address, phone
@@ -447,6 +459,7 @@ Layout per voucher page:
 **Template: `PurchaseReturnVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Return type title
 3. **Supplier Info** — Name (AR/EN), code, VAT number
@@ -478,6 +491,7 @@ Layout per voucher page:
 **Template: `SalesReturnVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Return type title
 3. **Customer Info** — Name (AR/EN), code, VAT number
@@ -507,6 +521,7 @@ Layout per voucher page:
 **Template: `GiftVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Gift direction title (Received/Given)
 3. **Party Info**:
@@ -537,6 +552,7 @@ Layout per voucher page:
 **Template: `InventoryVoucher`**
 
 Layout per voucher page:
+
 1. **Header** — Company info
 2. **Voucher Title** — Inventory operation title
 3. **Warehouse Info** — Varies by subtype:
@@ -881,6 +897,7 @@ class CurrencyInfo {
 ## 7. Implementation Phases
 
 ### Phase 1: Core Infrastructure (v3.0.0)
+
 - [ ] `GeniusPdfVoucherTemplate` base class
 - [ ] `GeniusPdfVoucherData` and related models
 - [ ] `GeniusPdfVoucherStyle` with pre-built styles
@@ -889,32 +906,38 @@ class CurrencyInfo {
 - [ ] `GeniusPdfVoucherBatch` for multi-voucher PDFs
 
 ### Phase 2: Financial Vouchers (v3.1.0)
+
 - [ ] `AccountingEntryVoucher` (00001–00004)
 - [ ] `ReceiptVoucher` (00100–00103)
 - [ ] `PaymentVoucher` (00200–00203)
 - [ ] `TaxVoucher` (00300–00304)
 
 ### Phase 3: Banking Vouchers (v3.2.0)
+
 - [ ] `BankDepositVoucher` (10000–10002)
 - [ ] `BankWithdrawalVoucher` (10100–10102)
 - [ ] `TransferVoucher` (10200–10203)
 - [ ] `BillPaymentVoucher` (10300–10305)
 
 ### Phase 4: Remittance Vouchers (v3.3.0)
+
 - [ ] `RemittanceOutgoingVoucher` (10400–10401, 10500–10501)
 - [ ] `RemittanceIncomingVoucher` (10450–10451, 10550–10551)
 
 ### Phase 5: Trade Vouchers (v3.4.0)
+
 - [ ] `PurchaseVoucher` (20000–20003)
 - [ ] `SalesVoucher` (20200–20203)
 - [ ] `PurchaseReturnVoucher` (20400–20403)
 - [ ] `SalesReturnVoucher` (20450–20453)
 
 ### Phase 6: Auxiliary Vouchers (v3.5.0)
+
 - [ ] `GiftVoucher` (20500–20501)
 - [ ] `InventoryVoucher` (20600–20604)
 
 ### Phase 7: Examples & Documentation (v3.6.0)
+
 - [ ] Example app with all voucher types
 - [ ] README documentation
 - [ ] CHANGELOG updates

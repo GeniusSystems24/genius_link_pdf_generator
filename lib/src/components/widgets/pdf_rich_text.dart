@@ -12,10 +12,10 @@ import '../../core/pdf_logger.dart';
 import '../../extensions/color_extensions.dart';
 import '../models/pdf_styles.dart';
 
-part 'pdf_rich_text/foundations.dart';
-part 'pdf_rich_text/renderer.dart';
-part 'pdf_rich_text/builder.dart';
-part 'pdf_rich_text/labeled_values.dart';
-part 'pdf_rich_text/bullet_list.dart';
-part 'pdf_rich_text/measurement.dart';
-part 'pdf_rich_text/markdown.dart';
+part 'rich_text/foundations.dart';
+part 'rich_text/renderer.dart';
+part 'rich_text/builder.dart';
+part 'rich_text/labeled_values.dart';
+part 'rich_text/bullet_list.dart';
+part 'rich_text/measurement.dart';
+part 'rich_text/markdown.dart';

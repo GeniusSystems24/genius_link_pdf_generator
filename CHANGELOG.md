@@ -2358,15 +2358,15 @@ final thumbnail = await pdfBytes.toThumbnail(dpi: 72);
 
 #### Template Bug Fixes
 
-- **customer_statement_template.dart** - Fixed duplicate info box: right panel was showing identical customer data instead of statement details (period, opening balance, currency)
-- **purchase_order_template.dart** - Fixed status badge text position drawn at (0,0) instead of correct badge rectangle bounds
-- **payslip_template.dart** - Added missing newline between notes label and text content
+- **customer_statement.dart** - Fixed duplicate info box: right panel was showing identical customer data instead of statement details (period, opening balance, currency)
+- **purchase_order.dart** - Fixed status badge text position drawn at (0,0) instead of correct badge rectangle bounds
+- **payslip.dart** - Added missing newline between notes label and text content
 
 #### Template Improvements
 
-- **tax_invoice_template.dart** - Implemented proper number-to-words conversion for English and Arabic (supports values up to billions, with currency/sub-currency names: SAR/Halalas, USD/Cents, etc.)
-- **attendance_report_template.dart** - Fixed inconsistent bold font fallback to use `PdfFontStyle.bold` from config assets
-- **balance_sheet_template.dart** - Enhanced unbalanced warning with colored background box (green/red), left accent border, and difference amount display
+- **tax_invoice.dart** - Implemented proper number-to-words conversion for English and Arabic (supports values up to billions, with currency/sub-currency names: SAR/Halalas, USD/Cents, etc.)
+- **attendance_report.dart** - Fixed inconsistent bold font fallback to use `PdfFontStyle.bold` from config assets
+- **balance_sheet.dart** - Enhanced unbalanced warning with colored background box (green/red), left accent border, and difference amount display
 - Added thousands separators to currency formatting across 9 templates: balance_sheet, budget_report, cash_flow, credit_note, income_statement, payslip, purchase_order, quotation, tax_invoice
 
 ---

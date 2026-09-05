@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:genius_pdf_example/features/printing/presentation/pages/s11_print_profiles/a4_portrait_verification_example_screen.dart';
+import 'package:genius_pdf_example/features/printing/presentation/pages/s11_print_profiles/a4_portrait_verify_screen.dart';
 
 /// Compatibility entry point for the former aggregate S11 Print Profiles page.
 ///

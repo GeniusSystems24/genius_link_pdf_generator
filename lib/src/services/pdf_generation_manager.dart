@@ -9,11 +9,11 @@ import '../core/pdf_logger.dart';
 import 'pdf_service.dart';
 
 
-part 'job_management/job_models.dart';
-part 'job_management/priority_queue.dart';
-part 'job_management/job_executor.dart';
-part 'job_management/generation_manager.dart';
-part 'job_management/manager_extensions.dart';
-part 'job_management/scheduler.dart';
-part 'job_management/statistics.dart';
-part 'job_management/chains.dart';
+part 'jobs/job_models.dart';
+part 'jobs/priority_queue.dart';
+part 'jobs/job_executor.dart';
+part 'jobs/generation_manager.dart';
+part 'jobs/manager_extensions.dart';
+part 'jobs/scheduler.dart';
+part 'jobs/statistics.dart';
+part 'jobs/chains.dart';

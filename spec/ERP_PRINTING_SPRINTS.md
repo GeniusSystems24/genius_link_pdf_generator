@@ -88,7 +88,7 @@ example/lib/features/dashboard/presentation/pages
 s01_directionality_verification_page.dart
 s02_components_rtl_verification_page.dart
 s04_data_grid_verification_page.dart
-s06_erp_domain_calculation_verification_page.dart
+s06_erp_calc_verification_page.dart
 ```
 
 إذا كان للمشروع convention مختلف لأسماء الصفحات، يستخدم convention المشروع مع الحفاظ على وضوح الغرض.

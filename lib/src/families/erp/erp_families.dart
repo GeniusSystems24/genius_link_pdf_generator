@@ -8,4 +8,4 @@ library;
 export 'family_models.dart';
 export 'family_document.dart';
 export 'family_types.dart';
-export 'existing_template_family_registry.dart';
+export 'existing_family_registry.dart';

@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
-import '../application/contracts/pdf_generation_ports.dart';
+import '../app/contracts/pdf_generation_ports.dart';
 import '../builders/pdf_document_builder.dart';
-import '../composition/genius_pdf_composition_root.dart';
+import '../compose/pdf_composition_root.dart';
 import '../domain/models/pdf_delivery.dart';
 import '../domain/models/pdf_operations.dart';
 import '../domain/models/pdf_result.dart';

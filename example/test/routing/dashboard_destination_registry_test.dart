@@ -6,7 +6,7 @@ void main() {
   test('S10 and S11 destinations are registered', () {
     expect(
       DashboardDestinationRegistry.primaryDestinations.any(
-        (item) => item.id == 's10_template_family_consolidation',
+        (item) => item.id == 's10_family_merge',
       ),
       isTrue,
     );
@@ -23,13 +23,13 @@ void main() {
   test('S08 and S09 ERP destinations are registered', () {
     expect(
       DashboardDestinationRegistry.primaryDestinations.any(
-        (item) => item.id == 's08_erp_document_families',
+        (item) => item.id == 's08_doc_families',
       ),
       isTrue,
     );
     expect(
       DashboardDestinationRegistry.primaryDestinations.any(
-        (item) => item.id == 's09_migrated_transaction_templates',
+        (item) => item.id == 's09_migrated_tx',
       ),
       isTrue,
     );
@@ -40,13 +40,13 @@ void main() {
   test('S07 ERP Semantic Components destination is registered', () {
     expect(
       DashboardDestinationRegistry.primaryDestinations.any(
-        (item) => item.id == 's07_erp_semantic_components',
+        (item) => item.id == 's07_erp_components',
       ),
       isTrue,
     );
     expect(
       DashboardDestinationRegistry.titleFor(
-        's07_erp_semantic_components',
+        's07_erp_components',
       ),
       'S07 ERP Semantic Components',
     );
@@ -57,13 +57,13 @@ void main() {
   test('S06 ERP Domain destination is registered', () {
     expect(
       DashboardDestinationRegistry.primaryDestinations.any(
-        (item) => item.id == 's06_erp_domain_calculation',
+        (item) => item.id == 's06_erp_calc',
       ),
       isTrue,
     );
     expect(
       DashboardDestinationRegistry.titleFor(
-        's06_erp_domain_calculation',
+        's06_erp_calc',
       ),
       'S06 ERP Domain & Calculations',
     );

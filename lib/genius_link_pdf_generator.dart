@@ -99,9 +99,9 @@ export 'src/domain/models/pdf_operations.dart';
 export 'src/domain/models/pdf_delivery.dart';
 
 // Composition and application contracts (optional advanced injection)
-export 'src/composition/genius_pdf_composition_root.dart';
-export 'src/application/contracts/pdf_generation_ports.dart';
-export 'src/application/contracts/pdf_document_processor.dart';
+export 'src/compose/pdf_composition_root.dart';
+export 'src/app/contracts/pdf_generation_ports.dart';
+export 'src/app/contracts/pdf_document_processor.dart';
 
 // Builders
 export 'src/builders/pdf_document_builder.dart';
@@ -118,9 +118,9 @@ export 'src/services/pdf_security_service.dart';
 export 'src/services/export/export.dart';
 
 // MVC presentation
-export 'src/presentation/views/pdf_preview.dart';
-export 'src/presentation/controllers/genius_pdf_controller.dart';
-export 'src/presentation/controllers/genius_pdf_preview_controller.dart';
+export 'src/ui/views/pdf_preview.dart';
+export 'src/ui/controllers/genius_pdf_controller.dart';
+export 'src/ui/controllers/genius_pdf_preview_controller.dart';
 
 // Extensions
 export 'src/extensions/color_extensions.dart';
@@ -149,9 +149,9 @@ export 'src/printing/printing.dart';
 
 // Sharing (v2.3.0)
 export 'src/sharing/sharing.dart';
-export 'src/packs/erp_packs.dart';
-export 'src/template_engine_vnext/template_engine_vnext.dart';
+export 'src/packs/packs.dart';
+export 'src/engine_vnext/template_engine_vnext.dart';
 export 'src/compliance/compliance.dart';
 export 'src/quality/quality.dart';
-export 'src/template_designer/template_designer.dart';
-export 'src/industry_packs/industry_pack_api.dart';
+export 'src/designer/template_designer.dart';
+export 'src/industries/industry_pack_api.dart';

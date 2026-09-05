@@ -40,7 +40,7 @@ The existing voucher base is intentionally the single implementation point for
 shared voucher rendering. S10 also removes repeated `_drawSignatures()` geometry
 from Attendance, Employee, Leave, Payslip, Inventory and Trial Balance and
 routes it through `drawErpSignatureRow()` in
-`erp_shared_template_layout.dart`:
+`erp_shared_layout.dart`:
 
 - `drawAccountEntriesTable`: centralized
 - `drawPartyInfo`: centralized

@@ -12,10 +12,10 @@ import '../../extensions/color_extensions.dart';
 import '../../models/pdf_image.dart';
 import '../models/pdf_styles.dart';
 
-part 'summary/genius_pdf_summary_item.dart';
-part 'summary/genius_pdf_summary_group.dart';
-part 'summary/genius_pdf_summary_style.dart';
-part 'summary/genius_pdf_total_bar.dart';
-part 'summary/genius_pdf_signature_area.dart';
-part 'summary/genius_pdf_q_r_code.dart';
-part 'summary/genius_pdf_summary_section.dart';
+part 'summary/item.dart';
+part 'summary/group.dart';
+part 'summary/style.dart';
+part 'summary/total_bar.dart';
+part 'summary/signature_area.dart';
+part 'summary/qr_code.dart';
+part 'summary/section.dart';

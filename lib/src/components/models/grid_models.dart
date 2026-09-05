@@ -5,9 +5,9 @@ import '../../core/pdf_formatter.dart';
 
 import 'pdf_styles.dart';
 
-part 'grid_models/column.dart';
-part 'grid_models/row.dart';
-part 'grid_models/style.dart';
-part 'grid_models/style_presets.dart';
-part 'grid_models/group.dart';
-part 'grid_models/totals.dart';
+part 'grid/column.dart';
+part 'grid/row.dart';
+part 'grid/style.dart';
+part 'grid/style_presets.dart';
+part 'grid/group.dart';
+part 'grid/totals.dart';

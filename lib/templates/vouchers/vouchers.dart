@@ -6,39 +6,39 @@ library;
 
 // Models
 export 'models/amount_to_words.dart';
-export 'models/voucher_enums.dart';
-export 'models/voucher_models.dart';
-export 'models/voucher_style.dart';
+export 'models/enums.dart';
+export 'models/models.dart';
+export 'models/style.dart';
 
 // Base template
-export 'templates/voucher_base_template.dart';
-export 'templates/modern_voucher_template.dart';
+export 'docs/voucher_base.dart';
+export 'docs/modern.dart';
 
 // Financial voucher templates (v3.0.0)
-export 'templates/accounting_entry_voucher.dart';
-export 'templates/receipt_voucher.dart';
-export 'templates/payment_voucher.dart';
-export 'templates/tax_voucher.dart';
+export 'docs/accounting_entry.dart';
+export 'docs/receipt.dart';
+export 'docs/payment.dart';
+export 'docs/tax.dart';
 
 // Banking voucher templates (v3.1.0)
-export 'templates/bank_deposit_voucher.dart';
-export 'templates/bank_withdrawal_voucher.dart';
-export 'templates/transfer_voucher.dart';
-export 'templates/bill_payment_voucher.dart';
+export 'docs/bank_deposit.dart';
+export 'docs/bank_withdrawal.dart';
+export 'docs/transfer.dart';
+export 'docs/bill_payment.dart';
 
 // Remittance voucher templates (v3.2.0)
-export 'templates/remittance_outgoing_voucher.dart';
-export 'templates/remittance_incoming_voucher.dart';
+export 'docs/remittance_outgoing.dart';
+export 'docs/remittance_incoming.dart';
 
 // Trade voucher templates (v3.3.0)
-export 'templates/purchase_voucher.dart';
-export 'templates/sales_voucher.dart';
-export 'templates/purchase_return_voucher.dart';
-export 'templates/sales_return_voucher.dart';
+export 'docs/purchase.dart';
+export 'docs/sales.dart';
+export 'docs/purchase_return.dart';
+export 'docs/sales_return.dart';
 
 // Auxiliary voucher templates (v3.4.0)
-export 'templates/gift_voucher.dart';
-export 'templates/inventory_voucher.dart';
+export 'docs/gift.dart';
+export 'docs/inventory.dart';
 
 // Batch generation
-export 'templates/voucher_batch.dart';
+export 'docs/voucher_batch.dart';

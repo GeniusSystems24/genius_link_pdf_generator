@@ -100,7 +100,7 @@ class _PackageSummary extends StatelessWidget {
           ActionChip(
             avatar: const Icon(Icons.speed_outlined, size: 18),
             label:  Text(pdfLocalization.performance),
-            onPressed: () => onNavigate('s24_performance_regression'),
+            onPressed: () => onNavigate('s24_performance'),
           ),
         ],
       ),
@@ -159,7 +159,7 @@ class _FeatureGrid extends StatelessWidget {
         icon: Icons.architecture_outlined,
       ),
        _DashboardFeature(
-        id: 's24_performance_regression',
+        id: 's24_performance',
         title: pdfLocalization.benchmarkAndPerformance,
         description: pdfLocalization.regressionVerificationPerformanceDesc,
         icon: Icons.speed_outlined,

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/consistency_verification_example_screen.dart';
+import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/consistency_verify_screen.dart';
 
 /// Compatibility entry point for the former aggregate S05 Formatting & Theme page.
 ///

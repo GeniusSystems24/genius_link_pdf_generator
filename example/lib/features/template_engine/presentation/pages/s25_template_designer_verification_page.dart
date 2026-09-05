@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:genius_pdf_example/features/template_engine/presentation/pages/s25_template_designer/metadata_verification_example_screen.dart';
+import 'package:genius_pdf_example/features/template_engine/presentation/pages/s25_template_designer/metadata_verify_screen.dart';
 
 /// Compatibility entry point for the former aggregate S25 Template Designer page.
 ///

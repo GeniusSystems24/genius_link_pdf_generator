@@ -27,6 +27,6 @@ import 'printer_discovery.dart';
 import '../core/pdf_config.dart';
 import '../core/pdf_logger.dart';
 
-part 'printer_service/models.dart';
-part 'printer_service/service.dart';
-part 'printer_service/extensions.dart';
+part 'printer/models.dart';
+part 'printer/service.dart';
+part 'printer/extensions.dart';

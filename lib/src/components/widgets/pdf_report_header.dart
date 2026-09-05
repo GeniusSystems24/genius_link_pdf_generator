@@ -12,8 +12,8 @@ import '../../extensions/color_extensions.dart';
 import '../../models/pdf_image.dart';
 import '../models/pdf_styles.dart';
 
-part 'pdf_report_header/models.dart';
-part 'pdf_report_header/enums.dart';
-part 'pdf_report_header/style.dart';
-part 'pdf_report_header/renderer.dart';
-part 'pdf_report_header/layout_enums.dart';
+part 'report_header/models.dart';
+part 'report_header/enums.dart';
+part 'report_header/style.dart';
+part 'report_header/renderer.dart';
+part 'report_header/layout_enums.dart';

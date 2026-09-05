@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import '../application/contracts/pdf_generation_ports.dart';
-import '../composition/genius_pdf_composition_root.dart';
-import '../presentation/controllers/pdf_preview_action_controller.dart';
+import '../app/contracts/pdf_generation_ports.dart';
+import '../compose/pdf_composition_root.dart';
+import '../ui/controllers/preview_action_controller.dart';
 
 /// Backward-compatible preview controller.
 ///

@@ -2626,14 +2626,14 @@ Industry-specific packs
 - `lib/genius_link_pdf_generator.dart`
 - `lib/genius_link_pdf_generator_api.dart`
 - `lib/src/builders/pdf_document_builder.dart`
-- `lib/src/builders/pdf_document_builder/document_builder.dart`
-- `lib/src/builders/pdf_document_builder/report_composer.dart`
+- `lib/src/builders/doc_builder/document_builder.dart`
+- `lib/src/builders/doc_builder/report_composer.dart`
 - `lib/src/components/components.dart`
 - `lib/src/components/widgets/*`
 - `lib/src/services/pdf_security_service.dart`
 - `lib/templates/*`
-- `lib/templates/engine/template_definition.dart`
-- `lib/templates/engine/template_elements.dart`
+- `lib/templates/engine/definition.dart`
+- `lib/templates/engine/elements.dart`
 - `lib/templates/vouchers/*`
 
 ---

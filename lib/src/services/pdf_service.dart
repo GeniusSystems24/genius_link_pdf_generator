@@ -4,16 +4,16 @@ import 'dart:ui';
 
 import 'package:share_plus/share_plus.dart';
 
-import '../application/contracts/pdf_document_processor.dart';
-import '../application/contracts/pdf_generation_ports.dart';
+import '../app/contracts/pdf_document_processor.dart';
+import '../app/contracts/pdf_generation_ports.dart';
 import '../builders/pdf_document_builder.dart';
-import '../composition/genius_pdf_composition_root.dart';
+import '../compose/pdf_composition_root.dart';
 import '../domain/models/pdf_operations.dart';
 import '../domain/models/pdf_result.dart';
-import '../presentation/controllers/genius_pdf_controller.dart';
+import '../ui/controllers/genius_pdf_controller.dart';
 
-export '../application/contracts/pdf_document_processor.dart';
-export '../application/contracts/pdf_generation_ports.dart';
+export '../app/contracts/pdf_document_processor.dart';
+export '../app/contracts/pdf_generation_ports.dart';
 export '../domain/models/pdf_operations.dart';
 
 /// Backward-compatible callback for resolving a platform directory.

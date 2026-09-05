@@ -114,7 +114,7 @@ import 'package:genius_pdf_example/features/security/presentation/pages/examples
 import 'package:genius_pdf_example/features/security/presentation/pages/examples/signatures/visual_signature_security_example_screen.dart';
 import 'package:genius_pdf_example/features/security/presentation/pages/examples/signatures/detailed_signature_security_example_screen.dart';
 import 'package:genius_pdf_example/features/security/presentation/pages/examples/signatures/multiple_signatures_security_example_screen.dart';
-import 'package:genius_pdf_example/features/security/presentation/pages/examples/signatures/custom_position_signature_security_example_screen.dart';
+import 'package:genius_pdf_example/features/security/presentation/pages/examples/signatures/custom_position_signature_security_ex_screen.dart';
 import 'package:genius_pdf_example/features/security/presentation/pages/examples/comprehensive_security_example_screen.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/pages/s00_baseline/mixed_erp_baseline_example_screen.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/pages/s00_baseline/summary_baseline_example_screen.dart';
@@ -125,89 +125,89 @@ import 'package:genius_pdf_example/features/getting_started/presentation/pages/s
 import 'package:genius_pdf_example/features/getting_started/presentation/pages/s00_baseline/qr_barcode_baseline_example_screen.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/pages/s00_baseline/watermark_baseline_example_screen.dart';
 import 'package:genius_pdf_example/features/getting_started/presentation/pages/s00_baseline/long_content_baseline_example_screen.dart';
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/precedence_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/logical_geometry_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/value_matrix_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/mixed_text_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/nested_overrides_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/long_multi_page_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/auto_inheritance_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/legacy_template_json_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/media_policy_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/matrix_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/summary_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/info_box_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/report_header_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/rich_text_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/data_grid_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/media_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/nested_override_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/long_multi_page_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/one_page_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/fifty_rows_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/five_hundred_rows_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/keep_together_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/repeated_headers_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/long_notes_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/page_metadata_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/custom_landscape_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/compatibility_adapter_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/sizing_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/long_content_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/pagination_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/grouping_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/spans_and_builders_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/erp_formatting_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/directionality_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/empty_state_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/large_data_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/consistency_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/currencies_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/precision_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/accounting_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/arabic_digits_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/nulls_units_exchange_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/theme_tokens_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/long_multi_page_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/baseline_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/before_tax_discount_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/after_tax_discount_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/multi_tax_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/multi_currency_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/rounding_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/paid_due_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/zero_negative_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/optional_nulls_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_domain_calculation/long_multi_page_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_semantic_components/identity_party_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_semantic_components/financial_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_semantic_components/operational_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_semantic_components/null_collapse_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_semantic_components/empty_state_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_semantic_components/bilingual_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_semantic_components/composition_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_semantic_components/long_multi_page_verification_example_screen.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s08_erp_document_families/s08_erp_document_families_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s09_migrated_transaction_templates/s09_migrated_transaction_templates_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s12_sales_erp_pack/s12_sales_erp_pack_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s13_purchasing_erp_pack/s13_purchasing_erp_pack_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s14_accounting_finance_pack/s14_accounting_finance_pack_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s15_inventory_wms_pack/s15_inventory_wms_pack_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s16_pos_retail_pack/s16_pos_retail_pack_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s17_hr_payroll_pack/s17_hr_payroll_pack_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s18_manufacturing_quality_pack/s18_manufacturing_quality_pack_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s19_fixed_assets_projects_pack/s19_fixed_assets_projects_pack_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s20_maintenance_service_logistics_pack/s20_maintenance_service_logistics_pack_examples.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/precedence_verify_screen.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/logical_geometry_verify_screen.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/value_matrix_verify_screen.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/mixed_text_verify_screen.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/nested_overrides_verify_screen.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/long_multi_page_verify_screen.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/auto_inheritance_verify_screen.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/legacy_template_json_verify_screen.dart';
+import 'package:genius_pdf_example/features/text_typography/presentation/pages/s01_directionality/media_policy_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/matrix_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/summary_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/info_box_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/report_header_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/rich_text_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/data_grid_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/media_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/nested_override_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s02_components_rtl/long_multi_page_verify_screen.dart';
+import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/one_page_verify_screen.dart';
+import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/fifty_rows_verify_screen.dart';
+import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/five_hundred_rows_verify_screen.dart';
+import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/keep_together_verify_screen.dart';
+import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/repeated_headers_verify_screen.dart';
+import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/long_notes_verify_screen.dart';
+import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/page_metadata_verify_screen.dart';
+import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/custom_landscape_verify_screen.dart';
+import 'package:genius_pdf_example/features/document_builder/presentation/pages/s03_flow_layout/compatibility_adapter_verify_screen.dart';
+import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/sizing_verify_screen.dart';
+import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/long_content_verify_screen.dart';
+import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/pagination_verify_screen.dart';
+import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/grouping_verify_screen.dart';
+import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/spans_and_builders_verify_screen.dart';
+import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/erp_formatting_verify_screen.dart';
+import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/directionality_verify_screen.dart';
+import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/empty_state_verify_screen.dart';
+import 'package:genius_pdf_example/features/tables_grids/presentation/pages/s04_data_grid_vnext/large_data_verify_screen.dart';
+import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/consistency_verify_screen.dart';
+import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/currencies_verify_screen.dart';
+import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/precision_verify_screen.dart';
+import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/accounting_verify_screen.dart';
+import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/arabic_digits_verify_screen.dart';
+import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/nulls_units_exchange_verify_screen.dart';
+import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/theme_tokens_verify_screen.dart';
+import 'package:genius_pdf_example/features/configuration/presentation/pages/s05_formatting_theme/long_multi_page_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/baseline_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/before_tax_discount_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/after_tax_discount_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/multi_tax_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/multi_currency_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/rounding_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/paid_due_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/zero_negative_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/optional_nulls_verify_screen.dart';
+import 'package:genius_pdf_example/features/architecture/presentation/pages/s06_erp_calc/long_multi_page_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_components/identity_party_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_components/financial_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_components/operational_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_components/null_collapse_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_components/empty_state_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_components/bilingual_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_components/composition_verify_screen.dart';
+import 'package:genius_pdf_example/features/components/presentation/pages/s07_erp_components/long_multi_page_verify_screen.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s08_doc_families/s08_doc_families_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s09_migrated_tx/s09_migrated_tx_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s12_sales/s12_sales_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s13_purchasing/s13_purchasing_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s14_accounting/s14_accounting_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s15_inventory/s15_inventory_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s16_pos_retail/s16_pos_retail_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s17_hr_payroll/s17_hr_payroll_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s18_mfg_quality/s18_mfg_quality_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s19_assets_projects/s19_assets_projects_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s20_service_logistics/s20_service_logistics_examples.dart';
 import 'package:genius_pdf_example/features/business_templates/presentation/pages/s21_crm_pack/s21_crm_pack_examples.dart';
-import 'package:genius_pdf_example/features/business_templates/presentation/pages/s26_industry_packs/s26_industry_packs_examples.dart';
-import 'package:genius_pdf_example/features/template_engine/presentation/pages/s10_template_family_consolidation/s10_template_family_consolidation_examples.dart';
+import 'package:genius_pdf_example/features/business_templates/presentation/pages/s26_industries/s26_industries_examples.dart';
+import 'package:genius_pdf_example/features/template_engine/presentation/pages/s10_family_merge/s10_family_merge_examples.dart';
 import 'package:genius_pdf_example/features/printing/presentation/pages/s11_print_profiles/s11_print_profiles_examples.dart';
-import 'package:genius_pdf_example/features/template_engine/presentation/pages/s22_template_engine_vnext/s22_template_engine_vnext_examples.dart';
-import 'package:genius_pdf_example/features/security/presentation/pages/s23_compliance_signing_archival/s23_compliance_signing_archival_examples.dart';
+import 'package:genius_pdf_example/features/template_engine/presentation/pages/s22_engine_vnext/s22_engine_vnext_examples.dart';
+import 'package:genius_pdf_example/features/security/presentation/pages/s23_compliance_archive/s23_compliance_archive_examples.dart';
 import 'package:genius_pdf_example/features/template_engine/presentation/pages/s25_template_designer/s25_template_designer_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/pages/examples/image_export/template_image_export_examples.dart';
 import 'package:genius_pdf_example/features/export/presentation/pages/examples/document_export/template_html_export_examples.dart';
-import 'package:genius_pdf_example/benchmark/presentation/pages/s24_performance_regression/s24_performance_regression_examples.dart';
+import 'package:genius_pdf_example/benchmark/presentation/pages/s24_performance/s24_performance_examples.dart';
 import 'package:genius_pdf_example/features/architecture/presentation/pages/examples/v2_architecture/v2_architecture_examples.dart';
 import 'package:genius_pdf_example/features/architecture/presentation/pages/examples/fluent_api_example_screen.dart';
 import 'package:genius_pdf_example/features/architecture/presentation/pages/examples/plugins_example_screen.dart';
@@ -486,182 +486,182 @@ final class DashboardDestinationRegistry {
       code: 'S05-08',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_baseline',
+      id: 's06_erp_calc_baseline',
       title: 'Baseline Calculation',
       code: 'S06-01',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_before_tax_discount',
+      id: 's06_erp_calc_before_tax_discount',
       title: 'Discount Before Tax',
       code: 'S06-02',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_after_tax_discount',
+      id: 's06_erp_calc_after_tax_discount',
       title: 'Discount After Tax',
       code: 'S06-03',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_multi_tax',
+      id: 's06_erp_calc_multi_tax',
       title: 'Multi-tax / Compound',
       code: 'S06-04',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_multi_currency',
+      id: 's06_erp_calc_multi_currency',
       title: 'Document / Base Currency',
       code: 'S06-05',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_rounding',
+      id: 's06_erp_calc_rounding',
       title: 'Rounding Adjustment',
       code: 'S06-06',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_paid_due',
+      id: 's06_erp_calc_paid_due',
       title: 'Paid / Due',
       code: 'S06-07',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_zero_negative',
+      id: 's06_erp_calc_zero_negative',
       title: 'Zero / Negative Policy',
       code: 'S06-08',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_optional_nulls',
+      id: 's06_erp_calc_optional_nulls',
       title: 'Null Optional Metadata',
       code: 'S06-09',
     ),
     DashboardDestination(
-      id: 's06_erp_domain_calculation_long_multi_page',
+      id: 's06_erp_calc_long_multi_page',
       title: 'Long / Multi-page Domain',
       code: 'S06-10',
     ),
     DashboardDestination(
-      id: 's07_erp_semantic_components_identity_party',
+      id: 's07_erp_components_identity_party',
       title: 'Identity / Party / Address',
       code: 'S07-01',
     ),
     DashboardDestination(
-      id: 's07_erp_semantic_components_financial',
+      id: 's07_erp_components_financial',
       title: 'Financial Semantic Blocks',
       code: 'S07-02',
     ),
     DashboardDestination(
-      id: 's07_erp_semantic_components_operational',
+      id: 's07_erp_components_operational',
       title: 'Operational Components',
       code: 'S07-03',
     ),
     DashboardDestination(
-      id: 's07_erp_semantic_components_null_collapse',
+      id: 's07_erp_components_null_collapse',
       title: 'Null Collapse / No Gap',
       code: 'S07-04',
     ),
     DashboardDestination(
-      id: 's07_erp_semantic_components_empty_state',
+      id: 's07_erp_components_empty_state',
       title: 'Explicit Empty State',
       code: 'S07-05',
     ),
     DashboardDestination(
-      id: 's07_erp_semantic_components_bilingual',
+      id: 's07_erp_components_bilingual',
       title: 'Bilingual Mixed Values',
       code: 'S07-06',
     ),
     DashboardDestination(
-      id: 's07_erp_semantic_components_composition',
+      id: 's07_erp_components_composition',
       title: 'Reusable Composition',
       code: 'S07-07',
     ),
     DashboardDestination(
-      id: 's07_erp_semantic_components_long_multi_page',
+      id: 's07_erp_components_long_multi_page',
       title: 'Long / Multi-page Semantics',
       code: 'S07-08',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_transaction',
+      id: 's08_doc_families_transaction',
       title: 'Transaction family',
       code: 'S08-01',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_statement',
+      id: 's08_doc_families_statement',
       title: 'Statement family',
       code: 'S08-02',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_voucher',
+      id: 's08_doc_families_voucher',
       title: 'Voucher family',
       code: 'S08-03',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_analytical',
+      id: 's08_doc_families_analytical',
       title: 'Analytical report',
       code: 'S08-04',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_operational',
+      id: 's08_doc_families_operational',
       title: 'Operational form',
       code: 'S08-05',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_register',
+      id: 's08_doc_families_register',
       title: 'Register',
       code: 'S08-06',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_thermal',
+      id: 's08_doc_families_thermal',
       title: 'Thermal receipt',
       code: 'S08-07',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_label',
+      id: 's08_doc_families_label',
       title: 'Label',
       code: 'S08-08',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_certificate',
+      id: 's08_doc_families_certificate',
       title: 'Certificate',
       code: 'S08-09',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_custom_slots',
+      id: 's08_doc_families_custom_slots',
       title: 'Replacement / custom section',
       code: 'S08-10',
     ),
     DashboardDestination(
-      id: 's08_erp_document_families_long_multi_page',
+      id: 's08_doc_families_long_multi_page',
       title: 'Long multi-page transaction',
       code: 'S08-11',
     ),
     DashboardDestination(
-      id: 's09_migrated_transaction_templates_quotation1',
+      id: 's09_migrated_tx_quotation1',
       title: 'Quotation — 1 line',
       code: 'S09-01',
     ),
     DashboardDestination(
-      id: 's09_migrated_transaction_templates_purchase_order50',
+      id: 's09_migrated_tx_purchase_order50',
       title: 'Purchase Order — 50 lines',
       code: 'S09-02',
     ),
     DashboardDestination(
-      id: 's09_migrated_transaction_templates_tax_invoice500',
+      id: 's09_migrated_tx_tax_invoice500',
       title: 'Tax Invoice — 500 lines',
       code: 'S09-03',
     ),
     DashboardDestination(
-      id: 's09_migrated_transaction_templates_long_content',
+      id: 's09_migrated_tx_long_content',
       title: 'Long party / notes / terms',
       code: 'S09-04',
     ),
     DashboardDestination(
-      id: 's09_migrated_transaction_templates_null_optional',
+      id: 's09_migrated_tx_null_optional',
       title: 'Null optional sections',
       code: 'S09-05',
     ),
     DashboardDestination(
-      id: 's09_migrated_transaction_templates_bilingual',
+      id: 's09_migrated_tx_bilingual',
       title: 'Bilingual / RTL structured values',
       code: 'S09-06',
     ),
     DashboardDestination(
-      id: 's10_template_family_consolidation_family_audit',
+      id: 's10_family_merge_family_audit',
       title: 'Template Family Audit',
       code: 'S10-01',
     ),
@@ -726,922 +726,922 @@ final class DashboardDestinationRegistry {
       code: 'S11-12',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_sales_order',
+      id: 's12_sales_sales_order',
       title: 'Sales Order',
       code: 'S12-01',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_proforma',
+      id: 's12_sales_proforma',
       title: 'Proforma Invoice',
       code: 'S12-02',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_pos',
+      id: 's12_sales_pos',
       title: 'Simplified / POS Invoice',
       code: 'S12-03',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_debit_note',
+      id: 's12_sales_debit_note',
       title: 'Debit Note',
       code: 'S12-04',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_sales_return',
+      id: 's12_sales_sales_return',
       title: 'Sales Return',
       code: 'S12-05',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_customer_receipt',
+      id: 's12_sales_customer_receipt',
       title: 'Customer Receipt',
       code: 'S12-06',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_picking',
+      id: 's12_sales_picking',
       title: 'Picking List',
       code: 'S12-07',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_packing',
+      id: 's12_sales_packing',
       title: 'Packing List',
       code: 'S12-08',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_backorder',
+      id: 's12_sales_backorder',
       title: 'Backorder',
       code: 'S12-09',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_customer_aging',
+      id: 's12_sales_customer_aging',
       title: 'Customer Aging',
       code: 'S12-10',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_sales_register',
+      id: 's12_sales_sales_register',
       title: 'Sales Register',
       code: 'S12-11',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_by_customer',
+      id: 's12_sales_by_customer',
       title: 'Sales by Customer',
       code: 'S12-12',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_by_item',
+      id: 's12_sales_by_item',
       title: 'Sales by Item',
       code: 'S12-13',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_by_salesperson',
+      id: 's12_sales_by_salesperson',
       title: 'Sales by Salesperson',
       code: 'S12-14',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_price_list',
+      id: 's12_sales_price_list',
       title: 'Price List',
       code: 'S12-15',
     ),
     DashboardDestination(
-      id: 's12_sales_erp_pack_commission',
+      id: 's12_sales_commission',
       title: 'Commission Report',
       code: 'S12-16',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_requisition',
+      id: 's13_purchasing_requisition',
       title: 'Purchase Requisition',
       code: 'S13-01',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_rfq',
+      id: 's13_purchasing_rfq',
       title: 'Request for Quotation',
       code: 'S13-02',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_supplier_quotation',
+      id: 's13_purchasing_supplier_quotation',
       title: 'Supplier Quotation',
       code: 'S13-03',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_comparison',
+      id: 's13_purchasing_comparison',
       title: 'Quotation Comparison',
       code: 'S13-04',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_purchase_order',
+      id: 's13_purchasing_purchase_order',
       title: 'Purchase Order',
       code: 'S13-05',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_grn',
+      id: 's13_purchasing_grn',
       title: 'Goods Receipt Note',
       code: 'S13-06',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_purchase_invoice',
+      id: 's13_purchasing_purchase_invoice',
       title: 'Purchase Invoice',
       code: 'S13-07',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_purchase_debit',
+      id: 's13_purchasing_purchase_debit',
       title: 'Purchase Debit Note',
       code: 'S13-08',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_purchase_credit',
+      id: 's13_purchasing_purchase_credit',
       title: 'Purchase Credit Note',
       code: 'S13-09',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_supplier_return',
+      id: 's13_purchasing_supplier_return',
       title: 'Supplier Return',
       code: 'S13-10',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_supplier_statement',
+      id: 's13_purchasing_supplier_statement',
       title: 'Supplier Statement',
       code: 'S13-11',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_supplier_aging',
+      id: 's13_purchasing_supplier_aging',
       title: 'Supplier Aging',
       code: 'S13-12',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_purchase_register',
+      id: 's13_purchasing_purchase_register',
       title: 'Purchase Register',
       code: 'S13-13',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_purchase_analysis',
+      id: 's13_purchasing_purchase_analysis',
       title: 'Purchase Analysis',
       code: 'S13-14',
     ),
     DashboardDestination(
-      id: 's13_purchasing_erp_pack_outstanding_po',
+      id: 's13_purchasing_outstanding_po',
       title: 'Outstanding Purchase Orders',
       code: 'S13-15',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_general_ledger',
+      id: 's14_accounting_general_ledger',
       title: 'General Ledger',
       code: 'S14-01',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_journal_entry',
+      id: 's14_accounting_journal_entry',
       title: 'Journal Entry',
       code: 'S14-02',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_journal_register',
+      id: 's14_accounting_journal_register',
       title: 'Journal Register',
       code: 'S14-03',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_account_statement',
+      id: 's14_accounting_account_statement',
       title: 'Account Statement',
       code: 'S14-04',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_ar_aging',
+      id: 's14_accounting_ar_aging',
       title: 'AR Aging',
       code: 'S14-05',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_ap_aging',
+      id: 's14_accounting_ap_aging',
       title: 'AP Aging',
       code: 'S14-06',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_customer_balances',
+      id: 's14_accounting_customer_balances',
       title: 'Customer Balances',
       code: 'S14-07',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_supplier_balances',
+      id: 's14_accounting_supplier_balances',
       title: 'Supplier Balances',
       code: 'S14-08',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_cash_book',
+      id: 's14_accounting_cash_book',
       title: 'Cash Book',
       code: 'S14-09',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_bank_book',
+      id: 's14_accounting_bank_book',
       title: 'Bank Book',
       code: 'S14-10',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_bank_reconciliation',
+      id: 's14_accounting_bank_reconciliation',
       title: 'Bank Reconciliation',
       code: 'S14-11',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_petty_cash',
+      id: 's14_accounting_petty_cash',
       title: 'Petty Cash',
       code: 'S14-12',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_payment_register',
+      id: 's14_accounting_payment_register',
       title: 'Payment Register',
       code: 'S14-13',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_receipt_register',
+      id: 's14_accounting_receipt_register',
       title: 'Receipt Register',
       code: 'S14-14',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_vat_summary',
+      id: 's14_accounting_vat_summary',
       title: 'VAT / Tax Summary',
       code: 'S14-15',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_tax_register',
+      id: 's14_accounting_tax_register',
       title: 'Tax Register',
       code: 'S14-16',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_tax_breakdown',
+      id: 's14_accounting_tax_breakdown',
       title: 'Tax Breakdown',
       code: 'S14-17',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_reconciliation',
+      id: 's14_accounting_reconciliation',
       title: 'Rounding / Reconciliation',
       code: 'S14-18',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_cost_center_statement',
+      id: 's14_accounting_cost_center_statement',
       title: 'Cost Center Statement',
       code: 'S14-19',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_cost_center_trial_balance',
+      id: 's14_accounting_cost_center_trial_balance',
       title: 'Cost Center Trial Balance',
       code: 'S14-20',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_project_financial',
+      id: 's14_accounting_project_financial',
       title: 'Project Financial',
       code: 'S14-21',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_budget_vs_actual',
+      id: 's14_accounting_budget_vs_actual',
       title: 'Budget vs Actual',
       code: 'S14-22',
     ),
     DashboardDestination(
-      id: 's14_accounting_finance_pack_multi_period',
+      id: 's14_accounting_multi_period',
       title: 'Multi-period Comparison',
       code: 'S14-23',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_stock_receipt',
+      id: 's15_inventory_stock_receipt',
       title: 'Stock Receipt',
       code: 'S15-01',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_stock_issue',
+      id: 's15_inventory_stock_issue',
       title: 'Stock Issue',
       code: 'S15-02',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_stock_transfer',
+      id: 's15_inventory_stock_transfer',
       title: 'Stock Transfer',
       code: 'S15-03',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_warehouse_transfer',
+      id: 's15_inventory_warehouse_transfer',
       title: 'Warehouse Transfer',
       code: 'S15-04',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_adjustment',
+      id: 's15_inventory_adjustment',
       title: 'Stock Adjustment',
       code: 'S15-05',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_stock_count',
+      id: 's15_inventory_stock_count',
       title: 'Stock Count',
       code: 'S15-06',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_cycle_count',
+      id: 's15_inventory_cycle_count',
       title: 'Cycle Count',
       code: 'S15-07',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_reconciliation',
+      id: 's15_inventory_reconciliation',
       title: 'Count Reconciliation',
       code: 'S15-08',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_item_card',
+      id: 's15_inventory_item_card',
       title: 'Item Card',
       code: 'S15-09',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_stock_ledger',
+      id: 's15_inventory_stock_ledger',
       title: 'Stock Ledger',
       code: 'S15-10',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_valuation',
+      id: 's15_inventory_valuation',
       title: 'Stock Valuation',
       code: 'S15-11',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_availability',
+      id: 's15_inventory_availability',
       title: 'Stock Availability',
       code: 'S15-12',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_reorder',
+      id: 's15_inventory_reorder',
       title: 'Reorder Report',
       code: 'S15-13',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_min_max',
+      id: 's15_inventory_min_max',
       title: 'Min / Max Report',
       code: 'S15-14',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_slow_dead',
+      id: 's15_inventory_slow_dead',
       title: 'Slow / Dead Stock',
       code: 'S15-15',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_batch_report',
+      id: 's15_inventory_batch_report',
       title: 'Batch Report',
       code: 'S15-16',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_serial_report',
+      id: 's15_inventory_serial_report',
       title: 'Serial Report',
       code: 'S15-17',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_expiry_report',
+      id: 's15_inventory_expiry_report',
       title: 'Expiry Report',
       code: 'S15-18',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_item_label',
+      id: 's15_inventory_item_label',
       title: 'Item Label',
       code: 'S15-19',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_shelf_label',
+      id: 's15_inventory_shelf_label',
       title: 'Shelf Label',
       code: 'S15-20',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_batch_label',
+      id: 's15_inventory_batch_label',
       title: 'Batch Label',
       code: 'S15-21',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_serial_label',
+      id: 's15_inventory_serial_label',
       title: 'Serial Label',
       code: 'S15-22',
     ),
     DashboardDestination(
-      id: 's15_inventory_wms_pack_location_label',
+      id: 's15_inventory_location_label',
       title: 'Location Label',
       code: 'S15-23',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_receipt58',
+      id: 's16_pos_retail_receipt58',
       title: '58mm Receipt',
       code: 'S16-01',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_receipt80',
+      id: 's16_pos_retail_receipt80',
       title: '80mm Receipt',
       code: 'S16-02',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_refund',
+      id: 's16_pos_retail_refund',
       title: 'Refund Receipt',
       code: 'S16-03',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_exchange',
+      id: 's16_pos_retail_exchange',
       title: 'Exchange Receipt',
       code: 'S16-04',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_gift',
+      id: 's16_pos_retail_gift',
       title: 'Gift Receipt',
       code: 'S16-05',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_kot',
+      id: 's16_pos_retail_kot',
       title: 'Kitchen Order Ticket',
       code: 'S16-06',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_shift_open',
+      id: 's16_pos_retail_shift_open',
       title: 'Shift Open',
       code: 'S16-07',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_shift_close',
+      id: 's16_pos_retail_shift_close',
       title: 'Shift Close',
       code: 'S16-08',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_x_report',
+      id: 's16_pos_retail_x_report',
       title: 'X Report',
       code: 'S16-09',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_z_report',
+      id: 's16_pos_retail_z_report',
       title: 'Z Report',
       code: 'S16-10',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_cash_drawer',
+      id: 's16_pos_retail_cash_drawer',
       title: 'Cash Drawer',
       code: 'S16-11',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_payment_summary',
+      id: 's16_pos_retail_payment_summary',
       title: 'Payment Method Summary',
       code: 'S16-12',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_barcode_label',
+      id: 's16_pos_retail_barcode_label',
       title: 'Barcode Label',
       code: 'S16-13',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_price_label',
+      id: 's16_pos_retail_price_label',
       title: 'Price Label',
       code: 'S16-14',
     ),
     DashboardDestination(
-      id: 's16_pos_retail_pack_promotion_label',
+      id: 's16_pos_retail_promotion_label',
       title: 'Promotion Label',
       code: 'S16-15',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_employee_profile',
+      id: 's17_hr_payroll_employee_profile',
       title: 'Employee Profile',
       code: 'S17-01',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_employee_list',
+      id: 's17_hr_payroll_employee_list',
       title: 'Employee List',
       code: 'S17-02',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_employment_contract',
+      id: 's17_hr_payroll_employment_contract',
       title: 'Employment Contract/Form',
       code: 'S17-03',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_employee_action',
+      id: 's17_hr_payroll_employee_action',
       title: 'Employee Action Form',
       code: 'S17-04',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_attendance',
+      id: 's17_hr_payroll_attendance',
       title: 'Attendance Report',
       code: 'S17-05',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_timesheet',
+      id: 's17_hr_payroll_timesheet',
       title: 'Timesheet',
       code: 'S17-06',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_overtime',
+      id: 's17_hr_payroll_overtime',
       title: 'Overtime Report',
       code: 'S17-07',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_leave_balance',
+      id: 's17_hr_payroll_leave_balance',
       title: 'Leave Balance',
       code: 'S17-08',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_leave_request',
+      id: 's17_hr_payroll_leave_request',
       title: 'Leave Request',
       code: 'S17-09',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_payslip',
+      id: 's17_hr_payroll_payslip',
       title: 'Payslip',
       code: 'S17-10',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_payroll_sheet',
+      id: 's17_hr_payroll_payroll_sheet',
       title: 'Payroll Sheet',
       code: 'S17-11',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_payroll_summary',
+      id: 's17_hr_payroll_payroll_summary',
       title: 'Payroll Summary',
       code: 'S17-12',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_allowances',
+      id: 's17_hr_payroll_allowances',
       title: 'Allowances Report',
       code: 'S17-13',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_deductions',
+      id: 's17_hr_payroll_deductions',
       title: 'Deductions Report',
       code: 'S17-14',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_loan_advance',
+      id: 's17_hr_payroll_loan_advance',
       title: 'Loan / Advance',
       code: 'S17-15',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_salary_certificate',
+      id: 's17_hr_payroll_salary_certificate',
       title: 'Salary Certificate',
       code: 'S17-16',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_employment_certificate',
+      id: 's17_hr_payroll_employment_certificate',
       title: 'Employment Certificate',
       code: 'S17-17',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_experience_certificate',
+      id: 's17_hr_payroll_experience_certificate',
       title: 'Experience Certificate',
       code: 'S17-18',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_end_of_service',
+      id: 's17_hr_payroll_end_of_service',
       title: 'End-of-Service',
       code: 'S17-19',
     ),
     DashboardDestination(
-      id: 's17_hr_payroll_pack_final_settlement',
+      id: 's17_hr_payroll_final_settlement',
       title: 'Final Settlement',
       code: 'S17-20',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_bom',
+      id: 's18_mfg_quality_bom',
       title: 'Bill of Materials',
       code: 'S18-01',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_production_order',
+      id: 's18_mfg_quality_production_order',
       title: 'Production Order',
       code: 'S18-02',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_work_order',
+      id: 's18_mfg_quality_work_order',
       title: 'Work Order',
       code: 'S18-03',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_job_card',
+      id: 's18_mfg_quality_job_card',
       title: 'Job Card',
       code: 'S18-04',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_material_requirement',
+      id: 's18_mfg_quality_material_requirement',
       title: 'Material Requirement',
       code: 'S18-05',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_material_issue',
+      id: 's18_mfg_quality_material_issue',
       title: 'Material Issue',
       code: 'S18-06',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_material_return',
+      id: 's18_mfg_quality_material_return',
       title: 'Material Return',
       code: 'S18-07',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_production_receipt',
+      id: 's18_mfg_quality_production_receipt',
       title: 'Production Receipt',
       code: 'S18-08',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_routing',
+      id: 's18_mfg_quality_routing',
       title: 'Routing / Traveler',
       code: 'S18-09',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_machine_operation',
+      id: 's18_mfg_quality_machine_operation',
       title: 'Machine Operation',
       code: 'S18-10',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_labor',
+      id: 's18_mfg_quality_labor',
       title: 'Labor Report',
       code: 'S18-11',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_scrap',
+      id: 's18_mfg_quality_scrap',
       title: 'Scrap Report',
       code: 'S18-12',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_wip',
+      id: 's18_mfg_quality_wip',
       title: 'Work in Progress',
       code: 'S18-13',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_variance',
+      id: 's18_mfg_quality_variance',
       title: 'Production Variance',
       code: 'S18-14',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_quality_inspection',
+      id: 's18_mfg_quality_quality_inspection',
       title: 'Quality Inspection',
       code: 'S18-15',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_incoming_inspection',
+      id: 's18_mfg_quality_incoming_inspection',
       title: 'Incoming Inspection',
       code: 'S18-16',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_in_process_inspection',
+      id: 's18_mfg_quality_in_process_inspection',
       title: 'In-process Inspection',
       code: 'S18-17',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_final_inspection',
+      id: 's18_mfg_quality_final_inspection',
       title: 'Final Inspection',
       code: 'S18-18',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_ncr',
+      id: 's18_mfg_quality_ncr',
       title: 'NCR',
       code: 'S18-19',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_capa',
+      id: 's18_mfg_quality_capa',
       title: 'CAPA',
       code: 'S18-20',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_coa',
+      id: 's18_mfg_quality_coa',
       title: 'Certificate of Analysis',
       code: 'S18-21',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_quality_checklist',
+      id: 's18_mfg_quality_quality_checklist',
       title: 'Quality Checklist',
       code: 'S18-22',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_audit',
+      id: 's18_mfg_quality_audit',
       title: 'Audit Form',
       code: 'S18-23',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_calibration',
+      id: 's18_mfg_quality_calibration',
       title: 'Calibration Record',
       code: 'S18-24',
     ),
     DashboardDestination(
-      id: 's18_manufacturing_quality_pack_nested_tables',
+      id: 's18_mfg_quality_nested_tables',
       title: 'Nested Operation / Material Tables',
       code: 'S18-25',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_card',
+      id: 's19_assets_projects_asset_card',
       title: 'Asset Card',
       code: 'S19-01',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_register',
+      id: 's19_assets_projects_asset_register',
       title: 'Asset Register',
       code: 'S19-02',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_label',
+      id: 's19_assets_projects_asset_label',
       title: 'Asset Label',
       code: 'S19-03',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_transfer',
+      id: 's19_assets_projects_asset_transfer',
       title: 'Asset Transfer',
       code: 'S19-04',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_assignment',
+      id: 's19_assets_projects_asset_assignment',
       title: 'Asset Assignment',
       code: 'S19-05',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_return',
+      id: 's19_assets_projects_asset_return',
       title: 'Asset Return',
       code: 'S19-06',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_disposal',
+      id: 's19_assets_projects_asset_disposal',
       title: 'Asset Disposal',
       code: 'S19-07',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_depreciation',
+      id: 's19_assets_projects_depreciation',
       title: 'Depreciation Report',
       code: 'S19-08',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_maintenance',
+      id: 's19_assets_projects_asset_maintenance',
       title: 'Asset Maintenance',
       code: 'S19-09',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_count',
+      id: 's19_assets_projects_asset_count',
       title: 'Asset Count',
       code: 'S19-10',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_asset_movement',
+      id: 's19_assets_projects_asset_movement',
       title: 'Asset Movement',
       code: 'S19-11',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_project_summary',
+      id: 's19_assets_projects_project_summary',
       title: 'Project Summary',
       code: 'S19-12',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_project_budget',
+      id: 's19_assets_projects_project_budget',
       title: 'Project Budget',
       code: 'S19-13',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_project_cost',
+      id: 's19_assets_projects_project_cost',
       title: 'Project Cost',
       code: 'S19-14',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_project_profitability',
+      id: 's19_assets_projects_project_profitability',
       title: 'Project Profitability',
       code: 'S19-15',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_project_timesheet',
+      id: 's19_assets_projects_project_timesheet',
       title: 'Project Timesheet',
       code: 'S19-16',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_project_expense',
+      id: 's19_assets_projects_project_expense',
       title: 'Project Expense',
       code: 'S19-17',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_milestone',
+      id: 's19_assets_projects_milestone',
       title: 'Milestone Report',
       code: 'S19-18',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_progress',
+      id: 's19_assets_projects_progress',
       title: 'Progress Report',
       code: 'S19-19',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_completion_certificate',
+      id: 's19_assets_projects_completion_certificate',
       title: 'Completion Certificate',
       code: 'S19-20',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_project_billing',
+      id: 's19_assets_projects_project_billing',
       title: 'Project Billing',
       code: 'S19-21',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_resource_utilization',
+      id: 's19_assets_projects_resource_utilization',
       title: 'Resource Utilization',
       code: 'S19-22',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_project_purchasing',
+      id: 's19_assets_projects_project_purchasing',
       title: 'Project Purchasing',
       code: 'S19-23',
     ),
     DashboardDestination(
-      id: 's19_fixed_assets_projects_pack_multi_period_financials',
+      id: 's19_assets_projects_multi_period_financials',
       title: 'Multi-period Financials',
       code: 'S19-24',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_service_order',
+      id: 's20_service_logistics_service_order',
       title: 'Service Order',
       code: 'S20-01',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_maintenance_work_order',
+      id: 's20_service_logistics_maintenance_work_order',
       title: 'Maintenance Work Order',
       code: 'S20-02',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_preventive_schedule',
+      id: 's20_service_logistics_preventive_schedule',
       title: 'Preventive Schedule',
       code: 'S20-03',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_maintenance_checklist',
+      id: 's20_service_logistics_maintenance_checklist',
       title: 'Maintenance Checklist',
       code: 'S20-04',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_technician_report',
+      id: 's20_service_logistics_technician_report',
       title: 'Technician Report',
       code: 'S20-05',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_service_completion',
+      id: 's20_service_logistics_service_completion',
       title: 'Service Completion',
       code: 'S20-06',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_spare_parts',
+      id: 's20_service_logistics_spare_parts',
       title: 'Spare Parts Usage',
       code: 'S20-07',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_warranty',
+      id: 's20_service_logistics_warranty',
       title: 'Warranty Report',
       code: 'S20-08',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_inspection',
+      id: 's20_service_logistics_inspection',
       title: 'Inspection Report',
       code: 'S20-09',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_service_history',
+      id: 's20_service_logistics_service_history',
       title: 'Calibration / Service History',
       code: 'S20-10',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_shipment',
+      id: 's20_service_logistics_shipment',
       title: 'Shipment Document',
       code: 'S20-11',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_packing_list',
+      id: 's20_service_logistics_packing_list',
       title: 'Packing List',
       code: 'S20-12',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_dispatch_note',
+      id: 's20_service_logistics_dispatch_note',
       title: 'Dispatch Note',
       code: 'S20-13',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_waybill',
+      id: 's20_service_logistics_waybill',
       title: 'Waybill',
       code: 'S20-14',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_manifest',
+      id: 's20_service_logistics_manifest',
       title: 'Manifest',
       code: 'S20-15',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_trip_sheet',
+      id: 's20_service_logistics_trip_sheet',
       title: 'Trip Sheet',
       code: 'S20-16',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_trip_report',
+      id: 's20_service_logistics_trip_report',
       title: 'Trip Report',
       code: 'S20-17',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_shipping_label',
+      id: 's20_service_logistics_shipping_label',
       title: 'Shipping Label',
       code: 'S20-18',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_pallet_label',
+      id: 's20_service_logistics_pallet_label',
       title: 'Pallet Label',
       code: 'S20-19',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_container_list',
+      id: 's20_service_logistics_container_list',
       title: 'Container List',
       code: 'S20-20',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_freight_summary',
+      id: 's20_service_logistics_freight_summary',
       title: 'Freight Summary',
       code: 'S20-21',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_proof_of_delivery',
+      id: 's20_service_logistics_proof_of_delivery',
       title: 'Proof of Delivery',
       code: 'S20-22',
     ),
     DashboardDestination(
-      id: 's20_maintenance_service_logistics_pack_profile_matrix',
+      id: 's20_service_logistics_profile_matrix',
       title: 'Label / Thermal Profile Matrix',
       code: 'S20-23',
     ),
@@ -1701,97 +1701,97 @@ final class DashboardDestinationRegistry {
       code: 'S21-11',
     ),
     DashboardDestination(
-      id: 's22_template_engine_vnext_schema',
+      id: 's22_engine_vnext_schema',
       title: 'Versioned Schema + Elements',
       code: 'S22-01',
     ),
     DashboardDestination(
-      id: 's22_template_engine_vnext_legacy_migration',
+      id: 's22_engine_vnext_legacy_migration',
       title: 'Legacy v1 → v2 Migration',
       code: 'S22-02',
     ),
     DashboardDestination(
-      id: 's22_template_engine_vnext_expressions',
+      id: 's22_engine_vnext_expressions',
       title: 'Safe Expressions + Aggregates',
       code: 'S22-03',
     ),
     DashboardDestination(
-      id: 's22_template_engine_vnext_large_loop',
+      id: 's22_engine_vnext_large_loop',
       title: 'Bounded Large Loop',
       code: 'S22-04',
     ),
     DashboardDestination(
-      id: 's22_template_engine_vnext_composition',
+      id: 's22_engine_vnext_composition',
       title: 'Components / Styles / SubTemplate',
       code: 'S22-05',
     ),
     DashboardDestination(
-      id: 's22_template_engine_vnext_scoped_registry',
+      id: 's22_engine_vnext_scoped_registry',
       title: 'Registry Fallback / History',
       code: 'S22-06',
     ),
     DashboardDestination(
-      id: 's22_template_engine_vnext_directionality',
+      id: 's22_engine_vnext_directionality',
       title: 'Direction / Value Direction',
       code: 'S22-07',
     ),
     DashboardDestination(
-      id: 's22_template_engine_vnext_invalid_expression',
+      id: 's22_engine_vnext_invalid_expression',
       title: 'Invalid Expression Rejection',
       code: 'S22-08',
     ),
     DashboardDestination(
-      id: 's23_compliance_signing_archival_original',
+      id: 's23_compliance_archive_original',
       title: 'Original',
       code: 'S23-01',
     ),
     DashboardDestination(
-      id: 's23_compliance_signing_archival_copy',
+      id: 's23_compliance_archive_copy',
       title: 'Copy',
       code: 'S23-02',
     ),
     DashboardDestination(
-      id: 's23_compliance_signing_archival_reprint',
+      id: 's23_compliance_archive_reprint',
       title: 'Reprint',
       code: 'S23-03',
     ),
     DashboardDestination(
-      id: 's23_compliance_signing_archival_missing_required_field',
+      id: 's23_compliance_archive_missing_required_field',
       title: 'Required-field Failure',
       code: 'S23-04',
     ),
     DashboardDestination(
-      id: 's23_compliance_signing_archival_country_tenant_fallback',
+      id: 's23_compliance_archive_country_tenant_fallback',
       title: 'Country / Tenant Registry',
       code: 'S23-05',
     ),
     DashboardDestination(
-      id: 's23_compliance_signing_archival_security_policy',
+      id: 's23_compliance_archive_security_policy',
       title: 'Existing Security Adapter',
       code: 'S23-06',
     ),
     DashboardDestination(
-      id: 's23_compliance_signing_archival_archive_metadata',
+      id: 's23_compliance_archive_archive_metadata',
       title: 'Archive / Audit Metadata',
       code: 'S23-07',
     ),
     DashboardDestination(
-      id: 's24_performance_regression_benchmark',
+      id: 's24_performance_benchmark',
       title: 'Family Benchmark',
       code: 'S24-01',
     ),
     DashboardDestination(
-      id: 's24_performance_regression_cache',
+      id: 's24_performance_cache',
       title: 'Resource / Measurement Cache',
       code: 'S24-02',
     ),
     DashboardDestination(
-      id: 's24_performance_regression_semantic',
+      id: 's24_performance_semantic',
       title: 'Semantic Regression',
       code: 'S24-03',
     ),
     DashboardDestination(
-      id: 's24_performance_regression_golden_manifest',
+      id: 's24_performance_golden_manifest',
       title: 'Golden Coverage Manifest',
       code: 'S24-04',
     ),
@@ -1826,27 +1826,27 @@ final class DashboardDestinationRegistry {
       code: 'S25-06',
     ),
     DashboardDestination(
-      id: 's26_industry_packs_retail',
+      id: 's26_industries_retail',
       title: 'Retail',
       code: 'S26-01',
     ),
     DashboardDestination(
-      id: 's26_industry_packs_restaurant',
+      id: 's26_industries_restaurant',
       title: 'Restaurant',
       code: 'S26-02',
     ),
     DashboardDestination(
-      id: 's26_industry_packs_construction',
+      id: 's26_industries_construction',
       title: 'Construction / Real Estate',
       code: 'S26-03',
     ),
     DashboardDestination(
-      id: 's26_industry_packs_healthcare_education',
+      id: 's26_industries_healthcare_education',
       title: 'Healthcare / Education Shells',
       code: 'S26-04',
     ),
     DashboardDestination(
-      id: 's26_industry_packs_mobility_distribution_hospitality',
+      id: 's26_industries_mobility_distribution_hospitality',
       title: 'Automotive / Distribution / Hospitality',
       code: 'S26-05',
     ),
@@ -2304,77 +2304,77 @@ final class DashboardDestinationRegistry {
         const S05ThemeTokensVerificationExampleScreen(),
       's05_formatting_theme_long_multi_page' =>
         const S05LongMultiPageVerificationExampleScreen(),
-      's06_erp_domain_calculation' || 's06_erp_domain_calculation_baseline' =>
+      's06_erp_calc' || 's06_erp_calc_baseline' =>
         const S06BaselineVerificationExampleScreen(),
-      's06_erp_domain_calculation_before_tax_discount' =>
+      's06_erp_calc_before_tax_discount' =>
         const S06BeforeTaxDiscountVerificationExampleScreen(),
-      's06_erp_domain_calculation_after_tax_discount' =>
+      's06_erp_calc_after_tax_discount' =>
         const S06AfterTaxDiscountVerificationExampleScreen(),
-      's06_erp_domain_calculation_multi_tax' =>
+      's06_erp_calc_multi_tax' =>
         const S06MultiTaxVerificationExampleScreen(),
-      's06_erp_domain_calculation_multi_currency' =>
+      's06_erp_calc_multi_currency' =>
         const S06MultiCurrencyVerificationExampleScreen(),
-      's06_erp_domain_calculation_rounding' =>
+      's06_erp_calc_rounding' =>
         const S06RoundingVerificationExampleScreen(),
-      's06_erp_domain_calculation_paid_due' =>
+      's06_erp_calc_paid_due' =>
         const S06PaidDueVerificationExampleScreen(),
-      's06_erp_domain_calculation_zero_negative' =>
+      's06_erp_calc_zero_negative' =>
         const S06ZeroNegativeVerificationExampleScreen(),
-      's06_erp_domain_calculation_optional_nulls' =>
+      's06_erp_calc_optional_nulls' =>
         const S06OptionalNullsVerificationExampleScreen(),
-      's06_erp_domain_calculation_long_multi_page' =>
+      's06_erp_calc_long_multi_page' =>
         const S06LongMultiPageVerificationExampleScreen(),
-      's07_erp_semantic_components' || 's07_erp_semantic_components_identity_party' =>
+      's07_erp_components' || 's07_erp_components_identity_party' =>
         const S07IdentityPartyVerificationExampleScreen(),
-      's07_erp_semantic_components_financial' =>
+      's07_erp_components_financial' =>
         const S07FinancialVerificationExampleScreen(),
-      's07_erp_semantic_components_operational' =>
+      's07_erp_components_operational' =>
         const S07OperationalVerificationExampleScreen(),
-      's07_erp_semantic_components_null_collapse' =>
+      's07_erp_components_null_collapse' =>
         const S07NullCollapseVerificationExampleScreen(),
-      's07_erp_semantic_components_empty_state' =>
+      's07_erp_components_empty_state' =>
         const S07EmptyStateVerificationExampleScreen(),
-      's07_erp_semantic_components_bilingual' =>
+      's07_erp_components_bilingual' =>
         const S07BilingualVerificationExampleScreen(),
-      's07_erp_semantic_components_composition' =>
+      's07_erp_components_composition' =>
         const S07CompositionVerificationExampleScreen(),
-      's07_erp_semantic_components_long_multi_page' =>
+      's07_erp_components_long_multi_page' =>
         const S07LongMultiPageVerificationExampleScreen(),
-      's08_erp_document_families' || 's08_erp_document_families_transaction' =>
+      's08_doc_families' || 's08_doc_families_transaction' =>
         const S08TransactionVerificationExampleScreen(),
-      's08_erp_document_families_statement' =>
+      's08_doc_families_statement' =>
         const S08StatementVerificationExampleScreen(),
-      's08_erp_document_families_voucher' =>
+      's08_doc_families_voucher' =>
         const S08VoucherVerificationExampleScreen(),
-      's08_erp_document_families_analytical' =>
+      's08_doc_families_analytical' =>
         const S08AnalyticalVerificationExampleScreen(),
-      's08_erp_document_families_operational' =>
+      's08_doc_families_operational' =>
         const S08OperationalVerificationExampleScreen(),
-      's08_erp_document_families_register' =>
+      's08_doc_families_register' =>
         const S08RegisterVerificationExampleScreen(),
-      's08_erp_document_families_thermal' =>
+      's08_doc_families_thermal' =>
         const S08ThermalVerificationExampleScreen(),
-      's08_erp_document_families_label' =>
+      's08_doc_families_label' =>
         const S08LabelVerificationExampleScreen(),
-      's08_erp_document_families_certificate' =>
+      's08_doc_families_certificate' =>
         const S08CertificateVerificationExampleScreen(),
-      's08_erp_document_families_custom_slots' =>
+      's08_doc_families_custom_slots' =>
         const S08CustomSlotsVerificationExampleScreen(),
-      's08_erp_document_families_long_multi_page' =>
+      's08_doc_families_long_multi_page' =>
         const S08LongMultiPageVerificationExampleScreen(),
-      's09_migrated_transaction_templates' || 's09_migrated_transaction_templates_quotation1' =>
+      's09_migrated_tx' || 's09_migrated_tx_quotation1' =>
         const S09Quotation1VerificationExampleScreen(),
-      's09_migrated_transaction_templates_purchase_order50' =>
+      's09_migrated_tx_purchase_order50' =>
         const S09PurchaseOrder50VerificationExampleScreen(),
-      's09_migrated_transaction_templates_tax_invoice500' =>
+      's09_migrated_tx_tax_invoice500' =>
         const S09TaxInvoice500VerificationExampleScreen(),
-      's09_migrated_transaction_templates_long_content' =>
+      's09_migrated_tx_long_content' =>
         const S09LongContentVerificationExampleScreen(),
-      's09_migrated_transaction_templates_null_optional' =>
+      's09_migrated_tx_null_optional' =>
         const S09NullOptionalVerificationExampleScreen(),
-      's09_migrated_transaction_templates_bilingual' =>
+      's09_migrated_tx_bilingual' =>
         const S09BilingualVerificationExampleScreen(),
-      's10_template_family_consolidation' || 's10_template_family_consolidation_family_audit' =>
+      's10_family_merge' || 's10_family_merge_family_audit' =>
         const S10FamilyAuditVerificationExampleScreen(),
       's11_print_profiles' || 's11_print_profiles_a4_portrait' =>
         const S11A4PortraitVerificationExampleScreen(),
@@ -2400,373 +2400,373 @@ final class DashboardDestinationRegistry {
         const S11PrePrintedVerificationExampleScreen(),
       's11_print_profiles_calibration' =>
         const S11CalibrationVerificationExampleScreen(),
-      's12_sales_erp_pack' || 's12_sales_erp_pack_sales_order' =>
+      's12_sales' || 's12_sales_sales_order' =>
         const S12SalesOrderVerificationExampleScreen(),
-      's12_sales_erp_pack_proforma' =>
+      's12_sales_proforma' =>
         const S12ProformaVerificationExampleScreen(),
-      's12_sales_erp_pack_pos' =>
+      's12_sales_pos' =>
         const S12PosVerificationExampleScreen(),
-      's12_sales_erp_pack_debit_note' =>
+      's12_sales_debit_note' =>
         const S12DebitNoteVerificationExampleScreen(),
-      's12_sales_erp_pack_sales_return' =>
+      's12_sales_sales_return' =>
         const S12SalesReturnVerificationExampleScreen(),
-      's12_sales_erp_pack_customer_receipt' =>
+      's12_sales_customer_receipt' =>
         const S12CustomerReceiptVerificationExampleScreen(),
-      's12_sales_erp_pack_picking' =>
+      's12_sales_picking' =>
         const S12PickingVerificationExampleScreen(),
-      's12_sales_erp_pack_packing' =>
+      's12_sales_packing' =>
         const S12PackingVerificationExampleScreen(),
-      's12_sales_erp_pack_backorder' =>
+      's12_sales_backorder' =>
         const S12BackorderVerificationExampleScreen(),
-      's12_sales_erp_pack_customer_aging' =>
+      's12_sales_customer_aging' =>
         const S12CustomerAgingVerificationExampleScreen(),
-      's12_sales_erp_pack_sales_register' =>
+      's12_sales_sales_register' =>
         const S12SalesRegisterVerificationExampleScreen(),
-      's12_sales_erp_pack_by_customer' =>
+      's12_sales_by_customer' =>
         const S12ByCustomerVerificationExampleScreen(),
-      's12_sales_erp_pack_by_item' =>
+      's12_sales_by_item' =>
         const S12ByItemVerificationExampleScreen(),
-      's12_sales_erp_pack_by_salesperson' =>
+      's12_sales_by_salesperson' =>
         const S12BySalespersonVerificationExampleScreen(),
-      's12_sales_erp_pack_price_list' =>
+      's12_sales_price_list' =>
         const S12PriceListVerificationExampleScreen(),
-      's12_sales_erp_pack_commission' =>
+      's12_sales_commission' =>
         const S12CommissionVerificationExampleScreen(),
-      's13_purchasing_erp_pack' || 's13_purchasing_erp_pack_requisition' =>
+      's13_purchasing' || 's13_purchasing_requisition' =>
         const S13RequisitionVerificationExampleScreen(),
-      's13_purchasing_erp_pack_rfq' =>
+      's13_purchasing_rfq' =>
         const S13RfqVerificationExampleScreen(),
-      's13_purchasing_erp_pack_supplier_quotation' =>
+      's13_purchasing_supplier_quotation' =>
         const S13SupplierQuotationVerificationExampleScreen(),
-      's13_purchasing_erp_pack_comparison' =>
+      's13_purchasing_comparison' =>
         const S13ComparisonVerificationExampleScreen(),
-      's13_purchasing_erp_pack_purchase_order' =>
+      's13_purchasing_purchase_order' =>
         const S13PurchaseOrderVerificationExampleScreen(),
-      's13_purchasing_erp_pack_grn' =>
+      's13_purchasing_grn' =>
         const S13GrnVerificationExampleScreen(),
-      's13_purchasing_erp_pack_purchase_invoice' =>
+      's13_purchasing_purchase_invoice' =>
         const S13PurchaseInvoiceVerificationExampleScreen(),
-      's13_purchasing_erp_pack_purchase_debit' =>
+      's13_purchasing_purchase_debit' =>
         const S13PurchaseDebitVerificationExampleScreen(),
-      's13_purchasing_erp_pack_purchase_credit' =>
+      's13_purchasing_purchase_credit' =>
         const S13PurchaseCreditVerificationExampleScreen(),
-      's13_purchasing_erp_pack_supplier_return' =>
+      's13_purchasing_supplier_return' =>
         const S13SupplierReturnVerificationExampleScreen(),
-      's13_purchasing_erp_pack_supplier_statement' =>
+      's13_purchasing_supplier_statement' =>
         const S13SupplierStatementVerificationExampleScreen(),
-      's13_purchasing_erp_pack_supplier_aging' =>
+      's13_purchasing_supplier_aging' =>
         const S13SupplierAgingVerificationExampleScreen(),
-      's13_purchasing_erp_pack_purchase_register' =>
+      's13_purchasing_purchase_register' =>
         const S13PurchaseRegisterVerificationExampleScreen(),
-      's13_purchasing_erp_pack_purchase_analysis' =>
+      's13_purchasing_purchase_analysis' =>
         const S13PurchaseAnalysisVerificationExampleScreen(),
-      's13_purchasing_erp_pack_outstanding_po' =>
+      's13_purchasing_outstanding_po' =>
         const S13OutstandingPoVerificationExampleScreen(),
-      's14_accounting_finance_pack' || 's14_accounting_finance_pack_general_ledger' =>
+      's14_accounting' || 's14_accounting_general_ledger' =>
         const S14GeneralLedgerVerificationExampleScreen(),
-      's14_accounting_finance_pack_journal_entry' =>
+      's14_accounting_journal_entry' =>
         const S14JournalEntryVerificationExampleScreen(),
-      's14_accounting_finance_pack_journal_register' =>
+      's14_accounting_journal_register' =>
         const S14JournalRegisterVerificationExampleScreen(),
-      's14_accounting_finance_pack_account_statement' =>
+      's14_accounting_account_statement' =>
         const S14AccountStatementVerificationExampleScreen(),
-      's14_accounting_finance_pack_ar_aging' =>
+      's14_accounting_ar_aging' =>
         const S14ArAgingVerificationExampleScreen(),
-      's14_accounting_finance_pack_ap_aging' =>
+      's14_accounting_ap_aging' =>
         const S14ApAgingVerificationExampleScreen(),
-      's14_accounting_finance_pack_customer_balances' =>
+      's14_accounting_customer_balances' =>
         const S14CustomerBalancesVerificationExampleScreen(),
-      's14_accounting_finance_pack_supplier_balances' =>
+      's14_accounting_supplier_balances' =>
         const S14SupplierBalancesVerificationExampleScreen(),
-      's14_accounting_finance_pack_cash_book' =>
+      's14_accounting_cash_book' =>
         const S14CashBookVerificationExampleScreen(),
-      's14_accounting_finance_pack_bank_book' =>
+      's14_accounting_bank_book' =>
         const S14BankBookVerificationExampleScreen(),
-      's14_accounting_finance_pack_bank_reconciliation' =>
+      's14_accounting_bank_reconciliation' =>
         const S14BankReconciliationVerificationExampleScreen(),
-      's14_accounting_finance_pack_petty_cash' =>
+      's14_accounting_petty_cash' =>
         const S14PettyCashVerificationExampleScreen(),
-      's14_accounting_finance_pack_payment_register' =>
+      's14_accounting_payment_register' =>
         const S14PaymentRegisterVerificationExampleScreen(),
-      's14_accounting_finance_pack_receipt_register' =>
+      's14_accounting_receipt_register' =>
         const S14ReceiptRegisterVerificationExampleScreen(),
-      's14_accounting_finance_pack_vat_summary' =>
+      's14_accounting_vat_summary' =>
         const S14VatSummaryVerificationExampleScreen(),
-      's14_accounting_finance_pack_tax_register' =>
+      's14_accounting_tax_register' =>
         const S14TaxRegisterVerificationExampleScreen(),
-      's14_accounting_finance_pack_tax_breakdown' =>
+      's14_accounting_tax_breakdown' =>
         const S14TaxBreakdownVerificationExampleScreen(),
-      's14_accounting_finance_pack_reconciliation' =>
+      's14_accounting_reconciliation' =>
         const S14ReconciliationVerificationExampleScreen(),
-      's14_accounting_finance_pack_cost_center_statement' =>
+      's14_accounting_cost_center_statement' =>
         const S14CostCenterStatementVerificationExampleScreen(),
-      's14_accounting_finance_pack_cost_center_trial_balance' =>
+      's14_accounting_cost_center_trial_balance' =>
         const S14CostCenterTrialBalanceVerificationExampleScreen(),
-      's14_accounting_finance_pack_project_financial' =>
+      's14_accounting_project_financial' =>
         const S14ProjectFinancialVerificationExampleScreen(),
-      's14_accounting_finance_pack_budget_vs_actual' =>
+      's14_accounting_budget_vs_actual' =>
         const S14BudgetVsActualVerificationExampleScreen(),
-      's14_accounting_finance_pack_multi_period' =>
+      's14_accounting_multi_period' =>
         const S14MultiPeriodVerificationExampleScreen(),
-      's15_inventory_wms_pack' || 's15_inventory_wms_pack_stock_receipt' =>
+      's15_inventory' || 's15_inventory_stock_receipt' =>
         const S15StockReceiptVerificationExampleScreen(),
-      's15_inventory_wms_pack_stock_issue' =>
+      's15_inventory_stock_issue' =>
         const S15StockIssueVerificationExampleScreen(),
-      's15_inventory_wms_pack_stock_transfer' =>
+      's15_inventory_stock_transfer' =>
         const S15StockTransferVerificationExampleScreen(),
-      's15_inventory_wms_pack_warehouse_transfer' =>
+      's15_inventory_warehouse_transfer' =>
         const S15WarehouseTransferVerificationExampleScreen(),
-      's15_inventory_wms_pack_adjustment' =>
+      's15_inventory_adjustment' =>
         const S15AdjustmentVerificationExampleScreen(),
-      's15_inventory_wms_pack_stock_count' =>
+      's15_inventory_stock_count' =>
         const S15StockCountVerificationExampleScreen(),
-      's15_inventory_wms_pack_cycle_count' =>
+      's15_inventory_cycle_count' =>
         const S15CycleCountVerificationExampleScreen(),
-      's15_inventory_wms_pack_reconciliation' =>
+      's15_inventory_reconciliation' =>
         const S15ReconciliationVerificationExampleScreen(),
-      's15_inventory_wms_pack_item_card' =>
+      's15_inventory_item_card' =>
         const S15ItemCardVerificationExampleScreen(),
-      's15_inventory_wms_pack_stock_ledger' =>
+      's15_inventory_stock_ledger' =>
         const S15StockLedgerVerificationExampleScreen(),
-      's15_inventory_wms_pack_valuation' =>
+      's15_inventory_valuation' =>
         const S15ValuationVerificationExampleScreen(),
-      's15_inventory_wms_pack_availability' =>
+      's15_inventory_availability' =>
         const S15AvailabilityVerificationExampleScreen(),
-      's15_inventory_wms_pack_reorder' =>
+      's15_inventory_reorder' =>
         const S15ReorderVerificationExampleScreen(),
-      's15_inventory_wms_pack_min_max' =>
+      's15_inventory_min_max' =>
         const S15MinMaxVerificationExampleScreen(),
-      's15_inventory_wms_pack_slow_dead' =>
+      's15_inventory_slow_dead' =>
         const S15SlowDeadVerificationExampleScreen(),
-      's15_inventory_wms_pack_batch_report' =>
+      's15_inventory_batch_report' =>
         const S15BatchReportVerificationExampleScreen(),
-      's15_inventory_wms_pack_serial_report' =>
+      's15_inventory_serial_report' =>
         const S15SerialReportVerificationExampleScreen(),
-      's15_inventory_wms_pack_expiry_report' =>
+      's15_inventory_expiry_report' =>
         const S15ExpiryReportVerificationExampleScreen(),
-      's15_inventory_wms_pack_item_label' =>
+      's15_inventory_item_label' =>
         const S15ItemLabelVerificationExampleScreen(),
-      's15_inventory_wms_pack_shelf_label' =>
+      's15_inventory_shelf_label' =>
         const S15ShelfLabelVerificationExampleScreen(),
-      's15_inventory_wms_pack_batch_label' =>
+      's15_inventory_batch_label' =>
         const S15BatchLabelVerificationExampleScreen(),
-      's15_inventory_wms_pack_serial_label' =>
+      's15_inventory_serial_label' =>
         const S15SerialLabelVerificationExampleScreen(),
-      's15_inventory_wms_pack_location_label' =>
+      's15_inventory_location_label' =>
         const S15LocationLabelVerificationExampleScreen(),
-      's16_pos_retail_pack' || 's16_pos_retail_pack_receipt58' =>
+      's16_pos_retail' || 's16_pos_retail_receipt58' =>
         const S16Receipt58VerificationExampleScreen(),
-      's16_pos_retail_pack_receipt80' =>
+      's16_pos_retail_receipt80' =>
         const S16Receipt80VerificationExampleScreen(),
-      's16_pos_retail_pack_refund' =>
+      's16_pos_retail_refund' =>
         const S16RefundVerificationExampleScreen(),
-      's16_pos_retail_pack_exchange' =>
+      's16_pos_retail_exchange' =>
         const S16ExchangeVerificationExampleScreen(),
-      's16_pos_retail_pack_gift' =>
+      's16_pos_retail_gift' =>
         const S16GiftVerificationExampleScreen(),
-      's16_pos_retail_pack_kot' =>
+      's16_pos_retail_kot' =>
         const S16KotVerificationExampleScreen(),
-      's16_pos_retail_pack_shift_open' =>
+      's16_pos_retail_shift_open' =>
         const S16ShiftOpenVerificationExampleScreen(),
-      's16_pos_retail_pack_shift_close' =>
+      's16_pos_retail_shift_close' =>
         const S16ShiftCloseVerificationExampleScreen(),
-      's16_pos_retail_pack_x_report' =>
+      's16_pos_retail_x_report' =>
         const S16XReportVerificationExampleScreen(),
-      's16_pos_retail_pack_z_report' =>
+      's16_pos_retail_z_report' =>
         const S16ZReportVerificationExampleScreen(),
-      's16_pos_retail_pack_cash_drawer' =>
+      's16_pos_retail_cash_drawer' =>
         const S16CashDrawerVerificationExampleScreen(),
-      's16_pos_retail_pack_payment_summary' =>
+      's16_pos_retail_payment_summary' =>
         const S16PaymentSummaryVerificationExampleScreen(),
-      's16_pos_retail_pack_barcode_label' =>
+      's16_pos_retail_barcode_label' =>
         const S16BarcodeLabelVerificationExampleScreen(),
-      's16_pos_retail_pack_price_label' =>
+      's16_pos_retail_price_label' =>
         const S16PriceLabelVerificationExampleScreen(),
-      's16_pos_retail_pack_promotion_label' =>
+      's16_pos_retail_promotion_label' =>
         const S16PromotionLabelVerificationExampleScreen(),
-      's17_hr_payroll_pack' || 's17_hr_payroll_pack_employee_profile' =>
+      's17_hr_payroll' || 's17_hr_payroll_employee_profile' =>
         const S17EmployeeProfileVerificationExampleScreen(),
-      's17_hr_payroll_pack_employee_list' =>
+      's17_hr_payroll_employee_list' =>
         const S17EmployeeListVerificationExampleScreen(),
-      's17_hr_payroll_pack_employment_contract' =>
+      's17_hr_payroll_employment_contract' =>
         const S17EmploymentContractVerificationExampleScreen(),
-      's17_hr_payroll_pack_employee_action' =>
+      's17_hr_payroll_employee_action' =>
         const S17EmployeeActionVerificationExampleScreen(),
-      's17_hr_payroll_pack_attendance' =>
+      's17_hr_payroll_attendance' =>
         const S17AttendanceVerificationExampleScreen(),
-      's17_hr_payroll_pack_timesheet' =>
+      's17_hr_payroll_timesheet' =>
         const S17TimesheetVerificationExampleScreen(),
-      's17_hr_payroll_pack_overtime' =>
+      's17_hr_payroll_overtime' =>
         const S17OvertimeVerificationExampleScreen(),
-      's17_hr_payroll_pack_leave_balance' =>
+      's17_hr_payroll_leave_balance' =>
         const S17LeaveBalanceVerificationExampleScreen(),
-      's17_hr_payroll_pack_leave_request' =>
+      's17_hr_payroll_leave_request' =>
         const S17LeaveRequestVerificationExampleScreen(),
-      's17_hr_payroll_pack_payslip' =>
+      's17_hr_payroll_payslip' =>
         const S17PayslipVerificationExampleScreen(),
-      's17_hr_payroll_pack_payroll_sheet' =>
+      's17_hr_payroll_payroll_sheet' =>
         const S17PayrollSheetVerificationExampleScreen(),
-      's17_hr_payroll_pack_payroll_summary' =>
+      's17_hr_payroll_payroll_summary' =>
         const S17PayrollSummaryVerificationExampleScreen(),
-      's17_hr_payroll_pack_allowances' =>
+      's17_hr_payroll_allowances' =>
         const S17AllowancesVerificationExampleScreen(),
-      's17_hr_payroll_pack_deductions' =>
+      's17_hr_payroll_deductions' =>
         const S17DeductionsVerificationExampleScreen(),
-      's17_hr_payroll_pack_loan_advance' =>
+      's17_hr_payroll_loan_advance' =>
         const S17LoanAdvanceVerificationExampleScreen(),
-      's17_hr_payroll_pack_salary_certificate' =>
+      's17_hr_payroll_salary_certificate' =>
         const S17SalaryCertificateVerificationExampleScreen(),
-      's17_hr_payroll_pack_employment_certificate' =>
+      's17_hr_payroll_employment_certificate' =>
         const S17EmploymentCertificateVerificationExampleScreen(),
-      's17_hr_payroll_pack_experience_certificate' =>
+      's17_hr_payroll_experience_certificate' =>
         const S17ExperienceCertificateVerificationExampleScreen(),
-      's17_hr_payroll_pack_end_of_service' =>
+      's17_hr_payroll_end_of_service' =>
         const S17EndOfServiceVerificationExampleScreen(),
-      's17_hr_payroll_pack_final_settlement' =>
+      's17_hr_payroll_final_settlement' =>
         const S17FinalSettlementVerificationExampleScreen(),
-      's18_manufacturing_quality_pack' || 's18_manufacturing_quality_pack_bom' =>
+      's18_mfg_quality' || 's18_mfg_quality_bom' =>
         const S18BomVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_production_order' =>
+      's18_mfg_quality_production_order' =>
         const S18ProductionOrderVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_work_order' =>
+      's18_mfg_quality_work_order' =>
         const S18WorkOrderVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_job_card' =>
+      's18_mfg_quality_job_card' =>
         const S18JobCardVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_material_requirement' =>
+      's18_mfg_quality_material_requirement' =>
         const S18MaterialRequirementVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_material_issue' =>
+      's18_mfg_quality_material_issue' =>
         const S18MaterialIssueVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_material_return' =>
+      's18_mfg_quality_material_return' =>
         const S18MaterialReturnVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_production_receipt' =>
+      's18_mfg_quality_production_receipt' =>
         const S18ProductionReceiptVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_routing' =>
+      's18_mfg_quality_routing' =>
         const S18RoutingVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_machine_operation' =>
+      's18_mfg_quality_machine_operation' =>
         const S18MachineOperationVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_labor' =>
+      's18_mfg_quality_labor' =>
         const S18LaborVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_scrap' =>
+      's18_mfg_quality_scrap' =>
         const S18ScrapVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_wip' =>
+      's18_mfg_quality_wip' =>
         const S18WipVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_variance' =>
+      's18_mfg_quality_variance' =>
         const S18VarianceVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_quality_inspection' =>
+      's18_mfg_quality_quality_inspection' =>
         const S18QualityInspectionVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_incoming_inspection' =>
+      's18_mfg_quality_incoming_inspection' =>
         const S18IncomingInspectionVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_in_process_inspection' =>
+      's18_mfg_quality_in_process_inspection' =>
         const S18InProcessInspectionVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_final_inspection' =>
+      's18_mfg_quality_final_inspection' =>
         const S18FinalInspectionVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_ncr' =>
+      's18_mfg_quality_ncr' =>
         const S18NcrVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_capa' =>
+      's18_mfg_quality_capa' =>
         const S18CapaVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_coa' =>
+      's18_mfg_quality_coa' =>
         const S18CoaVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_quality_checklist' =>
+      's18_mfg_quality_quality_checklist' =>
         const S18QualityChecklistVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_audit' =>
+      's18_mfg_quality_audit' =>
         const S18AuditVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_calibration' =>
+      's18_mfg_quality_calibration' =>
         const S18CalibrationVerificationExampleScreen(),
-      's18_manufacturing_quality_pack_nested_tables' =>
+      's18_mfg_quality_nested_tables' =>
         const S18NestedTablesVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack' || 's19_fixed_assets_projects_pack_asset_card' =>
+      's19_assets_projects' || 's19_assets_projects_asset_card' =>
         const S19AssetCardVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_asset_register' =>
+      's19_assets_projects_asset_register' =>
         const S19AssetRegisterVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_asset_label' =>
+      's19_assets_projects_asset_label' =>
         const S19AssetLabelVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_asset_transfer' =>
+      's19_assets_projects_asset_transfer' =>
         const S19AssetTransferVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_asset_assignment' =>
+      's19_assets_projects_asset_assignment' =>
         const S19AssetAssignmentVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_asset_return' =>
+      's19_assets_projects_asset_return' =>
         const S19AssetReturnVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_asset_disposal' =>
+      's19_assets_projects_asset_disposal' =>
         const S19AssetDisposalVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_depreciation' =>
+      's19_assets_projects_depreciation' =>
         const S19DepreciationVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_asset_maintenance' =>
+      's19_assets_projects_asset_maintenance' =>
         const S19AssetMaintenanceVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_asset_count' =>
+      's19_assets_projects_asset_count' =>
         const S19AssetCountVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_asset_movement' =>
+      's19_assets_projects_asset_movement' =>
         const S19AssetMovementVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_project_summary' =>
+      's19_assets_projects_project_summary' =>
         const S19ProjectSummaryVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_project_budget' =>
+      's19_assets_projects_project_budget' =>
         const S19ProjectBudgetVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_project_cost' =>
+      's19_assets_projects_project_cost' =>
         const S19ProjectCostVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_project_profitability' =>
+      's19_assets_projects_project_profitability' =>
         const S19ProjectProfitabilityVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_project_timesheet' =>
+      's19_assets_projects_project_timesheet' =>
         const S19ProjectTimesheetVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_project_expense' =>
+      's19_assets_projects_project_expense' =>
         const S19ProjectExpenseVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_milestone' =>
+      's19_assets_projects_milestone' =>
         const S19MilestoneVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_progress' =>
+      's19_assets_projects_progress' =>
         const S19ProgressVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_completion_certificate' =>
+      's19_assets_projects_completion_certificate' =>
         const S19CompletionCertificateVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_project_billing' =>
+      's19_assets_projects_project_billing' =>
         const S19ProjectBillingVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_resource_utilization' =>
+      's19_assets_projects_resource_utilization' =>
         const S19ResourceUtilizationVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_project_purchasing' =>
+      's19_assets_projects_project_purchasing' =>
         const S19ProjectPurchasingVerificationExampleScreen(),
-      's19_fixed_assets_projects_pack_multi_period_financials' =>
+      's19_assets_projects_multi_period_financials' =>
         const S19MultiPeriodFinancialsVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack' || 's20_maintenance_service_logistics_pack_service_order' =>
+      's20_service_logistics' || 's20_service_logistics_service_order' =>
         const S20ServiceOrderVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_maintenance_work_order' =>
+      's20_service_logistics_maintenance_work_order' =>
         const S20MaintenanceWorkOrderVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_preventive_schedule' =>
+      's20_service_logistics_preventive_schedule' =>
         const S20PreventiveScheduleVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_maintenance_checklist' =>
+      's20_service_logistics_maintenance_checklist' =>
         const S20MaintenanceChecklistVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_technician_report' =>
+      's20_service_logistics_technician_report' =>
         const S20TechnicianReportVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_service_completion' =>
+      's20_service_logistics_service_completion' =>
         const S20ServiceCompletionVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_spare_parts' =>
+      's20_service_logistics_spare_parts' =>
         const S20SparePartsVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_warranty' =>
+      's20_service_logistics_warranty' =>
         const S20WarrantyVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_inspection' =>
+      's20_service_logistics_inspection' =>
         const S20InspectionVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_service_history' =>
+      's20_service_logistics_service_history' =>
         const S20ServiceHistoryVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_shipment' =>
+      's20_service_logistics_shipment' =>
         const S20ShipmentVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_packing_list' =>
+      's20_service_logistics_packing_list' =>
         const S20PackingListVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_dispatch_note' =>
+      's20_service_logistics_dispatch_note' =>
         const S20DispatchNoteVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_waybill' =>
+      's20_service_logistics_waybill' =>
         const S20WaybillVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_manifest' =>
+      's20_service_logistics_manifest' =>
         const S20ManifestVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_trip_sheet' =>
+      's20_service_logistics_trip_sheet' =>
         const S20TripSheetVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_trip_report' =>
+      's20_service_logistics_trip_report' =>
         const S20TripReportVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_shipping_label' =>
+      's20_service_logistics_shipping_label' =>
         const S20ShippingLabelVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_pallet_label' =>
+      's20_service_logistics_pallet_label' =>
         const S20PalletLabelVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_container_list' =>
+      's20_service_logistics_container_list' =>
         const S20ContainerListVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_freight_summary' =>
+      's20_service_logistics_freight_summary' =>
         const S20FreightSummaryVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_proof_of_delivery' =>
+      's20_service_logistics_proof_of_delivery' =>
         const S20ProofOfDeliveryVerificationExampleScreen(),
-      's20_maintenance_service_logistics_pack_profile_matrix' =>
+      's20_service_logistics_profile_matrix' =>
         const S20ProfileMatrixVerificationExampleScreen(),
       's21_crm_pack' || 's21_crm_pack_customer' =>
         const S21CustomerVerificationExampleScreen(),
@@ -2790,41 +2790,41 @@ final class DashboardDestinationRegistry {
         const S21ContractVerificationExampleScreen(),
       's21_crm_pack_presentation' =>
         const S21PresentationVerificationExampleScreen(),
-      's22_template_engine_vnext' || 's22_template_engine_vnext_schema' =>
+      's22_engine_vnext' || 's22_engine_vnext_schema' =>
         const S22SchemaVerificationExampleScreen(),
-      's22_template_engine_vnext_legacy_migration' =>
+      's22_engine_vnext_legacy_migration' =>
         const S22LegacyMigrationVerificationExampleScreen(),
-      's22_template_engine_vnext_expressions' =>
+      's22_engine_vnext_expressions' =>
         const S22ExpressionsVerificationExampleScreen(),
-      's22_template_engine_vnext_large_loop' =>
+      's22_engine_vnext_large_loop' =>
         const S22LargeLoopVerificationExampleScreen(),
-      's22_template_engine_vnext_composition' =>
+      's22_engine_vnext_composition' =>
         const S22CompositionVerificationExampleScreen(),
-      's22_template_engine_vnext_scoped_registry' =>
+      's22_engine_vnext_scoped_registry' =>
         const S22ScopedRegistryVerificationExampleScreen(),
-      's22_template_engine_vnext_directionality' =>
+      's22_engine_vnext_directionality' =>
         const S22DirectionalityVerificationExampleScreen(),
-      's22_template_engine_vnext_invalid_expression' =>
+      's22_engine_vnext_invalid_expression' =>
         const S22InvalidExpressionVerificationExampleScreen(),
-      's23_compliance_signing_archival' || 's23_compliance_signing_archival_original' =>
+      's23_compliance_archive' || 's23_compliance_archive_original' =>
         const S23OriginalVerificationExampleScreen(),
-      's23_compliance_signing_archival_copy' =>
+      's23_compliance_archive_copy' =>
         const S23CopyVerificationExampleScreen(),
-      's23_compliance_signing_archival_reprint' =>
+      's23_compliance_archive_reprint' =>
         const S23ReprintVerificationExampleScreen(),
-      's23_compliance_signing_archival_missing_required_field' =>
+      's23_compliance_archive_missing_required_field' =>
         const S23MissingRequiredFieldVerificationExampleScreen(),
-      's23_compliance_signing_archival_country_tenant_fallback' =>
+      's23_compliance_archive_country_tenant_fallback' =>
         const S23CountryTenantFallbackVerificationExampleScreen(),
-      's23_compliance_signing_archival_security_policy' =>
+      's23_compliance_archive_security_policy' =>
         const S23SecurityPolicyVerificationExampleScreen(),
-      's23_compliance_signing_archival_archive_metadata' =>
+      's23_compliance_archive_archive_metadata' =>
         const S23ArchiveMetadataVerificationExampleScreen(),
-      's24_performance_regression' || 's24_performance_regression_benchmark' =>
+      's24_performance' || 's24_performance_benchmark' =>
         const S24FamilyBenchmarkVerificationExampleScreen(),
-      's24_performance_regression_cache' => const S24MeasurementCacheVerificationExampleScreen(),
-      's24_performance_regression_semantic' => const S24SemanticRegressionVerificationExampleScreen(),
-      's24_performance_regression_golden_manifest' => const S24GoldenCoverageManifestVerificationExampleScreen(),
+      's24_performance_cache' => const S24MeasurementCacheVerificationExampleScreen(),
+      's24_performance_semantic' => const S24SemanticRegressionVerificationExampleScreen(),
+      's24_performance_golden_manifest' => const S24GoldenCoverageManifestVerificationExampleScreen(),
       's25_template_designer' || 's25_template_designer_metadata' =>
         const S25MetadataVerificationExampleScreen(),
       's25_template_designer_authoring' =>
@@ -2837,15 +2837,15 @@ final class DashboardDestinationRegistry {
         const S25ValidationVerificationExampleScreen(),
       's25_template_designer_multi_page' =>
         const S25MultiPageVerificationExampleScreen(),
-      's26_industry_packs' || 's26_industry_packs_retail' =>
+      's26_industries' || 's26_industries_retail' =>
         const S26RetailVerificationExampleScreen(),
-      's26_industry_packs_restaurant' =>
+      's26_industries_restaurant' =>
         const S26RestaurantVerificationExampleScreen(),
-      's26_industry_packs_construction' =>
+      's26_industries_construction' =>
         const S26ConstructionVerificationExampleScreen(),
-      's26_industry_packs_healthcare_education' =>
+      's26_industries_healthcare_education' =>
         const S26HealthcareEducationVerificationExampleScreen(),
-      's26_industry_packs_mobility_distribution_hospitality' =>
+      's26_industries_mobility_distribution_hospitality' =>
         const S26MobilityDistributionHospitalityVerificationExampleScreen(),
       'components' || 'data_grid' => const DataGridInvoiceFooterRowsExampleScreen(),
       'data_grid_invoice_footer_rows' => const DataGridInvoiceFooterRowsExampleScreen(),
