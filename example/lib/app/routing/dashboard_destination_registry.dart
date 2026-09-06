@@ -65,6 +65,8 @@ import 'package:genius_pdf_example/features/templates/presentation/pages/templat
 import 'package:genius_pdf_example/features/templates/presentation/pages/templates/inventory_report_template_screen.dart';
 import 'package:genius_pdf_example/features/templates/presentation/pages/templates/single_account_pdf_example_screen.dart';
 import 'package:genius_pdf_example/features/templates/presentation/pages/templates/multi_account_pdf_example_screen.dart';
+import 'package:genius_pdf_example/features/templates/presentation/pages/templates/multi_transaction_transfer_pdf_example_screen.dart';
+import 'package:genius_pdf_example/features/templates/presentation/pages/templates/multi_transaction_transfer_for_account_pdf_example_screen.dart';
 import 'package:genius_pdf_example/features/export/presentation/pages/examples/image_export/single_account_image_example_screen.dart';
 import 'package:genius_pdf_example/features/export/presentation/pages/examples/image_export/multi_account_image_example_screen.dart';
 import 'package:genius_pdf_example/features/ai_features/presentation/pages/examples/content_analyzer_example_screen.dart';
@@ -1934,6 +1936,16 @@ final class DashboardDestinationRegistry {
       code: 'ACC-PDF-02',
     ),
     DashboardDestination(
+      id: 'template_multi_transaction_transfer_pdf',
+      title: 'MultiTransactionTransferPdf',
+      code: 'TRF-PDF-01',
+    ),
+    DashboardDestination(
+      id: 'template_multi_transaction_transfer_for_account_pdf',
+      title: 'MultiTransactionTransferForAccountPdf',
+      code: 'TRF-PDF-02',
+    ),
+    DashboardDestination(
       id: 'export_image_single_account',
       title: 'SingleAccountImage',
       code: 'ACC-IMG-01',
@@ -2978,6 +2990,10 @@ final class DashboardDestinationRegistry {
       'template_inventory_report' => const InventoryReportTemplateScreen(),
       'template_single_account_pdf' => const SingleAccountPdfExampleScreen(),
       'template_multi_account_pdf' => const MultiAccountPdfExampleScreen(),
+      'template_multi_transaction_transfer_pdf' =>
+        const MultiTransactionTransferPdfExampleScreen(),
+      'template_multi_transaction_transfer_for_account_pdf' =>
+        const MultiTransactionTransferForAccountPdfExampleScreen(),
       'export_image_single_account' => const SingleAccountImageExampleScreen(),
       'export_image_multi_account' => const MultiAccountImageExampleScreen(),
       'business_balance_sheet' => const BalanceSheetTemplateScreen(),

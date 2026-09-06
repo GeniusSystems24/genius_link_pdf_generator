@@ -36,6 +36,7 @@ builder, the fluent report composer, or your own application-specific layer.
 - [Architecture](#architecture)
 - [Optional modules](#optional-modules)
 - [Templates](#templates)
+- [4.2.0 transaction-transfer exports](#420-transaction-transfer-exports)
 - [4.1.0 Account export templates](#410-account-export-templates)
 - [4.0.0 S00 baseline verification](#400-s00-baseline-verification)
 - [Example application](#example-application)
@@ -132,7 +133,7 @@ When consumed from a hosted source, use the version required by your project:
 
 ```yaml
 dependencies:
-  genius_link_pdf_generator: ^4.1.0
+  genius_link_pdf_generator: ^4.2.0
 ```
 
 Run:
@@ -1015,6 +1016,99 @@ Available template families include invoices, financial reports, statements,
 HR documents, inventory reports, vouchers, remittances, and trade documents.
 Refer to the template source and the example application for constructors and
 data models, because template inputs vary by document type.
+
+
+## 4.2.0 transaction-transfer exports
+
+Version 4.2.0 adds two landscape PDF reports for the
+`transaction_transfer` accounting-leg dataset:
+
+- `MultiTransactionTransferPdf` — movements across multiple accounts.
+- `MultiTransactionTransferForAccountPdf` — movements for one account with an
+  opening balance and running current balance.
+
+Both templates use `(serviceId, transactionId)` as the logical transaction
+reference. A source row's signed `amount` controls accounting direction:
+positive values are Debit and negative values are Credit. Counter-account
+arrays in `description` are shown as metadata and do not override the signed
+movement direction.
+
+### Multi-account transfer report
+
+`MultiTransactionTransferPdf` renders one affected account per grid row. The
+main columns are date, reference, service, account, Debit, Credit, and
+Description. Transfer or commission type is prefixed to the note in the
+Description column.
+
+Currencies are separated using group headers and per-currency total rows. The
+grid therefore does not repeat a `Currency / العملة` column on every row.
+
+```dart
+final report = MultiTransactionTransferPdf(
+  config: pdfConfig,
+  meta: TransactionTransferDocumentMeta(
+    title: 'Transaction Transfers',
+    titleAr: 'حركات التحويلات',
+    issueDate: DateTime.now(),
+    exportingUserName: 'System User',
+  ),
+  rows: TransactionTransferJsonData.rowsFromJson(transactionTransferJson),
+  services: TransactionTransferJsonData.servicesFromJson(servicesJson),
+  configuration: TransactionTransferReportConfiguration(
+    periodStart: DateTime(2026, 8, 1),
+    periodEnd: DateTime(2026, 9, 30),
+    showTotals: true,
+  ),
+  reportId: 'TRF-2026-09',
+  showQRCode: true,
+  showNotes: true,
+);
+```
+
+### Account transfer report
+
+`MultiTransactionTransferForAccountPdf` filters the same source rows to one
+account. Provide `openingBalances` from the ledger immediately before the report
+period. Balances use the same signed convention as the source rows: positive is
+Debit and negative is Credit.
+
+Each currency starts with an opening-balance row. The report then applies every
+signed movement in chronological order and displays `Current Balance / الرصيد
+الحالي` after the operation. Currencies remain visually separated by group
+headers rather than a repeated currency column.
+
+```dart
+final report = MultiTransactionTransferForAccountPdf(
+  config: pdfConfig,
+  meta: TransactionTransferDocumentMeta(
+    title: 'Account Transfer Movements',
+    titleAr: 'حركات تحويلات الحساب',
+    issueDate: DateTime.now(),
+    exportingUserName: 'System User',
+  ),
+  rows: TransactionTransferJsonData.rowsFromJson(transactionTransferJson),
+  accountId: 2305,
+  services: TransactionTransferJsonData.servicesFromJson(servicesJson),
+  openingBalances: const <String, double>{
+    'YER': 125000,
+  },
+  configuration: TransactionTransferReportConfiguration(
+    periodStart: DateTime(2026, 8, 1),
+    periodEnd: DateTime(2026, 9, 30),
+  ),
+  reportId: 'ACC-2305-TRF-2026-09',
+);
+```
+
+The transaction-transfer JSON does not contain opening ledger balances, so the
+account template does not infer them. If an opening balance is not supplied for
+a currency, its opening row remains explicit and the running-balance cells stay
+blank instead of silently assuming zero.
+
+Both templates support RTL/LTR output, bilingual split headers, optional account
+name lookups, service-name lookups, date/currency/service/status filters,
+commission filtering, semantic Debit/Credit cell colors, QR/report notes, and a
+repeating footer with exporting user, issue date, and page number.
 
 ## 4.1.0 Account export templates
 

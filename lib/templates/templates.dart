@@ -38,6 +38,7 @@ export 'trial_balance.dart';
 export 'customer_statement.dart';
 export 'inventory_report.dart';
 export 'account_export/account_export.dart';
+export 'transaction_transfer_export/transaction_transfer_export.dart';
 
 // Financial templates (v1.3.0)
 export 'balance_sheet.dart';

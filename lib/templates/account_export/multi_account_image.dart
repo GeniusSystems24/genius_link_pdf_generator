@@ -319,7 +319,7 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
       company: company,
       printDate: meta.issueDate,
       config: config,
-      style: GeniusPdfReportHeaderStyle.classic(),
+      style: const GeniusPdfReportHeaderStyle.classic(),
       layout: GeniusPdfReportHeaderLayout.bilingualSplit,
       showCompanyInfo: company != null,
       showBilingualTitle: true,

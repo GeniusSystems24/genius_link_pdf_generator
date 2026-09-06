@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0] - 2026-09-06
+
+### Added
+
+- Added `MultiTransactionTransferPdf` for exporting transaction-transfer
+  accounting legs across multiple accounts.
+- Added `MultiTransactionTransferForAccountPdf` for exporting the
+  transaction-transfer movement of one account.
+- Added shared transaction-transfer JSON models, service metadata parsing,
+  account-directory support, report filtering, semantic Debit/Credit colors,
+  QR-code/report notes, repeating user/date/page footers, and example screens.
+- Added caller-provided opening balances per currency to the account report and
+  a running `Current Balance / الرصيد الحالي` after every movement.
+
+### Changed
+
+- Transaction identity uses `(serviceId, transactionId)` because transaction IDs
+  are scoped by service in the source data.
+- `MultiTransactionTransferPdf` renders one affected account per table row
+  instead of combining multiple accounts in one row.
+- Transfer/commission type is displayed beside the transaction note in the
+  `Description / البيان` column.
+- Both reports separate currencies with currency group headers and optional totals, so
+  the repeated `Currency / العملة` table column is no longer required.
+- The account report calculates each running balance from the caller-provided
+  opening balance using the signed transaction amount.
+
+### Removed
+
+- Removed summary sections from both transaction-transfer PDF templates.
+- Removed the `Status / الحالة`, `Line / السطر`, `Type / النوع`, and
+  `Currency / العملة` columns from the transaction-transfer tables.
+- Removed per-row status presentation from the table while retaining status as
+  an optional report filter in `TransactionTransferReportConfiguration`.
+
+### Examples
+
+- Added example screens for both transaction-transfer reports using realistic
+  transaction-transfer and service data.
+- The account example demonstrates opening balance, Debit/Credit movements,
+  descriptions with transfer/commission type, and running current balance.
+
 ## [4.1.0] - 2026-09-06
 
 ### Added
