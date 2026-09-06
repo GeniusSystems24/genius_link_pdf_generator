@@ -854,13 +854,13 @@ abstract class PDFGeneratorLocalization {
   /// No description provided for @trialBalanceHtmlExportDesc.
   ///
   /// In en, this message translates to:
-  /// **'Build TrialBalanceTemplate from lib/templates/trial_balance_template.dart and export its generated PDF document to HTML using GeniusPdfExportService. Preview, copy, save, and open the exact HTML output.'**
+  /// **'Build TrialBalanceTemplate from lib/templates/trial_balance.dart and export its generated PDF document to HTML using GeniusPdfExportService. Preview, copy, save, and open the exact HTML output.'**
   String get trialBalanceHtmlExportDesc;
 
   /// No description provided for @trialBalanceImageExportDesc.
   ///
   /// In en, this message translates to:
-  /// **'Build TrialBalanceTemplate from lib/templates/trial_balance_template.dart, rasterize every generated PDF page, save it as PNG or JPEG, and preview the exact exported image bytes.'**
+  /// **'Build TrialBalanceTemplate from lib/templates/trial_balance.dart, rasterize every generated PDF page, save it as PNG or JPEG, and preview the exact exported image bytes.'**
   String get trialBalanceImageExportDesc;
 
   /// No description provided for @builderLinks.

@@ -36,6 +36,7 @@ builder, the fluent report composer, or your own application-specific layer.
 - [Architecture](#architecture)
 - [Optional modules](#optional-modules)
 - [Templates](#templates)
+- [4.1.0 Account export templates](#410-account-export-templates)
 - [4.0.0 S00 baseline verification](#400-s00-baseline-verification)
 - [Example application](#example-application)
 - [Troubleshooting](#troubleshooting)
@@ -131,7 +132,7 @@ When consumed from a hosted source, use the version required by your project:
 
 ```yaml
 dependencies:
-  genius_link_pdf_generator: ^4.0.0
+  genius_link_pdf_generator: ^4.1.0
 ```
 
 Run:
@@ -1015,6 +1016,132 @@ HR documents, inventory reports, vouchers, remittances, and trade documents.
 Refer to the template source and the example application for constructors and
 data models, because template inputs vary by document type.
 
+## 4.1.0 Account export templates
+
+Version 4.1.0 adds a dedicated account-export family for exporting one or many
+ledger accounts to PDF or image output. The four templates share only their
+account/configuration models; each template owns its complete document drawing
+implementation so changes to one export format do not implicitly change the
+others.
+
+The account-export APIs are available from the full package entrypoint:
+
+```dart
+import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+```
+
+They can also be imported from the focused account-export barrel:
+
+```dart
+import 'package:genius_link_pdf_generator/templates/account_export/account_export.dart';
+```
+
+### Available account exports
+
+| Template | Output | Page orientation | Activity support | Primary use |
+| --- | --- | --- | --- | --- |
+| `SingleAccountPdf` | PDF | Portrait | Summary and detailed | Full statement for one account, including multiple currencies |
+| `MultiAccountPdf` | PDF | Landscape | Summary in the account grid | Large account lists, grouping, balances, movement, and totals |
+| `SingleAccountImage` | Image | Portrait source page | Summary only | Compact shareable snapshot for one account and one selected currency |
+| `MultiAccountImage` | Image(s) | Landscape source page | Summary only | Compact account tables split into bounded image-sized chunks |
+
+### Shared account-export models
+
+The four templates reuse the models in
+`lib/templates/account_export/models.dart`, including:
+
+- `AccountExportDocumentMeta` for title, issue date, and exporting-user data;
+- `AccountExportConfiguration` for field visibility, period, selected currency,
+  balances, activity, grouping, totals, and semantic amount colors;
+- `AccountExportFieldVisibility` for enabling optional account fields;
+- `AccountExportActivityMode` for summary or detailed PDF activity;
+- `AccountExportGrouping` for no grouping, account-group grouping, or
+  parent-account grouping;
+- account, balance, activity-summary, and transaction data models used by the
+  four renderers.
+
+Rendering helpers are intentionally **not** shared. Each of
+`single_account_pdf.dart`, `multi_account_pdf.dart`,
+`single_account_image.dart`, and `multi_account_image.dart` contains its own
+layout/grid/summary/footer drawing logic. This keeps each exported document
+independent while preserving a common data contract.
+
+### SingleAccountPdf
+
+`SingleAccountPdf` is designed for a full account statement. It uses a
+bilingual-split report header and a three-column minimal information block for
+account metadata. When multiple currencies are supplied and no
+`selectedCurrency` is forced, each currency is rendered separately in this
+order:
+
+1. account balance for the currency;
+2. account activity summary for the currency;
+3. detailed transaction grid for the currency when detailed mode is enabled.
+
+The transaction grid supports transaction number/date/type, a wrapping full
+description, currency, debit, credit, and running balance. Debit and credit
+amount cells use separate subtle semantic colors. The report also supports a
+QR verification block, report notes, and a repeating footer with exporting-user
+information, issue date, and page numbering.
+
+### MultiAccountPdf
+
+`MultiAccountPdf` uses landscape orientation to prioritize table readability.
+Its report details are rendered in a three-column minimal information block and
+can include report name, report period, report currencies, and account count.
+The main grid supports account hierarchy fields, group/nature/contact fields,
+selected-currency balance, debit movement, credit movement, and the last
+transaction date.
+
+The report can group accounts by account group or parent account and can render
+subtotals/grand totals. Group subtotal rows place the group name in the account
+name column for easier scanning. Per-account detailed transaction tables are
+not rendered in this template; movement remains summarized in the main grid.
+QR/report notes and the repeating user/date/page footer follow the same report
+conventions used by the trial-balance template.
+
+### Image exports
+
+Image templates intentionally remain summary-only so their output stays compact
+and legible. They use the package's existing PDF-to-image/export flow rather
+than a separate rasterization implementation.
+
+`SingleAccountImage` renders one account for one selected currency and allows
+optional account fields to be hidden when a smaller image is required.
+
+`MultiAccountImage` requires callers to bound the number of accounts rendered
+in one image through `maxAccountsPerImage`. For larger datasets, use
+`MultiAccountImage.split(...)` to create multiple independently renderable
+chunks instead of shrinking an unbounded table into a single image.
+
+### Debit and credit semantics
+
+All account-export tables that contain debit and credit amounts style the amount
+cells themselves, not only their headers. The default palette uses a subtle
+semantic background plus a matching foreground color for each side while
+maintaining readable contrast. Supply `AccountExportAmountColors` through
+`AccountExportConfiguration.amountColors` when an application needs a custom
+palette.
+
+### Configuration example
+
+The same configuration model can be reused across the account-export family:
+
+```dart
+const configuration = AccountExportConfiguration(
+  fields: AccountExportFieldVisibility.multiPdf,
+  selectedCurrency: 'YER',
+  showBalances: true,
+  showActivity: true,
+  activityMode: AccountExportActivityMode.summary,
+  grouping: AccountExportGrouping.accountGroup,
+  showTotals: true,
+);
+```
+
+For image templates, keep `activityMode` set to
+`AccountExportActivityMode.summary`. `MultiAccountImage` also requires a
+selected currency whenever balance or activity values are visible.
 
 ## 4.0.0 S00 baseline verification
 

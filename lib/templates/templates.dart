@@ -8,6 +8,10 @@
 /// - [TaxInvoiceTemplate] - ZATCA-compliant tax invoices
 /// - [TrialBalanceTemplate] - Trial balance reports
 /// - [CustomerStatementTemplate] - Customer account statements
+/// - [SingleAccountPdf] - Single-account summary/detailed exports
+/// - [MultiAccountPdf] - Grouped multi-account summary/detailed exports
+/// - [SingleAccountImage] - Compact single-account image source
+/// - [MultiAccountImage] - Compact split multi-account image source
 /// - [InventoryReportTemplate] - Inventory valuation reports
 /// - [BalanceSheetTemplate] - Balance sheet reports
 /// - [IncomeStatementTemplate] - Income statement (P&L) reports
@@ -33,6 +37,7 @@ export 'tax_invoice.dart';
 export 'trial_balance.dart';
 export 'customer_statement.dart';
 export 'inventory_report.dart';
+export 'account_export/account_export.dart';
 
 // Financial templates (v1.3.0)
 export 'balance_sheet.dart';

@@ -63,6 +63,10 @@ import 'package:genius_pdf_example/features/templates/presentation/pages/templat
 import 'package:genius_pdf_example/features/templates/presentation/pages/templates/trial_balance_template_screen.dart';
 import 'package:genius_pdf_example/features/templates/presentation/pages/templates/customer_statement_template_screen.dart';
 import 'package:genius_pdf_example/features/templates/presentation/pages/templates/inventory_report_template_screen.dart';
+import 'package:genius_pdf_example/features/templates/presentation/pages/templates/single_account_pdf_example_screen.dart';
+import 'package:genius_pdf_example/features/templates/presentation/pages/templates/multi_account_pdf_example_screen.dart';
+import 'package:genius_pdf_example/features/export/presentation/pages/examples/image_export/single_account_image_example_screen.dart';
+import 'package:genius_pdf_example/features/export/presentation/pages/examples/image_export/multi_account_image_example_screen.dart';
 import 'package:genius_pdf_example/features/ai_features/presentation/pages/examples/content_analyzer_example_screen.dart';
 import 'package:genius_pdf_example/features/ai_features/presentation/pages/examples/smart_layout_example_screen.dart';
 import 'package:genius_pdf_example/features/ai_features/presentation/pages/examples/text_services_example_screen.dart';
@@ -1919,6 +1923,26 @@ final class DashboardDestinationRegistry {
       id: 'template_inventory_report',
       title: 'Inventory Report',
     ),
+    DashboardDestination(
+      id: 'template_single_account_pdf',
+      title: 'SingleAccountPdf',
+      code: 'ACC-PDF-01',
+    ),
+    DashboardDestination(
+      id: 'template_multi_account_pdf',
+      title: 'MultiAccountPdf',
+      code: 'ACC-PDF-02',
+    ),
+    DashboardDestination(
+      id: 'export_image_single_account',
+      title: 'SingleAccountImage',
+      code: 'ACC-IMG-01',
+    ),
+    DashboardDestination(
+      id: 'export_image_multi_account',
+      title: 'MultiAccountImage',
+      code: 'ACC-IMG-02',
+    ),
     DashboardDestination(id: 'ai_content_analyzer', title: 'Content Analyzer'),
     DashboardDestination(id: 'ai_smart_layout', title: 'Smart Layout'),
     DashboardDestination(id: 'ai_text_services', title: 'Text Services'),
@@ -2952,6 +2976,10 @@ final class DashboardDestinationRegistry {
       'template_trial_balance' => const TrialBalanceTemplateScreen(),
       'template_customer_statement' => const CustomerStatementTemplateScreen(),
       'template_inventory_report' => const InventoryReportTemplateScreen(),
+      'template_single_account_pdf' => const SingleAccountPdfExampleScreen(),
+      'template_multi_account_pdf' => const MultiAccountPdfExampleScreen(),
+      'export_image_single_account' => const SingleAccountImageExampleScreen(),
+      'export_image_multi_account' => const MultiAccountImageExampleScreen(),
       'business_balance_sheet' => const BalanceSheetTemplateScreen(),
       'business_income_statement' => const IncomeStatementTemplateScreen(),
       'business_cash_flow' => const CashFlowTemplateScreen(),

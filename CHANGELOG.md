@@ -5,7 +5,73 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.1.0] - 2026-09-06
+
+### Added
+
+- Added four production account-export templates:
+  `SingleAccountPdf`, `MultiAccountPdf`, `SingleAccountImage`, and
+  `MultiAccountImage`.
+- Added reusable account-export domain/configuration models for document
+  metadata, field visibility, activity mode, grouping, balances, currencies,
+  transactions, and semantic debit/credit colors.
+- Added bilingual split report headers, compact/minimal information sections,
+  QR-code verification blocks, report notes, and repeating report footers where
+  appropriate.
+- Added multi-currency single-account PDF output that renders each currency as
+  a dedicated balance, activity-summary, and optional detailed-transaction
+  section.
+- Added last-transaction-date support for multi-account exports, including a
+  fallback to the latest supplied transaction when an explicit date is absent.
+- Added account-group and parent-account grouping with optional subtotal and
+  grand-total rows for multi-account PDF reports.
+- Added bounded multi-account image rendering with `maxAccountsPerImage` and
+  `MultiAccountImage.split(...)` so large account sets can be exported as
+  multiple images safely.
+- Added example screens and realistic demo data for all four account-export
+  templates, including large single-account transaction sets and a 200-account
+  multi-account example.
+- Added Dart API documentation for the new public account-export models,
+  templates, configuration options, and image-export limitations.
+
+### Changed
+
+- Account-export debit and credit amount cells now use consistent semantic
+  foreground/background colors, including summary and total rows where
+  applicable.
+- `SingleAccountPdf` now uses a portrait report layout with a bilingual split
+  header, three-column minimal account information, currency-by-currency
+  sections, grid-based account activity, QR/report notes, and a footer with the
+  exporting user, issue date, and page numbering.
+- `MultiAccountPdf` now uses a landscape report layout with a bilingual split
+  header, three-column minimal report details, last-transaction-date display,
+  group names in the account-name column of subtotal rows, QR/report notes,
+  and a repeating footer containing user, issue date, and page numbering.
+- `MultiAccountPdf` no longer renders per-account detailed transaction tables;
+  debit/credit activity remains summarized in the main account grid.
+- `SingleAccountImage` and `MultiAccountImage` were aligned with the visual
+  hierarchy and report conventions of their PDF counterparts while remaining
+  summary-only and optimized for constrained image space.
+- Account-export image generation continues to use the package's existing
+  PDF-to-image flow instead of introducing a separate rasterization path.
+- RTL/LTR and Arabic/English behavior across account exports now follows the
+  same report-header, grid, summary, QR, notes, and footer conventions used by
+  the existing ERP templates.
+
+### Refactored
+
+- Made the rendering implementation of each account-export template fully
+  independent. `single_account_pdf.dart`, `multi_account_pdf.dart`,
+  `single_account_image.dart`, and `multi_account_image.dart` now own their
+  document-specific drawing helpers and do not call rendering code from one
+  another.
+- Kept only data/configuration models shared between the four account-export
+  templates; `account_export.dart` is a barrel export for the models and the
+  four independent templates.
+- Removed the account-export shared rendering helper/style files that were no
+  longer needed after rendering isolation.
+
+## [4.0.1]
 
 ### Removed
 
@@ -19,7 +85,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Replace example imports under `screens/`, `documents/`, `widgets/`, `theme/`,
   and `data/` with their feature-first, `app`, or `shared` equivalents.
-
 
 ## [4.0.0] - 2026-09-03
 
@@ -63,7 +128,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Automotive/Distribution/Hospitality variants that reuse
   service/logistics/transaction families.
 - Added tests, QA matrix, docs and Dashboard manual verification.
-
 
 ### S21 — CRM Pack
 
@@ -113,7 +177,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   references and no hard-coded country law in base templates.
 - Added S23 tests, docs and Dashboard verification page.
 
-
 ### S19 — Fixed Assets & Projects Pack
 
 #### Added
@@ -146,7 +209,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added QA for multi-stop manifests, long shipment items, Arabic addresses with
   Latin tracking numbers, label/thermal profiles and POD signatures.
 - Added S20 documentation and Dashboard manual verification page.
-
 
 ### S17 — HR & Payroll Pack
 
@@ -181,7 +243,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added QA for multi-level BOM, long routing, mixed units, RTL technical terms
   with Latin codes and multi-page checklists.
 - Added S18 documentation, semantic QA matrix and Dashboard verification page.
-
 
 ### S14 — Accounting & Finance Pack
 
@@ -232,7 +293,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `showAmounts` (default `true`) so Gift/KOT outputs reuse the same thermal
   renderer without breaking existing callers.
 
-
 ### S12 — Sales ERP Pack
 
 #### Added
@@ -272,7 +332,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Existing `PurchaseOrderTemplate` now inherits the Purchasing transaction pack
   base while preserving its existing constructor and S09 family-plan adapter.
-
 
 ### S10 — Consolidate Existing Templates & Voucher Family
 
@@ -315,7 +374,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `GeniusPdfCalibrationTestDocument` for printer/stock alignment.
 - Added S11 tests, docs and real-PDF Manual Verification scenarios.
 
-
 ### S08 — Generic ERP Document Families
 
 #### Added
@@ -357,7 +415,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documented intentional visual differences caused by replacing physical
   left/right layout with direction-safe logical start/end composition.
 
-
 ### S07 — ERP Semantic Components
 
 #### Added
@@ -390,7 +447,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Identity/party/address/tax/terms layout can be reused by later document
   families instead of being rebuilt per template.
 
-
 ### S06 — ERP Shared Domain & Calculation Layer
 
 #### Added
@@ -418,7 +474,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ERP calculations are independent from UI, templates and PDF rendering.
 - Quotation, Purchase Order and Invoice can share the same ERP domain layer.
 - Optional metadata remains null/empty instead of generating dummy values.
-
 
 ### S05 — Formatting Engine & Design Tokens
 
@@ -451,7 +506,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Existing string-based Summary/InfoBox/Grid APIs remain valid.
 - Existing DataGrid `valueFormatter` callbacks remain valid.
 - Existing `GeniusPdfPrintTheme` remains valid and is wrapped automatically.
-
 
 ### S04 — DataGrid vNext for ERP Reports
 
@@ -486,7 +540,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - S04 composes the established renderer instead of copying its low-level
   drawing implementation.
 - S05 remains responsible for the shared formatter/theme contracts.
-
 
 ### S03 — Flow Layout, Blocks, Bands & Pagination Engine
 
@@ -524,8 +577,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `docs/sprints/s03/FLOW_LAYOUT_CONTRACT.md`.
 - Added `docs/sprints/s03/S03_IMPLEMENTATION_STATUS.md`.
 
-
-
 #### S03 analyzer repair
 
 - Flow-layout bands use the existing `GeniusPdfConfig` font getters directly,
@@ -536,7 +587,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `PdfSpacerBlock`, `PdfPageBreakBlock`, `PdfSectionHeaderBand`,
   `PdfGroupHeaderBand`, `PdfTableHeaderBand`, `PdfTableFooterBand`,
   `PdfStatusMarkerBand`, and `PdfOriginalCopyBand`.
-
 
 #### S03 font override compatibility fix
 
@@ -580,7 +630,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   AUTO-inheritance, legacy JSON, nested override, mixed-text and media scenarios.
 - Ensured S01 is reachable from registry/sidebar/mobile drawer/Dashboard Home.
 - Added `docs/sprints/s01/S01_COMPLETION_AUDIT.md`.
-
 
 ### Added — ERP printing Sprint S00 baseline
 
@@ -762,17 +811,20 @@ New package `lib/src/core/financial/` with full financial validation support:
 ### Added
 
 #### Complete Voucher Demo — Comprehensive Example
+
 - **`complete_voucher_demo_builder.dart`** — showcases all 16 voucher template classes in a single batch PDF
   - One representative voucher from each template class
   - Demonstrates the full breadth of the voucher system
   - 16 vouchers covering 64 service ID subtypes
 
 #### Example Showcase Enhancement
+
 - **Complete Demo tab** — new tab in the example app showcasing all voucher types
   - Icon: `library_books_rounded`
   - Generates a comprehensive 16-page PDF with one voucher from each template class
 
 ### Summary
+
 - **16 template classes**: AccountingEntry, Receipt, Payment, Tax, BankDeposit, BankWithdrawal, Transfer, BillPayment, RemittanceOutgoing, RemittanceIncoming, Purchase, Sales, PurchaseReturn, SalesReturn, Gift, Inventory
 - **64 service ID subtypes**: Each template class supports 2-6 payment/operation variants
 - **Full bilingual support**: Arabic/English throughout all templates and examples
@@ -784,6 +836,7 @@ New package `lib/src/core/financial/` with full financial validation support:
 ### Added
 
 #### Auxiliary Voucher Templates (Gift & Inventory)
+
 - **`GiftVoucher`** — 2 service IDs (20500–20501): Received Gift/Grant, Given Gift
   - Direction-based layout (received vs given)
   - Donor/recipient info sections
@@ -801,6 +854,7 @@ New package `lib/src/core/financial/` with full financial validation support:
   - Damage details (type, description, inspection, disposal, insurance claim)
 
 #### New Models & Enums
+
 - **`VoucherGiftData`** — gift data model with direction, donor/recipient, occasion, reason, fair market value, tax treatment, authorization
 - **`VoucherInventoryData`** — inventory data model with operation type, warehouses, department, adjustment reason, damage type/description, inspection, disposal, insurance claim
 - **`GiftDirection`** enum — received, given
@@ -813,6 +867,7 @@ New package `lib/src/core/financial/` with full financial validation support:
 - 7 new `VoucherServiceId` entries (20500–20604)
 
 #### Example
+
 - `auxiliary_voucher_demo_builder.dart` — 5-voucher batch demo (received gift, given gift, inventory transfer, inventory damage with insurance claim, inventory adjustment)
 
 ---
@@ -822,6 +877,7 @@ New package `lib/src/core/financial/` with full financial validation support:
 ### Added
 
 #### Trade Voucher Templates
+
 - **`PurchaseVoucher`** — 4 service IDs (20000–20003): Cash Purchase, Credit Purchase, Advance Purchase, Installment Purchase
   - Supplier info, PO reference, items table with discount/tax columns
   - Invoice summary (subtotal, discount, taxable, VAT, grand total)
@@ -842,6 +898,7 @@ New package `lib/src/core/financial/` with full financial validation support:
   - Refund/settlement block per subtype (cash refund, receivable reduction, customer refund, installment adjustment)
 
 #### New Models & Enums
+
 - **`VoucherTradeData`** — comprehensive trade data model with order reference, summary calculations, payment terms, warehouse, delivery, and return-specific fields
 - **`VoucherReturnReason`** enum — defective, wrongItem, qualityIssue, orderCancellation, overDelivery, other
 - **`TradeSignatories`** extension — purchasing, salesDept, warehouseKeeper, qualityInspector, customer, supplier
@@ -849,6 +906,7 @@ New package `lib/src/core/financial/` with full financial validation support:
 - 16 new `VoucherServiceId` entries (20000–20453)
 
 #### Example
+
 - `trade_voucher_demo_builder.dart` — 4-voucher batch demo (credit purchase with 4 items, cash sale with delivery, cash purchase return with defective reason, credit sales return with cancellation)
 
 ---
@@ -862,6 +920,7 @@ New package `lib/src/core/financial/` with full financial validation support:
 Extends the voucher system with 2 new remittance template classes covering 8 service IDs for domestic and international, personal and commercial money transfers. Includes sender/beneficiary info blocks, currency exchange details, fee breakdowns, compliance/AML fields, and tracking references.
 
 **New Service IDs:**
+
 - `VoucherServiceId.domesticPersonalOutgoing` (10400) — Personal remittance within the country
 - `VoucherServiceId.domesticCommercialOutgoing` (10401) — Commercial remittance within the country
 - `VoucherServiceId.internationalPersonalOutgoing` (10500) — Personal remittance abroad
@@ -872,22 +931,27 @@ Extends the voucher system with 2 new remittance template classes covering 8 ser
 - `VoucherServiceId.internationalCommercialIncoming` (10551) — Commercial remittance from abroad
 
 **New Template Classes:**
+
 - `RemittanceOutgoingVoucher` — Outgoing remittance vouchers with sender info, beneficiary info (bank/SWIFT/correspondent bank for international), currency exchange details, fees breakdown, compliance/AML section, and tracking number with expected delivery
 - `RemittanceIncomingVoucher` — Incoming remittance vouchers with sender info, beneficiary info, exchange details for international transfers, receiving fees, and disbursement method display
 
 **New Data Model:**
+
 - `VoucherRemittanceData` — Comprehensive remittance data with sender/beneficiary details (name, ID, phone, address, country), bank routing (account, IBAN, SWIFT, correspondent bank), currency exchange (source/target currency, rate, amounts), fees (transfer fee, exchange margin, total cost), compliance (purpose code, AML reference), and tracking (tracking number, expected delivery, disbursement method)
 
 **New Voucher Categories:**
+
 - `VoucherCategory.remittanceOutgoing` — Outgoing Remittances / حوالات صادرة
 - `VoucherCategory.remittanceIncoming` — Incoming Remittances / حوالات واردة
 
 **New Signatories:**
+
 - `RemittanceSignatories.sender()` — Sender / المرسل
 - `RemittanceSignatories.beneficiary()` — Beneficiary / المستفيد
 - `RemittanceSignatories.complianceOfficer()` — Compliance Officer / مسؤول الامتثال
 
 **Example:**
+
 - `buildRemittanceVoucherDemoReport()` — Demo generating 4 remittance vouchers (domestic outgoing, international outgoing, domestic incoming, international incoming) in one batch PDF
 - Remittance Vouchers card added to Examples Showcase screen
 
@@ -902,6 +966,7 @@ Extends the voucher system with 2 new remittance template classes covering 8 ser
 Extends the voucher system with 4 new banking template classes covering 15 service IDs. All templates support bilingual RTL/LTR layouts, batch PDF generation, and the full voucher styling system.
 
 **New Service IDs:**
+
 - `VoucherServiceId.cashDeposit` (10000) — Cash deposit into bank account
 - `VoucherServiceId.checkDeposit` (10001) — Check deposit into bank account
 - `VoucherServiceId.electronicDeposit` (10002) — Electronic transfer deposit
@@ -920,27 +985,32 @@ Extends the voucher system with 4 new banking template classes covering 15 servi
 - `VoucherServiceId.entertainmentRecharge` (10305) — Streaming subscriptions
 
 **New Template Classes:**
+
 - `BankDepositVoucher` — Bank deposit vouchers with denomination breakdown table for cash deposits, check details for check deposits, and electronic transfer references
 - `BankWithdrawalVoucher` — Bank withdrawal vouchers with authorized person info, ATM location/card details, and check withdrawal support
 - `TransferVoucher` — Transfer vouchers with source/destination account blocks, beneficiary info, fees/commission, net amount calculation, and currency exchange support
 - `BillPaymentVoucher` — Bill payment vouchers with service provider info, subtype-specific bill details (meter readings, consumption, plans, mobile numbers), and confirmation references
 
 **New Data Models:**
+
 - `VoucherBankInfo` — Bank account information (name, branch, account number, IBAN, SWIFT, currency, balance)
 - `VoucherTransferData` — Transfer details (source/destination accounts, beneficiary, fees, net amount, platform)
 - `VoucherBillData` — Bill payment details (provider, subscriber, billing period, meter, consumption, plan, mobile, confirmation)
 - `BankingSignatories` — Extension with factory methods: `depositor`, `bankTeller`, `requester`, `treasury`, `authorizedSignatory`, `operator`
 
 **New Voucher Categories:**
+
 - `VoucherCategory.bankDeposit` — Bank Deposits / إيداعات بنكية
 - `VoucherCategory.bankWithdrawal` — Bank Withdrawals / سحوبات بنكية
 - `VoucherCategory.transfer` — Transfers / التحويلات
 - `VoucherCategory.billPayment` — Bill Payments / دفع الفواتير
 
 **New Payment Method:**
+
 - `VoucherPaymentMethod.currencyExchange` — Currency exchange with source/target currency, exchange rate, and fee
 
 **Example:**
+
 - `buildBankingVoucherDemoReport()` — Demo generating 4 banking vouchers in one batch PDF (cash deposit, check withdrawal, bank transfer, utility bill)
 - Banking Vouchers card added to Examples Showcase screen
 
@@ -955,6 +1025,7 @@ Extends the voucher system with 4 new banking template classes covering 15 servi
 A comprehensive, bilingual (Arabic/English) service voucher system for generating professional financial documents. All vouchers support RTL/LTR layouts, multi-voucher batch PDFs, and customizable styling.
 
 **Core Models:**
+
 - `VoucherServiceId` — Enum of 17 service IDs across 4 categories: Accounting Entries (00001–00004), Receipt Vouchers (00100–00103), Payment Vouchers (00200–00203), Tax Vouchers (00300–00304)
 - `VoucherCategory` — Categorizes vouchers: `accountingEntry`, `receipt`, `payment`, `tax`
 - `VoucherData` — Core data model with voucher number, date, amount, currency, party, payment details, line items, account entries, signatories, and custom fields
@@ -969,16 +1040,19 @@ A comprehensive, bilingual (Arabic/English) service voucher system for generatin
 - `VoucherTaxType` — Tax type enum: `incomeTax`, `vat`, `governmentFee`, `customsDuty`, `taxSettlement`
 
 **Styling:**
+
 - `GeniusPdfVoucherStyle` — Full style configuration with colors, typography, layout, and options
 - Factory styles: `.standard()`, `.formal()`, `.minimal()`, `.financial()`, `.government()`
 - `copyWith()` method for easy customization
 
 **Utilities:**
+
 - `AmountToWords` — Converts numeric amounts to Arabic and English words
 - `CurrencyInfo` — Currency data for 11 currencies: SAR, USD, EUR, GBP, AED, KWD, QAR, BHD, OMR, EGP, JOD
 - Proper Arabic grammar for thousands/millions/billions
 
 **Template Classes:**
+
 - `GeniusPdfVoucherTemplate` — Abstract base class with shared drawing methods: header, title, voucher info, party info, payment details, account entries table, items table, amount block, amount in words, notes, signatures, footer
 - `AccountingEntryVoucher` — For service IDs 00001–00004 (Simple Entry, Compound Entry, Opening Entry, Adjusting Entry)
 - `ReceiptVoucher` — For service IDs 00100–00103 (Cash Receipt, Bank Transfer Receipt, Check Receipt, Electronic Receipt)
@@ -986,11 +1060,13 @@ A comprehensive, bilingual (Arabic/English) service voucher system for generatin
 - `TaxVoucher` — For service IDs 00300–00304 (Income Tax, VAT, Government Fees, Customs Duty, Tax Settlement) with type-specific calculation tables
 
 **Batch Generation:**
+
 - `GeniusPdfVoucherBatch` — Combine multiple vouchers into a single PDF document
 - `GeniusPdfVoucherBatchOptions` — Configure page breaks, batch summary page, batch title
 - Summary page with voucher list table and grand total
 
 **Example:**
+
 - `buildVoucherDemoReport()` — Demo function generating 5 different vouchers in one batch PDF
 - Service Vouchers card added to Examples Showcase screen
 
@@ -1005,6 +1081,7 @@ A comprehensive, bilingual (Arabic/English) service voucher system for generatin
 All chart components have been removed from the library. The charts functionality was causing system freezes and instability issues. Users who need chart functionality should use external charting libraries and render them to images before embedding in PDFs.
 
 **Removed Components:**
+
 - `GeniusPdfBarChart` — Bar chart component
 - `GeniusPdfLineChart` — Line chart component
 - `GeniusPdfPieChart` — Pie chart component
@@ -1014,28 +1091,33 @@ All chart components have been removed from the library. The charts functionalit
 - Chart type enums (`GeniusBarChartType`, `GeniusLineChartType`, `GeniusChartLegendPosition`, `GeniusChartLegendOrientation`)
 
 **Removed Builder Methods:**
+
 - `addBarChart()` — Removed from `GeniusPdfDocumentBuilder`
 - `addLineChart()` — Removed from `GeniusPdfDocumentBuilder`
 - `addPieChart()` — Removed from `GeniusPdfDocumentBuilder`
 - `addAreaChart()` — Removed from `GeniusPdfDocumentBuilder`
 
 **Removed Composer Methods:**
+
 - `barChart()` — Removed from `GeniusPdfReportComposer`
 - `lineChart()` — Removed from `GeniusPdfReportComposer`
 - `pieChart()` — Removed from `GeniusPdfReportComposer`
 - `areaChart()` — Removed from `GeniusPdfReportComposer`
 
 **Removed from Smart Layout Engine:**
+
 - `chart` element type removed from `GeniusLayoutElementType` enum
 
 **Migration Guide:**
 
 If you need charts in your PDFs, consider these alternatives:
+
 1. Use Flutter's `fl_chart` or `syncfusion_flutter_charts` to render charts as widgets
 2. Convert the chart widget to an image using `RepaintBoundary`
 3. Embed the image in your PDF using `addImage()` or `addImageFromBytes()`
 
 Example migration:
+
 ```dart
 // Before (removed)
 // builder.addBarChart(myChart, height: 200);

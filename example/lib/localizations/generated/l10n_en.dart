@@ -406,11 +406,11 @@ class PDFGeneratorLocalizationEn extends PDFGeneratorLocalization {
 
   @override
   String get trialBalanceHtmlExportDesc =>
-      'Build TrialBalanceTemplate from lib/templates/trial_balance_template.dart and export its generated PDF document to HTML using GeniusPdfExportService. Preview, copy, save, and open the exact HTML output.';
+      'Build TrialBalanceTemplate from lib/templates/trial_balance.dart and export its generated PDF document to HTML using GeniusPdfExportService. Preview, copy, save, and open the exact HTML output.';
 
   @override
   String get trialBalanceImageExportDesc =>
-      'Build TrialBalanceTemplate from lib/templates/trial_balance_template.dart, rasterize every generated PDF page, save it as PNG or JPEG, and preview the exact exported image bytes.';
+      'Build TrialBalanceTemplate from lib/templates/trial_balance.dart, rasterize every generated PDF page, save it as PNG or JPEG, and preview the exact exported image bytes.';
 
   @override
   String get builderLinks => 'Builder Links';

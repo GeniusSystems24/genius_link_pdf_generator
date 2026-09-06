@@ -838,6 +838,20 @@ final class ExampleNavigationCatalog {
                   Icons.inventory_2_outlined,
                   keywords: const ['inventory report', 'inventory', 'stock', 'valuation', 'warehouse', 'template'],
                 ),
+                _leaf(
+                  'template_single_account_pdf',
+                  'SingleAccountPdf',
+                  Icons.account_balance_wallet_outlined,
+                  code: 'ACC-PDF-01',
+                  keywords: const ['account', 'single account', 'pdf', 'debit', 'credit', 'activity', 'template'],
+                ),
+                _leaf(
+                  'template_multi_account_pdf',
+                  'MultiAccountPdf',
+                  Icons.account_tree_outlined,
+                  code: 'ACC-PDF-02',
+                  keywords: const ['accounts', 'multi account', 'pdf', 'grouping', 'totals', 'transactions', 'template'],
+                ),
               ],
             ),
             _group(
@@ -1640,6 +1654,20 @@ final class ExampleNavigationCatalog {
                   'png',
                   'jpeg',
                 ],
+              ),
+              _leaf(
+                'export_image_single_account',
+                'SingleAccountImage',
+                Icons.image_outlined,
+                code: 'ACC-IMG-01',
+                keywords: const <String>['export', 'image', 'single account', 'summary', 'png', 'jpeg'],
+              ),
+              _leaf(
+                'export_image_multi_account',
+                'MultiAccountImage',
+                Icons.collections_outlined,
+                code: 'ACC-IMG-02',
+                keywords: const <String>['export', 'image', 'multi account', 'summary', 'split', 'png', 'jpeg'],
               ),
               _leaf(
                 'export_image_quotation',
