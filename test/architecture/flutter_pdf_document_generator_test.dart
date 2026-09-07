@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:genius_link_pdf_generator/src/app/contracts/pdf_generation_ports.dart';
-import 'package:genius_link_pdf_generator/src/infra/generation/flutter_pdf_generator.dart';
+import 'package:genius_link_pdf_generator/src/application/contracts/pdf_generation_ports.dart';
+import 'package:genius_link_pdf_generator/src/infrastructure/generation/flutter_pdf_generator.dart';
 
 void main() {
   test('uses builder-owned background strategy when available', () async {

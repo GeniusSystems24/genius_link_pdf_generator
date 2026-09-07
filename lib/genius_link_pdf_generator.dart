@@ -93,44 +93,44 @@ export 'src/domain/financial/financial.dart';
 export 'src/domain/erp/erp.dart';
 
 // Domain models
-export 'src/models/pdf_image.dart';
-export 'src/models/pdf_result.dart';
+export 'src/domain/models/pdf_image.dart';
+export 'src/core/compatibility/models/pdf_result.dart';
 export 'src/domain/models/pdf_operations.dart';
 export 'src/domain/models/pdf_delivery.dart';
 
 // Composition and application contracts (optional advanced injection)
-export 'src/compose/pdf_composition_root.dart';
-export 'src/app/contracts/pdf_generation_ports.dart';
-export 'src/app/contracts/pdf_document_processor.dart';
+export 'src/infrastructure/composition/pdf_composition_root.dart';
+export 'src/application/contracts/pdf_generation_ports.dart';
+export 'src/application/contracts/pdf_document_processor.dart';
 
 // Builders
-export 'src/builders/pdf_document_builder.dart';
+export 'src/presentation/document/builders/pdf_document_builder.dart';
 
 // Stable package-owned facade
-export 'src/public/genius_pdf_client.dart';
+export 'src/presentation/facades/genius_pdf_client.dart';
 
 // Services
-export 'src/services/pdf_service.dart';
-export 'src/services/pdf_generation_manager.dart';
-export 'src/services/pdf_security_service.dart';
+export 'src/application/generation/pdf_service.dart';
+export 'src/application/generation/pdf_generation_manager.dart';
+export 'src/application/document_operations/pdf_security_service.dart';
 
 // Export
-export 'src/services/export/export.dart';
+export 'src/application/export/export.dart';
 
 // MVC presentation
-export 'src/ui/views/pdf_preview.dart';
-export 'src/ui/controllers/genius_pdf_controller.dart';
-export 'src/ui/controllers/genius_pdf_preview_controller.dart';
+export 'src/presentation/views/pdf_preview.dart';
+export 'src/presentation/controllers/genius_pdf_controller.dart';
+export 'src/presentation/controllers/genius_pdf_preview_controller.dart';
 
 // Extensions
-export 'src/extensions/color_extensions.dart';
-export 'src/extensions/datetime_extensions.dart';
+export 'src/core/extensions/color_extensions.dart';
+export 'src/core/extensions/datetime_extensions.dart';
 
 // Components
-export 'src/components/components.dart';
+export 'src/presentation/document/components/components.dart';
 
 // ERP document families (S08)
-export 'src/families/erp/erp_families.dart';
+export 'src/presentation/document/families/erp/erp_families.dart';
 
 // Templates
 export 'templates/templates.dart';
@@ -142,16 +142,16 @@ export 'templates/engine/engine.dart';
 export 'src/core/v2/v2.dart';
 
 // AI Features (v2.1.0)
-export 'src/ai/ai.dart';
+export 'src/infrastructure/ai/ai.dart';
 
 // Printing (v2.2.0)
-export 'src/printing/printing.dart';
+export 'src/infrastructure/printing/printing.dart';
 
 // Sharing (v2.3.0)
-export 'src/sharing/sharing.dart';
-export 'src/packs/packs.dart';
-export 'src/engine_vnext/template_engine_vnext.dart';
-export 'src/compliance/compliance.dart';
-export 'src/quality/quality.dart';
-export 'src/designer/template_designer.dart';
-export 'src/industries/industry_pack_api.dart';
+export 'src/infrastructure/sharing/sharing.dart';
+export 'src/presentation/document/packs/packs.dart';
+export 'src/application/templates/engine_vnext/template_engine_vnext.dart';
+export 'src/application/compliance/compliance.dart';
+export 'src/infrastructure/quality/quality.dart';
+export 'src/presentation/designer/template_designer.dart';
+export 'src/application/industries/industry_pack_api.dart';

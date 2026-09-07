@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import '../../src/components/components.dart';
+import '../../src/presentation/document/components/components.dart';
 
 /// Controls whether PDF account activity is summarized or transaction-level.
 enum AccountExportActivityMode {

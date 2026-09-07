@@ -3,16 +3,16 @@ import 'dart:typed_data';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../src/components/components.dart';
+import '../src/presentation/document/components/components.dart';
 import '../src/core/directionality.dart';
 import '../src/core/pdf_config.dart';
 import '../src/domain/erp/erp.dart';
 import '../src/domain/financial/financial.dart';
-import '../src/families/erp/erp_families.dart';
-import '../src/models/pdf_result.dart';
+import '../src/presentation/document/families/erp/erp_families.dart';
+import '../src/core/compatibility/models/pdf_result.dart';
 import 'erp_legacy_shared.dart';
 
-import '../src/packs/sales/documents.dart';
+import '../src/presentation/document/packs/sales/documents.dart';
 /// Quotation item model.
 ///
 /// Kept for source compatibility. S09 adapts this model into [ErpLineItem]

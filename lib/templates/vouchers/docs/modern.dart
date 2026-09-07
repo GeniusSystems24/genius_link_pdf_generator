@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' as m;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../../src/components/components.dart';
+import '../../../src/presentation/document/components/components.dart';
 import '../models/amount_to_words.dart';
 import '../models/models.dart';
 import '../models/style.dart';

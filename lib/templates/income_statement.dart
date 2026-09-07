@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridRow, PdfTextStyle, PdfGridColumn, PdfGridStyle;
 
-import '../src/components/components.dart';
+import '../src/presentation/document/components/components.dart';
 import '../src/core/pdf_config.dart';
 
-import '../src/families/erp/erp_families.dart';
+import '../src/presentation/document/families/erp/erp_families.dart';
 /// Income statement line item.
 class IncomeStatementItem {
   const IncomeStatementItem({

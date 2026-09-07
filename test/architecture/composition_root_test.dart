@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:genius_link_pdf_generator/src/app/application.dart';
-import 'package:genius_link_pdf_generator/src/compose/pdf_composition_root.dart';
+import 'package:genius_link_pdf_generator/src/application/application.dart';
+import 'package:genius_link_pdf_generator/src/infrastructure/composition/pdf_composition_root.dart';
 import 'package:genius_link_pdf_generator/src/domain/domain.dart';
 
 void main() {

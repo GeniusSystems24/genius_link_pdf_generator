@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../src/core/pdf_config.dart';
-import '../src/models/pdf_image.dart';
-import '../src/builders/pdf_document_builder.dart';
-import '../src/extensions/datetime_extensions.dart';
+import '../src/domain/models/pdf_image.dart';
+import '../src/presentation/document/builders/pdf_document_builder.dart';
+import '../src/core/extensions/datetime_extensions.dart';
 
 /// Example invoice document builder.
 ///

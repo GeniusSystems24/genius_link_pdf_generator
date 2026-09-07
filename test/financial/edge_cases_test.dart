@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genius_link_pdf_generator/src/domain/financial/financial.dart';
-import 'package:genius_link_pdf_generator/src/models/pdf_result.dart';
+import 'package:genius_link_pdf_generator/src/core/compatibility/models/pdf_result.dart';
 
 void main() {
   final policy = GeniusRoundingPolicy.defaults();

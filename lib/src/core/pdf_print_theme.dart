@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
 
-import '../components/models/pdf_styles.dart';
+import '../presentation/document/components/models/pdf_styles.dart';
 
 part 'print_theme/theme.dart';
 part 'print_theme/color_scheme.dart';

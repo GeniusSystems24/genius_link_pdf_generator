@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.1] - 2026-09-07
+
+### Refactored
+
+- Restructured `lib/src` into clear Clean Architecture layers: `core`, `domain`,
+  `application`, `infrastructure`, and `presentation`.
+- Consolidated overlapping legacy architecture folders, including `app` into
+  `application`, `infra` into `infrastructure`, and `ui` into `presentation`.
+- Reorganized generation, document operations, export, jobs, delivery,
+  printing, and sharing code according to responsibility and dependency
+  direction.
+- Moved document builders, reusable components, families, packs, and other
+  rendering concerns into the presentation layer where appropriate.
+- Simplified printing infrastructure by organizing adapters and implementation
+  code under the canonical infrastructure layer.
+
+### Changed
+
+- Updated internal Dart `import`, `export`, and `part` paths to match the new
+  architecture.
+- Updated documented `lib/src/...` references to use the canonical paths.
+- Removed obsolete empty directories left by the previous internal structure.
+
+### Compatibility
+
+- Preserved existing public class names, APIs, package usage patterns, and
+  runtime behavior while changing the internal source layout.
+- The restructuring is internal and is not intended to introduce consumer-facing
+  breaking changes.
+
 ## [4.2.0] - 2026-09-06
 
 ### Added

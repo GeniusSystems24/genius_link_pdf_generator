@@ -2,8 +2,8 @@
 import 'dart:ui';
 
 
-import '../src/builders/pdf_document_builder.dart';
-import '../src/components/components.dart';
+import '../src/presentation/document/builders/pdf_document_builder.dart';
+import '../src/presentation/document/components/components.dart';
 import '../src/core/directionality.dart';
 
 /// One signature definition for shared legacy-template family layout.

@@ -6,7 +6,7 @@ library;
 
 import 'dart:ui';
 
-import '../../src/components/components.dart';
+import '../../src/presentation/document/components/components.dart';
 
 /// Metadata displayed by transaction-transfer export documents.
 class TransactionTransferDocumentMeta {

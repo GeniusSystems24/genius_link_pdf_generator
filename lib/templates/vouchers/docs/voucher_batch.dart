@@ -9,10 +9,10 @@ import 'dart:ui';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../../src/builders/pdf_document_builder.dart';
-import '../../../src/components/components.dart';
+import '../../../src/presentation/document/builders/pdf_document_builder.dart';
+import '../../../src/presentation/document/components/components.dart';
 import '../../../src/core/pdf_config.dart';
-import '../../../src/extensions/color_extensions.dart';
+import '../../../src/core/extensions/color_extensions.dart';
 import '../models/style.dart';
 import 'voucher_base.dart';
 

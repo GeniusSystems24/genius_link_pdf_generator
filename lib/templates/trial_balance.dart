@@ -4,11 +4,11 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import 'package:intl/intl.dart';
 
-import '../src/components/components.dart';
+import '../src/presentation/document/components/components.dart';
 import '../src/core/pdf_config.dart';
 
 import 'erp_shared_layout.dart';
-import '../src/families/erp/erp_families.dart';
+import '../src/presentation/document/families/erp/erp_families.dart';
 /// Account entry for trial balance.
 class TrialBalanceEntry {
   const TrialBalanceEntry({

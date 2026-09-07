@@ -4,13 +4,13 @@ import 'dart:ui';
 import 'package:syncfusion_flutter_pdf/pdf.dart'
     hide PdfGridColumn, PdfGridRow, PdfGridStyle, PdfTextStyle;
 
-import '../src/components/components.dart';
+import '../src/presentation/document/components/components.dart';
 import '../src/domain/financial/financial.dart';
 import '../src/core/pdf_config.dart';
-import '../src/models/pdf_result.dart';
+import '../src/core/compatibility/models/pdf_result.dart';
 
 import 'erp_shared_layout.dart';
-import '../src/families/erp/erp_families.dart';
+import '../src/presentation/document/families/erp/erp_families.dart';
 /// Employee information for payslip.
 class PayslipEmployee {
   const PayslipEmployee({

@@ -1,5 +1,5 @@
 
-import '../../src/families/erp/erp_families.dart';
+import '../../src/presentation/document/families/erp/erp_families.dart';
 import 'registry.dart';
 
 /// S10 bridge between the generic template engine registry and ERP families.

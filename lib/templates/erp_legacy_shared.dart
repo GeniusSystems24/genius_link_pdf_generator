@@ -1,5 +1,5 @@
 
-import '../src/components/components.dart';
+import '../src/presentation/document/components/components.dart';
 import '../src/domain/erp/erp.dart';
 
 /// Shared compatibility helpers for S09 legacy template adapters.

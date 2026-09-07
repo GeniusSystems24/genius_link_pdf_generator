@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'directionality.dart';
 import 'pdf_print_theme.dart';
-import '../components/models/pdf_styles.dart';
+import '../presentation/document/components/models/pdf_styles.dart';
 
 /// Semantic colors are independent from RTL/LTR.
 class GeniusPdfSemanticColors {

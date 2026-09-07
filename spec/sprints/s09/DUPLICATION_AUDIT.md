@@ -42,4 +42,4 @@ After S09:
 
 The family implementation intentionally owns the shared rendering construction
 once; therefore some complexity moved from the three templates into
-`lib/src/families/erp/family_document.dart` instead of being deleted.
+`lib/src/presentation/document/families/erp/family_document.dart` instead of being deleted.

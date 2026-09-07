@@ -10,17 +10,17 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart' as m;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../../src/components/components.dart';
+import '../../../src/presentation/document/components/components.dart';
 import '../../../src/domain/financial/financial.dart';
 import '../../../src/core/pdf_config.dart';
-import '../../../src/extensions/color_extensions.dart';
-import '../../../src/models/pdf_result.dart';
+import '../../../src/core/extensions/color_extensions.dart';
+import '../../../src/core/compatibility/models/pdf_result.dart';
 import '../models/amount_to_words.dart';
 import '../models/enums.dart';
 import '../models/models.dart';
 import '../models/style.dart';
 
-import '../../../src/families/erp/erp_families.dart';
+import '../../../src/presentation/document/families/erp/erp_families.dart';
 /// Abstract base class for all voucher templates.
 ///
 /// Subclasses must override [buildVoucherContent] to render the

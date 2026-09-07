@@ -1,17 +1,17 @@
 
 import 'dart:typed_data';
 
-import '../src/components/components.dart';
+import '../src/presentation/document/components/components.dart';
 import '../src/core/directionality.dart';
 import '../src/core/pdf_config.dart';
 import '../src/domain/erp/erp.dart';
 import '../src/domain/financial/financial.dart';
-import '../src/families/erp/erp_families.dart';
-import '../src/models/pdf_image.dart';
-import '../src/models/pdf_result.dart';
+import '../src/presentation/document/families/erp/erp_families.dart';
+import '../src/domain/models/pdf_image.dart';
+import '../src/core/compatibility/models/pdf_result.dart';
 import 'erp_legacy_shared.dart';
 
-import '../src/packs/sales/documents.dart';
+import '../src/presentation/document/packs/sales/documents.dart';
 /// Invoice line item data.
 class InvoiceLineItem {
   const InvoiceLineItem({

@@ -6,7 +6,7 @@ Version: **4.0.0**
 S08 introduces a generic structural layer under:
 
 ```text
-lib/src/families/erp
+lib/src/presentation/document/families/erp
 ```
 
 The families consume S06 `ErpDocumentContext` / `ErpCalculationResult` and S07
