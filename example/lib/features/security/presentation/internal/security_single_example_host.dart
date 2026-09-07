@@ -1,9 +1,12 @@
+// Global manager/background migration for Security examples
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
+import 'package:genius_pdf_example/features/security/models/documents/security_background_generation.dart';
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/feature_example_page.dart';
 
@@ -52,6 +55,7 @@ class _SecuritySingleExampleHostState
   bool _isOpening = false;
   Uint8List? _previewData;
   String? _previewFileName;
+  String? _previewFilePath;
 
   String get _title => switch (widget.example) {
       SecurityExampleKind.confidentialWatermark => 'Confidential Watermark',
@@ -129,56 +133,43 @@ class _SecuritySingleExampleHostState
     if (_isGenerating || _isOpening) return;
 
     setState(() {
+      _isGenerating = true;
       _previewData = null;
       _previewFileName = null;
+      _previewFilePath = null;
     });
 
-    switch (widget.example) {
-      case SecurityExampleKind.confidentialWatermark:
-        await _generateConfidentialWatermarkPdf();
-        break;
-      case SecurityExampleKind.draftWatermark:
-        await _generateDraftWatermarkPdf();
-        break;
-      case SecurityExampleKind.copyWatermark:
-        await _generateCopyWatermarkPdf();
-        break;
-      case SecurityExampleKind.tiledWatermark:
-        await _generateTiledWatermarkPdf();
-        break;
-      case SecurityExampleKind.customWatermark:
-        await _generateCustomWatermarkPdf();
-        break;
-      case SecurityExampleKind.passwordProtection:
-        await _generatePasswordProtectedPdf();
-        break;
-      case SecurityExampleKind.readOnlyProtection:
-        await _generateReadOnlyPdf();
-        break;
-      case SecurityExampleKind.printOnlyProtection:
-        await _generatePrintOnlyPdf();
-        break;
-      case SecurityExampleKind.fullProtection:
-        await _generateFullProtectionPdf();
-        break;
-      case SecurityExampleKind.aes256Encryption:
-        await _generateAes256EncryptedPdf();
-        break;
-      case SecurityExampleKind.visualSignature:
-        await _generateVisualSignaturePdf();
-        break;
-      case SecurityExampleKind.detailedSignature:
-        await _generateDetailedSignaturePdf();
-        break;
-      case SecurityExampleKind.multipleSignatures:
-        await _generateMultipleSignaturesPdf();
-        break;
-      case SecurityExampleKind.customPositionSignature:
-        await _generateCustomPositionSignaturePdf();
-        break;
-      case SecurityExampleKind.comprehensiveSecurity:
-        await _generateComprehensiveDemo();
-        break;
+    try {
+      final fileName = 'security_${widget.example.name}';
+      final success = await generateExamplePdf(
+        builder: ExampleBackgroundPdfBuilder(
+          config: geniusPdfConfig,
+          backgroundGenerator: () => generateSecurityExampleInBackground(
+            exampleName: widget.example.name,
+            config: geniusPdfConfig,
+          ),
+        ),
+        fileName: fileName,
+        metadata: <String, dynamic>{
+          'feature': 'security',
+          'screen': 'SecuritySingleExampleHost',
+          'example': widget.example.name,
+          'category': _category,
+          'workflow': 'security-preview',
+          'showGenerationToast': true,
+        },
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _previewData = success.bytes;
+        _previewFileName = '$fileName.pdf';
+        _previewFilePath = success.filePath;
+      });
+    } catch (error) {
+      _showError(error.toString());
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
     }
   }
 
@@ -207,693 +198,6 @@ class _SecuritySingleExampleHostState
       codeHeight: 600,
     );
   }
-
-  Future<void> _generateConfidentialWatermarkPdf() async {
-      const type = 'confidential';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Watermark Demo - ${type.toUpperCase()}');
-
-              document.addWatermark(GeniusPdfWatermark.confidential(
-                    config: geniusPdfConfig,
-                  ));
-
-        await _capturePdfPreview(document, 'watermark_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateDraftWatermarkPdf() async {
-      const type = 'draft';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Watermark Demo - ${type.toUpperCase()}');
-
-              document.addWatermark(GeniusPdfWatermark.draft(
-                    config: geniusPdfConfig,
-                  ));
-
-        await _capturePdfPreview(document, 'watermark_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateCopyWatermarkPdf() async {
-      const type = 'copy';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Watermark Demo - ${type.toUpperCase()}');
-
-              document.addWatermark(GeniusPdfWatermark.copy(
-                    config: geniusPdfConfig,
-                  ));
-
-        await _capturePdfPreview(document, 'watermark_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateTiledWatermarkPdf() async {
-      const type = 'tiled';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Watermark Demo - ${type.toUpperCase()}');
-
-              GeniusPdfWatermark.tiled(
-                    config: geniusPdfConfig,
-                    GeniusTiledWatermarkSettings(
-                      text: 'SAMPLE',
-                      fontSize: 20,
-                      color: const Color(0xFF808080),
-                      opacity: 0.1,
-                      horizontalSpacing: 100,
-                      verticalSpacing: 80,
-                    ),
-                  ).applyToDocument(document);
-
-        await _capturePdfPreview(document, 'watermark_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateCustomWatermarkPdf() async {
-      const type = 'custom';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Watermark Demo - ${type.toUpperCase()}');
-
-              GeniusPdfWatermark.text(
-                    config: geniusPdfConfig,
-                    GeniusTextWatermarkSettings(
-                      text: 'GENIUS LINK',
-                      fontSize: 50,
-                      color: const Color(0xFF2196F3),
-                      opacity: 0.15,
-                      rotation: -30,
-                      isBold: true,
-                    ),
-                  ).applyToDocument(document);
-
-        await _capturePdfPreview(document, 'watermark_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generatePasswordProtectedPdf() async {
-      const type = 'password';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Encrypted Document - ${type.toUpperCase()}');
-
-        final infoFont = geniusPdfConfig.baseFont;
-        String encryptionInfo = '';
-
-              document.protectWithPassword(password: 'demo123');
-                  encryptionInfo =
-                      'Password: demo123\nEncryption: AES-256\nPermissions: All';
-
-        graphics.drawRectangle(
-          brush: PdfSolidBrush(PdfColor(255, 255, 200)),
-          pen: PdfPen(PdfColor(200, 200, 0)),
-          bounds: Rect.fromLTWH(50, 200, pageSize.width - 100, 100),
-        );
-        graphics.drawString(
-          'Encryption Details:\n$encryptionInfo',
-          infoFont,
-          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-          bounds: Rect.fromLTWH(60, 210, pageSize.width - 120, 80),
-          format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
-        );
-
-        await _capturePdfPreview(document, 'encrypted_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateReadOnlyPdf() async {
-      const type = 'readonly';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Encrypted Document - ${type.toUpperCase()}');
-
-        final infoFont = geniusPdfConfig.baseFont;
-        String encryptionInfo = '';
-
-              GeniusPdfSecurityService.applySecurity(
-                    document,
-                    GeniusPdfSecuritySettings.readOnly(ownerPassword: 'admin123'),
-                  );
-                  encryptionInfo =
-                      'Owner Password: admin123\nPermissions: Read & Print Only';
-
-        graphics.drawRectangle(
-          brush: PdfSolidBrush(PdfColor(255, 255, 200)),
-          pen: PdfPen(PdfColor(200, 200, 0)),
-          bounds: Rect.fromLTWH(50, 200, pageSize.width - 100, 100),
-        );
-        graphics.drawString(
-          'Encryption Details:\n$encryptionInfo',
-          infoFont,
-          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-          bounds: Rect.fromLTWH(60, 210, pageSize.width - 120, 80),
-          format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
-        );
-
-        await _capturePdfPreview(document, 'encrypted_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generatePrintOnlyPdf() async {
-      const type = 'printonly';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Encrypted Document - ${type.toUpperCase()}');
-
-        final infoFont = geniusPdfConfig.baseFont;
-        String encryptionInfo = '';
-
-              GeniusPdfSecurityService.applySecurity(
-                    document,
-                    GeniusPdfSecuritySettings.printOnly(ownerPassword: 'admin123'),
-                  );
-                  encryptionInfo = 'Owner Password: admin123\nPermissions: Print Only';
-
-        graphics.drawRectangle(
-          brush: PdfSolidBrush(PdfColor(255, 255, 200)),
-          pen: PdfPen(PdfColor(200, 200, 0)),
-          bounds: Rect.fromLTWH(50, 200, pageSize.width - 100, 100),
-        );
-        graphics.drawString(
-          'Encryption Details:\n$encryptionInfo',
-          infoFont,
-          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-          bounds: Rect.fromLTWH(60, 210, pageSize.width - 120, 80),
-          format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
-        );
-
-        await _capturePdfPreview(document, 'encrypted_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateFullProtectionPdf() async {
-      const type = 'full';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Encrypted Document - ${type.toUpperCase()}');
-
-        final infoFont = geniusPdfConfig.baseFont;
-        String encryptionInfo = '';
-
-              GeniusPdfSecurityService.applySecurity(
-                    document,
-                    GeniusPdfSecuritySettings.fullProtection(
-                      userPassword: 'user123',
-                      ownerPassword: 'admin123',
-                    ),
-                  );
-                  encryptionInfo =
-                      'User Password: user123\nOwner Password: admin123\nPermissions: None';
-
-        graphics.drawRectangle(
-          brush: PdfSolidBrush(PdfColor(255, 255, 200)),
-          pen: PdfPen(PdfColor(200, 200, 0)),
-          bounds: Rect.fromLTWH(50, 200, pageSize.width - 100, 100),
-        );
-        graphics.drawString(
-          'Encryption Details:\n$encryptionInfo',
-          infoFont,
-          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-          bounds: Rect.fromLTWH(60, 210, pageSize.width - 120, 80),
-          format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
-        );
-
-        await _capturePdfPreview(document, 'encrypted_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateAes256EncryptedPdf() async {
-      const type = 'aes256';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Encrypted Document - ${type.toUpperCase()}');
-
-        final infoFont = geniusPdfConfig.baseFont;
-        String encryptionInfo = '';
-
-              GeniusPdfSecurityService.applySecurity(
-                    document,
-                    GeniusPdfSecuritySettings(
-                      userPassword: 'secure123',
-                      ownerPassword: 'admin123',
-                      encryptionLevel: GeniusPdfEncryptionLevel.aes256,
-                      permissions: GeniusPdfPermissions.readOnly(),
-                      encryptMetadata: true,
-                    ),
-                  );
-                  encryptionInfo =
-                      'User Password: secure123\nOwner Password: admin123\nEncryption: AES-256 Bit';
-
-        graphics.drawRectangle(
-          brush: PdfSolidBrush(PdfColor(255, 255, 200)),
-          pen: PdfPen(PdfColor(200, 200, 0)),
-          bounds: Rect.fromLTWH(50, 200, pageSize.width - 100, 100),
-        );
-        graphics.drawString(
-          'Encryption Details:\n$encryptionInfo',
-          infoFont,
-          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-          bounds: Rect.fromLTWH(60, 210, pageSize.width - 120, 80),
-          format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
-        );
-
-        await _capturePdfPreview(document, 'encrypted_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateVisualSignaturePdf() async {
-      const type = 'visual';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Signed Document - ${type.toUpperCase()}');
-
-              final signature = GeniusPdfDigitalSignature(
-                    config: geniusPdfConfig,
-                    settings: GeniusDigitalSignatureSettings(
-                      signerName: 'John Doe',
-                      pageNumber: 0,
-                    ),
-                  );
-                  signature.drawOnPage(page);
-
-        await _capturePdfPreview(document, 'signed_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateDetailedSignaturePdf() async {
-      const type = 'detailed';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Signed Document - ${type.toUpperCase()}');
-
-              final signature = GeniusPdfDigitalSignature(
-                    config: geniusPdfConfig,
-                    settings: GeniusDigitalSignatureSettings(
-                      signerName: 'Jane Smith',
-                      reason: 'Document Review and Approval',
-                      location: 'Riyadh, Saudi Arabia',
-                      contactInfo: 'jane.smith@company.com',
-                      appearance: const GeniusSignatureAppearance(
-                        showName: true,
-                        showDate: true,
-                        showReason: true,
-                        showLocation: true,
-                      ),
-                      pageNumber: 0,
-                    ),
-                  );
-                  signature.drawOnPage(page);
-
-        await _capturePdfPreview(document, 'signed_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateMultipleSignaturesPdf() async {
-      const type = 'multiple';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Signed Document - ${type.toUpperCase()}');
-
-              final sig1 = GeniusPdfDigitalSignature(
-                    config: geniusPdfConfig,
-                    settings: GeniusDigitalSignatureSettings(
-                      signerName: 'Reviewer 1',
-                      reason: 'Technical Review',
-                      bounds: Rect.fromLTWH(50, pageSize.height - 130, 180, 90),
-                      pageNumber: 0,
-                    ),
-                  );
-                  sig1.drawOnPage(
-                      page, Rect.fromLTWH(50, pageSize.height - 130, 180, 90));
-
-                  final sig2 = GeniusPdfDigitalSignature(
-                    config: geniusPdfConfig,
-                    settings: GeniusDigitalSignatureSettings(
-                      signerName: 'Reviewer 2',
-                      reason: 'Management Approval',
-                      bounds: Rect.fromLTWH(
-                          pageSize.width - 230, pageSize.height - 130, 180, 90),
-                      pageNumber: 0,
-                    ),
-                  );
-                  sig2.drawOnPage(
-                      page,
-                      Rect.fromLTWH(
-                          pageSize.width - 230, pageSize.height - 130, 180, 90));
-
-        await _capturePdfPreview(document, 'signed_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateCustomPositionSignaturePdf() async {
-      const type = 'custom';
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-        final page = document.pages.add();
-        final graphics = page.graphics;
-        final pageSize = page.getClientSize();
-
-        _addSampleContent(
-            graphics, pageSize, 'Signed Document - ${type.toUpperCase()}');
-
-              final signature = GeniusPdfDigitalSignature(
-                    config: geniusPdfConfig,
-                    settings: GeniusDigitalSignatureSettings(
-                      signerName: 'CEO Signature',
-                      reason: 'Final Approval',
-                      location: 'Head Office',
-                      appearance: GeniusSignatureAppearance(
-                        showName: true,
-                        showDate: true,
-                        showReason: true,
-                        showLocation: true,
-                        backgroundColor: const Color(0xFFE8F5E9),
-                        borderColor: const Color(0xFF4CAF50),
-                        textColor: const Color(0xFF1B5E20),
-                      ),
-                      bounds: Rect.fromLTWH(pageSize.width / 2 - 100, 300, 200, 100),
-                      pageNumber: 0,
-                    ),
-                  );
-                  signature.drawOnPage(
-                      page, Rect.fromLTWH(pageSize.width / 2 - 100, 300, 200, 100));
-
-        await _capturePdfPreview(document, 'signed_$type');
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  Future<void> _generateComprehensiveDemo() async {
-      setState(() => _isGenerating = true);
-
-      try {
-        final document = PdfDocument();
-
-        final page1 = document.pages.add();
-        _addSampleContent(
-            page1.graphics, page1.getClientSize(), 'Page 1: Watermark Demo');
-
-        final page2 = document.pages.add();
-        _addSampleContent(
-            page2.graphics, page2.getClientSize(), 'Page 2: Tiled Watermark');
-
-        final page3 = document.pages.add();
-
-        GeniusPdfWatermark.text(
-          config: geniusPdfConfig,
-          GeniusTextWatermarkSettings.confidential(opacity: 0.15),
-        ).applyToPage(page1);
-
-        GeniusPdfWatermark.tiled(
-          config: geniusPdfConfig,
-          GeniusTiledWatermarkSettings(
-            text: 'SAMPLE',
-            fontSize: 18,
-            opacity: 0.08,
-          ),
-        ).applyToPage(page2);
-
-        final signature = GeniusPdfDigitalSignature(
-          config: geniusPdfConfig,
-          settings: GeniusDigitalSignatureSettings(
-            signerName: 'Document Admin',
-            reason: 'Comprehensive Demo',
-            location: 'Demo Location',
-            appearance: const GeniusSignatureAppearance(
-              showName: true,
-              showDate: true,
-              showReason: true,
-              showLocation: true,
-            ),
-            pageNumber: 2,
-          ),
-        );
-        signature.drawOnPage(page3);
-
-        document.protectWithPassword(
-          password: 'demo123',
-          permissions: GeniusPdfPermissions.printOnly(),
-        );
-
-        await _capturePdfPreview(document, 'comprehensive_security_demo');
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                   Text(pdfLocalization.comprehensiveDemoGeneratedPasswordDemo),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              behavior: SnackBarBehavior.floating,
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          );
-        }
-      } catch (e) {
-        _showError(e.toString());
-      } finally {
-        setState(() => _isGenerating = false);
-      }
-    }
-
-  void _addSampleContent(PdfGraphics graphics, Size pageSize, String title) {
-      graphics.drawString(
-        title,
-        geniusPdfConfig.baseFont,
-        brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-        bounds: Rect.fromLTWH(50, 50, pageSize.width - 100, 40),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: geniusPdfConfig.pdfTextDirection,
-        ),
-      );
-
-      const sampleText = '''
-  This is a sample document demonstrating the security features of the Genius Link PDF Generator library.
-
-  The library provides comprehensive security features including:
-  • Text, diagonal, and tiled watermarks
-  • Password protection with AES-256 encryption
-  • Granular permission controls
-  • Digital signatures with customizable appearance
-
-  This document was generated to showcase these features in action.
-  ''';
-
-      graphics.drawString(
-        sampleText,
-        geniusPdfConfig.boldFont,
-        brush: PdfSolidBrush(PdfColor(50, 50, 50)),
-        bounds: Rect.fromLTWH(50, 120, pageSize.width - 100, 200),
-        format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
-      );
-
-      _drawSampleTable(
-          graphics, Rect.fromLTWH(50, 350, pageSize.width - 100, 150));
-    }
-
-  void _drawSampleTable(PdfGraphics graphics, Rect bounds) {
-      const columns = ['Feature', 'Status', 'Description'];
-      final rows = [
-        ['Watermarks', 'Active', 'Text & pattern watermarks'],
-        ['Encryption', 'AES-256', 'High-grade encryption'],
-        ['Permissions', 'Configured', 'Custom access control'],
-        ['Signatures', 'Supported', 'Digital signing'],
-      ];
-
-      final cellWidth = bounds.width / 3;
-      const cellHeight = 25.0;
-
-      graphics.drawRectangle(
-        brush: PdfSolidBrush(PdfColor(41, 128, 185)),
-        bounds: Rect.fromLTWH(bounds.left, bounds.top, bounds.width, cellHeight),
-      );
-
-      for (int i = 0; i < columns.length; i++) {
-        graphics.drawString(
-          columns[i],
-          geniusPdfConfig.boldFont,
-          brush: PdfSolidBrush(PdfColor(255, 255, 255)),
-          bounds: Rect.fromLTWH(bounds.left + i * cellWidth + 5, bounds.top + 5,
-              cellWidth - 10, cellHeight - 10),
-          format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
-        );
-      }
-
-      for (int r = 0; r < rows.length; r++) {
-        final y = bounds.top + cellHeight * (r + 1);
-        final bgColor =
-            r % 2 == 0 ? PdfColor(248, 249, 250) : PdfColor(255, 255, 255);
-
-        graphics.drawRectangle(
-          brush: PdfSolidBrush(bgColor),
-          pen: PdfPen(PdfColor(220, 220, 220)),
-          bounds: Rect.fromLTWH(bounds.left, y, bounds.width, cellHeight),
-        );
-
-        for (int c = 0; c < rows[r].length; c++) {
-          graphics.drawString(
-            rows[r][c],
-            geniusPdfConfig.baseFont,
-            brush: PdfSolidBrush(PdfColor(50, 50, 50)),
-            bounds: Rect.fromLTWH(bounds.left + c * cellWidth + 5, y + 5,
-                cellWidth - 10, cellHeight - 10),
-            format: PdfStringFormat(textDirection: geniusPdfConfig.pdfTextDirection),
-          );
-        }
-      }
-    }
 
   Widget _buildPreviewContent(BuildContext context) {
     final data = _previewData;
@@ -978,10 +282,15 @@ class _SecuritySingleExampleHostState
 
     setState(() => _isOpening = true);
     try {
-      await demoDocuments.saveAndOpen(
-        bytes: data,
-        fileName: fileName,
-      );
+      final filePath = _previewFilePath;
+      if (filePath != null && filePath.isNotEmpty) {
+        await demoDocuments.open(filePath);
+      } else {
+        await demoDocuments.saveAndOpen(
+          bytes: data,
+          fileName: fileName,
+        );
+      }
     } catch (error) {
       _showError(error.toString());
     } finally {
@@ -989,24 +298,6 @@ class _SecuritySingleExampleHostState
         setState(() => _isOpening = false);
       }
     }
-  }
-
-  Future<void> _capturePdfPreview(
-    PdfDocument document,
-    String fileName,
-  ) async {
-    late final Uint8List bytes;
-    try {
-      bytes = Uint8List.fromList(await document.save());
-    } finally {
-      document.dispose();
-    }
-
-    if (!mounted) return;
-    setState(() {
-      _previewData = bytes;
-      _previewFileName = fileName;
-    });
   }
 
   void _showError(String message) {

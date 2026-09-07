@@ -104,6 +104,12 @@ TransactionTransferDocumentMeta _transactionTransferDemoMeta({
 /// Builds the example for [MultiTransactionTransferPdf].
 MultiTransactionTransferPdf buildMultiTransactionTransferPdfDemo({
   required bool isRtl,
+  TransactionTransferTemplateCustomization customization =
+      const TransactionTransferTemplateCustomization(),
+  bool includeCommission = true,
+  bool showTotals = true,
+  bool showQRCode = true,
+  bool showNotes = true,
 }) {
   return MultiTransactionTransferPdf(
     config: _transactionTransferDemoConfig(isRtl: isRtl),
@@ -116,15 +122,18 @@ MultiTransactionTransferPdf buildMultiTransactionTransferPdfDemo({
     rows: transactionTransferDemoRows,
     services: transactionTransferDemoServices,
     accountDirectory: transactionTransferDemoAccountDirectory,
+    customization: customization,
     configuration: TransactionTransferReportConfiguration(
       periodStart: DateTime(2026, 8, 28),
       periodEnd: DateTime(2026, 9, 1),
       selectedCurrency: 'YER',
-      includeCommission: true,
-      showTotals: true,
+      includeCommission: includeCommission,
+      showTotals: showTotals,
     ),
     reportId: 'TRF-REG-20260906-001',
     qrCodeUrl: 'https://example.com/reports/TRF-REG-20260906-001',
+    showQRCode: showQRCode,
+    showNotes: showNotes,
     notes:
         'Each grid row represents one accounting leg and names one affected account. The transaction reference remains serviceId + transactionId.',
     notesAr:
@@ -135,7 +144,16 @@ MultiTransactionTransferPdf buildMultiTransactionTransferPdfDemo({
 /// Builds the account-scoped example for
 /// [MultiTransactionTransferForAccountPdf].
 MultiTransactionTransferForAccountPdf
-buildMultiTransactionTransferForAccountPdfDemo({required bool isRtl}) {
+buildMultiTransactionTransferForAccountPdfDemo({
+  required bool isRtl,
+  TransactionTransferTemplateCustomization customization =
+      const TransactionTransferTemplateCustomization(),
+  bool includeCommission = true,
+  bool showTotals = true,
+  bool showQRCode = true,
+  bool showNotes = true,
+  double openingBalance = 125000,
+}) {
   final account = transactionTransferDemoAccountDirectory[2305]!;
   return MultiTransactionTransferForAccountPdf(
     config: _transactionTransferDemoConfig(isRtl: isRtl),
@@ -150,16 +168,19 @@ buildMultiTransactionTransferForAccountPdfDemo({required bool isRtl}) {
     account: account,
     services: transactionTransferDemoServices,
     accountDirectory: transactionTransferDemoAccountDirectory,
+    customization: customization,
     configuration: TransactionTransferReportConfiguration(
       periodStart: DateTime(2026, 8, 28),
       periodEnd: DateTime(2026, 9, 1),
       selectedCurrency: 'YER',
-      includeCommission: true,
-      showTotals: true,
+      includeCommission: includeCommission,
+      showTotals: showTotals,
     ),
-    openingBalances: const <String, double>{'YER': 125000},
+    openingBalances: <String, double>{'YER': openingBalance},
     reportId: 'TRF-ACC-2305-20260906',
     qrCodeUrl: 'https://example.com/reports/TRF-ACC-2305-20260906',
+    showQRCode: showQRCode,
+    showNotes: showNotes,
     notes:
         'This view filters the same source rows to account 2305, adds the caller-supplied opening balance row, and keeps commission legs visible. Counter-account labels remain number-based where names are unavailable.',
     notesAr:

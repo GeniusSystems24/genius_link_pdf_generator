@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/configuration/models/documents/s05_formatting_theme_verification_documents.dart';
+import 'package:genius_pdf_example/features/configuration/models/documents/configuration_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,8 +16,17 @@ class S05ThemeTokensVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s05ThemeDesignTokensVerify,
       apiName: 'buildS05ThemeTokensVerificationPdf',
       icon: Icons.format_paint_outlined,
-      generator: buildS05ThemeTokensVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+
+        generateConfigurationVerificationInBackground(
+
+          apiName: 'buildS05ThemeTokensVerificationPdf',
+
+          isRtl: isRtl,
+
+        ),
       fileName: 's05_formatting_theme_theme_tokens.pdf',
+      showGenerationToast: true,
       usageCode: r'''Future<Uint8List> buildS05ThemeTokensVerificationPdf(GeniusPdfConfig config) async {
   final formatter = GeniusPdfDefaultFormatter(
     settings: GeniusPdfFormatSettings(

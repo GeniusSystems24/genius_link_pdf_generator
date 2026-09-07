@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/components/models/documents/s02_components_rtl_verification_documents.dart';
+import 'package:genius_pdf_example/features/components/models/documents/components_verification_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,7 +16,12 @@ class S02SummaryVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s02SummaryRtlVerify,
       apiName: 'buildS02SummaryVerificationPdf',
       icon: Icons.compare_arrows_outlined,
-      generator: buildS02SummaryVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+          generateComponentsVerificationInBackground(
+            apiName: 'buildS02SummaryVerificationPdf',
+            isRtl: isRtl,
+          ),
+      showGenerationToast: true,
       fileName: 's02_components_rtl_summary.pdf',
       usageCode: r'''Future<Uint8List> buildS02SummaryVerificationPdf(GeniusPdfConfig config) async {
   final direction = config.textDirection == TextDirection.rtl

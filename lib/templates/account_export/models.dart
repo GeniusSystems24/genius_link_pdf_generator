@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import '../../src/components/components.dart';
+
 /// Controls whether PDF account activity is summarized or transaction-level.
 enum AccountExportActivityMode {
   /// Shows opening balance, debit, credit, net movement, and closing balance.
@@ -457,3 +459,181 @@ class AccountExportAccount {
     return null;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Reusable/customizable export API
+// ---------------------------------------------------------------------------
+
+/// Identifies a labeled-value section that can be customized by an account
+/// export consumer.
+enum AccountExportDetailSection {
+  /// Report-level metadata such as period, currency, and account count.
+  report,
+
+  /// Account identity/details such as number, name, parent, and group.
+  account,
+
+  /// Currency-specific balance details.
+  currency,
+}
+
+/// Identifies a grid owned by an account-export template.
+enum AccountExportGridKind {
+  /// Currency/activity summary grid.
+  activitySummary,
+
+  /// Detailed transaction grid for one account.
+  transactions,
+
+  /// Multi-account grid used by PDF exports.
+  accounts,
+
+  /// Compact multi-account grid used by image exports.
+  compactAccounts,
+}
+
+/// Rewrites the default labeled values for a template section.
+typedef AccountExportDetailsBuilder = List<GeniusPdfLabeledValue> Function(
+  AccountExportDetailSection section,
+  List<GeniusPdfLabeledValue> defaultItems,
+);
+
+/// Rewrites, removes, reorders, or adds columns for an account-export grid.
+typedef AccountExportColumnsBuilder = List<GeniusPdfGridColumn> Function(
+  AccountExportGridKind kind,
+  List<GeniusPdfGridColumn> defaultColumns,
+);
+
+/// Rewrites a generated grid row.
+///
+/// [source] is the domain object that produced the row when one exists, such
+/// as [AccountExportAccount] or [AccountExportTransaction]. Total/group rows
+/// can pass another useful source object or `null`.
+typedef AccountExportRowBuilder = GeniusPdfGridRow Function(
+  AccountExportGridKind kind,
+  Object? source,
+  GeniusPdfGridRow defaultRow,
+);
+
+/// Formats a date used by surrounding report metadata.
+typedef AccountExportDateFormatter = String Function(DateTime value);
+
+/// Formats an amount used in non-grid text.
+typedef AccountExportAmountFormatter = String Function(
+  double value,
+  String? currency,
+);
+
+/// Presentation and extension hooks shared by the four account-export
+/// templates.
+///
+/// Defaults preserve the package's current rendering. Consumers can opt into
+/// only the hooks they need; no subclassing is required.
+class AccountExportCustomization {
+  /// Creates account-export presentation/customization settings.
+  const AccountExportCustomization({
+    this.headerLayout = GeniusPdfReportHeaderLayout.bilingualSplit,
+    this.headerStyle,
+    this.infoBoxStyle,
+    this.gridStyle = const GeniusPdfGridStyle.classic(),
+    this.reportDetailsColumns = 3,
+    this.accountDetailsColumns = 3,
+    this.showFooter = true,
+    this.pageNumberFormat = '{0}/{1}',
+    this.dateFormatter,
+    this.amountFormatter,
+    this.detailsBuilder,
+    this.columnsBuilder,
+    this.rowBuilder,
+  })  : assert(reportDetailsColumns > 0),
+        assert(accountDetailsColumns > 0);
+
+  /// Layout used by [GeniusPdfReportHeader].
+  final GeniusPdfReportHeaderLayout headerLayout;
+
+  /// Optional header style. Null preserves the template's bilingual style.
+  final GeniusPdfReportHeaderStyle? headerStyle;
+
+  /// Optional details-box style. Null preserves `minimal()`.
+  final GeniusPdfInfoBoxStyle? infoBoxStyle;
+
+  /// Grid style used by generated account-export tables.
+  final GeniusPdfGridStyle gridStyle;
+
+  /// Number of columns used by report-level details boxes.
+  final int reportDetailsColumns;
+
+  /// Number of columns used by account/currency detail boxes.
+  final int accountDetailsColumns;
+
+  /// Whether templates should install their standard repeating footer.
+  final bool showFooter;
+
+  /// Page-number format passed to the package footer helper.
+  final String pageNumberFormat;
+
+  /// Optional surrounding-report date formatter.
+  final AccountExportDateFormatter? dateFormatter;
+
+  /// Optional non-grid amount formatter.
+  final AccountExportAmountFormatter? amountFormatter;
+
+  /// Optional labeled-value section transformer.
+  final AccountExportDetailsBuilder? detailsBuilder;
+
+  /// Optional grid-column transformer.
+  final AccountExportColumnsBuilder? columnsBuilder;
+
+  /// Optional generated-row transformer.
+  final AccountExportRowBuilder? rowBuilder;
+
+  /// Resolves the effective details style.
+  GeniusPdfInfoBoxStyle get effectiveInfoBoxStyle =>
+      infoBoxStyle ?? GeniusPdfInfoBoxStyle.minimal();
+
+  /// Formats [value] using [dateFormatter] or the package-friendly ISO date.
+  String formatDate(DateTime value) {
+    final custom = dateFormatter;
+    if (custom != null) return custom(value);
+    return '${value.year.toString().padLeft(4, '0')}-'
+        '${value.month.toString().padLeft(2, '0')}-'
+        '${value.day.toString().padLeft(2, '0')}';
+  }
+
+  /// Formats [value] for text outside data-grid currency cells.
+  String formatAmount(double value, [String? currency]) {
+    final custom = amountFormatter;
+    if (custom != null) return custom(value, currency);
+    return value.toStringAsFixed(2);
+  }
+
+  /// Applies [detailsBuilder] while protecting the template's default list.
+  List<GeniusPdfLabeledValue> buildDetails(
+    AccountExportDetailSection section,
+    List<GeniusPdfLabeledValue> defaultItems,
+  ) {
+    final builder = detailsBuilder;
+    if (builder == null) return defaultItems;
+    return builder(section, List<GeniusPdfLabeledValue>.of(defaultItems));
+  }
+
+  /// Applies [columnsBuilder] to a copy of the default columns.
+  List<GeniusPdfGridColumn> buildColumns(
+    AccountExportGridKind kind,
+    List<GeniusPdfGridColumn> defaultColumns,
+  ) {
+    final builder = columnsBuilder;
+    if (builder == null) return defaultColumns;
+    return builder(kind, List<GeniusPdfGridColumn>.of(defaultColumns));
+  }
+
+  /// Applies [rowBuilder] to a generated row.
+  GeniusPdfGridRow buildRow(
+    AccountExportGridKind kind,
+    Object? source,
+    GeniusPdfGridRow defaultRow,
+  ) {
+    return rowBuilder?.call(kind, source, defaultRow) ?? defaultRow;
+  }
+}
+

@@ -1,16 +1,19 @@
+// Global manager/background migration for Getting Started S00
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
+import 'package:genius_pdf_example/features/getting_started/models/documents/getting_started_background_generation.dart';
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
-typedef S00DocumentBuilderFactory = GeniusPdfDocumentBuilder Function(
-  GeniusPdfConfig config,
-);
+
+typedef S00DocumentBuilderFactory =
+    GeniusPdfDocumentBuilder Function(GeniusPdfConfig config);
 
 /// Shared presentation for one focused S00 baseline/regression example.
 ///
@@ -51,6 +54,7 @@ class _S00BaselineExampleDetailScreenState
     extends State<S00BaselineExampleDetailScreen> {
   late bool _isRtl;
   Uint8List? _previewData;
+  String? _previewFilePath;
   Object? _executionError;
   bool _executing = false;
   bool _openingPdf = false;
@@ -61,10 +65,6 @@ class _S00BaselineExampleDetailScreenState
     _isRtl = widget.initialRtl;
   }
 
-  GeniusPdfConfig get _config => geniusPdfConfig.copyWith(
-        textDirection: _isRtl ? TextDirection.rtl : TextDirection.ltr,
-      );
-
   String get _expected => _isRtl ? widget.expectedRtl : widget.expectedLtr;
 
   void _setDirection(bool rtl) {
@@ -72,6 +72,7 @@ class _S00BaselineExampleDetailScreenState
     setState(() {
       _isRtl = rtl;
       _previewData = null;
+      _previewFilePath = null;
       _executionError = null;
     });
   }
@@ -84,25 +85,44 @@ class _S00BaselineExampleDetailScreenState
       _executionError = null;
     });
 
-    GeniusPdfDocumentBuilder? builder;
     try {
-      builder = widget.builderFactory(_config);
-      final bytes = Uint8List.fromList(builder.generate());
+      final fileName = widget.fileName.toLowerCase().endsWith('.pdf')
+          ? widget.fileName.substring(0, widget.fileName.length - 4)
+          : widget.fileName;
+
+      final success = await generateExamplePdf(
+        builder: ExampleBackgroundPdfBuilder(
+          config: geniusPdfConfig,
+          backgroundGenerator: () => generateGettingStartedBaselineInBackground(
+            apiName: widget.apiName,
+            isRtl: _isRtl,
+          ),
+        ),
+        fileName: fileName,
+        metadata: <String, dynamic>{
+          'feature': 'getting_started',
+          'screen': widget.title,
+          'apiName': widget.apiName,
+          'workflow': 's00-baseline-preview',
+          'showGenerationToast': true,
+        },
+      );
 
       if (!mounted) return;
       setState(() {
-        _previewData = bytes;
+        _previewData = success.bytes;
+        _previewFilePath = success.filePath;
         _executionError = null;
       });
     } catch (error) {
       if (!mounted) return;
       setState(() {
         _previewData = null;
+        _previewFilePath = null;
         _executionError = error;
       });
       _showMessage('Unable to generate PDF preview: $error', error: true);
     } finally {
-      builder?.dispose();
       if (mounted) setState(() => _executing = false);
     }
   }
@@ -113,10 +133,15 @@ class _S00BaselineExampleDetailScreenState
 
     setState(() => _openingPdf = true);
     try {
-      await demoDocuments.saveAndOpen(
-        bytes: bytes,
-        fileName: widget.fileName,
-      );
+      final filePath = _previewFilePath;
+      if (filePath != null && filePath.isNotEmpty) {
+        await demoDocuments.open(filePath);
+      } else {
+        await demoDocuments.saveAndOpen(
+          bytes: bytes,
+          fileName: widget.fileName,
+        );
+      }
       if (mounted) _showMessage('PDF opened successfully.');
     } catch (error) {
       if (mounted) {
@@ -342,7 +367,7 @@ class _Header extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               SegmentedButton<bool>(
-                segments:  [
+                segments: [
                   ButtonSegment(value: false, label: Text(pdfLocalization.ltr)),
                   ButtonSegment(value: true, label: Text(pdfLocalization.rtl)),
                 ],
@@ -364,13 +389,14 @@ class _Header extends StatelessWidget {
                   executing
                       ? 'Running…'
                       : hasPreview
-                          ? 'Run again'
-                          : 'Run example',
+                      ? 'Run again'
+                      : 'Run example',
                 ),
               ),
               OutlinedButton.icon(
-                onPressed:
-                    hasPreview && !executing && !openingPdf ? onOpenPdf : null,
+                onPressed: hasPreview && !executing && !openingPdf
+                    ? onOpenPdf
+                    : null,
                 icon: openingPdf
                     ? const SizedBox(
                         width: 16,
@@ -378,7 +404,7 @@ class _Header extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.open_in_new_rounded),
-                label:  Text(pdfLocalization.openPdf),
+                label: Text(pdfLocalization.openPdf),
               ),
             ],
           );
@@ -386,11 +412,7 @@ class _Header extends StatelessWidget {
           if (compact) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                identity,
-                const SizedBox(height: 16),
-                actions,
-              ],
+              children: [identity, const SizedBox(height: 16), actions],
             );
           }
 
@@ -464,7 +486,7 @@ class _PreviewColumn extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     if (executing) {
-      return  Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -485,7 +507,7 @@ class _PreviewColumn extends StatelessWidget {
             children: [
               Icon(Icons.error_outline_rounded, color: colors.error, size: 42),
               const SizedBox(height: 12),
-               Text(pdfLocalization.pdfGenerationFailed),
+              Text(pdfLocalization.pdfGenerationFailed),
               const SizedBox(height: 6),
               SelectableText(
                 '$error',

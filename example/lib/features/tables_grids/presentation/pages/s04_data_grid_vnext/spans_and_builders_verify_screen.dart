@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/tables_grids/models/documents/s04_data_grid_vnext_verification_documents.dart';
+import 'package:genius_pdf_example/features/tables_grids/models/documents/tables_grids_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,8 +16,12 @@ class S04SpansAndBuildersVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s04SpansBuildersConditionalStyleVerify,
       apiName: 'buildS04SpansAndBuildersVerificationPdf',
       icon: Icons.table_view_outlined,
-      generator: buildS04SpansAndBuildersVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) => generateTablesGridsExampleInBackground(
+        apiName: 'buildS04SpansAndBuildersVerificationPdf',
+        isRtl: isRtl,
+      ),
       fileName: 's04_data_grid_vnext_spans_and_builders.pdf',
+      showGenerationToast: true,
       usageCode: r'''Future<Uint8List> buildS04SpansAndBuildersVerificationPdf(GeniusPdfConfig config) async {
   final direction = config.textDirection == TextDirection.rtl
       ? GeniusPdfDirection.rtl

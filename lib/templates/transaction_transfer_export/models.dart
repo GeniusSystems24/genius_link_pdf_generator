@@ -6,6 +6,8 @@ library;
 
 import 'dart:ui';
 
+import '../../src/components/components.dart';
+
 /// Metadata displayed by transaction-transfer export documents.
 class TransactionTransferDocumentMeta {
   /// Creates document metadata.
@@ -61,6 +63,13 @@ class TransactionTransferAccountInfo {
 
 /// Bilingual service metadata resolved from the services dataset.
 class TransactionTransferServiceInfo {
+  /// Creates service metadata.
+  const TransactionTransferServiceInfo({
+    required this.serviceId,
+    required this.name,
+    this.nameAr,
+    this.extensionSymbol,
+  });
 
   /// Creates service information from a row in the services JSON dataset.
   factory TransactionTransferServiceInfo.fromJson(Map<String, dynamic> json) {
@@ -77,13 +86,6 @@ class TransactionTransferServiceInfo {
       extensionSymbol: _asNullableString(description['extensionSymbol']),
     );
   }
-  /// Creates service metadata.
-  const TransactionTransferServiceInfo({
-    required this.serviceId,
-    required this.name,
-    this.nameAr,
-    this.extensionSymbol,
-  });
 
   /// Service identifier matching `transaction_transfer.serviceId`.
   final int serviceId;
@@ -104,6 +106,12 @@ class TransactionTransferServiceInfo {
 
 /// Counter-account reference stored in `debitAccounts` or `creditAccounts`.
 class TransactionTransferCounterAccount {
+  /// Creates a counter-account reference.
+  const TransactionTransferCounterAccount({
+    required this.accountId,
+    required this.currencyId,
+    required this.amount,
+  });
 
   /// Creates a counter-account reference from JSON.
   factory TransactionTransferCounterAccount.fromJson(
@@ -115,12 +123,6 @@ class TransactionTransferCounterAccount {
       amount: _asDouble(json['amount']).abs(),
     );
   }
-  /// Creates a counter-account reference.
-  const TransactionTransferCounterAccount({
-    required this.accountId,
-    required this.currencyId,
-    required this.amount,
-  });
 
   /// Referenced account identifier.
   final int accountId;
@@ -134,6 +136,14 @@ class TransactionTransferCounterAccount {
 
 /// Structured `description` object of a transaction-transfer row.
 class TransactionTransferDescription {
+  /// Creates a transfer-row description.
+  const TransactionTransferDescription({
+    this.note,
+    this.type,
+    this.creatorDeviceId,
+    this.debitAccounts = const <TransactionTransferCounterAccount>[],
+    this.creditAccounts = const <TransactionTransferCounterAccount>[],
+  });
 
   /// Creates a description from JSON.
   factory TransactionTransferDescription.fromJson(
@@ -160,14 +170,6 @@ class TransactionTransferDescription {
       creditAccounts: readAccounts('creditAccounts'),
     );
   }
-  /// Creates a transfer-row description.
-  const TransactionTransferDescription({
-    this.note,
-    this.type,
-    this.creatorDeviceId,
-    this.debitAccounts = const <TransactionTransferCounterAccount>[],
-    this.creditAccounts = const <TransactionTransferCounterAccount>[],
-  });
 
   /// Optional free-form transaction note.
   final String? note;
@@ -206,6 +208,23 @@ class TransactionTransferDescription {
 /// [compositeTransactionKey], which combines [serviceId] and [transactionId],
 /// when grouping rows into logical transactions.
 class TransactionTransferRow {
+  /// Creates a transaction-transfer row.
+  const TransactionTransferRow({
+    required this.serviceId,
+    required this.transactionId,
+    required this.id,
+    required this.accountId,
+    required this.currencyId,
+    required this.amount,
+    required this.description,
+    required this.status,
+    required this.creatorUserId,
+    required this.createdAt,
+    this.rowNo,
+    this.tenantId,
+    this.updatorUserId,
+    this.updatedAt,
+  });
 
   /// Creates a transaction-transfer row from source JSON.
   factory TransactionTransferRow.fromJson(Map<String, dynamic> json) {
@@ -228,23 +247,6 @@ class TransactionTransferRow {
       updatedAt: _asNullableDateTime(json['updatedAt']),
     );
   }
-  /// Creates a transaction-transfer row.
-  const TransactionTransferRow({
-    required this.serviceId,
-    required this.transactionId,
-    required this.id,
-    required this.accountId,
-    required this.currencyId,
-    required this.amount,
-    required this.description,
-    required this.status,
-    required this.creatorUserId,
-    required this.createdAt,
-    this.rowNo,
-    this.tenantId,
-    this.updatorUserId,
-    this.updatedAt,
-  });
 
   /// Optional source row number.
   final int? rowNo;
@@ -372,6 +374,29 @@ class TransactionTransferReportConfiguration {
 
   /// Semantic debit and credit amount colors.
   final TransactionTransferAmountColors amountColors;
+
+  /// Returns a copy with selected filters or presentation data replaced.
+  TransactionTransferReportConfiguration copyWith({
+    DateTime? periodStart,
+    DateTime? periodEnd,
+    String? selectedCurrency,
+    Set<int>? serviceIds,
+    Set<int>? statuses,
+    bool? includeCommission,
+    bool? showTotals,
+    TransactionTransferAmountColors? amountColors,
+  }) {
+    return TransactionTransferReportConfiguration(
+      periodStart: periodStart ?? this.periodStart,
+      periodEnd: periodEnd ?? this.periodEnd,
+      selectedCurrency: selectedCurrency ?? this.selectedCurrency,
+      serviceIds: serviceIds ?? this.serviceIds,
+      statuses: statuses ?? this.statuses,
+      includeCommission: includeCommission ?? this.includeCommission,
+      showTotals: showTotals ?? this.showTotals,
+      amountColors: amountColors ?? this.amountColors,
+    );
+  }
 
   /// Returns whether [row] belongs to this report configuration.
   bool includes(TransactionTransferRow row) {
@@ -622,3 +647,194 @@ DateTime? _asNullableDateTime(Object? value) {
   if (value == null) return null;
   return _asDateTime(value);
 }
+
+// ---------------------------------------------------------------------------
+// Reusable/customizable export API
+// ---------------------------------------------------------------------------
+
+/// Identifies a labeled-value section in transaction-transfer reports.
+enum TransactionTransferDetailSection {
+  /// General report details.
+  report,
+
+  /// Selected-account details.
+  account,
+}
+
+/// Identifies a transaction-transfer grid that can be customized.
+enum TransactionTransferGridKind {
+  /// General multi-transaction grid.
+  transfers,
+
+  /// One-account movement grid.
+  accountMovements,
+}
+
+/// Rewrites a details section before it is rendered.
+typedef TransactionTransferDetailsBuilder = List<GeniusPdfLabeledValue> Function(
+  TransactionTransferDetailSection section,
+  List<GeniusPdfLabeledValue> defaultItems,
+);
+
+/// Rewrites, removes, reorders, or adds grid columns.
+typedef TransactionTransferColumnsBuilder = List<GeniusPdfGridColumn> Function(
+  TransactionTransferGridKind kind,
+  List<GeniusPdfGridColumn> defaultColumns,
+);
+
+/// Rewrites a generated transaction-transfer grid row.
+typedef TransactionTransferRowBuilder = GeniusPdfGridRow Function(
+  TransactionTransferGridKind kind,
+  TransactionTransferRow? source,
+  GeniusPdfGridRow defaultRow,
+);
+
+/// Formats a report date outside the date-grid cell formatter.
+typedef TransactionTransferDateFormatter = String Function(DateTime value);
+
+/// Formats amounts used in free-form text such as counter-account labels.
+typedef TransactionTransferAmountFormatter = String Function(
+  double value,
+  String? currency,
+);
+
+/// Custom account-label resolver.
+typedef TransactionTransferAccountLabelBuilder = String Function(
+  int accountId,
+  TransactionTransferAccountInfo? account,
+  bool isRtl,
+);
+
+/// Custom service-label resolver.
+typedef TransactionTransferServiceLabelBuilder = String Function(
+  int serviceId,
+  TransactionTransferServiceInfo? service,
+  bool isRtl,
+);
+
+/// Custom description resolver for transfer/commission rows.
+typedef TransactionTransferDescriptionBuilder = String Function(
+  TransactionTransferRow row,
+  bool isRtl,
+);
+
+/// Presentation and extension hooks shared by both transaction-transfer PDFs.
+///
+/// Defaults preserve the existing v4.2.0 output. The callbacks are intended
+/// for application-specific columns, labels, descriptions, and directory
+/// naming without forking either template.
+class TransactionTransferTemplateCustomization {
+  /// Creates transaction-transfer customization settings.
+  const TransactionTransferTemplateCustomization({
+    this.headerLayout = GeniusPdfReportHeaderLayout.bilingualSplit,
+    this.headerStyle,
+    this.infoBoxStyle,
+    this.gridStyle = const GeniusPdfGridStyle.classic(),
+    this.reportDetailsColumns = 3,
+    this.showFooter = true,
+    this.pageNumberFormat = '{0}/{1}',
+    this.dateFormatter,
+    this.amountFormatter,
+    this.detailsBuilder,
+    this.columnsBuilder,
+    this.rowBuilder,
+    this.accountLabelBuilder,
+    this.serviceLabelBuilder,
+    this.descriptionBuilder,
+  }) : assert(reportDetailsColumns > 0);
+
+  /// Report-header layout.
+  final GeniusPdfReportHeaderLayout headerLayout;
+
+  /// Optional custom header style.
+  final GeniusPdfReportHeaderStyle? headerStyle;
+
+  /// Optional custom report-details style.
+  final GeniusPdfInfoBoxStyle? infoBoxStyle;
+
+  /// Grid style applied to transaction-transfer tables.
+  final GeniusPdfGridStyle gridStyle;
+
+  /// Number of columns in report/account details boxes.
+  final int reportDetailsColumns;
+
+  /// Whether the standard repeating footer is enabled.
+  final bool showFooter;
+
+  /// Page-number format used by the footer helper.
+  final String pageNumberFormat;
+
+  /// Optional date formatter for footer/period labels.
+  final TransactionTransferDateFormatter? dateFormatter;
+
+  /// Optional amount formatter for textual amount fragments.
+  final TransactionTransferAmountFormatter? amountFormatter;
+
+  /// Optional details-list transformer.
+  final TransactionTransferDetailsBuilder? detailsBuilder;
+
+  /// Optional column-list transformer.
+  final TransactionTransferColumnsBuilder? columnsBuilder;
+
+  /// Optional generated-row transformer.
+  final TransactionTransferRowBuilder? rowBuilder;
+
+  /// Optional account display-name resolver.
+  final TransactionTransferAccountLabelBuilder? accountLabelBuilder;
+
+  /// Optional service display-name resolver.
+  final TransactionTransferServiceLabelBuilder? serviceLabelBuilder;
+
+  /// Optional transfer/commission description resolver.
+  final TransactionTransferDescriptionBuilder? descriptionBuilder;
+
+  /// Resolves the effective details style.
+  GeniusPdfInfoBoxStyle get effectiveInfoBoxStyle =>
+      infoBoxStyle ?? GeniusPdfInfoBoxStyle.minimal();
+
+  /// Formats [value] with the configured callback or ISO-like default.
+  String formatDate(DateTime value) {
+    final custom = dateFormatter;
+    if (custom != null) return custom(value);
+    return '${value.year.toString().padLeft(4, '0')}-'
+        '${value.month.toString().padLeft(2, '0')}-'
+        '${value.day.toString().padLeft(2, '0')}';
+  }
+
+  /// Formats [value] for text outside data-grid currency cells.
+  String formatAmount(double value, [String? currency]) {
+    final custom = amountFormatter;
+    if (custom != null) return custom(value, currency);
+    return value.toStringAsFixed(2);
+  }
+
+  /// Applies [detailsBuilder].
+  List<GeniusPdfLabeledValue> buildDetails(
+    TransactionTransferDetailSection section,
+    List<GeniusPdfLabeledValue> defaultItems,
+  ) {
+    final builder = detailsBuilder;
+    if (builder == null) return defaultItems;
+    return builder(section, List<GeniusPdfLabeledValue>.of(defaultItems));
+  }
+
+  /// Applies [columnsBuilder].
+  List<GeniusPdfGridColumn> buildColumns(
+    TransactionTransferGridKind kind,
+    List<GeniusPdfGridColumn> defaultColumns,
+  ) {
+    final builder = columnsBuilder;
+    if (builder == null) return defaultColumns;
+    return builder(kind, List<GeniusPdfGridColumn>.of(defaultColumns));
+  }
+
+  /// Applies [rowBuilder].
+  GeniusPdfGridRow buildRow(
+    TransactionTransferGridKind kind,
+    TransactionTransferRow? source,
+    GeniusPdfGridRow defaultRow,
+  ) {
+    return rowBuilder?.call(kind, source, defaultRow) ?? defaultRow;
+  }
+}
+

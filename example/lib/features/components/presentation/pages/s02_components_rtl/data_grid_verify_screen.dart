@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/components/models/documents/s02_components_rtl_verification_documents.dart';
+import 'package:genius_pdf_example/features/components/models/documents/components_verification_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,7 +16,12 @@ class S02DataGridVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s02DataGridRtlVerify,
       apiName: 'buildS02DataGridVerificationPdf',
       icon: Icons.compare_arrows_outlined,
-      generator: buildS02DataGridVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+          generateComponentsVerificationInBackground(
+            apiName: 'buildS02DataGridVerificationPdf',
+            isRtl: isRtl,
+          ),
+      showGenerationToast: true,
       fileName: 's02_components_rtl_data_grid.pdf',
       usageCode: r'''Future<Uint8List> buildS02DataGridVerificationPdf(GeniusPdfConfig config) async {
   final direction = config.textDirection == TextDirection.rtl

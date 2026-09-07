@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/components/models/documents/s07_erp_components_verification_documents.dart';
+import 'package:genius_pdf_example/features/components/models/documents/components_verification_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,7 +16,12 @@ class S07BilingualVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s07BilingualMixedValuesVerify,
       apiName: 'buildS07BilingualVerificationPdf',
       icon: Icons.view_module_outlined,
-      generator: buildS07BilingualVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+          generateComponentsVerificationInBackground(
+            apiName: 'buildS07BilingualVerificationPdf',
+            isRtl: isRtl,
+          ),
+      showGenerationToast: true,
       fileName: 's07_erp_components_bilingual.pdf',
       usageCode: r'''Future<Uint8List> buildS07BilingualVerificationPdf(GeniusPdfConfig config) async {
   final direction = config.textDirection == TextDirection.rtl

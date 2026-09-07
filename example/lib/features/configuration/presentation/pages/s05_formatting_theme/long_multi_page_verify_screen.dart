@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/configuration/models/documents/s05_formatting_theme_verification_documents.dart';
+import 'package:genius_pdf_example/features/configuration/models/documents/configuration_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,8 +16,17 @@ class S05LongMultiPageVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s05LongMultiPageTableVerify,
       apiName: 'buildS05LongMultiPageVerificationPdf',
       icon: Icons.format_paint_outlined,
-      generator: buildS05LongMultiPageVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+
+        generateConfigurationVerificationInBackground(
+
+          apiName: 'buildS05LongMultiPageVerificationPdf',
+
+          isRtl: isRtl,
+
+        ),
       fileName: 's05_formatting_theme_long_multi_page.pdf',
+      showGenerationToast: true,
       usageCode: r'''Future<Uint8List> buildS05LongMultiPageVerificationPdf(GeniusPdfConfig config) async {
   final formatter = GeniusPdfDefaultFormatter(
     settings: GeniusPdfFormatSettings(

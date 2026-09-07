@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/configuration/models/documents/s05_formatting_theme_verification_documents.dart';
+import 'package:genius_pdf_example/features/configuration/models/documents/configuration_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,8 +16,17 @@ class S05ArabicDigitsVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s05ArabicLatinDigitsVerify,
       apiName: 'buildS05ArabicDigitsVerificationPdf',
       icon: Icons.format_paint_outlined,
-      generator: buildS05ArabicDigitsVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+
+        generateConfigurationVerificationInBackground(
+
+          apiName: 'buildS05ArabicDigitsVerificationPdf',
+
+          isRtl: isRtl,
+
+        ),
       fileName: 's05_formatting_theme_arabic_digits.pdf',
+      showGenerationToast: true,
       usageCode: r'''Future<Uint8List> buildS05ArabicDigitsVerificationPdf(GeniusPdfConfig config) async {
   final formatter = GeniusPdfDefaultFormatter(
     settings: GeniusPdfFormatSettings(

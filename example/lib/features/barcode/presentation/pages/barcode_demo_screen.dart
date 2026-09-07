@@ -1,13 +1,16 @@
+// Global manager/background migration for Barcode examples
 
 import 'package:flutter/material.dart';
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
+import 'package:genius_pdf_example/features/barcode/models/documents/barcode_background_generation.dart';
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
-import 'package:genius_pdf_example/shared/application/contracts/demo_file_gateway.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
 import 'package:genius_pdf_example/app/theme/app_theme.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
+
 /// Demo screen for Barcode & QR Code generation features.
 class BarcodeDemoScreen extends StatefulWidget {
   final int initialTab;
@@ -77,8 +80,9 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       child: TabBar(
         controller: _tabController,
         labelColor: AppColors.primary,
-        unselectedLabelColor:
-            isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+        unselectedLabelColor: isDark
+            ? AppColors.darkTextSecondary
+            : AppColors.lightTextSecondary,
         indicatorSize: TabBarIndicatorSize.tab,
         indicator: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.1),
@@ -87,7 +91,11 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
         dividerColor: Colors.transparent,
         padding: const EdgeInsets.all(6),
         tabs: [
-          _buildTab(Icons.view_week_rounded, pdfLocalization.oneDBarcodes, isDark),
+          _buildTab(
+            Icons.view_week_rounded,
+            pdfLocalization.oneDBarcodes,
+            isDark,
+          ),
           _buildTab(Icons.qr_code_2_rounded, pdfLocalization.qrCodes, isDark),
           _buildTab(Icons.grid_view_rounded, pdfLocalization.allInOne, isDark),
         ],
@@ -128,21 +136,35 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
             isDark,
             icon: Icons.view_week_rounded,
             title: pdfLocalization.geniusPdfBarcode,
-            description:
-                pdfLocalization.text1DBarcodesProductsShippingDesc,
+            description: pdfLocalization.text1DBarcodesProductsShippingDesc,
             gradient: AppColors.primaryGradient,
           ),
           const SizedBox(height: 16),
           _buildRtlToggle(isDark),
           const SizedBox(height: 16),
-          _buildBarcodeCard(isDark, 'EAN-13 Product', 'رمز منتج EAN-13',
-              'Product barcode for retail', GeniusBarcodeType.ean13),
+          _buildBarcodeCard(
+            isDark,
+            'EAN-13 Product',
+            'رمز منتج EAN-13',
+            'Product barcode for retail',
+            GeniusBarcodeType.ean13,
+          ),
           const SizedBox(height: 12),
-          _buildBarcodeCard(isDark, 'Code 128', 'كود 128',
-              'Alphanumeric barcode', GeniusBarcodeType.code128),
+          _buildBarcodeCard(
+            isDark,
+            'Code 128',
+            'كود 128',
+            'Alphanumeric barcode',
+            GeniusBarcodeType.code128,
+          ),
           const SizedBox(height: 12),
-          _buildBarcodeCard(isDark, 'Shipping Label', 'بطاقة الشحن',
-              'Tracking barcode for logistics', GeniusBarcodeType.code39),
+          _buildBarcodeCard(
+            isDark,
+            'Shipping Label',
+            'بطاقة الشحن',
+            'Tracking barcode for logistics',
+            GeniusBarcodeType.code39,
+          ),
           const SizedBox(height: 16),
           _buildGenerateButton(
             isDark,
@@ -156,8 +178,13 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
     );
   }
 
-  Widget _buildBarcodeCard(bool isDark, String title, String titleAr,
-      String subtitle, GeniusBarcodeType type) {
+  Widget _buildBarcodeCard(
+    bool isDark,
+    String title,
+    String titleAr,
+    String subtitle,
+    GeniusBarcodeType type,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -175,8 +202,11 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(Icons.view_week_rounded,
-                color: AppColors.primary, size: 24),
+            child: Icon(
+              Icons.view_week_rounded,
+              color: AppColors.primary,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -244,17 +274,37 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
           const SizedBox(height: 16),
           _buildRtlToggle(isDark),
           const SizedBox(height: 16),
-          _buildQRCard(isDark, pdfLocalization.urlQrCode, 'رمز QR لرابط',
-              pdfLocalization.scanToOpenWebsite, Icons.link_rounded),
+          _buildQRCard(
+            isDark,
+            pdfLocalization.urlQrCode,
+            'رمز QR لرابط',
+            pdfLocalization.scanToOpenWebsite,
+            Icons.link_rounded,
+          ),
           const SizedBox(height: 12),
-          _buildQRCard(isDark, pdfLocalization.zatcaInvoice, 'فاتورة هيئة الزكاة',
-              pdfLocalization.saudiEInvoiceQrTlv, Icons.receipt_long_rounded),
+          _buildQRCard(
+            isDark,
+            pdfLocalization.zatcaInvoice,
+            'فاتورة هيئة الزكاة',
+            pdfLocalization.saudiEInvoiceQrTlv,
+            Icons.receipt_long_rounded,
+          ),
           const SizedBox(height: 12),
-          _buildQRCard(isDark, pdfLocalization.wiFiConfig, 'إعدادات واي فاي',
-              pdfLocalization.wiFiConnectionQr, Icons.wifi_rounded),
+          _buildQRCard(
+            isDark,
+            pdfLocalization.wiFiConfig,
+            'إعدادات واي فاي',
+            pdfLocalization.wiFiConnectionQr,
+            Icons.wifi_rounded,
+          ),
           const SizedBox(height: 12),
-          _buildQRCard(isDark, pdfLocalization.vCardContact, 'بطاقة اتصال',
-              pdfLocalization.contactInformationQr, Icons.contact_page_rounded),
+          _buildQRCard(
+            isDark,
+            pdfLocalization.vCardContact,
+            'بطاقة اتصال',
+            pdfLocalization.contactInformationQr,
+            Icons.contact_page_rounded,
+          ),
           const SizedBox(height: 16),
           _buildGenerateButton(
             isDark,
@@ -268,8 +318,13 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
     );
   }
 
-  Widget _buildQRCard(bool isDark, String title, String titleAr,
-      String subtitle, IconData icon) {
+  Widget _buildQRCard(
+    bool isDark,
+    String title,
+    String titleAr,
+    String subtitle,
+    IconData icon,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -315,8 +370,11 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
               ],
             ),
           ),
-          const Icon(Icons.qr_code_rounded,
-              color: AppColors.secondary, size: 28),
+          const Icon(
+            Icons.qr_code_rounded,
+            color: AppColors.secondary,
+            size: 28,
+          ),
         ],
       ),
     );
@@ -335,8 +393,7 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
             isDark,
             icon: Icons.grid_view_rounded,
             title: pdfLocalization.completeDemo,
-            description:
-                pdfLocalization.fullPdfBarcodeQrCodeTypesOnePageDesc,
+            description: pdfLocalization.fullPdfBarcodeQrCodeTypesOnePageDesc,
             gradient: AppColors.successGradient,
           ),
           const SizedBox(height: 16),
@@ -380,8 +437,11 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Row(
               children: [
-                const Icon(Icons.check_circle_rounded,
-                    color: AppColors.success, size: 18),
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: AppColors.success,
+                  size: 18,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -403,18 +463,22 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
   // ============================================================
   // Shared Widgets
   // ============================================================
-  Widget _buildHeaderCard(bool isDark,
-      {required IconData icon,
-      required String title,
-      required String description,
-      required List<Color> gradient}) {
+  Widget _buildHeaderCard(
+    bool isDark, {
+    required IconData icon,
+    required String title,
+    required String description,
+    required List<Color> gradient,
+  }) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [
-          gradient.first.withValues(alpha: isDark ? 0.2 : 0.1),
-          gradient.last.withValues(alpha: isDark ? 0.1 : 0.05),
-        ]),
+        gradient: LinearGradient(
+          colors: [
+            gradient.first.withValues(alpha: isDark ? 0.2 : 0.1),
+            gradient.last.withValues(alpha: isDark ? 0.1 : 0.05),
+          ],
+        ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: gradient.first.withValues(alpha: 0.3)),
       ),
@@ -433,20 +497,24 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? AppColors.darkText : AppColors.lightText,
-                    )),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? AppColors.darkText : AppColors.lightText,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(description,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.lightTextSecondary,
-                    )),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -467,20 +535,24 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
       ),
       child: Row(
         children: [
-          Icon(Icons.language_rounded,
-              size: 18,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary),
+          Icon(
+            Icons.language_rounded,
+            size: 18,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.lightTextSecondary,
+          ),
           const SizedBox(width: 8),
-          Text(pdfLocalization.languageDirection,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: isDark ? AppColors.darkText : AppColors.lightText,
-              )),
+          Text(
+            pdfLocalization.languageDirection,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: isDark ? AppColors.darkText : AppColors.lightText,
+            ),
+          ),
           const Spacer(),
           SegmentedButton<bool>(
-            segments:  [
+            segments: [
               ButtonSegment(value: true, label: Text(pdfLocalization.rtl)),
               ButtonSegment(value: false, label: Text(pdfLocalization.ltr)),
             ],
@@ -497,7 +569,11 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
   }
 
   Widget _buildGenerateButton(
-      bool isDark, String label, List<Color> gradient, VoidCallback onTap) {
+    bool isDark,
+    String label,
+    List<Color> gradient,
+    VoidCallback onTap,
+  ) {
     return Container(
       width: double.infinity,
       height: 56,
@@ -529,7 +605,10 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.white))
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
             : const Icon(Icons.picture_as_pdf_rounded, size: 22),
         label: Text(
           _isGenerating ? 'Generating...' : label,
@@ -542,301 +621,56 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
   // ============================================================
   // PDF Generation Methods
   // ============================================================
-  Future<void> _generate1DBarcodes() async {
+  Future<void> _generate1DBarcodes() => _runBarcodeGeneration(
+    kind: BarcodeBackgroundDocumentKind.oneDimensional,
+    fileName: 'barcodes_1d',
+  );
+
+  Future<void> _generateQRCodes() => _runBarcodeGeneration(
+    kind: BarcodeBackgroundDocumentKind.qrCodes,
+    fileName: 'qr_codes',
+  );
+
+  Future<void> _generateAllInOne() => _runBarcodeGeneration(
+    kind: BarcodeBackgroundDocumentKind.allInOne,
+    fileName: 'barcode_qr_complete',
+  );
+
+  Future<void> _runBarcodeGeneration({
+    required BarcodeBackgroundDocumentKind kind,
+    required String fileName,
+  }) async {
+    if (_isGenerating) return;
     setState(() => _isGenerating = true);
+
     try {
-      final document = PdfDocument();
-      final page = document.pages.add();
-      final pageSize = page.getClientSize();
-      final titleFont =
-          PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 18);
-
-      // Title
-      page.graphics.drawString(
-        _isRTL ? 'الرموز الشريطية 1D' : '1D Barcodes Demo',
-        titleFont,
-        brush: PdfSolidBrush(PdfColor(33, 150, 243)),
-        bounds: Rect.fromLTWH(20, 20, pageSize.width - 40, 30),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: _isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
+      final success = await generateExamplePdf(
+        builder: ExampleBackgroundPdfBuilder(
+          config: geniusPdfConfig,
+          backgroundGenerator: () =>
+              generateBarcodeDocumentInBackground(kind: kind, isRtl: _isRTL),
         ),
+        fileName: fileName,
+        metadata: <String, dynamic>{
+          'feature': 'barcode',
+          'screen': 'BarcodeDemoScreen',
+          'documentKind': kind.name,
+          'workflow': 'barcode-demo',
+          'showGenerationToast': true,
+        },
       );
 
-      double yOffset = 70;
-
-      // EAN-13
-      final ean13 = GeniusPdfBarcode.ean13(
-        config: geniusPdfConfig,
-        data: '5901234123457',
-        caption: pdfLocalization.productCode,
-        captionAr: 'رمز المنتج',
-        style: const GeniusPdfBarcodeStyle.retail(),
-      );
-      final ean13Rect = ean13.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 100),
-      );
-      yOffset = ean13Rect.bottom + 20;
-
-      // Code 128
-      final code128 = GeniusPdfBarcode.code128(
-        config: geniusPdfConfig,
-        data: 'GENIUS-PDF-2025',
-        caption: pdfLocalization.referenceNumber,
-        captionAr: 'الرقم المرجعي',
-        style: const GeniusPdfBarcodeStyle.document(),
-      );
-      final code128Rect = code128.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 100),
-      );
-      yOffset = code128Rect.bottom + 20;
-
-      // Shipping barcode
-      final shipping = GeniusPdfBarcode.shipping(
-        config: geniusPdfConfig,
-        data: '1Z999AA10123456784',
-        trackingLabel: 'Tracking Number',
-        trackingLabelAr: 'رقم التتبع',
-      );
-      shipping.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 110),
-      );
-
-      await _saveAndOpenPdf(document, 'barcodes_1d');
-    } catch (e) {
-      _showError(e.toString());
-    } finally {
-      if (mounted) setState(() => _isGenerating = false);
-    }
-  }
-
-  Future<void> _generateQRCodes() async {
-    setState(() => _isGenerating = true);
-    try {
-      final document = PdfDocument();
-      final page = document.pages.add();
-      final pageSize = page.getClientSize();
-      final titleFont =
-          PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 18);
-
-      // Title
-      page.graphics.drawString(
-        _isRTL ? 'رموز QR' : 'QR Codes Demo',
-        titleFont,
-        brush: PdfSolidBrush(PdfColor(33, 150, 243)),
-        bounds: Rect.fromLTWH(20, 20, pageSize.width - 40, 30),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: _isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
-        ),
-      );
-
-      double yOffset = 70;
-      final halfWidth = (pageSize.width - 60) / 2;
-
-      // URL QR Code
-      final urlQR = GeniusPdfQRCodeGenerator.url(
-        config: geniusPdfConfig,
-        url: 'https://github.com/GeniusSystems24',
-        caption: pdfLocalization.visitWebsite,
-        captionAr: 'زيارة الموقع',
-        style: const GeniusPdfQRCodeStyle(),
-      );
-      urlQR.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset, halfWidth, 140),
-      );
-
-      // ZATCA QR Code
-      final zatcaQR = GeniusPdfQRCodeGenerator.zatca(
-        config: geniusPdfConfig,
-        sellerName: 'شركة الأمل للتجارة',
-        vatNumber: '300123456789003',
-        timestamp: DateTime.now(),
-        total: 34615.00,
-        vatAmount: 4515.00,
-        style: const GeniusPdfQRCodeStyle.invoice(),
-      );
-      zatcaQR.draw(
-        page: page,
-        bounds: Rect.fromLTWH(40 + halfWidth, yOffset, halfWidth, 140),
-      );
-
-      yOffset += 160;
-
-      // WiFi QR Code
-      final wifiQR = GeniusPdfQRCodeGenerator.wifi(
-        config: geniusPdfConfig,
-        ssid: 'GeniusOffice',
-        password: 'Genius@2025',
-        style: GeniusPdfQRCodeStyle.branded(
-          primaryColor: const Color(0xFF4CAF50),
-        ),
-      );
-      wifiQR.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset, halfWidth, 140),
-      );
-
-      // vCard QR Code
-      final vCardQR = GeniusPdfQRCodeGenerator.vCard(
-        config: geniusPdfConfig,
-        name: _isRTL ? 'أحمد محمد' : 'Ahmed Mohammed',
-        phone: '+966501234567',
-        email: 'ahmed@example.com',
-        company: _isRTL ? 'شركة الأمل' : 'Al-Amal Co.',
-        style: const GeniusPdfQRCodeStyle.payment(),
-      );
-      vCardQR.draw(
-        page: page,
-        bounds: Rect.fromLTWH(40 + halfWidth, yOffset, halfWidth, 140),
-      );
-
-      await _saveAndOpenPdf(document, 'qr_codes');
-    } catch (e) {
-      _showError(e.toString());
-    } finally {
-      if (mounted) setState(() => _isGenerating = false);
-    }
-  }
-
-  Future<void> _generateAllInOne() async {
-    setState(() => _isGenerating = true);
-    try {
-      final document = PdfDocument();
-      final page = document.pages.add();
-      final pageSize = page.getClientSize();
-      final titleFont =
-          PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 16);
-      final sectionFont =
-          PdfTrueTypeFont(geniusPdfConfig.assets.primaryFont.toList(), 12);
-
-      // Title
-      page.graphics.drawString(
-        _isRTL
-            ? 'عرض شامل - الرموز الشريطية و QR'
-            : 'Complete Barcode & QR Code Demo',
-        titleFont,
-        brush: PdfSolidBrush(PdfColor(33, 150, 243)),
-        bounds: Rect.fromLTWH(20, 15, pageSize.width - 40, 25),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: _isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
-        ),
-      );
-
-      double yOffset = 50;
-
-      // Section: 1D Barcodes
-      page.graphics.drawString(
-        _isRTL ? '— الرموز الشريطية 1D —' : '— 1D Barcodes —',
-        sectionFont,
-        brush: PdfSolidBrush(PdfColor(100, 100, 100)),
-        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 20),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: _isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
-        ),
-      );
-      yOffset += 25;
-
-      // EAN-13
-      final ean13 = GeniusPdfBarcode.ean13(
-        config: geniusPdfConfig,
-        data: '5901234123457',
-        caption: pdfLocalization.ean13,
-        style: const GeniusPdfBarcodeStyle.compact(),
-      );
-      final ean13Rect = ean13.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset, (pageSize.width - 60) / 2, 80),
-      );
-
-      // Code 128
-      final code128 = GeniusPdfBarcode.code128(
-        config: geniusPdfConfig,
-        data: 'GENIUS-2025',
-        caption: pdfLocalization.code128,
-        style: const GeniusPdfBarcodeStyle.compact(),
-      );
-      code128.draw(
-        page: page,
-        bounds: Rect.fromLTWH(
-            (pageSize.width + 20) / 2, yOffset, (pageSize.width - 60) / 2, 80),
-      );
-      yOffset = ean13Rect.bottom + 15;
-
-      // Section: QR Codes
-      page.graphics.drawString(
-        _isRTL ? '— رموز QR —' : '— QR Codes —',
-        sectionFont,
-        brush: PdfSolidBrush(PdfColor(100, 100, 100)),
-        bounds: Rect.fromLTWH(20, yOffset, pageSize.width - 40, 20),
-        format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          textDirection: _isRTL
-              ? PdfTextDirection.rightToLeft
-              : PdfTextDirection.leftToRight,
-        ),
-      );
-      yOffset += 25;
-
-      final qrWidth = (pageSize.width - 80) / 3;
-
-      // URL QR
-      final urlQR = GeniusPdfQRCodeGenerator.url(
-        config: geniusPdfConfig,
-        url: 'https://genius.systems',
-        caption: pdfLocalization.url,
-        captionAr: 'رابط',
-        style: const GeniusPdfQRCodeStyle.compact(),
-      );
-      urlQR.draw(
-        page: page,
-        bounds: Rect.fromLTWH(20, yOffset, qrWidth, 90),
-      );
-
-      // ZATCA QR
-      final zatcaQR = GeniusPdfQRCodeGenerator.zatca(
-        config: geniusPdfConfig,
-        sellerName: 'شركة الأمل',
-        vatNumber: '300123456789003',
-        timestamp: DateTime.now(),
-        total: 34615.00,
-        vatAmount: 4515.00,
-        style: const GeniusPdfQRCodeStyle.compact(),
-      );
-      zatcaQR.draw(
-        page: page,
-        bounds: Rect.fromLTWH(40 + qrWidth, yOffset, qrWidth, 90),
-      );
-
-      // WiFi QR
-      final wifiQR = GeniusPdfQRCodeGenerator.wifi(
-        config: geniusPdfConfig,
-        ssid: 'Office',
-        password: 'pass123',
-        style: const GeniusPdfQRCodeStyle.compact(),
-      );
-      wifiQR.draw(
-        page: page,
-        bounds: Rect.fromLTWH(60 + qrWidth * 2, yOffset, qrWidth, 90),
-      );
-
-      await _saveAndOpenPdf(document, 'barcode_qr_complete');
-    } catch (e) {
-      _showError(e.toString());
+      final path = success.filePath;
+      if (path?.isNotEmpty ?? false) {
+        await demoDocuments.open(path!);
+      } else {
+        await demoDocuments.saveAndOpen(
+          bytes: success.bytes,
+          fileName: '$fileName.pdf',
+        );
+      }
+    } catch (error) {
+      _showError(error.toString());
     } finally {
       if (mounted) setState(() => _isGenerating = false);
     }
@@ -845,27 +679,6 @@ class _BarcodeDemoScreenState extends State<BarcodeDemoScreen>
   // ============================================================
   // Helpers
   // ============================================================
-  Future<void> _saveAndOpenPdf(PdfDocument document, String fileName) async {
-    final bytes = await document.save();
-    document.dispose();
-
-    await demoDocuments.saveAndOpen(
-      bytes: bytes,
-      fileName: fileName,
-      location: DemoStorageLocation.temporary,
-    );
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_isRTL ? 'تم إنشاء PDF بنجاح' : 'PDF generated'),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  }
-
   void _showError(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

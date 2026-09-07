@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 
 import 'package:genius_pdf_example/shared/presentation/controllers/demo_document_controller.dart';
 
@@ -10,14 +11,15 @@ typedef JobManagerErrorCallback = void Function(String message);
 final class JobManagerDemoController extends ChangeNotifier {
   JobManagerDemoController({
     required DemoDocumentController documents,
+    GeniusPdfGenerationManager? manager,
     GeniusPdfGenerationManagerConfig? config,
   })  : _documents = documents,
-        _manager = GeniusPdfGenerationManager(
-            config: config ??
-                GeniusPdfGenerationManagerConfig(
-                  maxConcurrentJobs: 2,
-                  cleanupCompletedJobs: false,
-                )) {
+        _manager = manager ??
+            (config == null
+                ? geniusPdfGenerationManager
+                : GeniusPdfGenerationManager(config: config)),
+        _ownsManager = manager == null && config != null {
+    _jobs = List.unmodifiable(_manager.allJobs);
     _queueSubscription = _manager.queueUpdates.listen((value) {
       _jobs = List.unmodifiable(value);
       notifyListeners();
@@ -26,6 +28,7 @@ final class JobManagerDemoController extends ChangeNotifier {
 
   final DemoDocumentController _documents;
   final GeniusPdfGenerationManager _manager;
+  final bool _ownsManager;
   late final StreamSubscription<List<GeniusPdfJob>> _queueSubscription;
 
   List<GeniusPdfJob> _jobs = const [];
@@ -78,7 +81,7 @@ final class JobManagerDemoController extends ChangeNotifier {
   @override
   void dispose() {
     _queueSubscription.cancel();
-    _manager.dispose();
+    if (_ownsManager) _manager.dispose();
     super.dispose();
   }
 }

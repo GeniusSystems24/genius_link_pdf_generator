@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart' show geniusPdfConfig;
+import 'package:genius_pdf_example/features/modern_vouchers/models/documents/modern_vouchers_background_generation.dart';
 import 'package:genius_pdf_example/features/modern_vouchers/models/documents/modern_vouchers_demo_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
@@ -37,7 +39,13 @@ Future<Uint8List> generateModernPurchaseReturnVoucherPdf(GeniusPdfConfig config)
       description: pdfLocalization.purchaseReturnVoucherWithPoReference,
       apiName: 'generateModernPurchaseReturnVoucherPdf',
       icon: Icons.remove_shopping_cart_outlined,
-      generator: generateModernPurchaseReturnVoucherPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+          generateModernVoucherInBackground(
+            apiName: 'generateModernPurchaseReturnVoucherPdf',
+            isRtl: isRtl,
+            rootConfig: geniusPdfConfig,
+          ),
+      showGenerationToast: true,
       usageCode: dartUsageCode,
       fileName: 'modern_purchase_return_demo.pdf',
       initialRtl: true,

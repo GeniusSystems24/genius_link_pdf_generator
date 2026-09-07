@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/text_typography/models/documents/s01_directionality_verification_documents.dart';
+import 'package:genius_pdf_example/features/text_typography/models/documents/text_typography_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,8 +16,17 @@ class S01LegacyTemplateJsonVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s01LegacyTemplateJsonVerify,
       apiName: 'buildS01LegacyTemplateJsonVerificationPdf',
       icon: Icons.swap_horiz_outlined,
-      generator: buildS01LegacyTemplateJsonVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+
+        generateTextTypographyVerificationInBackground(
+
+          apiName: 'buildS01LegacyTemplateJsonVerificationPdf',
+
+          isRtl: isRtl,
+
+        ),
       fileName: 's01_directionality_legacy_template_json.pdf',
+      showGenerationToast: true,
       usageCode: r'''Future<Uint8List> buildS01LegacyTemplateJsonVerificationPdf(GeniusPdfConfig config) async {
   final direction = config.textDirection == TextDirection.rtl
       ? GeniusPdfDirection.rtl

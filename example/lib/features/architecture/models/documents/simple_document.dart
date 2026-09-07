@@ -7,14 +7,15 @@ import 'package:pdf/widgets.dart' as pw;
 
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart' show geniusPdfConfig;
 
-Future<Uint8List> buildSimpleDocumentBytes() async {
+Future<Uint8List> buildSimpleDocumentBytes({GeniusPdfConfig? config}) async {
+  final effectiveConfig = config ?? geniusPdfConfig;
   const primaryColor = p.PdfColor.fromInt(0xFF6366F1);
   const lightBg = p.PdfColor.fromInt(0xFFF8FAFC);
 
   return GeniusPdfBuilder(
     id: 'simple-doc',
     config: GeniusPdfConfig(
-      baseFontBytes: geniusPdfConfig.assets.primaryFont,
+      baseFontBytes: effectiveConfig.assets.primaryFont,
       baseFontSize: 10,
     ),
   )

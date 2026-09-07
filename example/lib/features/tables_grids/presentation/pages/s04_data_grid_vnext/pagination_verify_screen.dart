@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/tables_grids/models/documents/s04_data_grid_vnext_verification_documents.dart';
+import 'package:genius_pdf_example/features/tables_grids/models/documents/tables_grids_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,8 +16,12 @@ class S04PaginationVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s04MultiPageRepeatedHeaderVerify,
       apiName: 'buildS04PaginationVerificationPdf',
       icon: Icons.table_view_outlined,
-      generator: buildS04PaginationVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) => generateTablesGridsExampleInBackground(
+        apiName: 'buildS04PaginationVerificationPdf',
+        isRtl: isRtl,
+      ),
       fileName: 's04_data_grid_vnext_pagination.pdf',
+      showGenerationToast: true,
       usageCode: r'''Future<Uint8List> buildS04PaginationVerificationPdf(GeniusPdfConfig config) async {
   final direction = config.textDirection == TextDirection.rtl
       ? GeniusPdfDirection.rtl

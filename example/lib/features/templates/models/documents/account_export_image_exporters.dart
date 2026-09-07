@@ -43,11 +43,25 @@ Future<TemplateImageExportResult> exportSingleAccountImageDemo({
   required GeniusExportFormat format,
   required GeniusImageQuality quality,
   required DemoDocumentController documents,
+  AccountExportCustomization customization = const AccountExportCustomization(),
+  AccountExportFieldVisibility fields = AccountExportFieldVisibility.singleImage,
+  bool showBalances = true,
+  bool showActivity = true,
+  bool showQRCode = true,
+  bool showNotes = true,
 }) async {
   final pages = <Uint8List>[];
   final paths = <String>[];
   await _appendBuilderImages(
-    builder: buildSingleAccountImageDemo(isRtl: isRtl),
+    builder: buildSingleAccountImageDemo(
+      isRtl: isRtl,
+      customization: customization,
+      fields: fields,
+      showBalances: showBalances,
+      showActivity: showActivity,
+      showQRCode: showQRCode,
+      showNotes: showNotes,
+    ),
     fileName: 'single_account_image',
     format: format,
     quality: quality,
@@ -69,10 +83,28 @@ Future<TemplateImageExportResult> exportMultiAccountImageDemo({
   required GeniusExportFormat format,
   required GeniusImageQuality quality,
   required DemoDocumentController documents,
+  AccountExportCustomization customization = const AccountExportCustomization(),
+  AccountExportFieldVisibility fields = AccountExportFieldVisibility.multiImage,
+  int maxAccountsPerImage = 8,
+  bool showBalances = true,
+  bool showActivity = true,
+  bool showLastTransactionDate = true,
+  bool showQRCode = true,
+  bool showNotes = true,
 }) async {
   final pages = <Uint8List>[];
   final paths = <String>[];
-  final builders = buildMultiAccountImageDemos(isRtl: isRtl);
+  final builders = buildMultiAccountImageDemos(
+    isRtl: isRtl,
+    customization: customization,
+    fields: fields,
+    maxAccountsPerImage: maxAccountsPerImage,
+    showBalances: showBalances,
+    showActivity: showActivity,
+    showLastTransactionDate: showLastTransactionDate,
+    showQRCode: showQRCode,
+    showNotes: showNotes,
+  );
   for (final builder in builders) {
     await _appendBuilderImages(
       builder: builder,

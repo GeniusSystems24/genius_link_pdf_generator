@@ -1,15 +1,12 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/templates/models/documents/template_example_build.dart';
-import 'package:genius_pdf_example/features/templates/models/documents/templates_demo_documents.dart';
+import 'package:genius_pdf_example/features/templates/models/documents/export_template_background_generators.dart';
 import 'package:genius_pdf_example/features/templates/presentation/widgets/template_example_detail_screen.dart';
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 
-TemplateExampleBuild _buildInventoryReportTemplate({required bool isRtl}) {
-  return TemplateExampleBuild(
-    builder: buildInventoryReportTemplate(isRtl: isRtl),
-    fileName: 'inventory_report_demo',
-  );
+Future<Uint8List> _generateInventoryReportInBackground({required bool isRtl}) {
+  return generateInventoryReportTemplateInBackground(isRtl: isRtl);
 }
 
 /// Dedicated example screen for the Inventory Report template.
@@ -19,12 +16,12 @@ class InventoryReportTemplateScreen extends StatelessWidget {
   static const String dartUsageCode = r'''// Dart usage code — the same builder used by this example.
 // Set isRtl to false for LTR output.
 
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart'
     show geniusPdfConfig;
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
 import 'package:genius_pdf_example/shared/data/sample_data.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -48,8 +45,16 @@ InventoryReportTemplate buildInventoryReportTemplate({required bool isRtl}) {
 }
 
 final template = buildInventoryReportTemplate(isRtl: true);
-final pdfBytes = Uint8List.fromList(template.generate());
-template.dispose();
+final result = await generateExamplePdf(
+  builder: template,
+  fileName: 'inventory_report_demo',
+  metadata: const <String, dynamic>{
+    'feature': 'templates',
+    'template': 'InventoryReportTemplate',
+    'workflow': 'usage-example',
+  },
+);
+final pdfBytes = result.bytes;
 ''';
 
   @override
@@ -60,7 +65,13 @@ template.dispose();
       titleAr: 'تقرير المخزون',
       description: pdfLocalization.inventoryValuationReportCategoryDesc,
       icon: Icons.inventory_2_outlined,
-      buildTemplate: _buildInventoryReportTemplate,
+      backgroundGenerator: _generateInventoryReportInBackground,
+      backgroundFileName: 'inventory_report_demo.pdf',
+      jobMetadata: const <String, dynamic>{
+        'feature': 'templates',
+        'template': 'InventoryReportTemplate',
+      },
+      showGenerationToast: true,
       usageCode: dartUsageCode,
     );
   }

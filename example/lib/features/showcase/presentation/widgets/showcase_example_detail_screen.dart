@@ -1,9 +1,12 @@
+// Global manager/background migration for Showcase examples
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
+import 'package:genius_pdf_example/features/showcase/models/documents/showcase_background_generation.dart';
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/features/showcase/models/documents/showcase_demo_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
@@ -44,6 +47,7 @@ class _ShowcaseExampleDetailScreenState
     extends State<ShowcaseExampleDetailScreen> {
   late bool _isRtl;
   Uint8List? _previewData;
+  String? _previewFilePath;
   Object? _executionError;
   bool _executing = false;
   bool _openingPdf = false;
@@ -62,6 +66,7 @@ class _ShowcaseExampleDetailScreenState
       // The existing preview was produced with a different direction. Do not
       // regenerate automatically; wait for the next explicit Run example.
       _previewData = null;
+      _previewFilePath = null;
       _executionError = null;
     });
   }
@@ -75,23 +80,36 @@ class _ShowcaseExampleDetailScreenState
     });
 
     try {
-      final config = geniusPdfConfig.copyWith(
-        textDirection: _isRtl ? TextDirection.rtl : TextDirection.ltr,
-      );
-      final bytes = await buildShowcaseDemoBytes(
-        showcaseId: widget.showcaseId,
-        config: config,
+      final success = await generateExamplePdf(
+        builder: ExampleBackgroundPdfBuilder(
+          config: geniusPdfConfig,
+          backgroundGenerator: () => generateShowcaseExampleInBackground(
+            showcaseId: widget.showcaseId,
+            isRtl: _isRtl,
+          ),
+        ),
+        fileName: 'showcase_${widget.showcaseId}',
+        metadata: <String, dynamic>{
+          'feature': 'showcase',
+          'showcaseId': widget.showcaseId,
+          'screen': widget.title,
+          'category': widget.category,
+          'workflow': 'showcase-preview',
+          'showGenerationToast': true,
+        },
       );
 
       if (!mounted) return;
       setState(() {
-        _previewData = bytes;
+        _previewData = success.bytes;
+        _previewFilePath = success.filePath;
         _executionError = null;
       });
     } catch (error) {
       if (!mounted) return;
       setState(() {
         _previewData = null;
+        _previewFilePath = null;
         _executionError = error;
       });
       _showMessage('Unable to generate PDF preview: $error', error: true);
@@ -106,10 +124,15 @@ class _ShowcaseExampleDetailScreenState
 
     setState(() => _openingPdf = true);
     try {
-      await demoDocuments.saveAndOpen(
-        bytes: bytes,
-        fileName: 'showcase_${widget.showcaseId}.pdf',
-      );
+      final filePath = _previewFilePath;
+      if (filePath != null && filePath.isNotEmpty) {
+        await demoDocuments.open(filePath);
+      } else {
+        await demoDocuments.saveAndOpen(
+          bytes: bytes,
+          fileName: 'showcase_${widget.showcaseId}.pdf',
+        );
+      }
       if (mounted) {
         _showMessage('PDF opened successfully.');
       }

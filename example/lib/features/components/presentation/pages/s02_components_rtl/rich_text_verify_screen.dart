@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/components/models/documents/s02_components_rtl_verification_documents.dart';
+import 'package:genius_pdf_example/features/components/models/documents/components_verification_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,7 +16,12 @@ class S02RichTextVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s02RichTextRtlVerify,
       apiName: 'buildS02RichTextVerificationPdf',
       icon: Icons.compare_arrows_outlined,
-      generator: buildS02RichTextVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+          generateComponentsVerificationInBackground(
+            apiName: 'buildS02RichTextVerificationPdf',
+            isRtl: isRtl,
+          ),
+      showGenerationToast: true,
       fileName: 's02_components_rtl_rich_text.pdf',
       usageCode: r'''Future<Uint8List> buildS02RichTextVerificationPdf(GeniusPdfConfig config) async {
   final direction = config.textDirection == TextDirection.rtl

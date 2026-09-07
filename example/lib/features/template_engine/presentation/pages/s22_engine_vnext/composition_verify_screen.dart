@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/template_engine/models/documents/s22_engine_vnext_verification_documents.dart';
+import 'package:genius_pdf_example/features/template_engine/models/documents/template_engine_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -36,10 +36,12 @@ class _S22CompositionVerificationExampleScreenState extends State<S22Composition
       description: pdfLocalization.s22ComponentsStylesSubTemplateVerify,
       apiName: 'buildS22CompositionVerificationPdf',
       icon: Icons.account_tree_outlined,
-      generator: (config) => buildS22CompositionVerificationPdf(
-        config,
+      backgroundGenerator: ({required bool isRtl}) => generateTemplateEngineVerificationInBackground(
+        apiName: 'buildS22CompositionVerificationPdf',
+        isRtl: isRtl,
         rowCount: _rowCount,
       ),
+      showGenerationToast: true,
       usageCode: dartUsageCode,
       fileName: 's22_engine_vnext_composition.pdf',
       configurationVersion: _rowCount,

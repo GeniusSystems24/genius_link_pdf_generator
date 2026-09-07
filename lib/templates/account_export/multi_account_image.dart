@@ -58,11 +58,6 @@ GeniusPdfGridColumn _creditColumn(
   );
 }
 
-String _date(DateTime value) =>
-    '${value.year.toString().padLeft(4, '0')}-'
-    '${value.month.toString().padLeft(2, '0')}-'
-    '${value.day.toString().padLeft(2, '0')}';
-
 extension _AccountExportDocumentBuilderSupport on GeniusPdfDocumentBuilder {
   void _drawGrid(
     List<GeniusPdfGridColumn> columns,
@@ -126,6 +121,7 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
     this.maxAccountsPerImage = 12,
     this.imageIndex = 0,
     this.totalAccountCount,
+    this.customization = const AccountExportCustomization(),
     this.reportId,
     this.qrCodeUrl,
     this.showQRCode = true,
@@ -181,6 +177,9 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
   /// Compact fields, selected currency, and summary visibility.
   final AccountExportConfiguration configuration;
 
+  /// Reusable presentation and extension hooks for this template.
+  final AccountExportCustomization customization;
+
   /// Maximum account rows allowed in one image.
   final int maxAccountsPerImage;
 
@@ -232,6 +231,7 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
       activityMode: AccountExportActivityMode.summary,
     ),
     int maxAccountsPerImage = 12,
+    AccountExportCustomization customization = const AccountExportCustomization(),
     String? reportId,
     String? qrCodeUrl,
     bool showQRCode = true,
@@ -262,6 +262,7 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
           company: company,
           configuration: configuration,
           maxAccountsPerImage: maxAccountsPerImage,
+          customization: customization,
           imageIndex: currentIndex,
           totalAccountCount: accounts.length,
           reportId: imageReportId,
@@ -280,7 +281,7 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
   /// Builds the compact summary-only multi-account source page.
   @override
   void build() {
-    _addRepeatingFooter();
+    if (customization.showFooter) _addRepeatingFooter();
 
     newPage();
     _drawHeader();
@@ -295,7 +296,7 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
       userLabel: config.isRTL ? 'المستخدم: ' : 'User: ',
       printTime: _footerIssueDate(),
       showPageNumber: true,
-      pageNumberFormat: '{0}/{1}',
+      pageNumberFormat: customization.pageNumberFormat,
     );
   }
 
@@ -308,7 +309,7 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
   }
 
   String _footerIssueDate() {
-    final value = _date(meta.issueDate);
+    final value = customization.formatDate(meta.issueDate);
     return config.isRTL ? 'تاريخ الإصدار: $value' : 'Issue date: $value';
   }
 
@@ -320,7 +321,7 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
       printDate: meta.issueDate,
       config: config,
       style: const GeniusPdfReportHeaderStyle.classic(),
-      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
+      layout: customization.headerLayout,
       showCompanyInfo: company != null,
       showBilingualTitle: true,
       customFields: <String, String>{
@@ -376,14 +377,19 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
       ),
     ];
 
+    final detailItems = customization.buildDetails(
+      AccountExportDetailSection.report,
+      values,
+    );
+
     final result = GeniusPdfInfoBox(
       config: config,
       title: 'Report Details',
       titleAr: 'تفاصيل التقرير',
-      items: values,
-      columns: 3,
+      items: detailItems,
+      columns: customization.reportDetailsColumns,
       columnSpacing: 12,
-      style: GeniusPdfInfoBoxStyle.minimal(),
+      style: customization.effectiveInfoBoxStyle,
     ).draw(
       page: currentPage,
       bounds: Rect.fromLTWH(0, currentY, pageWidth, 76),
@@ -394,9 +400,9 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
   String _reportPeriodLabel() {
     final start = configuration.periodStart;
     final end = configuration.periodEnd;
-    if (start != null && end != null) return '${_date(start)} — ${_date(end)}';
-    if (start != null) return config.isRTL ? 'من ${_date(start)}' : 'From ${_date(start)}';
-    if (end != null) return config.isRTL ? 'حتى ${_date(end)}' : 'Through ${_date(end)}';
+    if (start != null && end != null) return '${customization.formatDate(start)} — ${customization.formatDate(end)}';
+    if (start != null) return config.isRTL ? 'من ${customization.formatDate(start)}' : 'From ${customization.formatDate(start)}';
+    if (end != null) return config.isRTL ? 'حتى ${customization.formatDate(end)}' : 'Through ${customization.formatDate(end)}';
     return config.isRTL ? 'جميع الفترات' : 'All dates';
   }
 
@@ -458,7 +464,7 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
     final rows = accounts.map((account) {
       final balance = account.balanceFor(configuration.selectedCurrency);
       final summary = account.summaryFor(configuration.selectedCurrency);
-      return GeniusPdfGridRow(cells: <String, dynamic>{
+      final defaultRow = GeniusPdfGridRow(cells: <String, dynamic>{
         'number': account.accountNumber,
         'name': account.displayName(isRtl: config.isRTL),
         'parent': account.displayParentName(isRtl: config.isRTL),
@@ -468,6 +474,11 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
         'debit': summary?.totalDebit,
         'credit': summary?.totalCredit,
       });
+      return customization.buildRow(
+        AccountExportGridKind.compactAccounts,
+        account,
+        defaultRow,
+      );
     }).toList();
 
     if (configuration.showTotals && rows.isNotEmpty) {
@@ -495,7 +506,12 @@ class MultiAccountImage extends GeniusErpRegisterDocument {
     }
 
     _drawSectionTitle('Accounts', 'الحسابات');
-    _drawGrid(columns, rows, spacing: 4);
+    _drawGrid(
+      customization.buildColumns(AccountExportGridKind.compactAccounts, columns),
+      rows,
+      spacing: 4,
+      style: customization.gridStyle,
+    );
   }
 
   DateTime? _lastTransactionDate(AccountExportAccount account) {

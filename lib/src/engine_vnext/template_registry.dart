@@ -283,13 +283,24 @@ class GeniusPdfTemplateRegistry {
   }
 
   String _fnv1a64(String source) {
-    var hash = 0xcbf29ce484222325;
-    const prime = 0x100000001b3;
-    const mask = 0xffffffffffffffff;
+    const uint32 = 0x100000000;
+    var hashHigh = 0xcbf29ce4;
+    var hashLow = 0x84222325;
+    const primeLow = 0x1b3;
     for (final unit in utf8.encode(source)) {
-      hash ^= unit;
-      hash = (hash * prime) & mask;
+      hashLow = (hashLow ^ unit) >>> 0;
+
+      final lowProduct = hashLow * primeLow;
+      final lowCarry = lowProduct ~/ uint32;
+      final nextLow = lowProduct.remainder(uint32);
+      final nextHigh =
+          (hashHigh * primeLow + lowCarry + (hashLow << 8))
+              .remainder(uint32);
+
+      hashHigh = nextHigh;
+      hashLow = nextLow;
     }
-    return hash.toRadixString(16).padLeft(16, '0');
+    return hashHigh.toRadixString(16).padLeft(8, '0') +
+        hashLow.toRadixString(16).padLeft(8, '0');
   }
 }

@@ -1,9 +1,11 @@
+// Global manager/background migration for verification examples
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
 
@@ -11,6 +13,10 @@ import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart
 typedef VerificationPdfGenerator = Future<Uint8List> Function(
   GeniusPdfConfig config,
 );
+
+typedef VerificationPdfBackgroundGenerator = Future<Uint8List> Function({
+  required bool isRtl,
+});
 
 /// Shared page for one focused verification example.
 ///
@@ -25,20 +31,27 @@ class VerificationExampleDetailScreen extends StatefulWidget {
     required this.description,
     required this.apiName,
     required this.icon,
-    required this.generator,
+    this.generator,
+    this.backgroundGenerator,
     required this.usageCode,
     required this.fileName,
     this.initialRtl = false,
     this.controls = const <Widget>[],
     this.configurationVersion,
-  });
+    this.showGenerationToast = true,
+    this.jobPriority = GeniusPdfJobPriority.normal,
+  }) : assert(
+          generator != null || backgroundGenerator != null,
+          'Provide generator or backgroundGenerator.',
+        );
 
   final String sprint;
   final String title;
   final String description;
   final String apiName;
   final IconData icon;
-  final VerificationPdfGenerator generator;
+  final VerificationPdfGenerator? generator;
+  final VerificationPdfBackgroundGenerator? backgroundGenerator;
   final String usageCode;
   final String fileName;
   final bool initialRtl;
@@ -49,6 +62,12 @@ class VerificationExampleDetailScreen extends StatefulWidget {
   /// Changing this value invalidates the current PDF preview.
   final Object? configurationVersion;
 
+  /// Whether the app-wide generation observer should show Toasts.
+  final bool showGenerationToast;
+
+  /// Queue priority used by the global generation manager.
+  final GeniusPdfJobPriority jobPriority;
+
   @override
   State<VerificationExampleDetailScreen> createState() =>
       _VerificationExampleDetailScreenState();
@@ -58,6 +77,7 @@ class _VerificationExampleDetailScreenState
     extends State<VerificationExampleDetailScreen> {
   late bool _isRtl;
   Uint8List? _previewData;
+  String? _previewFilePath;
   Object? _error;
   bool _running = false;
   bool _opening = false;
@@ -73,6 +93,7 @@ class _VerificationExampleDetailScreenState
     super.didUpdateWidget(oldWidget);
     if (oldWidget.configurationVersion != widget.configurationVersion) {
       _previewData = null;
+      _previewFilePath = null;
       _error = null;
     }
   }
@@ -86,6 +107,7 @@ class _VerificationExampleDetailScreenState
     setState(() {
       _isRtl = rtl;
       _previewData = null;
+      _previewFilePath = null;
       _error = null;
     });
   }
@@ -98,14 +120,48 @@ class _VerificationExampleDetailScreenState
     });
 
     try {
-      final bytes = await widget.generator(_config);
-      if (!mounted) return;
-      setState(() => _previewData = bytes);
+      final backgroundGenerator = widget.backgroundGenerator;
+      if (backgroundGenerator != null) {
+        final fileName = widget.fileName.toLowerCase().endsWith('.pdf')
+            ? widget.fileName.substring(0, widget.fileName.length - 4)
+            : widget.fileName;
+
+        final success = await generateExamplePdf(
+          builder: ExampleBackgroundPdfBuilder(
+            config: geniusPdfConfig,
+            backgroundGenerator: () => backgroundGenerator(isRtl: _isRtl),
+          ),
+          fileName: fileName,
+          priority: widget.jobPriority,
+          metadata: <String, dynamic>{
+            'feature': 'verification',
+            'screen': widget.title,
+            'sprint': widget.sprint,
+            'apiName': widget.apiName,
+            'workflow': 'verification-preview',
+            'showGenerationToast': widget.showGenerationToast,
+          },
+        );
+
+        if (!mounted) return;
+        setState(() {
+          _previewData = success.bytes;
+          _previewFilePath = success.filePath;
+        });
+      } else {
+        final bytes = await widget.generator!(_config);
+        if (!mounted) return;
+        setState(() {
+          _previewData = bytes;
+          _previewFilePath = null;
+        });
+      }
     } catch (error) {
       if (!mounted) return;
       setState(() {
         _error = error;
         _previewData = null;
+        _previewFilePath = null;
       });
     } finally {
       if (mounted) setState(() => _running = false);
@@ -118,10 +174,15 @@ class _VerificationExampleDetailScreenState
 
     setState(() => _opening = true);
     try {
-      await demoDocuments.saveAndOpen(
-        bytes: bytes,
-        fileName: widget.fileName,
-      );
+      final filePath = _previewFilePath;
+      if (filePath != null && filePath.isNotEmpty) {
+        await demoDocuments.open(filePath);
+      } else {
+        await demoDocuments.saveAndOpen(
+          bytes: bytes,
+          fileName: widget.fileName,
+        );
+      }
     } finally {
       if (mounted) setState(() => _opening = false);
     }

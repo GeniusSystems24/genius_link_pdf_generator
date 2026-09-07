@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/template_engine/models/documents/s22_engine_vnext_verification_documents.dart';
+import 'package:genius_pdf_example/features/template_engine/models/documents/template_engine_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -36,10 +36,12 @@ class _S22ScopedRegistryVerificationExampleScreenState extends State<S22ScopedRe
       description: pdfLocalization.s22RegistryFallbackHistoryVerify,
       apiName: 'buildS22ScopedRegistryVerificationPdf',
       icon: Icons.account_tree_outlined,
-      generator: (config) => buildS22ScopedRegistryVerificationPdf(
-        config,
+      backgroundGenerator: ({required bool isRtl}) => generateTemplateEngineVerificationInBackground(
+        apiName: 'buildS22ScopedRegistryVerificationPdf',
+        isRtl: isRtl,
         rowCount: _rowCount,
       ),
+      showGenerationToast: true,
       usageCode: dartUsageCode,
       fileName: 's22_engine_vnext_scoped_registry.pdf',
       configurationVersion: _rowCount,

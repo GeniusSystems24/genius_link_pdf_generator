@@ -357,6 +357,13 @@ List<AccountExportAccount> _buildMultiAccountPdfDemoAccounts() {
 
 MultiAccountPdf buildMultiAccountPdfDemo({
   required bool isRtl,
+  AccountExportCustomization customization = const AccountExportCustomization(),
+  AccountExportGrouping grouping = AccountExportGrouping.accountGroup,
+  bool showBalances = true,
+  bool showActivity = true,
+  bool showTotals = true,
+  bool showQRCode = true,
+  bool showNotes = true,
 }) {
   return MultiAccountPdf(
     config: accountExportDemoConfig(isRtl: isRtl),
@@ -364,43 +371,63 @@ MultiAccountPdf buildMultiAccountPdfDemo({
     meta: accountExportDemoMeta(isRtl: isRtl),
     accounts: _buildMultiAccountPdfDemoAccounts(),
     reportId: 'MULTI-ACC-EXP-20260906-200',
-    showQRCode: true,
-    showNotes: true,
+    showQRCode: showQRCode,
+    showNotes: showNotes,
+    customization: customization,
     configuration: AccountExportConfiguration(
       fields: AccountExportFieldVisibility.multiPdf,
       selectedCurrency: 'YER',
       periodStart: DateTime(2026, 8, 1),
       periodEnd: DateTime(2026, 8, 31),
-      showBalances: true,
-      showActivity: true,
+      showBalances: showBalances,
+      showActivity: showActivity,
       activityMode: AccountExportActivityMode.summary,
-      grouping: AccountExportGrouping.accountGroup,
-      showTotals: true,
+      grouping: grouping,
+      showTotals: showTotals,
     ),
   );
 }
 
-SingleAccountImage buildSingleAccountImageDemo({required bool isRtl}) {
+SingleAccountImage buildSingleAccountImageDemo({
+  required bool isRtl,
+  AccountExportCustomization customization = const AccountExportCustomization(),
+  AccountExportFieldVisibility fields = AccountExportFieldVisibility.singleImage,
+  bool showBalances = true,
+  bool showActivity = true,
+  bool showQRCode = true,
+  bool showNotes = true,
+}) {
   return SingleAccountImage(
     config: accountExportDemoConfig(isRtl: isRtl),
     company: SampleData.companyInfo,
     meta: accountExportDemoMeta(isRtl: isRtl),
     account: accountExportDemoAccounts.first,
     reportId: 'SINGLE-ACC-IMG-20260906-001',
-    showQRCode: true,
-    showNotes: true,
-    configuration: const AccountExportConfiguration(
-      fields: AccountExportFieldVisibility.singleImage,
+    showQRCode: showQRCode,
+    showNotes: showNotes,
+    customization: customization,
+    configuration: AccountExportConfiguration(
+      fields: fields,
       selectedCurrency: 'YER',
-      showBalances: true,
-      showActivity: true,
+      showBalances: showBalances,
+      showActivity: showActivity,
       activityMode: AccountExportActivityMode.summary,
       showTotals: true,
     ),
   );
 }
 
-List<MultiAccountImage> buildMultiAccountImageDemos({required bool isRtl}) {
+List<MultiAccountImage> buildMultiAccountImageDemos({
+  required bool isRtl,
+  AccountExportCustomization customization = const AccountExportCustomization(),
+  AccountExportFieldVisibility fields = AccountExportFieldVisibility.multiImage,
+  int maxAccountsPerImage = 8,
+  bool showBalances = true,
+  bool showActivity = true,
+  bool showLastTransactionDate = true,
+  bool showQRCode = true,
+  bool showNotes = true,
+}) {
   final sourceAccounts = _buildMultiAccountPdfDemoAccounts().take(24).toList();
   return MultiAccountImage.split(
     config: accountExportDemoConfig(isRtl: isRtl),
@@ -408,17 +435,18 @@ List<MultiAccountImage> buildMultiAccountImageDemos({required bool isRtl}) {
     meta: accountExportDemoMeta(isRtl: isRtl),
     accounts: sourceAccounts,
     reportId: 'MULTI-ACC-IMG-20260906',
-    maxAccountsPerImage: 8,
-    showQRCode: true,
-    showNotes: true,
-    showLastTransactionDate: true,
-    configuration:  AccountExportConfiguration(
-      fields: AccountExportFieldVisibility.multiImage,
+    maxAccountsPerImage: maxAccountsPerImage,
+    showQRCode: showQRCode,
+    showNotes: showNotes,
+    showLastTransactionDate: showLastTransactionDate,
+    customization: customization,
+    configuration: AccountExportConfiguration(
+      fields: fields,
       selectedCurrency: 'YER',
       periodStart: DateTime(2026, 8, 1),
       periodEnd: DateTime(2026, 8, 31),
-      showBalances: true,
-      showActivity: true,
+      showBalances: showBalances,
+      showActivity: showActivity,
       activityMode: AccountExportActivityMode.summary,
       showTotals: true,
     ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/security/models/documents/s23_compliance_archive_verification_documents.dart';
+import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart' show geniusPdfConfig;
+import 'package:genius_pdf_example/features/security/models/documents/security_verification_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -26,7 +27,13 @@ class S23ArchiveMetadataVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s23ArchiveAuditMetadataVerify,
       apiName: 'buildS23ArchiveMetadataVerificationPdf',
       icon: Icons.verified_user_outlined,
-      generator: buildS23ArchiveMetadataVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+          generateSecurityVerificationInBackground(
+            apiName: 'buildS23ArchiveMetadataVerificationPdf',
+            isRtl: isRtl,
+            rootConfig: geniusPdfConfig,
+          ),
+      showGenerationToast: true,
       usageCode: dartUsageCode,
       fileName: 's23_compliance_archive_archive_metadata.pdf',
     );

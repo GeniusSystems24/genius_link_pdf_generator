@@ -1,12 +1,7 @@
 import 'dart:ui';
 
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../src/components/components.dart';
-import '../../src/core/pdf_config.dart';
-import '../../src/families/erp/erp_families.dart';
-import 'models.dart';
 
 GeniusPdfCellStyle _debitCellStyle(TransactionTransferAmountColors colors) {
   return GeniusPdfCellStyle(
@@ -32,23 +27,19 @@ GeniusPdfCellStyle _creditCellStyle(TransactionTransferAmountColors colors) {
   );
 }
 
-String _date(DateTime value) =>
-    '${value.year.toString().padLeft(4, '0')}-'
-    '${value.month.toString().padLeft(2, '0')}-'
-    '${value.day.toString().padLeft(2, '0')}';
-
 extension _MultiTransactionTransferBuilderSupport on GeniusPdfDocumentBuilder {
   void _drawGrid(
     List<GeniusPdfGridColumn> columns,
     List<GeniusPdfGridRow> rows, {
     double spacing = 10,
+    GeniusPdfGridStyle style = const GeniusPdfGridStyle.classic(),
   }) {
     if (rows.isEmpty) return;
     final result = GeniusPdfDataGrid(
       config: config,
       columns: columns,
       rows: rows,
-      style: const GeniusPdfGridStyle.classic(),
+      style: style,
     ).drawAt(
       page: currentPage,
       x: 0,
@@ -103,6 +94,7 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
     this.accountDirectory = const <int, TransactionTransferAccountInfo>{},
     this.company,
     this.configuration = const TransactionTransferReportConfiguration(),
+    this.customization = const TransactionTransferTemplateCustomization(),
     this.reportId,
     this.qrCodeUrl,
     this.showQRCode = true,
@@ -129,6 +121,9 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
   /// Period/currency/service/status filters and semantic amount colors.
   final TransactionTransferReportConfiguration configuration;
 
+  /// Reusable presentation and extension hooks for this template.
+  final TransactionTransferTemplateCustomization customization;
+
   /// Stable report identifier displayed next to the QR code.
   final String? reportId;
 
@@ -150,7 +145,7 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
 
   @override
   void build() {
-    _addRepeatingFooter();
+    if (customization.showFooter) _addRepeatingFooter();
     newPage();
     _drawHeader();
     final filteredRows = _filteredRows();
@@ -173,10 +168,10 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
       userName: _footerUserName(),
       userLabel: config.isRTL ? 'المستخدم: ' : 'User: ',
       printTime: config.isRTL
-          ? 'تاريخ الإصدار: ${_date(meta.issueDate)}'
-          : 'Issue date: ${_date(meta.issueDate)}',
+          ? 'تاريخ الإصدار: ${customization.formatDate(meta.issueDate)}'
+          : 'Issue date: ${customization.formatDate(meta.issueDate)}',
       showPageNumber: true,
-      pageNumberFormat: '{0}/{1}',
+      pageNumberFormat: customization.pageNumberFormat,
     );
   }
 
@@ -196,7 +191,7 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
       printDate: meta.issueDate,
       config: config,
       style: const GeniusPdfReportHeaderStyle.classic(),
-      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
+      layout: customization.headerLayout,
       showCompanyInfo: company != null,
       showBilingualTitle: true,
       customFields: <String, String>{
@@ -259,14 +254,19 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
       ),
     ];
 
+    final detailItems = customization.buildDetails(
+      TransactionTransferDetailSection.report,
+      values,
+    );
+
     final box = GeniusPdfInfoBox(
       config: config,
       title: 'Report Details',
       titleAr: 'تفاصيل التقرير',
-      items: values,
-      columns: 3,
+      items: detailItems,
+      columns: customization.reportDetailsColumns,
       columnSpacing: 14,
-      style: GeniusPdfInfoBoxStyle.minimal(),
+      style: customization.effectiveInfoBoxStyle,
     );
     final result = box.draw(
       page: currentPage,
@@ -278,9 +278,9 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
   String _periodLabel() {
     final start = configuration.periodStart;
     final end = configuration.periodEnd;
-    if (start != null && end != null) return '${_date(start)} — ${_date(end)}';
-    if (start != null) return config.isRTL ? 'من ${_date(start)}' : 'From ${_date(start)}';
-    if (end != null) return config.isRTL ? 'حتى ${_date(end)}' : 'Through ${_date(end)}';
+    if (start != null && end != null) return '${customization.formatDate(start)} — ${customization.formatDate(end)}';
+    if (start != null) return config.isRTL ? 'من ${customization.formatDate(start)}' : 'From ${customization.formatDate(start)}';
+    if (end != null) return config.isRTL ? 'حتى ${customization.formatDate(end)}' : 'Through ${customization.formatDate(end)}';
     return config.isRTL ? 'جميع الفترات' : 'All dates';
   }
 
@@ -328,10 +328,15 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
       }
     }
 
-    _drawGrid(_columns(), gridRows);
+    _drawGrid(
+      _columns(),
+      gridRows,
+      style: customization.gridStyle,
+    );
   }
 
-  List<GeniusPdfGridColumn> _columns() => <GeniusPdfGridColumn>[
+  List<GeniusPdfGridColumn> _columns() {
+    final defaultColumns = <GeniusPdfGridColumn>[
         GeniusPdfGridColumn.date(
           id: 'date',
           title: 'Date',
@@ -383,10 +388,15 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
           flexFactor: 12,
           wrapText: true,
         ),
-      ];
+    ];
+    return customization.buildColumns(
+      TransactionTransferGridKind.transfers,
+      defaultColumns,
+    );
+  }
 
   GeniusPdfGridRow _transferRow(TransactionTransferRow row) {
-    return GeniusPdfGridRow(cells: <String, dynamic>{
+    final defaultRow = GeniusPdfGridRow(cells: <String, dynamic>{
       'date': row.createdAt,
       'reference': '${row.serviceId}/${row.transactionId}',
       'service': _serviceLabel(row.serviceId),
@@ -395,9 +405,16 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
       'credit': row.creditAmount,
       'note': _descriptionLabel(row),
     });
+    return customization.buildRow(
+      TransactionTransferGridKind.transfers,
+      row,
+      defaultRow,
+    );
   }
 
   String _descriptionLabel(TransactionTransferRow row) {
+    final custom = customization.descriptionBuilder;
+    if (custom != null) return custom(row, config.isRTL);
     final type = row.description.isCommission
         ? (config.isRTL ? 'عمولة' : 'Commission')
         : (config.isRTL ? 'تحويل' : 'Transfer');
@@ -407,6 +424,8 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
 
   String _serviceLabel(int serviceId) {
     final service = services[serviceId];
+    final custom = customization.serviceLabelBuilder;
+    if (custom != null) return custom(serviceId, service, config.isRTL);
     if (service == null) {
       return config.isRTL ? 'خدمة #$serviceId' : 'Service #$serviceId';
     }
@@ -417,6 +436,8 @@ class MultiTransactionTransferPdf extends GeniusErpRegisterDocument {
 
   String _accountLabel(int accountId) {
     final info = accountDirectory[accountId];
+    final custom = customization.accountLabelBuilder;
+    if (custom != null) return custom(accountId, info, config.isRTL);
     if (info == null) return '#$accountId';
     return '${info.displayName(isRtl: config.isRTL)} (#$accountId)';
   }

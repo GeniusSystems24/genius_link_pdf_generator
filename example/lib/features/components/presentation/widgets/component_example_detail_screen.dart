@@ -1,11 +1,13 @@
+// Global manager/background migration for focused Component examples
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
+import 'package:genius_pdf_example/features/components/models/documents/component_background_generation.dart';
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
-import 'package:genius_pdf_example/features/components/models/documents/components_demo_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -44,6 +46,7 @@ class _ComponentExampleDetailScreenState
     extends State<ComponentExampleDetailScreen> {
   late bool _isRtl;
   Uint8List? _previewData;
+  String? _previewFilePath;
   Object? _executionError;
   bool _executing = false;
   bool _openingPdf = false;
@@ -62,6 +65,7 @@ class _ComponentExampleDetailScreenState
       // The existing preview was produced with a different direction. Do not
       // regenerate automatically; wait for the next explicit Run example.
       _previewData = null;
+      _previewFilePath = null;
       _executionError = null;
     });
   }
@@ -75,23 +79,36 @@ class _ComponentExampleDetailScreenState
     });
 
     try {
-      final config = geniusPdfConfig.copyWith(
-        textDirection: _isRtl ? TextDirection.rtl : TextDirection.ltr,
-      );
-      final bytes = await buildComponentDemoBytes(
-        component: widget.componentId,
-        config: config,
+      final success = await generateExamplePdf(
+        builder: ExampleBackgroundPdfBuilder(
+          config: geniusPdfConfig,
+          backgroundGenerator: () => generateComponentExampleInBackground(
+            componentId: widget.componentId,
+            isRtl: _isRtl,
+          ),
+        ),
+        fileName: 'demo_${widget.componentId}',
+        metadata: <String, dynamic>{
+          'feature': 'components',
+          'componentId': widget.componentId,
+          'screen': widget.title,
+          'category': widget.category,
+          'workflow': 'component-preview',
+          'showGenerationToast': true,
+        },
       );
 
       if (!mounted) return;
       setState(() {
-        _previewData = bytes;
+        _previewData = success.bytes;
+        _previewFilePath = success.filePath;
         _executionError = null;
       });
     } catch (error) {
       if (!mounted) return;
       setState(() {
         _previewData = null;
+        _previewFilePath = null;
         _executionError = error;
       });
       _showMessage('Unable to generate PDF preview: $error', error: true);
@@ -106,10 +123,15 @@ class _ComponentExampleDetailScreenState
 
     setState(() => _openingPdf = true);
     try {
-      await demoDocuments.saveAndOpen(
-        bytes: bytes,
-        fileName: 'demo_${widget.componentId}.pdf',
-      );
+      final path = _previewFilePath;
+      if (path != null && path.isNotEmpty) {
+        await demoDocuments.open(path);
+      } else {
+        await demoDocuments.saveAndOpen(
+          bytes: bytes,
+          fileName: 'demo_${widget.componentId}.pdf',
+        );
+      }
       if (mounted) {
         _showMessage('PDF opened successfully.');
       }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/components/models/documents/s07_erp_components_verification_documents.dart';
+import 'package:genius_pdf_example/features/components/models/documents/components_verification_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,7 +16,12 @@ class S07EmptyStateVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s07ExplicitEmptyStateVerify,
       apiName: 'buildS07EmptyStateVerificationPdf',
       icon: Icons.view_module_outlined,
-      generator: buildS07EmptyStateVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+          generateComponentsVerificationInBackground(
+            apiName: 'buildS07EmptyStateVerificationPdf',
+            isRtl: isRtl,
+          ),
+      showGenerationToast: true,
       fileName: 's07_erp_components_empty_state.pdf',
       usageCode: r'''Future<Uint8List> buildS07EmptyStateVerificationPdf(GeniusPdfConfig config) async {
   final direction = config.textDirection == TextDirection.rtl

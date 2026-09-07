@@ -1,7 +1,9 @@
-import 'dart:ui';
+// Global manager/background migration for Printing PDF generation
 
 import 'package:flutter/foundation.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
+import 'package:genius_pdf_example/features/printing/models/documents/printing_background_generation.dart';
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
 
 final class PrintingDemoController extends ChangeNotifier {
   PrintingDemoController({required GeniusPdfConfig config}) : _config = config;
@@ -43,160 +45,23 @@ final class PrintingDemoController extends ChangeNotifier {
     _setLoading(true, 'Generating sample PDF...');
 
     try {
-      final document = PdfDocument();
-
-      PdfFont font;
-      PdfFont titleFont;
-      try {
-        font = _config.baseFont;
-        titleFont = PdfTrueTypeFont(
-          _config.baseFontBytes,
-          18,
-          style: PdfFontStyle.bold,
-        );
-      } catch (_) {
-        font = PdfTrueTypeFont(_config.baseFontBytes, 12);
-        titleFont = PdfTrueTypeFont(
-          _config.baseFontBytes,
-          18,
-          style: PdfFontStyle.bold,
-        );
-      }
-
-      final page1 = document.pages.add();
-      final g1 = page1.graphics;
-      g1.drawString(
-        'Genius Link PDF Generator',
-        titleFont,
-        brush: PdfSolidBrush(PdfColor(0, 51, 102)),
-        bounds: const Rect.fromLTWH(50, 100, 500, 40),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      g1.drawString(
-        'Advanced Printing Demo (v2.2.1)',
-        font,
-        brush: PdfSolidBrush(PdfColor(100, 100, 100)),
-        bounds: const Rect.fromLTWH(50, 150, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      g1.drawLine(
-        PdfPen(PdfColor(0, 51, 102), width: 2),
-        const Offset(50, 190),
-        const Offset(550, 190),
-      );
-      g1.drawString(
-        'Generated: ${DateTime.now().toString().split('.').first}',
-        font,
-        brush: PdfSolidBrush(PdfColor(100, 100, 100)),
-        bounds: const Rect.fromLTWH(50, 210, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      g1.drawString(
-        'Page 1 of 3',
-        font,
-        brush: PdfSolidBrush(PdfColor(150, 150, 150)),
-        bounds: const Rect.fromLTWH(50, 750, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
+      final success = await generateExamplePdf(
+        builder: ExampleBackgroundPdfBuilder(
+          config: _config,
+          backgroundGenerator: () => generatePrintingSamplePdfInBackground(
+            config: _config,
+          ),
+        ),
+        fileName: 'printing_sample_document',
+        metadata: <String, dynamic>{
+          'feature': 'printing',
+          'screen': 'PrintingDemo',
+          'workflow': 'printing-sample',
+          'showGenerationToast': true,
+        },
       );
 
-      final page2 = document.pages.add();
-      final g2 = page2.graphics;
-      g2.drawString(
-        'Print Settings Reference',
-        titleFont,
-        brush: PdfSolidBrush(PdfColor(0, 51, 102)),
-        bounds: const Rect.fromLTWH(50, 50, 500, 40),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      g2.drawLine(
-        PdfPen(PdfColor(200, 200, 200)),
-        const Offset(50, 90),
-        const Offset(550, 90),
-      );
-
-      const settingsInfo = [
-        'Paper Sizes: A4, Letter, Legal, A3, A5, Custom',
-        'Orientations: Portrait, Landscape, Auto',
-        'Color Modes: Color, Grayscale, Black & White',
-        'Quality: Draft, Normal, High, Photo',
-        'Duplex: Simplex, Long Edge, Short Edge',
-        'Pages Per Sheet: 1, 2, 4, 6, 9, 16',
-        'Scale: 25% to 200%',
-        'Features: Collate, Reverse Order, Fit to Page',
-      ];
-
-      var yPos = 110.0;
-      for (final info in settingsInfo) {
-        g2.drawString(
-          '• $info',
-          font,
-          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-          bounds: Rect.fromLTWH(50, yPos, 500, 25),
-          format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-        );
-        yPos += 30;
-      }
-      g2.drawString(
-        'Page 2 of 3',
-        font,
-        brush: PdfSolidBrush(PdfColor(150, 150, 150)),
-        bounds: const Rect.fromLTWH(50, 750, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-
-      final page3 = document.pages.add();
-      final g3 = page3.graphics;
-      g3.drawString(
-        'Test Page',
-        titleFont,
-        brush: PdfSolidBrush(PdfColor(0, 51, 102)),
-        bounds: const Rect.fromLTWH(50, 50, 500, 40),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      g3.drawLine(
-        PdfPen(PdfColor(200, 200, 200)),
-        const Offset(50, 90),
-        const Offset(550, 90),
-      );
-      g3.drawString(
-        'This page tests mixed content rendering.',
-        font,
-        brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-        bounds: const Rect.fromLTWH(50, 110, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      g3.drawString(
-        'Use this to verify font rendering in print output.',
-        font,
-        brush: PdfSolidBrush(PdfColor(100, 100, 100)),
-        bounds: const Rect.fromLTWH(50, 140, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      g3.drawRectangle(
-        brush: PdfSolidBrush(PdfColor(0, 102, 204)),
-        bounds: const Rect.fromLTWH(50, 200, 200, 100),
-      );
-      g3.drawRectangle(
-        brush: PdfSolidBrush(PdfColor(255, 153, 0)),
-        bounds: const Rect.fromLTWH(260, 200, 200, 100),
-      );
-      g3.drawString(
-        'Color test boxes - Verify color mode settings',
-        font,
-        brush: PdfSolidBrush(PdfColor(100, 100, 100)),
-        bounds: const Rect.fromLTWH(50, 320, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      g3.drawString(
-        'Page 3 of 3',
-        font,
-        brush: PdfSolidBrush(PdfColor(150, 150, 150)),
-        bounds: const Rect.fromLTWH(50, 750, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-
-      _samplePdfBytes = Uint8List.fromList(await document.save());
-      document.dispose();
+      _samplePdfBytes = success.bytes;
       _setLoading(
         false,
         'Sample PDF ready (3 pages, ${_samplePdfBytes!.length} bytes)',

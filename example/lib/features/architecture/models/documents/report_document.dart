@@ -7,12 +7,13 @@ import 'package:pdf/widgets.dart' as pw;
 
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart' show geniusPdfConfig;
 
-Future<Uint8List> buildMultiPageReportBytes() async {
+Future<Uint8List> buildMultiPageReportBytes({GeniusPdfConfig? config}) async {
+  final effectiveConfig = config ?? geniusPdfConfig;
   const primaryColor = PdfColor.fromInt(0xFF6366F1);
   const lightBg = PdfColor.fromInt(0xFFF8FAFC);
   const darkText = PdfColor.fromInt(0xFF1E293B);
 
-  final regularFont = geniusPdfConfig.assets.primaryFont;
+  final regularFont = effectiveConfig.assets.primaryFont;
 
   return GeniusPdfBuilder(
     id: 'monthly-report',

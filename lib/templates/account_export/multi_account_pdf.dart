@@ -58,11 +58,6 @@ GeniusPdfGridColumn _creditColumn(
   );
 }
 
-String _date(DateTime value) =>
-    '${value.year.toString().padLeft(4, '0')}-'
-    '${value.month.toString().padLeft(2, '0')}-'
-    '${value.day.toString().padLeft(2, '0')}';
-
 String _nature(AccountBalanceNature? nature, bool isRtl) {
   return switch (nature) {
     AccountBalanceNature.debit => isRtl ? 'مدين' : 'Debit',
@@ -153,6 +148,7 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
     this.configuration = const AccountExportConfiguration(
       fields: AccountExportFieldVisibility.multiPdf,
     ),
+    this.customization = const AccountExportCustomization(),
     this.reportId,
     this.qrCodeUrl,
     this.showQRCode = true,
@@ -176,6 +172,9 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
 
   /// Shared visibility, period, currency, grouping, and activity configuration.
   final AccountExportConfiguration configuration;
+
+  /// Reusable presentation and extension hooks for this template.
+  final AccountExportCustomization customization;
 
   /// Stable report/export identifier displayed above the QR code.
   final String? reportId;
@@ -206,7 +205,7 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
   /// this template does not append per-account detailed transaction tables.
   @override
   void build() {
-    _addRepeatingFooter();
+    if (customization.showFooter) _addRepeatingFooter();
 
     newPage();
     _drawHeader();
@@ -221,7 +220,7 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
       userLabel: config.isRTL ? 'المستخدم: ' : 'User: ',
       printTime: _footerIssueDate(),
       showPageNumber: true,
-      pageNumberFormat: '{0}/{1}',
+      pageNumberFormat: customization.pageNumberFormat,
     );
   }
 
@@ -237,7 +236,7 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
   }
 
   String _footerIssueDate() {
-    final value = _date(meta.issueDate);
+    final value = customization.formatDate(meta.issueDate);
     return config.isRTL ? 'تاريخ الإصدار: $value' : 'Issue date: $value';
   }
 
@@ -249,7 +248,7 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
       printDate: meta.issueDate,
       config: config,
       style: const GeniusPdfReportHeaderStyle.classic(),
-      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
+      layout: customization.headerLayout,
       showCompanyInfo: company != null,
       showBilingualTitle: true,
       customFields: <String, String>{
@@ -296,14 +295,19 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
       ),
     ];
 
+    final detailItems = customization.buildDetails(
+      AccountExportDetailSection.report,
+      values,
+    );
+
     final box = GeniusPdfInfoBox(
       config: config,
       title: 'Report Details',
       titleAr: 'تفاصيل التقرير',
-      items: values,
-      columns: 3,
+      items: detailItems,
+      columns: customization.reportDetailsColumns,
       columnSpacing: 14,
-      style: GeniusPdfInfoBoxStyle.minimal(),
+      style: customization.effectiveInfoBoxStyle,
     );
 
     final result = box.draw(
@@ -318,13 +322,13 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
     final end = configuration.periodEnd;
 
     if (start != null && end != null) {
-      return '${_date(start)} — ${_date(end)}';
+      return '${customization.formatDate(start)} — ${customization.formatDate(end)}';
     }
     if (start != null) {
-      return config.isRTL ? 'من ${_date(start)}' : 'From ${_date(start)}';
+      return config.isRTL ? 'من ${customization.formatDate(start)}' : 'From ${customization.formatDate(start)}';
     }
     if (end != null) {
-      return config.isRTL ? 'حتى ${_date(end)}' : 'Through ${_date(end)}';
+      return config.isRTL ? 'حتى ${customization.formatDate(end)}' : 'Through ${customization.formatDate(end)}';
     }
     return config.isRTL ? 'جميع الفترات' : 'All dates';
   }
@@ -391,7 +395,11 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
       }
     }
 
-    _drawGrid(columns, rows);
+    _drawGrid(
+      customization.buildColumns(AccountExportGridKind.accounts, columns),
+      rows,
+      style: customization.gridStyle,
+    );
   }
 
   List<GeniusPdfGridColumn> _accountColumns() {
@@ -481,7 +489,7 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
   GeniusPdfGridRow _accountRow(AccountExportAccount account) {
     final balance = account.balanceFor(configuration.selectedCurrency);
     final summary = account.summaryFor(configuration.selectedCurrency);
-    return GeniusPdfGridRow(cells: <String, dynamic>{
+    final defaultRow = GeniusPdfGridRow(cells: <String, dynamic>{
       'number': account.accountNumber,
       'name': account.displayName(isRtl: config.isRTL),
       'parentNumber': account.parentAccountNumber,
@@ -495,6 +503,11 @@ class MultiAccountPdf extends GeniusErpRegisterDocument {
       'debit': summary?.totalDebit,
       'credit': summary?.totalCredit,
     });
+    return customization.buildRow(
+      AccountExportGridKind.accounts,
+      account,
+      defaultRow,
+    );
   }
 
   DateTime? _lastTransactionDate(AccountExportAccount account) {

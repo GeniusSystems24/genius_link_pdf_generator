@@ -1,16 +1,19 @@
+// Global manager/background migration for Business verification examples
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     hide EdgeInsets, Colors;
 
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
+import 'package:genius_pdf_example/features/business_templates/models/documents/business_verification_background_generation.dart';
 import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
-typedef BusinessVerificationPdfGenerator = Future<Uint8List> Function(
-  GeniusPdfConfig config,
-);
+
+typedef BusinessVerificationPdfGenerator =
+    Future<Uint8List> Function(GeniusPdfConfig config);
 
 /// Shared host for one focused business/ERP verification example.
 ///
@@ -28,6 +31,8 @@ class BusinessVerificationExampleDetailScreen extends StatefulWidget {
     required this.generator,
     required this.usageCode,
     required this.fileName,
+    this.showGenerationToast = true,
+    this.jobPriority = GeniusPdfJobPriority.normal,
   });
 
   final String sprint;
@@ -39,6 +44,12 @@ class BusinessVerificationExampleDetailScreen extends StatefulWidget {
   final String usageCode;
   final String fileName;
 
+  /// Shows app-wide start/progress/completion Toast feedback.
+  final bool showGenerationToast;
+
+  /// Queue priority used by the global PDF generation manager.
+  final GeniusPdfJobPriority jobPriority;
+
   @override
   State<BusinessVerificationExampleDetailScreen> createState() =>
       _BusinessVerificationExampleDetailScreenState();
@@ -48,19 +59,17 @@ class _BusinessVerificationExampleDetailScreenState
     extends State<BusinessVerificationExampleDetailScreen> {
   bool _rtl = false;
   Uint8List? _previewData;
+  String? _previewFilePath;
   Object? _error;
   bool _running = false;
   bool _opening = false;
-
-  GeniusPdfConfig get _config => geniusPdfConfig.copyWith(
-        textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
-      );
 
   void _setRtl(bool value) {
     if (_rtl == value || _running || _opening) return;
     setState(() {
       _rtl = value;
       _previewData = null;
+      _previewFilePath = null;
       _error = null;
     });
   }
@@ -71,14 +80,42 @@ class _BusinessVerificationExampleDetailScreenState
       _running = true;
       _error = null;
     });
+
     try {
-      final bytes = await widget.generator(_config);
+      final fileName = widget.fileName.toLowerCase().endsWith('.pdf')
+          ? widget.fileName.substring(0, widget.fileName.length - 4)
+          : widget.fileName;
+
+      final success = await generateExamplePdf(
+        builder: ExampleBackgroundPdfBuilder(
+          config: geniusPdfConfig,
+          backgroundGenerator: () => generateBusinessVerificationInBackground(
+            apiName: widget.apiName,
+            isRtl: _rtl,
+          ),
+        ),
+        fileName: fileName,
+        priority: widget.jobPriority,
+        metadata: <String, dynamic>{
+          'feature': 'business_templates',
+          'screen': widget.title,
+          'sprint': widget.sprint,
+          'apiName': widget.apiName,
+          'workflow': 'business-verification-preview',
+          'showGenerationToast': widget.showGenerationToast,
+        },
+      );
+
       if (!mounted) return;
-      setState(() => _previewData = bytes);
+      setState(() {
+        _previewData = success.bytes;
+        _previewFilePath = success.filePath;
+      });
     } catch (error) {
       if (!mounted) return;
       setState(() {
         _previewData = null;
+        _previewFilePath = null;
         _error = error;
       });
     } finally {
@@ -91,7 +128,15 @@ class _BusinessVerificationExampleDetailScreenState
     if (bytes == null || _running || _opening) return;
     setState(() => _opening = true);
     try {
-      await demoDocuments.saveAndOpen(bytes: bytes, fileName: widget.fileName);
+      final path = _previewFilePath;
+      if (path != null && path.isNotEmpty) {
+        await demoDocuments.open(path);
+      } else {
+        await demoDocuments.saveAndOpen(
+          bytes: bytes,
+          fileName: widget.fileName,
+        );
+      }
     } finally {
       if (mounted) setState(() => _opening = false);
     }
@@ -134,7 +179,7 @@ class _BusinessVerificationExampleDetailScreenState
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               SegmentedButton<bool>(
-                segments:  [
+                segments: [
                   ButtonSegment(value: false, label: Text(pdfLocalization.ltr)),
                   ButtonSegment(value: true, label: Text(pdfLocalization.rtl)),
                 ],
@@ -156,8 +201,8 @@ class _BusinessVerificationExampleDetailScreenState
                   _running
                       ? 'Running…'
                       : _previewData == null
-                          ? 'Run example'
-                          : 'Run again',
+                      ? 'Run example'
+                      : 'Run again',
                 ),
               ),
               OutlinedButton.icon(
@@ -193,11 +238,7 @@ class _BusinessVerificationExampleDetailScreenState
               }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  preview,
-                  const SizedBox(height: 20),
-                  code,
-                ],
+                children: [preview, const SizedBox(height: 20), code],
               );
             },
           ),
@@ -223,7 +264,7 @@ class _BusinessPdfPreviewPanel extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     Widget child;
     if (running) {
-      child =  Center(
+      child = Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -245,7 +286,7 @@ class _BusinessPdfPreviewPanel extends StatelessWidget {
         ),
       );
     } else if (data == null) {
-      child =  Center(
+      child = Center(
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Column(

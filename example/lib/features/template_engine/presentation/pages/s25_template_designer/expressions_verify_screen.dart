@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/template_engine/models/documents/s25_template_designer_verification_documents.dart';
+import 'package:genius_pdf_example/features/template_engine/models/documents/template_engine_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -41,11 +41,13 @@ class _S25ExpressionsVerificationExampleScreenState extends State<S25Expressions
       description: pdfLocalization.s25ConditionsExpressionsVerify,
       apiName: 'buildS25ExpressionsVerificationPdf',
       icon: Icons.design_services_outlined,
-      generator: (config) => buildS25ExpressionsVerificationPdf(
-        config,
+      backgroundGenerator: ({required bool isRtl}) => generateTemplateEngineVerificationInBackground(
+        apiName: 'buildS25ExpressionsVerificationPdf',
+        isRtl: isRtl,
         profile: _profile,
         rows: _rows,
       ),
+      showGenerationToast: true,
       usageCode: dartUsageCode,
       fileName: 's25_template_designer_expressions.pdf',
       configurationVersion: '$_profile:$_rows',

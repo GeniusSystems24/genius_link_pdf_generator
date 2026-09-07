@@ -61,8 +61,6 @@ String _date(DateTime value) => '${value.year.toString().padLeft(4, '0')}-'
     '${value.month.toString().padLeft(2, '0')}-'
     '${value.day.toString().padLeft(2, '0')}';
 
-String _amount(double value) => value.toStringAsFixed(2);
-
 String _nature(AccountBalanceNature? nature, bool isRtl) {
   return switch (nature) {
     AccountBalanceNature.debit => isRtl ? 'مدين' : 'Debit',
@@ -130,6 +128,7 @@ List<GeniusPdfGridRow> _summaryRows(
   List<AccountActivitySummary> summaries,
   AccountExportAmountColors colors,
   bool isRtl,
+  String Function(DateTime) dateFormatter,
 ) {
   return summaries
       .map(
@@ -240,6 +239,7 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
     this.configuration = const AccountExportConfiguration(
       fields: AccountExportFieldVisibility.singlePdf,
     ),
+    this.customization = const AccountExportCustomization(),
     String? reportId,
     this.qrCodeUrl,
     bool showQRCode = true,
@@ -272,6 +272,9 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
 
   /// Visibility, period, currency, and activity-mode configuration.
   final AccountExportConfiguration configuration;
+
+  /// Reusable presentation and extension hooks for this template.
+  final AccountExportCustomization customization;
 
   /// Stable report/export identifier displayed with the QR code.
   final String? reportId;
@@ -313,7 +316,7 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
   /// Builds the document using the configured account data and visibility.
   @override
   void build() {
-    _addRepeatingFooter();
+    if (customization.showFooter) _addRepeatingFooter();
 
     newPage();
     _drawHeader();
@@ -332,7 +335,7 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
       userName: _footerUserInfo(),
       userLabel: config.isRTL ? 'المستخدم: ' : 'User: ',
       showPageNumber: true,
-      pageNumberFormat: '{0}/{1}',
+      pageNumberFormat: customization.pageNumberFormat,
     );
   }
 
@@ -359,7 +362,7 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
       printDate: meta.issueDate,
       config: config,
       style: const GeniusPdfReportHeaderStyle.classic(),
-      layout: GeniusPdfReportHeaderLayout.bilingualSplit,
+      layout: customization.headerLayout,
       showCompanyInfo: company != null,
       showBilingualTitle: true,
       customFields: <String, String>{
@@ -429,14 +432,19 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
         ),
     ];
 
+    final detailItems = customization.buildDetails(
+      AccountExportDetailSection.account,
+      values,
+    );
+
     final box = GeniusPdfInfoBox(
       config: config,
       title: 'Account Details',
       titleAr: 'بيانات الحساب',
-      items: values,
-      columns: 3,
+      items: detailItems,
+      columns: customization.accountDetailsColumns,
       columnSpacing: 14,
-      style: GeniusPdfInfoBoxStyle.minimal(),
+      style: customization.effectiveInfoBoxStyle,
     );
 
     final result = box.draw(
@@ -456,7 +464,7 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
           (balance) => GeniusPdfSummaryItem(
             label: '${balance.currency} balance',
             labelAr: 'رصيد ${balance.currency}',
-            value: '${_amount(balance.amount)} ${balance.currency} — '
+            value: '${customization.formatAmount(balance.amount, balance.currency)} ${balance.currency} — '
                 '${_nature(balance.nature, config.isRTL)}',
             valueColor: balance.nature == AccountBalanceNature.debit
                 ? colors.debitForeground
@@ -557,14 +565,9 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
     if (balances.isEmpty) return;
 
     final balance = balances.first;
-    final box = GeniusPdfInfoBox(
-      config: config,
-      title: 'Account balance in $currency',
-      titleAr: 'رصيد الحساب بعملة $currency',
-      columns: 3,
-      columnSpacing: 14,
-      style: GeniusPdfInfoBoxStyle.minimal(),
-      items: <GeniusPdfLabeledValue>[
+    final currencyItems = customization.buildDetails(
+      AccountExportDetailSection.currency,
+      <GeniusPdfLabeledValue>[
         GeniusPdfLabeledValue(
           config: config,
           label: 'Currency',
@@ -575,7 +578,7 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
           config: config,
           label: 'Balance',
           labelAr: 'الرصيد',
-          value: _amount(balance.amount),
+          value: customization.formatAmount(balance.amount, balance.currency),
         ),
         GeniusPdfLabeledValue(
           config: config,
@@ -584,6 +587,15 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
           value: _nature(balance.nature, config.isRTL),
         ),
       ],
+    );
+    final box = GeniusPdfInfoBox(
+      config: config,
+      title: 'Account balance in $currency',
+      titleAr: 'رصيد الحساب بعملة $currency',
+      columns: customization.accountDetailsColumns,
+      columnSpacing: 14,
+      style: customization.effectiveInfoBoxStyle,
+      items: currencyItems,
     );
 
     final result = box.draw(
@@ -603,14 +615,28 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
       'Account activity in $currency',
       'حركة الحساب بعملة $currency',
     );
+    final defaultColumns = _summaryColumns(configuration.amountColors);
+    final defaultRows = _summaryRows(
+      summaries,
+      configuration.amountColors,
+      config.isRTL,
+      customization.formatDate,
+    );
     _drawGrid(
-      _summaryColumns(configuration.amountColors),
-      _summaryRows(
-        summaries,
-        configuration.amountColors,
-        config.isRTL,
+      customization.buildColumns(
+        AccountExportGridKind.activitySummary,
+        defaultColumns,
       ),
+      <GeniusPdfGridRow>[
+        for (final row in defaultRows)
+          customization.buildRow(
+            AccountExportGridKind.activitySummary,
+            summaries,
+            row,
+          ),
+      ],
       spacing: 12,
+      style: customization.gridStyle,
     );
   }
 
@@ -626,6 +652,7 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
       _portraitTransactionColumns(configuration.amountColors),
       rows,
       spacing: 16,
+      style: customization.gridStyle,
     );
   }
 
@@ -646,8 +673,9 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
 
     return transactions
         .map(
-          (transaction) => GeniusPdfGridRow(
-            cells: <String, dynamic>{
+          (transaction) {
+            final defaultRow = GeniusPdfGridRow(
+              cells: <String, dynamic>{
               'number': transaction.transactionNumber,
               'date': transaction.date,
               'type': transaction.displayType(isRtl: config.isRTL),
@@ -657,8 +685,14 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
               'debit': transaction.debit == 0 ? null : transaction.debit,
               'credit': transaction.credit == 0 ? null : transaction.credit,
               'balance': transaction.balanceAfterTransaction,
-            },
-          ),
+              },
+            );
+            return customization.buildRow(
+              AccountExportGridKind.transactions,
+              transaction,
+              defaultRow,
+            );
+          },
         )
         .toList(growable: false);
   }
@@ -666,7 +700,7 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
   List<GeniusPdfGridColumn> _portraitTransactionColumns(
     AccountExportAmountColors colors,
   ) {
-    return <GeniusPdfGridColumn>[
+    final defaultColumns = <GeniusPdfGridColumn>[
       const GeniusPdfGridColumn(
         id: 'number',
         title: 'Transaction No.',
@@ -711,6 +745,10 @@ class SingleAccountPdf extends GeniusErpStatementDocument {
         currencySymbol: '',
       ),
     ];
+    return customization.buildColumns(
+      AccountExportGridKind.transactions,
+      defaultColumns,
+    );
   }
 
   void _drawFooterSection() {

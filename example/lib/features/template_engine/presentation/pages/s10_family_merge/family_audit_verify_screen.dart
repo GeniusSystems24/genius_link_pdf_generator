@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/template_engine/models/documents/s10_family_merge_verification_documents.dart';
+import 'package:genius_pdf_example/features/template_engine/models/documents/template_engine_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -26,7 +26,11 @@ class S10FamilyAuditVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s10TemplateFamilyAuditVerify,
       apiName: 'buildS10FamilyAuditVerificationPdf',
       icon: Icons.hub_outlined,
-      generator: buildS10FamilyAuditVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) => generateTemplateEngineVerificationInBackground(
+        apiName: 'buildS10FamilyAuditVerificationPdf',
+        isRtl: isRtl,
+      ),
+      showGenerationToast: true,
       usageCode: dartUsageCode,
       fileName: 's10_family_merge_family_audit.pdf',
     );

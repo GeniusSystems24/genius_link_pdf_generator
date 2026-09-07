@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/template_engine/models/documents/s22_engine_vnext_verification_documents.dart';
+import 'package:genius_pdf_example/features/template_engine/models/documents/template_engine_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -36,10 +36,12 @@ class _S22InvalidExpressionVerificationExampleScreenState extends State<S22Inval
       description: pdfLocalization.s22InvalidExpressionRejectionVerify,
       apiName: 'buildS22InvalidExpressionVerificationPdf',
       icon: Icons.account_tree_outlined,
-      generator: (config) => buildS22InvalidExpressionVerificationPdf(
-        config,
+      backgroundGenerator: ({required bool isRtl}) => generateTemplateEngineVerificationInBackground(
+        apiName: 'buildS22InvalidExpressionVerificationPdf',
+        isRtl: isRtl,
         rowCount: _rowCount,
       ),
+      showGenerationToast: true,
       usageCode: dartUsageCode,
       fileName: 's22_engine_vnext_invalid_expression.pdf',
       configurationVersion: _rowCount,

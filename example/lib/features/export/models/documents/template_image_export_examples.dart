@@ -11,6 +11,7 @@ import 'package:genius_pdf_example/features/business_templates/models/documents/
 import 'package:genius_pdf_example/features/business_templates/models/documents/hr_templates.dart';
 import 'package:genius_pdf_example/features/business_templates/models/documents/sales_templates.dart';
 import 'package:genius_pdf_example/shared/presentation/controllers/demo_document_controller.dart';
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
 
 import 'package:genius_pdf_example/features/templates/models/documents/templates_demo_documents.dart';
 /// Result of exporting every page of one template to raster images.
@@ -30,6 +31,21 @@ final class TemplateImageExportResult {
   int get pageCount => pages.length;
 }
 
+Future<Uint8List> _generateManagedImageSourcePdf({
+  required GeniusPdfDocumentBuilder builder,
+  required String fileName,
+}) async {
+  final success = await generateExamplePdf(
+    builder: builder,
+    fileName: '${fileName}_image_source',
+    metadata: <String, dynamic>{
+      'workflow': 'template-image-export',
+      'template': fileName,
+    },
+  );
+  return success.bytes;
+}
+
 /// Builds the Balance Sheet template and exports every PDF page as an image.
 Future<TemplateImageExportResult> exportBalanceSheetTemplateAsImages({
   required bool isRtl,
@@ -45,7 +61,10 @@ Future<TemplateImageExportResult> exportBalanceSheetTemplateAsImages({
   final demo = buildBalanceSheetDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -83,7 +102,6 @@ Future<TemplateImageExportResult> exportBalanceSheetTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -102,7 +120,10 @@ Future<TemplateImageExportResult> exportIncomeStatementTemplateAsImages({
   final demo = buildIncomeStatementDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -140,7 +161,6 @@ Future<TemplateImageExportResult> exportIncomeStatementTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -159,7 +179,10 @@ Future<TemplateImageExportResult> exportCashFlowTemplateAsImages({
   final demo = buildCashFlowDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -197,7 +220,6 @@ Future<TemplateImageExportResult> exportCashFlowTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -216,7 +238,10 @@ Future<TemplateImageExportResult> exportBudgetReportTemplateAsImages({
   final demo = buildBudgetReportDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -254,7 +279,6 @@ Future<TemplateImageExportResult> exportBudgetReportTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -273,7 +297,10 @@ Future<TemplateImageExportResult> exportQuotationTemplateAsImages({
   final demo = buildQuotationDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -311,7 +338,6 @@ Future<TemplateImageExportResult> exportQuotationTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -330,7 +356,10 @@ Future<TemplateImageExportResult> exportPurchaseOrderTemplateAsImages({
   final demo = buildPurchaseOrderDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -368,7 +397,6 @@ Future<TemplateImageExportResult> exportPurchaseOrderTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -387,7 +415,10 @@ Future<TemplateImageExportResult> exportDeliveryNoteTemplateAsImages({
   final demo = buildDeliveryNoteDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -425,7 +456,6 @@ Future<TemplateImageExportResult> exportDeliveryNoteTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -444,7 +474,10 @@ Future<TemplateImageExportResult> exportCreditNoteTemplateAsImages({
   final demo = buildCreditNoteDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -482,7 +515,6 @@ Future<TemplateImageExportResult> exportCreditNoteTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -501,7 +533,10 @@ Future<TemplateImageExportResult> exportPayslipTemplateAsImages({
   final demo = buildPayslipDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -539,7 +574,6 @@ Future<TemplateImageExportResult> exportPayslipTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -558,7 +592,10 @@ Future<TemplateImageExportResult> exportEmployeeReportTemplateAsImages({
   final demo = buildEmployeeReportDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -596,7 +633,6 @@ Future<TemplateImageExportResult> exportEmployeeReportTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -615,7 +651,10 @@ Future<TemplateImageExportResult> exportAttendanceReportTemplateAsImages({
   final demo = buildAttendanceReportDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -653,7 +692,6 @@ Future<TemplateImageExportResult> exportAttendanceReportTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 
@@ -672,7 +710,10 @@ Future<TemplateImageExportResult> exportLeaveReportTemplateAsImages({
   final demo = buildLeaveReportDemo(isRtl: isRtl);
   PdfDocument? document;
   try {
-    final pdfBytes = Uint8List.fromList(demo.builder.generate());
+    final pdfBytes = await _generateManagedImageSourcePdf(
+      builder: demo.builder,
+      fileName: demo.fileName,
+    );
     document = PdfDocument(inputBytes: pdfBytes);
 
     final results = await document.exportToImages(
@@ -710,7 +751,6 @@ Future<TemplateImageExportResult> exportLeaveReportTemplateAsImages({
     );
   } finally {
     document?.dispose();
-    demo.builder.dispose();
   }
 }
 

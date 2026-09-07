@@ -1,8 +1,10 @@
-import 'dart:ui';
+// Global manager/background migration for Sharing sample PDF
 
 import 'package:flutter/foundation.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart';
 
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
+import 'package:genius_pdf_example/features/sharing/models/documents/sharing_background_generation.dart';
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
 final class SharingDemoController extends ChangeNotifier {
   SharingDemoController({
@@ -51,72 +53,23 @@ final class SharingDemoController extends ChangeNotifier {
   Future<void> generateSamplePdf() async {
     _setLoading(true, 'Generating sample PDF...');
     try {
-      final document = PdfDocument();
-      final page = document.pages.add();
-      final graphics = page.graphics;
-      final font = PdfTrueTypeFont(_config.baseFontBytes, 12);
-      final titleFont = PdfTrueTypeFont(
-        _config.baseFontBytes,
-        18,
-        style: PdfFontStyle.bold,
+      final result = await generateExamplePdf(
+        builder: ExampleBackgroundPdfBuilder(
+          config: _config,
+          backgroundGenerator: () => generateSharingSamplePdfInBackground(
+            config: _config,
+          ),
+        ),
+        fileName: 'share_demo',
+        metadata: <String, dynamic>{
+          'feature': 'sharing',
+          'screen': 'SharingDemoController',
+          'workflow': 'sharing-sample-document',
+          'showGenerationToast': true,
+        },
       );
 
-      graphics.drawString(
-        'Genius Link PDF Generator',
-        titleFont,
-        brush: PdfSolidBrush(PdfColor(0, 51, 102)),
-        bounds: const Rect.fromLTWH(50, 50, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      graphics.drawString(
-        'Sharing Demo Document (v2.3.x)',
-        font,
-        brush: PdfSolidBrush(PdfColor(100, 100, 100)),
-        bounds: const Rect.fromLTWH(50, 90, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      graphics.drawLine(
-        PdfPen(PdfColor(0, 51, 102), width: 2),
-        const Offset(50, 130),
-        const Offset(550, 130),
-      );
-      graphics.drawString(
-        'Generated: ${DateTime.now().toString().split('.').first}',
-        font,
-        brush: PdfSolidBrush(PdfColor(100, 100, 100)),
-        bounds: const Rect.fromLTWH(50, 150, 500, 30),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-      graphics.drawString(
-        'This document demonstrates the sharing capabilities '
-        'of the Genius Link PDF Generator library.',
-        font,
-        brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-        bounds: const Rect.fromLTWH(50, 200, 500, 100),
-        format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-      );
-
-      const features = [
-        '• Unified sharing service',
-        '• Email with attachments',
-        '• Bluetooth/Nearby Share',
-        '• WhatsApp & Telegram',
-        '• Local storage saving',
-      ];
-      var yPos = 320.0;
-      for (final feature in features) {
-        graphics.drawString(
-          feature,
-          font,
-          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-          bounds: Rect.fromLTWH(50, yPos, 500, 25),
-          format: PdfStringFormat(textDirection: _config.pdfTextDirection),
-        );
-        yPos += 30;
-      }
-
-      _samplePdfBytes = Uint8List.fromList(await document.save());
-      document.dispose();
+      _samplePdfBytes = result.bytes;
       _setLoading(
         false,
         'Sample PDF ready (${_samplePdfBytes!.length} bytes)',

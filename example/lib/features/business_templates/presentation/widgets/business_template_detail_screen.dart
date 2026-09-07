@@ -8,6 +8,8 @@ import 'package:genius_pdf_example/features/business_templates/models/documents/
 import 'package:genius_pdf_example/shared/presentation/widgets/code_viewer.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
+import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart';
+import 'package:genius_pdf_example/shared/application/services/example_pdf_generation.dart';
 /// Builds one of the business-template demo documents for the requested
 /// direction.
 typedef BusinessTemplateDemoBuilder = NewTemplatesDemoBuild Function({
@@ -51,6 +53,7 @@ class _BusinessTemplateDetailScreenState
   late bool _isRtl;
 
   Uint8List? _previewData;
+  String? _previewFilePath;
   Object? _executionError;
   bool _executing = false;
   bool _openingPdf = false;
@@ -69,6 +72,7 @@ class _BusinessTemplateDetailScreenState
       // The previous preview belongs to a different execution/configuration.
       // Invalidate it and wait for an explicit Run example action.
       _previewData = null;
+      _previewFilePath = null;
       _executionError = null;
     });
   }
@@ -81,27 +85,35 @@ class _BusinessTemplateDetailScreenState
       _executionError = null;
     });
 
-    NewTemplatesDemoBuild? demo;
     try {
-      demo = widget.buildTemplate(isRtl: _isRtl);
-      final bytes = await Future<Uint8List>(() {
-        return Uint8List.fromList(demo!.builder.generate());
-      });
+      final demo = widget.buildTemplate(isRtl: _isRtl);
+      final success = await generateExamplePdf(
+        builder: demo.builder,
+        fileName: demo.fileName,
+        metadata: <String, dynamic>{
+          'feature': 'business_templates',
+          'screen': widget.title,
+          'category': widget.category,
+          'workflow': 'business-template-preview',
+          'showGenerationToast': true,
+        },
+      );
 
       if (!mounted) return;
       setState(() {
-        _previewData = bytes;
+        _previewData = success.bytes;
+        _previewFilePath = success.filePath;
         _executionError = null;
       });
     } catch (error) {
       if (!mounted) return;
       setState(() {
         _previewData = null;
+        _previewFilePath = null;
         _executionError = error;
       });
       _showMessage('Unable to generate PDF preview: $error', error: true);
     } finally {
-      demo?.builder.dispose();
       if (mounted) {
         setState(() => _executing = false);
       }
@@ -114,28 +126,24 @@ class _BusinessTemplateDetailScreenState
 
     setState(() => _openingPdf = true);
 
-    NewTemplatesDemoBuild? demo;
     try {
-      demo = widget.buildTemplate(isRtl: _isRtl);
-      final result = await const GeniusPdfService().generateAndOpen(
-        builder: demo.builder,
-        fileName: demo.fileName,
-      );
-
-      if (!mounted) return;
-      result.when(
-        onSuccess: (_) => _showMessage('PDF generated and opened successfully.'),
-        onFailure: (failure) => _showMessage(
-          failure.message,
-          error: true,
-        ),
-      );
+      final filePath = _previewFilePath;
+      if (filePath != null && filePath.isNotEmpty) {
+        await demoDocuments.open(filePath);
+      } else {
+        await demoDocuments.saveAndOpen(
+          bytes: _previewData!,
+          fileName: '${widget.title}.pdf',
+        );
+      }
+      if (mounted) {
+        _showMessage('PDF opened successfully.');
+      }
     } catch (error) {
       if (mounted) {
         _showMessage('Unable to open PDF: $error', error: true);
       }
     } finally {
-      demo?.builder.dispose();
       if (mounted) setState(() => _openingPdf = false);
     }
   }

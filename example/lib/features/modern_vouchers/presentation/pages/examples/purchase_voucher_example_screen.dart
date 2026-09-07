@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:genius_pdf_example/app/dependencies/example_dependencies.dart' show geniusPdfConfig;
+import 'package:genius_pdf_example/features/modern_vouchers/models/documents/modern_vouchers_background_generation.dart';
 import 'package:genius_pdf_example/features/modern_vouchers/models/documents/modern_vouchers_demo_documents.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
@@ -37,7 +39,13 @@ Future<Uint8List> generateModernPurchaseVoucherPdf(GeniusPdfConfig config) async
       description: pdfLocalization.officialPurchaseVoucherOrderDesc,
       apiName: 'generateModernPurchaseVoucherPdf',
       icon: Icons.inventory_2_outlined,
-      generator: generateModernPurchaseVoucherPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+          generateModernVoucherInBackground(
+            apiName: 'generateModernPurchaseVoucherPdf',
+            isRtl: isRtl,
+            rootConfig: geniusPdfConfig,
+          ),
+      showGenerationToast: true,
       usageCode: dartUsageCode,
       fileName: 'modern_purchase_demo.pdf',
       initialRtl: true,

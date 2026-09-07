@@ -1,18 +1,14 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:genius_link_pdf_generator/genius_link_pdf_generator.dart'
     show SingleAccountPdf;
 
-import 'package:genius_pdf_example/features/templates/models/documents/account_export_demo_documents.dart';
-import 'package:genius_pdf_example/features/templates/models/documents/template_example_build.dart';
+import 'package:genius_pdf_example/features/templates/models/documents/export_template_background_generators.dart';
 import 'package:genius_pdf_example/features/templates/presentation/widgets/template_example_detail_screen.dart';
 
-TemplateExampleBuild _buildSingleAccountPdf({required bool isRtl}) =>
-    TemplateExampleBuild(
-      builder: buildSingleAccountPdfDemo(
-        isRtl: isRtl,
-      ),
-      fileName: 'single_account_pdf_demo',
-    );
+Future<Uint8List> _generateSingleAccountPdfInBackground({required bool isRtl}) {
+  return generateSingleAccountPdfInBackground(isRtl: isRtl);
+}
 
 /// Demonstrates [SingleAccountPdf] in portrait with long per-currency activity.
 class SingleAccountPdfExampleScreen extends StatelessWidget {
@@ -32,7 +28,19 @@ final detailed = buildSingleAccountPdfDemo(
 final summary = buildSingleAccountPdfDemo(
   isRtl: false,
   activityMode: AccountExportActivityMode.summary,
-);''';
+);
+
+// The example app submits generation to its global GeniusPdfGenerationManager.
+final result = await generateExamplePdf(
+  builder: detailed,
+  fileName: 'single_account_pdf_demo',
+  metadata: const <String, dynamic>{
+    'feature': 'templates',
+    'template': 'SingleAccountPdf',
+    'workflow': 'usage-example',
+  },
+);
+final pdfBytes = result.bytes;''';
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +50,13 @@ final summary = buildSingleAccountPdfDemo(
       titleAr: 'PDF لحساب واحد',
       description: 'Portrait bilingual account export with three-column minimal account details, a balance summary plus Grid-based account activity per currency, independent currency sections, 120+ detailed rows per currency in the demo, TrialBalance-style QR and notes, and a per-page user/page footer.',
       icon: Icons.account_balance_wallet_outlined,
-      buildTemplate: _buildSingleAccountPdf,
+      backgroundGenerator: _generateSingleAccountPdfInBackground,
+      backgroundFileName: 'single_account_pdf_demo.pdf',
+      jobMetadata: <String, dynamic>{
+        'feature': 'templates',
+        'template': 'SingleAccountPdf',
+      },
+      showGenerationToast: true,
       usageCode: dartUsageCode,
     );
   }

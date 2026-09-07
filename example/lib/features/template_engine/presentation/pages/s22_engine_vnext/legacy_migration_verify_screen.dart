@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/template_engine/models/documents/s22_engine_vnext_verification_documents.dart';
+import 'package:genius_pdf_example/features/template_engine/models/documents/template_engine_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -36,10 +36,12 @@ class _S22LegacyMigrationVerificationExampleScreenState extends State<S22LegacyM
       description: pdfLocalization.s22LegacyV1V2MigrationVerify,
       apiName: 'buildS22LegacyMigrationVerificationPdf',
       icon: Icons.account_tree_outlined,
-      generator: (config) => buildS22LegacyMigrationVerificationPdf(
-        config,
+      backgroundGenerator: ({required bool isRtl}) => generateTemplateEngineVerificationInBackground(
+        apiName: 'buildS22LegacyMigrationVerificationPdf',
+        isRtl: isRtl,
         rowCount: _rowCount,
       ),
+      showGenerationToast: true,
       usageCode: dartUsageCode,
       fileName: 's22_engine_vnext_legacy_migration.pdf',
       configurationVersion: _rowCount,

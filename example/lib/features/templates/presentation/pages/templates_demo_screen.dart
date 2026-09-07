@@ -8,6 +8,8 @@ import 'package:genius_pdf_example/features/templates/presentation/pages/templat
 /// Legacy compatibility wrapper for the former tabbed Templates Demo screen.
 ///
 /// Report templates are now exposed as individual navigation destinations.
+/// Each destination delegates generation to `TemplateExampleDetailScreen`,
+/// which submits the job to the app-wide `GeniusPdfGenerationManager`.
 /// This class remains only so old source links and route aliases continue to
 /// compile. It does not render a catalog, multiple examples, [TabBar], or
 /// [TabBarView].

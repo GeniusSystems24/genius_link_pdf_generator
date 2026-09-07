@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:genius_pdf_example/features/architecture/models/documents/s06_erp_calc_verification_documents.dart';
+import 'package:genius_pdf_example/features/architecture/models/documents/architecture_verification_background_generation.dart';
 import 'package:genius_pdf_example/shared/presentation/widgets/verification_example_detail_screen.dart';
 
 import 'package:genius_pdf_example/localizations/pdf_generator_localization.dart';
@@ -16,8 +16,17 @@ class S06MultiTaxVerificationExampleScreen extends StatelessWidget {
       description: pdfLocalization.s06MultiTaxCompoundVerify,
       apiName: 'buildS06MultiTaxVerificationPdf',
       icon: Icons.calculate_outlined,
-      generator: buildS06MultiTaxVerificationPdf,
+      backgroundGenerator: ({required bool isRtl}) =>
+
+        generateArchitectureVerificationInBackground(
+
+          apiName: 'buildS06MultiTaxVerificationPdf',
+
+          isRtl: isRtl,
+
+        ),
       fileName: 's06_erp_calc_multi_tax.pdf',
+      showGenerationToast: true,
       usageCode: r'''Future<Uint8List> buildS06MultiTaxVerificationPdf(GeniusPdfConfig config) async {
   final direction = config.textDirection == TextDirection.rtl
       ? GeniusPdfDirection.rtl
